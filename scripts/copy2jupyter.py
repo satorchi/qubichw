@@ -11,5 +11,5 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 copy QUBIC data files to apcjupyter.in2p3.fr
 '''
-from qubicpack.copy_data import copy2jup
+from qubichk.copy_data import copy2jup
 copy2jup()

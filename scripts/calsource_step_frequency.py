@@ -15,7 +15,7 @@ from __future__ import division, print_function
 import time
 import datetime as dt
 
-from qubicpack.calibration_source import calibration_source
+from qubichw.calibration_source import calibration_source
 print('initializing calibration source')
 calsrc = calibration_source('LF')
 

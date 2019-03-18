@@ -11,5 +11,5 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 copy QUBIC data files to CC-IN2P3
 '''
-from qubicpack.copy_data import copy2cc
+from qubichk.copy_data import copy2cc
 copy2cc()

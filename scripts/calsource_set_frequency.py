@@ -14,12 +14,8 @@ simple script to set the frequency of the calibration source
 from __future__ import division, print_function
 import sys
 
-# import matplotlib even though we don't need it, and ensure that we don't make calls to Xserver
-import matplotlib
-matplotlib.use('Agg')
-
 # import the calibration_source class
-from qubicpack.calibration_source import calibration_source
+from qubichw.calibration_source import calibration_source
 
 
 # parse command line arguments

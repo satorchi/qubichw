@@ -12,10 +12,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 run the server for sending QUBIC housekeeping data over socket
 '''
 import os
-import matplotlib
-matplotlib.use('Agg')
 
-from qubicpack.hk.hk_broadcast import hk_broadcast
+from qubichk.hk_broadcast import hk_broadcast
 
 if 'HOME' in os.environ.keys():
     homedir = os.environ['HOME']

@@ -16,7 +16,7 @@ import sys,os,subprocess,time,socket
 import numpy as np
 import datetime as dt
 
-from qubicpack.hk.entropy_hk import entropy_hk
+from qubichk.entropy_hk import entropy_hk
 
 
 hk=entropy_hk()

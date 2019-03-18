@@ -23,13 +23,13 @@ readline.parse_and_bind('set editing-mode vi')
 from PyMS import PMSDevice
 
 # the calibration source
-from qubicpack.calibration_source import calibration_source
+from qubichw.calibration_source import calibration_source
 
 # the signal generator for modulating the calibration source
-from qubicpack.modulator import modulator
+from qubichw.modulator import modulator
 
 # the Arduino Uno
-from qubicpack.arduino import arduino
+from qubichw.arduino import arduino
 
 from satorchipy.datefunctions import tot_seconds
 

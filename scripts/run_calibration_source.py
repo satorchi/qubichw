@@ -52,14 +52,10 @@ if duration_seconds is None:
     quit()
 
 
-# avoid X11 errors.  No plotting to screen.
-import matplotlib
-matplotlib.use('Agg')
-
-# qubicpack tools for commanding various hardware
-from qubicpack.modulator import modulator
-from qubicpack.arduino import arduino
-from qubicpack.calibration_source import calibration_source
+# qubichw tools for commanding various hardware
+from qubichw.modulator import modulator
+from qubichw.arduino import arduino
+from qubichw.calibration_source import calibration_source
 
 # this is for the Energenie smart powerbar to switch on/off the devices
 from PyMS import PMSDevice

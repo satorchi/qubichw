@@ -15,7 +15,7 @@ import os,sys
 import matplotlib
 matplotlib.use('Agg')
 
-from qubicpack.hk.qubic_bot import qubic_bot
+from qubichk.qubic_bot import qubic_bot
 
 TESTMODE=False
 for arg in sys.argv:

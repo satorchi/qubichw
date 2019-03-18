@@ -11,9 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 a command line interface to the HP33120A signal generator
 '''
-import matplotlib
-matplotlib.use('Agg')
-from qubicpack.modulator import modulator
+from qubichw.modulator import modulator
 
 hp = modulator()
 hp.command_loop()
