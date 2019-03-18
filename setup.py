@@ -33,7 +33,7 @@ with open('README.md') as f:
 setup(install_requires=['numpy'],
       name=DISTNAME,
       version=VERSION,
-      packages=[DISTNAME+'/qubichw', DISTNAME+'/qubichk'],
+      packages=['qubichw', 'qubichk'],
       package_data={DISTNAME: ['data/*']},
       zip_safe=False,
       author=AUTHOR,
