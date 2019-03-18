@@ -1,0 +1,66 @@
+#headings: name, category, data_type, cadence, controller, comment
+#T1, temperature, float, 5Hz, AVS47, 4K horns
+#T2, temperature, float, 5Hz, AVS47, CX30850 (1K)
+#T3, temperature, float, 5Hz, AVS47, RiRT (TES)
+#T4, temperature, float, 5Hz, AVS47, Mirror 1
+#T5, temperature, float, 5Hz, AVS47, fridge
+#T6, temperature, float, 5Hz, AVS47, fridge
+#T7, temperature, float, 5Hz, AVS47, fridge
+#T8, temperature, float, 5Hz, AVS47, Mirror 2
+T01, temperature, float, 5Hz, AVS47, PT1 s1
+T02, temperature, float, 5Hz, AVS47, PT2 s1
+T03, temperature, float, 5Hz, AVS47, PT1 s2
+T04, temperature, float, 5Hz, AVS47, PT2 s2
+T05, temperature, float, 5Hz, AVS47, 4K PT2 CH
+T06, temperature, float, 5Hz, AVS47, HWP1
+T07, temperature, float, 5Hz, AVS47, HWP2
+T08, temperature, float, 5Hz, AVS47, 40K filters
+T09, temperature, float, 5Hz, AVS47, 40K sd
+T10, temperature, float, 5Hz, AVS47, 40K sr
+T11, temperature, float, 5Hz, AVS47, 4K filters
+T12, temperature, float, 5Hz, AVS47, 4K sd
+T13, temperature, float, 5Hz, AVS47, 300mK-4CP-D-1
+T14, temperature, float, 5Hz, AVS47, 300mK-4HS-D-1
+T15, temperature, float, 5Hz, AVS47, 300mK-3CP-D-1
+T16, temperature, float, 5Hz, AVS47, 300mK-3HS-D-1
+T17, temperature, float, 5Hz, AVS47, 1K-4HS-D-1
+T18, temperature, float, 5Hz, AVS47, 1K-4CP-D-1
+MMR3_HKs, temperature, array of 36 double, 5Hz, MACRT, temperatures
+MGC3_HKs, voltage, array of 46 double, 5Hz, MACRT, heater levels
+MHS1, position, bool, 1Hz, RaspberryPi2,  Mechanical heat switch #1 Open/Closed
+MHS2, position, bool, 1Hz, RaspberryPi2,  Mechanical heat switch #2 Open/Closed
+CalibSrc_lfFrequency, frequency, float, 1Hz, RaspberryPi1, 150GHz Calibration Source frequency
+CalibSrc_lfLevel, voltage, float, 1Hz, RaspberryPi1, 150GHz Calibration Source level
+CalibSrc_lfStatus, status, bool, 1Hz, RaspberryPi1, 150GHz Calibration Source On/Off
+CalibSrc_hfFrequency, frequency, float, 1Hz, RaspberryPi1, 220GHz Calibration Source frequency
+CalibSrc_hfLevel, voltage, float, 1Hz, RaspberryPi1, 220GHz Calibration Source level
+CalibSrc_hfStatus, status, bool, 1Hz, RaspberryPi1, 220GHz Calibration Source On/Off
+CalibSrc_Modulation, frequency, float, 1Hz, RaspberryPi1, Calibration source modulation frequency
+CalibSrc_Amplitude, voltage, array of N float, 1Hz, RaspberryPi1, Calibration source modulation amplitude
+CalibSrc_Offset, voltage, float, 1Hz, RaspberryPi1, Calibration source amplitude offset
+CFibers_Amplitudes, voltage, array of 4 16-bit unsigned int, 1Hz, QubicStudio, Carbon Fibre amplitude
+CFibers_Offsets, voltage, array of 4 16-bit unsigned int, 1Hz, QubicStudio, Carbon Fibre offset
+CFibers_Durations, time delta, array of 4 16-bit unsigned int, 1Hz, QubicStudio, Carbon Fibre duration
+CFibers_BrochesFlag, status, array of 3 8-bit unsigned int, 1Hz, QubicStudio, Carbon Fibre (unused)
+CFibers_A0, data, 16-bit unsigned int, 1Hz, QubicStudio, Carbon Fibre (unused)
+CFibers_RealtimeClock, time delta, 32-bit unsigned int, 1Hz, QubicStudio, Carbon Fibre milliseconds since power up
+CFibers_P, time, float, 1Hz, QubicStudio, Carbon Fibre period of pulses
+PT1, status, bool, 1Hz, PT, Pulse Tube 1 On/Off
+PT2, status, bool, 1Hz, PT, Pulse Tube 2 On/Off
+HWP_velocity, velocity, 8-bit unsigned int, 1Hz, QubicStudio, Half Wave Plate rotation speed
+HWP_direction, direction, 8-bit unsigned int, 1Hz, QubicStudio, Half Wave Plate rotation direction
+HWP_position, position, 8-bit unsigned int, 1Hz, QubicStudio, Half Wave Plate position angle
+Platform_AcqCount, data, 16-bit unsigned int, 1Hz, Platform, Platform data acquistion count
+Platform_PPS, data, 8-bit unsigned int, 1Hz, Platform, Platform Pulse Per Second count
+Platform_Azimut, position, 16-bit unsigned int, 1Hz, Platform, Platform pointing azimuth angle
+Platform_Elevation, position, 16-bit unsigned int, 1Hz, Platform, Platform pointing elevation angle
+Platform_DeltaTime, time, 16-bit unsigned int, 1Hz, Platform, Platform milliseconds since last pulse
+Platform_Status, status, 8-bit unsigned int, 1Hz, Platform, Platform status
+P1, pressure, float, 1Hz, Cryo, pressure at LOCATION
+P2, pressure, float, 1Hz, Cryo, pressure at LOCATION
+P3, pressure, float, 1Hz, Cryo, pressure at LOCATION
+P4, pressure, float, 1Hz, Cryo, pressure at LOCATION
+T_amb, temperature, float, 1Hz, Weather Station, ambient temperature
+P_amb, pressure, float, 1Hz, Weather Station, ambient pressure
+H_amb, humidity, float, 1Hz, Weather Station, ambient humidity
+HORN, status, 50-byte binary, 1Hz, Horns, Horn status Open/Closed (binary bitmap 50b)

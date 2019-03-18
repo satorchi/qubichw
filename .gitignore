@@ -1,0 +1,6 @@
+/build
+build.log
+error.log
+/dist
+*.pyc
+*~
