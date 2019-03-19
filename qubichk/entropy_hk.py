@@ -106,8 +106,13 @@ class entropy_hk :
         '''
         self.debugmsg('entropy command: %s' % cmd.strip())
         if not self.connected:
-            self.log('ERROR! Major Tom is not connected.')
+            self.log('ERROR! Can you hear me Major Tom?  Trying to reconnect...')
+            self.init_socket()
+
+        if not self.connected:
+            self.log("ERROR! Major Tom, there's something wrong.")
             return None
+            
                      
         self.socket.send(cmd)
         try:
