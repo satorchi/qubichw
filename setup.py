@@ -13,7 +13,7 @@ setup.py for qubichw
 '''
 from __future__ import division, print_function
 import os,sys,subprocess
-from numpy.distutils.core import setup
+from setuptools import setup
 
 DISTNAME         = 'qubichw'
 DESCRIPTION      = 'Utilities for QUBIC hardware control and monitoring'
@@ -33,8 +33,8 @@ with open('README.md') as f:
 setup(install_requires=['numpy'],
       name=DISTNAME,
       version=VERSION,
-      packages=['qubichw', 'qubichk'],
-      package_data={DISTNAME: ['data/*']},
+      packages=['qubichw','qubichk'],
+      package_data={'qubichw': ['data/*'], 'qubichk': ['data/*']},
       zip_safe=False,
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
@@ -59,6 +59,7 @@ exec_dir = '/usr/local/bin'
 scripts = ['scripts/calsource_commander.py',
            'scripts/calsource_set_frequency.py',
            'scripts/calsource_step_frequency.py',
+           'scripts/run_calibration_source.py',
            'qubichk/powersupply.py',
            'scripts/make_hk_fits.py',
            'scripts/modulator_commander.py',
