@@ -243,8 +243,16 @@ class calsource_configuration_manager():
         now = dt.datetime.utcnow()
         self.log('client listening on %s' % self.receiver)
 
-        cmdstr, addr = client.recvfrom(self.nbytes)
-        cmdstr_clean = ' '.join(cmdstr.strip().split())
+        try:
+            cmdstr, addr = client.recvfrom(self.nbytes)
+            cmdstr_clean = ' '.join(cmdstr.strip().split())
+        except socket.error:
+            addr = 'NONE'
+            cmdstr_clean = 'SOCKET ERROR'
+        except:
+            addr = 'NONE'
+            cmdstr_clean = 'UNKNOWN ERROR'
+            
         received_date = dt.datetime.utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
         
