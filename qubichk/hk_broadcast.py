@@ -156,7 +156,8 @@ class hk_broadcast :
             self.hk_entropy = entropy_hk()
 
         if not self.hk_entropy.connected:
-            self.log('ERROR! Major Tom is not responding.')
+            self.log('ERROR! Major Tom is not responding.  Trying to re-initialize...')
+            self.hk_entropy.reinit()
             return None
 
         # temperatures from the two AVS47 controllers
