@@ -41,6 +41,17 @@ class entropy_hk :
         self.assign_labels()
         return None
 
+    def reinit(self):
+        '''
+        re-initialize if communication was broken
+        '''
+        self.connected = False
+        self.init_socket()
+        if self.connected:
+            self.get_device_list()
+            self.get_startTime()
+        return None
+
     def log(self,msg):
         '''messages to log file and to screen
         '''
@@ -107,7 +118,7 @@ class entropy_hk :
         self.debugmsg('entropy command: %s' % cmd.strip())
         if not self.connected:
             self.log('ERROR! Can you hear me Major Tom?  Trying to reconnect...')
-            self.init_socket()
+            self.reinit()
 
         if not self.connected:
             self.log("ERROR! Major Tom, there's something wrong.")
