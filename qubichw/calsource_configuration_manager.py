@@ -547,10 +547,13 @@ class calsource_configuration_manager():
         '''
         send an acknowledgement to the commander
         '''
-        s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(0.2)
-        s.bind((self.hostname,self.broadcast_port))
+        try:
+            s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            s.settimeout(0.2)
+            s.bind((self.hostname,self.broadcast_port))
+        except:
+            self.log('Error!  Could not bind to socket: (%s,%i)' % (self.hostname,self.broadcast_port))
 
         now=dt.datetime.utcnow()
         now_str = now.strftime('%s.%f')
@@ -558,8 +561,12 @@ class calsource_configuration_manager():
         len_remain = self.nbytes - len_nowstr - 3
         fmt = '%%%is | %%%is' % (len_nowstr,len_remain)
         msg = fmt % (now_str,ack)
-        print('sending acknowledgement: %s' % msg)
-        s.sendto(msg, (addr, self.broadcast_port))
+        self.log('sending acknowledgement: %s' % msg)
+        try:
+            s.sendto(msg, (addr, self.broadcast_port))
+        except:
+            self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
+            
         s.close()
         return
     
