@@ -240,24 +240,26 @@ class calsource_configuration_manager():
         client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         client.bind((self.receiver, self.broadcast_port))
 
-        now = dt.datetime.utcnow()
         self.log('client listening on %s' % self.receiver)
 
+        now = dt.datetime.utcnow()        
         try:
-            cmdstr, addr = client.recvfrom(self.nbytes)
+            cmdstr, addr_tple = client.recvfrom(self.nbytes)
+            addr = addr_tple[0]
             cmdstr_clean = ' '.join(cmdstr.strip().split())
         except socket.error:
             addr = 'NONE'
-            cmdstr_clean = 'SOCKET ERROR'
+            cmdstr_clean = '%s SOCKET ERROR' % now.strftime('%s.%f')
+
         except:
             addr = 'NONE'
-            cmdstr_clean = 'UNKNOWN ERROR'
+            cmdstr_clean = '%s UNKNOWN ERROR' %  now.strftime('%s.%f')
             
+        
         received_date = dt.datetime.utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
-        
         self.log('received a command from %s at %s: %s' % (addr,received_date.strftime(self.date_fmt),cmdstr_clean))
-        return received_tstamp, cmdstr_clean, addr[0]
+        return received_tstamp, cmdstr_clean, addr
 
     def listen_for_acknowledgement(self,timeout=None):
         '''
