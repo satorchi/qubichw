@@ -25,17 +25,21 @@ class arduino:
     class for running the Arduino Uno
     '''
 
-    def __init__(self):
+    def __init__(self,port=None):
         self.s = None
-        self.port = None
+        self.port = port
         self.interrupt_flag_file = '/tmp/__ARDUINO_STOP__'
         self.clear_interrupt_flag()
+        self.init()
         return None
 
-    def init(self,port='/dev/arduino'):
+    def init(self,port=None):
         '''
         initialize the arduino device
         '''
+        if port is None: port = self.port
+        if port is None: port = '/dev/arduino'
+        
         self.connected = False
         try:
             self.s = serial.Serial(port, 9600,timeout=0.5)
@@ -46,6 +50,10 @@ class arduino:
             return False
 
         self.connected = True
+        if not self.verify_acquisition():
+            self.connected = False
+            return False
+
         return True
 
     def is_connected(self):
@@ -56,16 +64,49 @@ class arduino:
             return False
 
         if self.s is None:
+            self.connected = False
             return False
 
         if self.port is None:
+            self.connected = False
             return False
 
         if not os.path.exists(self.port):
+            self.connected = False
+            return False
+
+        if not self.verify_acquisition():
+            self.connected = False
             return False
 
         return True
 
+
+    def verify_acquisition(self):
+        '''
+        do a test acquisition and verify the result
+        '''
+        if self.s is None: return False
+        x = self.s.readline()
+        # first reading is often empty
+        x = self.s.readline()
+
+        val_str = x.strip().replace('\r','')
+        if len(val_str)==0:
+            print('ERROR! Empty response from Arduino.')
+            return False
+        
+        try:
+            val = eval(val_str)
+        except:
+            print('ERROR! Non number returned from Arduino: %s' % val_str)
+            return False
+
+        if not isinstance(val,int):
+            print('ERROR! Invalid data type returned from Arduino: %s' % type(val))
+            return False
+        
+        return True
     
     def acquire(self,duration=None,save=True):
         '''
@@ -73,7 +114,6 @@ class arduino:
 
         duration is given in seconds
         '''
-        print('##### arduino_acquire #####')
         if not self.connected: self.init()
         if not self.connected: return None,None
         self.clear_interrupt_flag()
@@ -83,6 +123,7 @@ class arduino:
         else:
             dt_duration=dt.timedelta(seconds=duration)
         
+        print('##### arduino_acquire #####')
         y=[]
         t=[]
         start_time=dt.datetime.utcnow()
