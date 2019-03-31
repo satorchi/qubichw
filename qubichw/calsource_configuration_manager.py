@@ -133,7 +133,6 @@ class calsource_configuration_manager():
             self.device['modulator'] = modulator()
             self.device['calsource'] = calibration_source('LF')
             self.device['arduino']   = arduino()
-            self.device['arduino'].init()
 
         # try to get hostname from the ethernet device
         cmd = '/sbin/ifconfig -a'
