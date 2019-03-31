@@ -27,6 +27,7 @@ class arduino:
 
     def __init__(self):
         self.s = None
+        self.port = None
         self.interrupt_flag_file = '/tmp/__ARDUINO_STOP__'
         self.clear_interrupt_flag()
         return None
@@ -37,9 +38,11 @@ class arduino:
         '''
         self.connected = False
         try:
-            self.s = serial.Serial('/dev/arduino', 9600,timeout=0.5)
+            self.s = serial.Serial(port, 9600,timeout=0.5)
+            self.port = port
         except:
             print('Could not connect to the Arduino Uno')
+            self.s = None
             return False
 
         self.connected = True
@@ -55,7 +58,10 @@ class arduino:
         if self.s is None:
             return False
 
-        if not os.path.exists('/dev/arduino'):
+        if self.port is None:
+            return False
+
+        if not os.path.exists(self.port):
             return False
 
         return True
@@ -78,7 +84,6 @@ class arduino:
             dt_duration=dt.timedelta(seconds=duration)
         
         y=[]
-        a=[]
         t=[]
         start_time=dt.datetime.utcnow()
         end_time=start_time+dt_duration
