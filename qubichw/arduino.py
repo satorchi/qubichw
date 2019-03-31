@@ -148,6 +148,10 @@ class arduino:
         '''
         write the result to file
         '''
+        if len(t)==0:
+            print('Arduino ERROR! No data.')
+            return None
+        
         startTime = t[0]
         outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.dat')
         h=open(outfile,'w')
