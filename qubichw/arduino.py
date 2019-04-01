@@ -161,6 +161,10 @@ class arduino:
         do a test acquisition and verify the result
         '''
         if self.s is None: return False
+
+        # flush the line
+        self.s.flush()
+        
         x = self.s.readline()
         # first reading is often empty
         x = self.s.readline()
@@ -198,6 +202,7 @@ class arduino:
             dt_duration=dt.timedelta(seconds=duration)
         
         self.log('##### arduino_acquire #####')
+        self.s.flush()
         y=[]
         t=[]
         start_time=dt.datetime.utcnow()
