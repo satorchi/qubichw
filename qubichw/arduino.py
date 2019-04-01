@@ -14,6 +14,7 @@ use the Arduino Uno as an ADC to monitor the signal generator
 '''
 from __future__ import division, print_function
 import serial,time,multiprocessing,os,pathlib
+from glob import glob
 import numpy as np
 from scipy.optimize import curve_fit
 import datetime as dt
@@ -28,9 +29,13 @@ class arduino:
     def __init__(self,port=None):
         self.s = None
         self.port = port
+        self.assign_logfile()
         self.assign_interrupt_flagfile()
         self.clear_interrupt_flag()
-        self.init()
+        if port is None:
+            self.find_arduino()
+        else:
+            self.init()
         return None
 
     def assign_logfile(self):
@@ -48,7 +53,7 @@ class arduino:
         now = dt.datetime.utcnow()
         try:
             h=open(logfile,'a')
-            h.write('%s | arduino assigning logfile' % now.strftime('%Y-%m-%d %H:%M:%S UT'))
+            h.write('%s | arduino assigning logfile\n' % now.strftime('%Y-%m-%d %H:%M:%S UT'))
             h.close()
             self.logfile = logfile
         except:
@@ -80,6 +85,26 @@ class arduino:
             homedir = '/tmp'
             
         self.interrupt_flag_file = '%s/__ARDUINO_STOP__' % homedir
+        return
+
+
+    def find_arduino(self):
+        '''
+        search for the Arduino Uno board
+        we use this if no Arduino has been specified 
+        '''
+        devs = glob('/dev/ttyACM*')
+        if len(devs)==0:
+            self.log('ERROR! No Arduino found!')
+            self.port = None
+            return None
+
+        # we take the first one found
+        devs.sort()
+        for dev in devs:
+            if self.init(dev): return
+
+            
         return
         
     def init(self,port=None):
