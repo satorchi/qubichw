@@ -28,11 +28,60 @@ class arduino:
     def __init__(self,port=None):
         self.s = None
         self.port = port
-        self.interrupt_flag_file = '/tmp/__ARDUINO_STOP__'
+        self.assign_interrupt_flagfile()
         self.clear_interrupt_flag()
         self.init()
         return None
 
+    def assign_logfile(self):
+        '''
+        assign a name for the log file
+        '''
+        if 'HOME' in os.environ.keys():
+            homedir = os.environ['HOME']
+        else:
+            homedir = '/tmp'
+        
+        logfile = homedir + os.sep + 'arduino.log'
+
+        # test we can write to log file
+        now = dt.datetime.utcnow()
+        try:
+            h=open(logfile,'a')
+            h.write('%s | arduino assigning logfile' % now.strftime('%Y-%m-%d %H:%M:%S UT'))
+            h.close()
+            self.logfile = logfile
+        except:
+            print('ERROR! Could not open Arduino log file.  Messages will be printed to screen only.')
+            self.logfile = None
+        
+        return
+
+    def log(self,msg):
+        '''
+        print a message to screen and to the log file
+        '''
+        now=dt.datetime.utcnow()
+        logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
+        if self.logfile is not None:
+            h=open(self.logfile,'a')
+            h.write(logmsg+'\n')
+            h.close()
+        print(logmsg)
+        return
+
+    def assign_interrupt_flagfile(self):
+        '''
+        assign an absolute path for the interrupt flag file
+        '''
+        if 'HOME' in os.environ.keys():
+            homedir = os.environ['HOME']
+        else:
+            homedir = '/tmp'
+            
+        self.interrupt_flag_file = '%s/__ARDUINO_STOP__' % homedir
+        return
+        
     def init(self,port=None):
         '''
         initialize the arduino device
@@ -45,7 +94,7 @@ class arduino:
             self.s = serial.Serial(port, 9600,timeout=0.5)
             self.port = port
         except:
-            print('Could not connect to the Arduino Uno')
+            self.log('Could not connect to the Arduino Uno')
             self.s = None
             return False
 
@@ -93,17 +142,17 @@ class arduino:
 
         val_str = x.strip().replace('\r','')
         if len(val_str)==0:
-            print('ERROR! Empty response from Arduino.')
+            self.log('ERROR! Empty response from Arduino.')
             return False
         
         try:
             val = eval(val_str)
         except:
-            print('ERROR! Non number returned from Arduino: %s' % val_str)
+            self.log('ERROR! Non number returned from Arduino: %s' % val_str)
             return False
 
         if not isinstance(val,int):
-            print('ERROR! Invalid data type returned from Arduino: %s' % type(val))
+            self.log('ERROR! Invalid data type returned from Arduino: %s' % type(val))
             return False
         
         return True
@@ -123,7 +172,7 @@ class arduino:
         else:
             dt_duration=dt.timedelta(seconds=duration)
         
-        print('##### arduino_acquire #####')
+        self.log('##### arduino_acquire #####')
         y=[]
         t=[]
         start_time=dt.datetime.utcnow()
@@ -139,10 +188,10 @@ class arduino:
             if save: return None
             return None,None
 
-        print('started data acquisition at %s' %  t[0].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
-        print('  ended data acquisition at %s' % t[-1].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
+        self.log('started data acquisition at %s' %  t[0].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
+        self.log('  ended data acquisition at %s' % t[-1].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
         delta=t[-1]-t[0]
-        print('total acquisition time: %.3f seconds' % tot_seconds(delta))
+        self.log('total acquisition time: %.3f seconds' % tot_seconds(delta))
 
         arduino_a = []
         arduino_t = []
@@ -174,7 +223,7 @@ class arduino:
         try:
             pathlib.Path(self.interrupt_flag_file).touch()
         except:
-            print('ERROR! Could not create interrupt flag file: %s' % self.interrupt_flag_file)
+            self.log('ERROR! Could not create interrupt flag file: %s' % self.interrupt_flag_file)
         return
 
     def clear_interrupt_flag(self):
@@ -182,11 +231,11 @@ class arduino:
         remove the interrupt flag file
         '''
         if os.path.isfile(self.interrupt_flag_file):
-            print('cleaning up interrupt flag file')
+            self.log('cleaning up interrupt flag file')
             try:
                 os.remove(self.interrupt_flag_file)
             except:
-                print('WARNING: Could not remove interrupt flag file: %s' % self.interrupt_flag_file)
+                self.log('WARNING: Could not remove interrupt flag file: %s' % self.interrupt_flag_file)
         return
 
 
@@ -195,7 +244,7 @@ class arduino:
         write the result to file
         '''
         if len(t)==0:
-            print('Arduino ERROR! No data.')
+            self.log('Arduino ERROR! No data.')
             return None
         
         startTime = t[0]
@@ -205,7 +254,7 @@ class arduino:
             tstamp = t[idx].strftime('%s.%f')
             h.write('%s %i\n' % (tstamp,val))
         h.close()
-        print('output file written: %s' % outfile)
+        self.log('output file written: %s' % outfile)
         return outfile
 
     
