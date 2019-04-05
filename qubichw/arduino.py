@@ -233,7 +233,7 @@ class arduino:
             client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             client.settimeout(1.0)
             client.bind(('', self.broadcast_port))
-            print('listening to Arduino on socket port %i' % self.broadcast_port)
+            self.log('listening to Arduino on socket port %i' % self.broadcast_port)
 
         y=[]
         t=[]
@@ -251,8 +251,8 @@ class arduino:
         else:
             counter = 0
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
-                print('acquisition loop: %i' % counter)
                 x, addr = client.recvfrom(8)
+                now=dt.datetime.utcnow()
                 y.append(x.strip())
                 t.append(dt.datetime.utcnow())
                 counter += 1
