@@ -17,7 +17,8 @@ import sys,os,time,subprocess
 from glob import glob
 
 cc_datadir  = '/sps/hep/qubic/Data/Calib-TD'
-qs_datadir  = '/qs/Qubic Studio/backup'
+#qs_datadir  = '/qs/Qubic Studio/backup'
+qs_datadir  = '/qs2' # Fri 05 Apr 2019 16:02:18 CEST
 cs_datadir  = '/calsource/qubic'
 jup_datadir = '/qubic/Data/Calib-TD'
 
