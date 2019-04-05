@@ -13,7 +13,7 @@ use the Arduino Uno as an ADC to monitor the signal generator
 
 '''
 from __future__ import division, print_function
-import serial,time,multiprocessing,os,pathlib
+import socket,serial,time,multiprocessing,os,pathlib
 from glob import glob
 import numpy as np
 from scipy.optimize import curve_fit
