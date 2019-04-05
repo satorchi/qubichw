@@ -26,16 +26,25 @@ class arduino:
     class for running the Arduino Uno
     '''
 
-    def __init__(self,port=None):
+    def __init__(self,connection='socket',port=None):
+        '''
+        initialize the arduino object.  We can connect by socket or by serial
+        '''
+        self.connection = connection.lower()
+        if self.connection<>'serial': self.connection='socket'
+
+        self.broadcast_port = 31337
         self.s = None
         self.port = port
         self.assign_logfile()
         self.assign_interrupt_flagfile()
         self.clear_interrupt_flag()
-        if port is None:
+
+        
+        if self.connection=='serial' and port is None:
             self.find_arduino()
         else:
-            self.init()
+            self.init(port)
         return None
 
     def assign_logfile(self):
@@ -106,10 +115,21 @@ class arduino:
 
             
         return
-        
+
     def init(self,port=None):
         '''
-        initialize the arduino device
+        initialize the arduino uno
+        '''
+        if self.connection=='serial':
+            return self.init_serial(port=port)
+
+        # nothing to do to initialize for socket connection (done in the acquire method)
+        self.connected = True
+        return True
+    
+    def init_serial(self,port=None):
+        '''
+        initialize the arduino device if it's a serial connection
         '''
         if port is None: port = self.port
         if port is None: port = '/dev/arduino'
@@ -137,6 +157,10 @@ class arduino:
         if not self.connected:
             return False
 
+        if self.connection=='socket':
+            self.connected = True
+            return True
+        
         if self.s is None:
             self.connected = False
             return False
@@ -202,17 +226,32 @@ class arduino:
             dt_duration=dt.timedelta(seconds=duration)
         
         self.log('##### arduino_acquire #####')
-        self.s.flush()
+        if self.connection=='serial':
+            self.s.flush()
+        else:            
+            client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+            client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            client.bind(('', self.broadcast_port))
+
         y=[]
         t=[]
         start_time=dt.datetime.utcnow()
         end_time=start_time+dt_duration
         now=dt.datetime.utcnow()
-        while now < end_time and not os.path.isfile(self.interrupt_flag_file):
-            x=self.s.readline()
-            now=dt.datetime.utcnow()
-            y.append(x)
-            t.append(dt.datetime.utcnow())
+
+        ## acquisition for serial connection.  Don't put the "if" inside the loop!
+        if self.connection=='serial':
+            while now < end_time and not os.path.isfile(self.interrupt_flag_file):
+                x=self.s.readline()
+                now=dt.datetime.utcnow()
+                y.append(x)
+                t.append(dt.datetime.utcnow())
+        else:
+            while now < end_time and not os.path.isfile(self.interrupt_flag_file):
+                x, addr = client.recvfrom(8)
+                y.append(x)
+                t.append(dt.datetime.utcnow())
+            
 
         if len(t)==0:
             if save: return None
@@ -225,7 +264,7 @@ class arduino:
 
         arduino_a = []
         arduino_t = []
-        # the first reading is always blank
+        # the first reading is always blank (?)
         for idx,val in enumerate(y):
             val_stripped=val.strip().replace('\r','')
             try:
