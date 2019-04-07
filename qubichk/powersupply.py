@@ -82,7 +82,7 @@ class PowerSupply :
         out,err=proc.communicate()
         serialno=out.split('==')[1].replace('"','').strip()
 
-        s=serial.Serial(port=self.port)
+        s=serial.Serial(port=self.port,timeout=2)
         s.write('*IDN?\n')
         a=s.readline()
         a_list=a.strip().split(',')
@@ -223,6 +223,7 @@ class PowerSupply :
         cmd=cmd % supplyno
 
         try:
+            self.s.flush() 
             response=self.s.write(cmd)
         except:
             self.log('ERROR! Could not write command to powersupply: %s, %s, id# %s' % (self.port,self.supplyname,self.serialno))
