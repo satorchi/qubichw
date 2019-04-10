@@ -18,6 +18,9 @@ from glob import glob
 import numpy as np
 from scipy.optimize import curve_fit
 import datetime as dt
+
+from astropy.io import fits
+
 from satorchipy.datefunctions import tot_seconds
 
 
@@ -273,9 +276,10 @@ class arduino:
         for idx,val in enumerate(y):
             val_stripped=val.strip().replace('\r','')
             try:
-                valno=eval(val_stripped)
+                valno = eval(val_stripped)
                 arduino_a.append(valno)
-                arduino_t.append(t[idx])
+                tstamp = eval(t[idx].strftime('%s.%f'))
+                arduino_t.append(tstamp)
             except:
                 pass
 
@@ -312,8 +316,13 @@ class arduino:
                 self.log('WARNING: Could not remove interrupt flag file: %s' % self.interrupt_flag_file)
         return
 
-
     def write_data(self,t,v):
+        '''
+        wrapper for write data to file (fits or txt)
+        '''
+        return self.write_data_fits(t,v)
+    
+    def write_data_txt(self,t,v):
         '''
         write the result to file
         '''
@@ -321,14 +330,50 @@ class arduino:
             self.log('Arduino ERROR! No data.')
             return None
         
-        startTime = t[0]
+        startTime = dt.datetime.fromtimestamp(t[0])
         outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.dat')
         h=open(outfile,'w')
         for idx,val in enumerate(v):
-            tstamp = t[idx].strftime('%s.%f')
-            h.write('%s %i\n' % (tstamp,val))
+            h.write('%.6f %i\n' % (t[idx],val))
         h.close()
         self.log('output file written: %s' % outfile)
+        return outfile
+
+    def write_data_fits(self,t,v):
+        '''
+        write data to FITS file
+        '''
+        if len(t)==0:
+            self.log('Arduino ERROR! No data.')
+            return None
+
+        npts = len(t)
+        startTime = dt.datetime.fromtimestamp(t[0])
+        outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.fits')
+
+        records=np.recarray(formats='>f4,>i2',names='timestamp,amplitude',shape=(npts))
+        records.timestamp = t
+        records.amplitude = v
+
+        # FITS primary header
+        prihdr=fits.Header()
+        prihdr['INSTRUME'] = 'QUBIC'
+        prihdr['EXTNAME']  = 'CALSOURCE'
+        prihdr['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S UT')
+        prihdu = fits.PrimaryHDU(header=prihdr)
+
+        cols  = fits.FITS_rec(records)
+
+        hdu1  = fits.BinTableHDU.from_columns(cols)
+        hdu1.header['INSTRUME'] = 'QUBIC'
+        hdu1.header['EXTNAME'] = 'CALSOURCE'
+        hdu1.header['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S UT')
+        
+        hdulist = [prihdu,hdu1]
+        thdulist = fits.HDUList(hdulist)
+        thdulist.writeto(outfile,overwrite=True)
+        thdulist.close()
+        
         return outfile
 
     
