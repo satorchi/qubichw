@@ -73,8 +73,10 @@ def files_on_calsource():
     '''
     find all the data files on calsource
     '''
-    glob_pattern = '%s/calsource_*.dat' % cs_datadir
+    glob_pattern = '%s/calsource_*.fits' % cs_datadir
     cs_filelist = glob(glob_pattern)
+    glob_pattern = '%s/calsource_*.dat' % cs_datadir
+    cs_filelist += glob(glob_pattern)
     cs_filelist.sort()
     cs_filelist_relative = make_relative_filelist(cs_datadir,cs_filelist)
     # files on cc are in the calsource subdirectory
