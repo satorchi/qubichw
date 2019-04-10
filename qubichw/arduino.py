@@ -374,6 +374,7 @@ class arduino:
         thdulist.writeto(outfile,overwrite=True)
         thdulist.close()
         
+        self.log('output file written: %s' % outfile)
         return outfile
 
     
