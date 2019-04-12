@@ -454,7 +454,8 @@ class calsource_configuration_manager():
         dev = 'arduino'
         if dev in command.keys():
             if 'duration' in command[dev].keys():
-                filename = self.device[dev].acquire(command[dev]['duration'],True)
+                # 
+                filename = self.device[dev].acquire(command[dev]['duration'])
                 if filename is None:
                     ack += ' | Arduino acquistion failed'
                 else:
