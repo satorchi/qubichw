@@ -244,6 +244,10 @@ class arduino:
         end_time=start_time+dt_duration
         now=dt.datetime.utcnow()
 
+        # open a file for on-the-fly acquisition to disk
+        outfile = start_time.strftime('calsource_%Y%m%dT%H%M%S.dat')
+        h=open(outfile,'w')
+
         ## acquisition for serial connection.  Don't put the "if" inside the loop!
         if self.connection=='serial':
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
@@ -255,9 +259,11 @@ class arduino:
             counter = 0
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
                 x, addr = client.recvfrom(8)
-                now=dt.datetime.utcnow()
-                y.append(x.strip())
-                t.append(dt.datetime.utcnow())
+                now = dt.datetime.utcnow()
+                val = x.strip()
+                y.append(val)
+                t.append(now)
+                h.write('%s %s\n' % (now.strftime('%s.%f'),x.strip()))
                 counter += 1
             
 
@@ -265,6 +271,8 @@ class arduino:
             if save: return None
             return None,None
 
+        h.close()
+        self.log('output file written: %s' % outfile)
         self.log('started data acquisition at %s' %  t[0].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
         self.log('  ended data acquisition at %s' % t[-1].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
         delta=t[-1]-t[0]
@@ -289,7 +297,7 @@ class arduino:
         self.clear_interrupt_flag()
         
         if save:
-            return self.write_data(t,a)
+            return self.write_data_fits(t,a)
         
         return t,a
 
