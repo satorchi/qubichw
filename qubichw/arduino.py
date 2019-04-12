@@ -213,11 +213,16 @@ class arduino:
         
         return True
     
-    def acquire(self,duration=None,save=True):
+    def acquire(self,duration=None):
         '''
         acquire data with timestamps from the Arduino Uno
 
         duration is given in seconds
+
+
+        Fri 12 Apr 2019 14:17:47 CEST:  change of behaviour.
+        we don't return the data, we return the filename with the data
+        "save" is no longer an option
         '''
         if not self.connected: self.init()
         if not self.connected: return None,None
@@ -251,19 +256,21 @@ class arduino:
         ## acquisition for serial connection.  Don't put the "if" inside the loop!
         if self.connection=='serial':
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
-                x=self.s.readline()
+                x = self.s.readline()
+                val = x.strip()
                 now=dt.datetime.utcnow()
-                y.append(x.strip())
-                t.append(dt.datetime.utcnow())
+                h.write('%s %s\n' % (now.strftime('%s.%f'),val))
+                y.append(val)
+                t.append(now)
         else:
             counter = 0
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
                 x, addr = client.recvfrom(8)
                 now = dt.datetime.utcnow()
                 val = x.strip()
+                h.write('%s %s\n' % (now.strftime('%s.%f'),val))
                 y.append(val)
                 t.append(now)
-                h.write('%s %s\n' % (now.strftime('%s.%f'),x.strip()))
                 counter += 1
             
 
@@ -278,6 +285,11 @@ class arduino:
         delta=t[-1]-t[0]
         self.log('total acquisition time: %.3f seconds' % tot_seconds(delta))
 
+        self.clear_interrupt_flag()
+        return outfile
+
+        '''
+        # Fri 12 Apr 2019 14:19:52 CEST: we no longer return the data.  File is saved on-the-fly.
         arduino_a = []
         arduino_t = []
         # the first reading is always blank (?)
@@ -294,12 +306,12 @@ class arduino:
         t = np.array(arduino_t)
         a = np.array(arduino_a)
 
-        self.clear_interrupt_flag()
         
         if save:
             return self.write_data_fits(t,a)
         
         return t,a
+        '''
 
     def interrupt(self):
         '''
