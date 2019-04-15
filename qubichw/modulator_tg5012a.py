@@ -115,7 +115,7 @@ class tg5012:
         except socket.error, exc:
             print("Caught exception socket.error : %s" % exc)
             return None
-        print('Establishing communication with the HP33120A wave generator on ip:port: %s:%d\n'% (ip,port))
+        print('Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d\n'% (ip,port))
         self.s = s
         id = self.ask_id()
         if id=='':
@@ -192,16 +192,15 @@ class tg5012:
             self.set_default_settings()
             self.set_output_on()
             return
-        
-        # matching the old commands to the new ones
-        if shape.upper().find('SQ') >= 0: shape='SQUARE'
-        if shape.upper().find('SI') >= 0: shape='SINE'
-        if shape.upper().find('TRI') >= 0: shape='RAMP'
-        
+                
         if frequency:
             self.set_frequency(frequency)
             time.sleep(0.5)
         if shape:
+            # matching the old commands to the new ones
+            if shape.upper().find('SQ') >= 0: shape='SQUARE'
+            if shape.upper().find('SI') >= 0: shape='SINE'
+            if shape.upper().find('TRI') >= 0: shape='RAMP'
             self.set_shape(shape)
             time.sleep(0.5)
         if amplitude:
