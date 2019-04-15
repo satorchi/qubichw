@@ -449,7 +449,7 @@ class calsource_configuration_manager():
             if settings is None:
                 msg = '%s: COMMAND FAILED' % dev
             else:
-                msg = '%s: SHAPE=%s FREQUENCY=%.6f Hz AMPLITUDE=%.6f V OFFSET=%.6f V DUTY CYCLE=%.1f%%' % \
+                msg = '%s: SHAPE=%s FREQUENCY=%S AMPLITUDE=%s OFFSET=%s DUTY CYCLE=%s' % \
                     (dev,
                      settings['shape'],
                      settings['frequency'],
