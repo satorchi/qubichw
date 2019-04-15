@@ -145,15 +145,23 @@ class tg5012:
         self.shape_dict = {
             0: 'SINE',
             1: 'SQUARE',
-            2: 'RAMP'
+            2: 'RAMP',
+            5: 'DC'
                 }
 
         self.settings['shape'] = self.shape_dict.get(self.shape_value, "UNKNOWN")
         # Filtering non printable characters and an s at the beginning
-        self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156])
-        self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36])
-        self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272])
-        self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384])
+        if(self.settings['shape'] ==  'DC'):
+            self.settings['offset'] = filter(lambda x: x in string.printable, self.answer[923:950])
+            self.settings['amplitude'] = '--'
+            self.settings['frequency'] = '--'
+            self.settings['duty']='--'
+
+        else:
+            self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156])
+            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36])
+            self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272])
+            self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384])
     
         if show:
             print("Shape:%s" % self.settings['shape'])
@@ -174,6 +182,8 @@ class tg5012:
         Frequency is given in Hz
         The wave form can be: SIN, SQU, TRI,     
         '''
+        self.set_output_off()
+
         if frequency is None\
            and shape is None\
            and amplitude is None\
@@ -202,9 +212,24 @@ class tg5012:
             self.set_duty(duty)
             time.sleep(0.5)
 
+        self.set_output_on()
+
         return True
 
-    def set_default_settings():
+    def set_modulation_off(self):
+        self.set_output_off()
+        self.s.send("WAVE ARB\n")
+        self.s.send("ARBLOAD DC\n")
+        self.s.send("ARBDCOFFS 5\n")
+        self.set_output_on()
+
+    def set_output_off(self):
+        self.s.send("OUTPUT OFF\n")
+
+    def set_output_on(self):
+        self.s.send("OUTPUT ON\n")
+
+    def set_default_settings(self):
         '''
         configure with default settings
         '''
