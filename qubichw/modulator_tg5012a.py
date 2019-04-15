@@ -20,6 +20,7 @@ class tg5012:
     class to send commands to the tti 5012A signal generator
     '''
     def  __init__(self,ip='192.168.2.16',port=9221):
+        print('New instance of tg5012 modulator class')
         self.energenie = None
         self.ip = ip
         self.port = port
@@ -127,7 +128,7 @@ class tg5012:
 
     def read_settings(self,show=True,full_response=False):
         '''
-        read the current settings of the HP33120a waveform generator
+        read the current settings of the TTi 5012A waveform generator
         '''
         self.s.send("*LRN?\n")
         self.answer1 = self.read_response()
@@ -137,7 +138,8 @@ class tg5012:
         self.settings = {}
         
         try:
-            self.shape_value = ord(struct.unpack("c",self.answer[918])[0]) #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
+            #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
+            self.shape_value = ord(struct.unpack("c",self.answer[918])[0]) 
         except:
             print("Error while reading the shape")
             return False
