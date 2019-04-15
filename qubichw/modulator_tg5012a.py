@@ -102,7 +102,7 @@ class tg5012:
 
     def init_tg5012a(self,port=None,ip=None):
         '''
-        establish connection to the HP33120A waveform generator
+        establish connection to the TTi 5012A waveform generator
         usually in ip 192.168.2.16:9221
         '''
         if port is None: port = self.port
@@ -182,6 +182,9 @@ class tg5012:
         Frequency is given in Hz
         The wave form can be: SIN, SQU, TRI,     
         '''
+        if not self.is_connected():
+            return None
+        
         self.set_output_off()
 
         if frequency is None\
