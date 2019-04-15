@@ -233,11 +233,11 @@ class tg5012:
         '''
         configure with default settings
         '''
-        self.set_frequency(self.default_settings('frequency'))
-        self.set_shape(self.default_settings('shape'))
-        self.set_ampliude(self.default_settings('amplitude'))
-        self.set_offset(self.default_settings('offset'))
-        self.set_duty(self.default_settings('duty'))
+        self.set_frequency(self.default_settings['frequency'])
+        self.set_shape(self.default_settings['shape'])
+        self.set_ampliude(self.default_settings['amplitude'])
+        self.set_offset(self.default_settings['offset'])
+        self.set_duty(self.default_settings['duty'])
         return True
 
     def set_frequency(self,frequency):
