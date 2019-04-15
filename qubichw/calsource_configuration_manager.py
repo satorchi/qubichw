@@ -26,7 +26,8 @@ from PyMS import PMSDevice
 from qubichw.calibration_source import calibration_source
 
 # the signal generator for modulating the calibration source
-from qubichw.modulator import modulator
+#from qubichw.modulator import modulator
+from qubichw.modulator_tg5012a import tg5012a as modulator
 
 # the Arduino Uno
 from qubichw.arduino import arduino
