@@ -189,7 +189,9 @@ class tg5012:
            and amplitude is None\
            and offset is None\
            and duty is None:
-            return self.set_default_settings()
+            self.set_default_settings()
+            self.set_output_on()
+            return
         
         # matching the old commands to the new ones
         if shape.upper().find('SQ') >= 0: shape='SQUARE'
