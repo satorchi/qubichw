@@ -542,7 +542,6 @@ class calsource_configuration_manager():
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
-        s.bind((self.hostname,self.broadcast_port))
 
         now=dt.datetime.utcnow()
         now_str = now.strftime('%s.%f')
