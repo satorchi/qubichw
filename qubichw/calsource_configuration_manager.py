@@ -236,15 +236,15 @@ class calsource_configuration_manager():
         listen for a command string arriving on socket
         this message is called by the "manager"
         '''
-        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-        client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        client.bind((self.receiver, self.broadcast_port))
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.bind((self.receiver, self.broadcast_port))
 
-        self.log('client listening on %s' % self.receiver)
+        self.log('listening on %s' % self.receiver)
 
         now = dt.datetime.utcnow()        
         try:
-            cmdstr, addr_tple = client.recvfrom(self.nbytes)
+            cmdstr, addr_tple = s.recvfrom(self.nbytes)
             addr = addr_tple[0]
             cmdstr_clean = ' '.join(cmdstr.strip().split())
         except socket.error:
@@ -269,16 +269,16 @@ class calsource_configuration_manager():
         if timeout is None: timeout = 25
         if timeout < 25: timeout = 25
         
-        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-        client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        client.settimeout(timeout)
-        client.bind((self.hostname, self.broadcast_port))
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.settimeout(timeout)
+        s.bind((self.hostname, self.broadcast_port))
 
         now = dt.datetime.utcnow()
         self.log('waiting up to %.0f seconds for acknowledgement on %s' % (timeout,self.hostname))
 
         try:
-            ack, addr = client.recvfrom(self.nbytes)
+            ack, addr = s.recvfrom(self.nbytes)
         except:
             self.log('no response from Calibration Source Manager')
             return None
