@@ -17,6 +17,11 @@ and access to the calsource files via nfs.
 from __future__ import division, print_function
 import sys,os,time,subprocess
 from glob import glob
+import datetime as dt
+import numpy as np
+from astropy.io import fits
+
+from satorchipy.datefunctions import tot_seconds
 
 cc_datadir  = '/sps/hep/qubic/Data/Calib-TD'
 #qs_datadir  = '/qs/Qubic Studio/backup'

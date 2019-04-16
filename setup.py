@@ -67,7 +67,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/run_hkserver.py',
            'scripts/copy2central.py',
            'scripts/copy2cc.py',
-           'scripts/copy2jupyter.py']
+           'scripts/copy2jupyter.py',
+           'scripts/calsource2fits.py']
 if len(sys.argv)>1 and sys.argv[1]=='install':
     print('installing executable scripts...')
     for F in scripts:
