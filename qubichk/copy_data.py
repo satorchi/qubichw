@@ -199,7 +199,7 @@ def copy2central():
     shell_command(cmd)
 
     # calsource dat and fits files
-    cmd = 'cd %s;find . -type f \( -name "*.fits" -o -name "*.dat" \) -exec cp -puv --parents {} %s \;' % (cs_datadir,central_datadir)
+    cmd = 'cd %s;find . -type f \( -name "*.fits" -o -name "*.dat" \) -exec cp -puv --parents {} %s/calsource \;' % (cs_datadir,central_datadir)
     shell_command(cmd)
     return
 
