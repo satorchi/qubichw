@@ -553,8 +553,8 @@ class calsource_configuration_manager():
 
         s.sendto(msg, (self.receiver, self.broadcast_port))
         sockname = s.getsockname()
-        print("send_command() closing socket: (%s,%i)" % sockname)
-        s.close()
+        print("send_command() NOT closing socket: (%s,%i)" % sockname)
+        #s.close()
         return
 
     def send_acknowledgement(self,ack,addr):
@@ -578,8 +578,8 @@ class calsource_configuration_manager():
             self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
 
         sockname = s.getsockname()
-        print("send_ack() closing socket: (%s,%i)" % sockname)
-        s.close()
+        print("send_ack() NOT closing socket: (%s,%i)" % sockname)
+        #s.close()
         return
     
     def command_loop(self):
