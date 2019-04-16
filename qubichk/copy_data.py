@@ -133,7 +133,7 @@ def copy2archive(server):
     if server=='apcjupyter':
         archive_datadir = jup_datadir
     if server=='central':
-        return self.copy2central()
+        return copy2central()
         
     if archive_datadir is None:
         print('Invalid archive.  Choose either "apcjupyter" or "cc"')
@@ -196,11 +196,11 @@ def copy2central():
 
     # QubicStudio fits files
     cmd = 'cd "%s";find . -type f -name "*.fits" -exec cp -puv --parents {} %s \;' % (qs_datadir,central_datadir)
-    self.shell_command(cmd)
+    shell_command(cmd)
 
     # calsource dat and fits files
     cmd = 'cd %s;find . -type f \( -name "*.fits" -o -name "*.dat" \) -exec cp -puv --parents {} %s \;' % (cs_datadir,central_datadir)
-    self.shell_command(cmd)
+    shell_command(cmd)
     return
 
 def copy2cc():
