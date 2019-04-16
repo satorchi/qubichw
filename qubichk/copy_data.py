@@ -9,8 +9,10 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           redistribute it.  There is NO WARRANTY, to the extent
           permitted by law.
 
-copy QUBIC data to cc-in2p3.  
+Copy QUBIC data to cc-in2p3 and apcjupyter.  Convert calsource files to fits at the same time.
+
 This script is run on qubic-central (192.168.2.1) which has access to the QubicStudio files via Samba
+and access to the calsource files via nfs.
 '''
 from __future__ import division, print_function
 import sys,os,time,subprocess
@@ -21,6 +23,7 @@ cc_datadir  = '/sps/hep/qubic/Data/Calib-TD'
 qs_datadir  = '/qs2' # Fri 05 Apr 2019 16:02:18 CEST
 cs_datadir  = '/calsource/qubic'
 jup_datadir = '/qubic/Data/Calib-TD'
+central_datadir = '/archive'
 
 def shell_command(cmd):
     '''
@@ -31,18 +34,15 @@ def shell_command(cmd):
     out,err = proc.communicate()
     return out,err
 
-def cc_command(cc_cmd):
-    '''
-    run a command on cc-in2p3 via ssh
-    '''
-    cmd = 'ssh cc "%s"' % cc_cmd
-    return shell_command(cmd)
 
 def archive_command(server,archive_cmd):
     '''
     run a command via ssh on the archive server (either cc or apcjupyter)
     '''
-    cmd = 'ssh %s "%s"' % (server,archive_cmd)
+    if server == 'central':
+        cmd = archive_cmd
+    else:
+        cmd = 'ssh %s "%s"' % (server,archive_cmd)
     return shell_command(cmd)
     
 
@@ -85,6 +85,20 @@ def files_on_calsource():
 
     return cs_filelist, cs_filelist_relative
 
+def files_on_central():
+    '''
+    find the files archived on qubic-central
+    '''
+    glob_pattern = '%s/20??-??-??/*/*/*.fits' % central_datadir
+    filelist = glob(glob_pattern)
+    glob_pattern = '%s/calsource/calsource_20??????T??????.dat' % central_datadir
+    filelist += glob(glob_pattern)
+    glob_pattern = '%s/calsource/calsource_20??????T??????.fits' % central_datadir
+    filelist += glob(glob_pattern)
+    filelist.sort()
+    filelist_relative = make_relative_filelist(central_datadir,filelist)
+    return filelist, filelist_relative
+
 def files_on_archive(server):
     '''
     find the files already on the archive (either cc or jupyter)
@@ -94,6 +108,9 @@ def files_on_archive(server):
         datadir = cc_datadir
     if server=='apcjupyter':
         datadir = jup_datadir
+    if server=='central':
+        return files_on_central()
+    
     if datadir is None: return None
         
     cmd = 'find %s -type f \\( -name "*.fits" -o -name "*.dat" \\)' % datadir
@@ -104,7 +121,7 @@ def files_on_archive(server):
     filelist = out.split('\n')
     filelist_relative = make_relative_filelist(datadir,filelist)
     return filelist, filelist_relative
-    
+        
 
 def copy2archive(server):
     '''
@@ -115,6 +132,9 @@ def copy2archive(server):
         archive_datadir = cc_datadir
     if server=='apcjupyter':
         archive_datadir = jup_datadir
+    if server=='central':
+        return self.copy2central()
+        
     if archive_datadir is None:
         print('Invalid archive.  Choose either "apcjupyter" or "cc"')
         return
@@ -169,6 +189,20 @@ def copy2archive(server):
             print(out)
     return
 
+def copy2central():
+    '''
+    copy files to qubic-central archive
+    '''
+
+    # QubicStudio fits files
+    cmd = 'cd "%s";find . -type f -name "*.fits" -exec cp -puv --parents {} %s \;' % (qs_datadir,central_datadir)
+    self.shell_command(cmd)
+
+    # calsource dat and fits files
+    cmd = 'cd %s;find . -type f \( -name "*.fits" -o -name "*.dat" \) -exec cp -puv --parents {} %s \;' % (cs_datadir,central_datadir)
+    self.shell_command(cmd)
+    return
+
 def copy2cc():
     '''
     copy files to CC-IN2P3
@@ -182,3 +216,73 @@ def copy2jup():
     return copy2archive('apcjupyter')
     
 
+def write_data_fits(t,v):
+    '''
+    write data to FITS file
+    '''
+    if len(t)==0:
+        print('Arduino ERROR! No data.')
+        return None
+
+    npts = len(t)
+    startTime = dt.datetime.fromtimestamp(t[0])
+    outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.fits')
+
+    records=np.recarray(formats='>f4,>i2',names='timestamp,amplitude',shape=(npts))
+    records.timestamp = t
+    records.amplitude = v
+
+    # FITS primary header
+    prihdr=fits.Header()
+    prihdr['INSTRUME'] = 'QUBIC'
+    prihdr['EXTNAME']  = 'CALSOURCE'
+    prihdr['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S UT')
+    prihdu = fits.PrimaryHDU(header=prihdr)
+
+    cols  = fits.FITS_rec(records)
+    
+    hdu1  = fits.BinTableHDU.from_columns(cols)
+    hdu1.header['INSTRUME'] = 'QUBIC'
+    hdu1.header['EXTNAME'] = 'CALSOURCE'
+    hdu1.header['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S UT')
+        
+    hdulist = [prihdu,hdu1]
+    thdulist = fits.HDUList(hdulist)
+    thdulist.writeto(outfile,overwrite=True)
+    thdulist.close()
+
+    return outfile
+
+def read_calsource_dat(filename):
+
+    if not os.path.isfile(filename):
+        print('file not found: %s' % filename)
+        return None,None
+
+    dat = np.loadtxt(filename)
+    t = dat.T[0]
+    v = dat.T[1]
+    
+    return  t,v
+
+def calsource2fits(filename):
+    
+    starttime = dt.datetime.utcnow()
+    sys.stdout.write('%s ... ' % filename)
+    sys.stdout.flush()
+    t,v = read_calsource_dat(filename)
+    if t is None: return
+    endtime = dt.datetime.utcnow()
+    delta = tot_seconds(endtime-starttime)
+    sys.stdout.write(' read file in %.1f seconds' % delta)
+    sys.stdout.flush()
+    
+    starttime = dt.datetime.utcnow()
+    fitsname = write_data_fits(t,v)
+    if fitsname is None: return
+    endtime = dt.datetime.utcnow()
+    delta = tot_seconds(endtime-starttime)
+    sys.stdout.write(' saved file in %.1f seconds\n' % delta)
+    sys.stdout.flush()
+
+    return
