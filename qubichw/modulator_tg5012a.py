@@ -49,10 +49,6 @@ class tg5012:
         id = self.ask_id()
         if id=='':  return False
 
-        sockname = self.s.getsockname()
-        print("modulator socket: (%s,%i)" % sockname)
-
-
         return True
 
     def read_response(self):
