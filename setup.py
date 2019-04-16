@@ -65,6 +65,7 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/modulator_commander.py',
            'scripts/run_bot.py',
            'scripts/run_hkserver.py',
+           'scripts/copy2central.py',
            'scripts/copy2cc.py',
            'scripts/copy2jupyter.py']
 if len(sys.argv)>1 and sys.argv[1]=='install':
