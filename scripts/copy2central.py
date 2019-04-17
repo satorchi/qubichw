@@ -20,7 +20,7 @@ from qubichk.copy_data import copy2central, central_datadir, calsource2fits
 
 copy2central()
 
-os.chdir(central_datadir)
+os.chdir('%s/calsource' % central_datadir)
 
 glob_pattern = 'calsource_????????T??????.dat'
 datfiles = glob(glob_pattern)
