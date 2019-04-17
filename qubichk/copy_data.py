@@ -233,7 +233,7 @@ def write_data_fits(t,v):
     startTime = dt.datetime.fromtimestamp(t[0])
     outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.fits')
 
-    records=np.recarray(formats='>f4,>i2',names='timestamp,amplitude',shape=(npts))
+    records=np.recarray(formats='>f8,>i2',names='timestamp,amplitude',shape=(npts))
     records.timestamp = t
     records.amplitude = v
 
