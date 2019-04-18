@@ -30,7 +30,9 @@ class tg5012:
         self.default_settings['amplitude'] = 2
         self.default_settings['offset'] = 2.5
         self.default_settings['duty'] = 50
+        self.default_settings['DCoffset'] = 10
         
+        self.maximum_voltage = 10
 
         self.s = None
         return None
@@ -189,6 +191,22 @@ class tg5012:
         if not self.is_connected():
             return None
         
+        '''
+        Check if DC shape is required for no time modulation. In this case amplitude, duty and frequency are ignored
+        '''
+        if(shape=="DC"):
+            self.set_modulation_off(offset)
+            return True
+        
+        '''
+        Check that the maximum voltage is not exceed
+        '''
+
+        if amplitude/2. + abs(offset) > self.maximum_voltage:
+            print("Maximum voltage exceeded. Setting default values")
+            self.set_default_settings()
+            return True
+
         self.set_output_off()
 
         if frequency is None\
@@ -224,11 +242,14 @@ class tg5012:
 
         return True
 
-    def set_modulation_off(self):
+    def set_modulation_off(self, offset):
         self.set_output_off()
+        if offset=None or abs(offset) > 10:
+            print "No valid offset found. Set offset to default value: %.2f V\n" % self.default_settings['DCoffset']
+            offset=self.default_settings['DCoffset']
         self.s.send("WAVE ARB\n")
         self.s.send("ARBLOAD DC\n")
-        self.s.send("ARBDCOFFS 5\n")
+        self.s.send("ARBDCOFFS %.2f\n" % offset)
         self.set_output_on()
 
     def set_output_off(self):
@@ -283,7 +304,6 @@ class tg5012:
         #for key in parms.keys():
         #    print('  %s: %s\n' % (key,parms[key]))
         
-
         
         if parms['help']:
             self.help()
