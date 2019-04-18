@@ -15,10 +15,6 @@ from __future__ import division, print_function
 import socket,subprocess,time,re,os,multiprocessing
 import datetime as dt
 
-import readline
-readline.parse_and_bind('tab: complete')
-readline.parse_and_bind('set editing-mode vi')
-
 # the Energenie powerbar
 from PyMS import PMSDevice
 
