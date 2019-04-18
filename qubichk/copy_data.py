@@ -253,7 +253,7 @@ def write_data_fits(t,v):
         
     hdulist = [prihdu,hdu1]
     thdulist = fits.HDUList(hdulist)
-    thdulist.writeto(outfile,overwrite=True)
+    thdulist.writeto(outfile,overwrite=False)
     thdulist.close()
 
     return outfile
