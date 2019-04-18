@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-$Id: copy2central.py
+$Id: calsource2fits.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
 $created: Tue 16 Apr 2019 19:09:06 CEST
 $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
