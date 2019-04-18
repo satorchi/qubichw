@@ -193,7 +193,7 @@ class tg5012:
         '''
         Check if DC shape is required for no time modulation. In this case amplitude, duty and frequency are ignored
         '''
-        if(shape=="DC"):
+        if(shape.upper()=="DC"):
             self.set_modulation_off(offset)
             return True
         
