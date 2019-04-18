@@ -15,6 +15,7 @@ and convert calsource dat files to fits
 from __future__ import division, print_function
 import os
 from glob import glob
+import datetime as dt
 
 from qubichk.copy_data import copy2central, central_datadir, calsource2fits
 
@@ -26,8 +27,15 @@ glob_pattern = 'calsource_????????T??????.dat'
 datfiles = glob(glob_pattern)
 datfiles.sort()
 for f in datfiles:
-    rootname = f.replace('.dat','')
-    fitsname = rootname+'.fits'
+    h = open(f,'r')
+    l1 = h.readline()
+    h.close()
+    try:
+        tstamp = eval(l1.strip().split()[0])
+        fitsname = 'calsource_%s.fits' % dt.datetime.fromtimestamp(tstamp).strftime('%Y%m%dT%H%M%S')
+    except:
+        rootname = f.replace('.dat','')
+        fitsname = rootname+'.fits'
     if not os.path.isfile(fitsname):
         calsource2fits(f)
 
