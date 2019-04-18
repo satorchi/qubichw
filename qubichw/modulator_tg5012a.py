@@ -245,7 +245,7 @@ class tg5012:
     def set_modulation_off(self, offset):
         self.set_output_off()
         if offset is None or abs(offset) > 10:
-            print "No valid offset found. Set offset to default value: %.2f V\n" % self.default_settings['DCoffset']
+            print("No valid offset found. Set offset to default value: %.2f V\n" % self.default_settings['DCoffset'])
             offset=self.default_settings['DCoffset']
         self.s.send("WAVE ARB\n")
         self.s.send("ARBLOAD DC\n")
