@@ -12,7 +12,7 @@ remote control of the TTi 5012A Signal Generator
 '''
 from __future__ import division, print_function
 import time,os,sys,socket,struct,string
-
+from math import abs
 from PyMS import PMSDevice
 
 class tg5012:
@@ -202,10 +202,12 @@ class tg5012:
         Check that the maximum voltage is not exceed
         '''
 
-        if amplitude/2. + abs(offset) > self.maximum_voltage:
-            print("Maximum voltage exceeded. Setting default values")
-            self.set_default_settings()
-            return True
+        ##### we need to get the amplitude as a number to do this
+        ##### anyway, the TTi 5012A cannot output more than 10V
+        #if amplitude + abs(offset) > self.maximum_voltage:
+        #    print("Maximum voltage exceeded. Setting default values")
+        #    self.set_default_settings()
+        #    return True
 
         self.set_output_off()
 
