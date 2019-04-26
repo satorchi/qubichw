@@ -89,11 +89,13 @@ class horn_monitor:
                 print('waiting up to %.0f seconds for acknowledgement' % self.timeout)
         
             try:
-                self.next_action()
+                retval = self.next_action()
             except KeyboardInterrupt:
                 print('interrupted with ctrl-c')
                 break
-        
+
+            if retval=='KeyboardInterrupt': break
+            
             now = dt.datetime.utcnow()
             tstamp = float(now.strftime('%s.%f'))
             self.write_horn_fits(tstamp)
@@ -125,7 +127,14 @@ class horn_monitor:
             nbytes_bin = self.client.recv(4)
         except KeyboardInterrupt:
             print('interrupted with ctrl-c')
-            return
+            return 'KeyboardInterrupt'
+        except socket.error:
+            print('ignoring socket error')
+        except:
+            print('ignoring some kind of error')
+            
+        
+            
         
         nbytes = struct.unpack('>L',nbytes_bin)[0]
         print('trying to get %i bytes' % nbytes)
@@ -139,7 +148,7 @@ class horn_monitor:
         fmt = '>%iL' % npts
         print('unpacking data array of %i elements' % npts)
         self.dat = np.array(struct.unpack(fmt,dat_bin))
-        return
+        return 'NormalReturn'
 
 
     def setup_horn_plot(self):
@@ -179,7 +188,7 @@ class horn_monitor:
         msg = dt.datetime.utcnow().strftime(self.date_fmt)
 
         if self.plot_type=='ascii':
-            gp.plot(self.dat, terminal="dumb", _with="lines", unset="grid", title=msg )
+            gp.plot(self.dat, terminal="dumb", _with="points pointtype '+'", unset="grid", title=msg )
             return
         
         self.ax.plot(self.dat,label=msg)
@@ -294,7 +303,7 @@ class horn_monitor:
             h.close()
             
             if self.plot_type=='ascii':
-                gp.plot(dat, terminal="dumb", _with="lines", unset="grid", title=msg )
+                gp.plot(self.dat, terminal="dumb", _with="points pointtype '+'", unset="grid", title=msg )
                 continue
 
             self.ax.plot(dat,label=msg)
