@@ -264,6 +264,9 @@ class horn_monitor:
         pattern = 'hornswitch_?_%s' % endpattern
         files = glob(pattern)
         files.sort()
+        print('files found:')
+        for f in files:
+            print('   %s' % f)
         return files
 
     def plot_saved_event(self,files):
