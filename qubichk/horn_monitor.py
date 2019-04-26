@@ -79,7 +79,7 @@ class horn_monitor:
 
         subcounter = 0
         counter = 0
-        print('going into loop. Touch file %s to interrupt.' % self.interrupt_flag_file)
+        print('going into loop. Ctrl-C to interrupt.')
 
         while not os.path.isfile(self.interrupt_flag_file):
             #### get data ###############################
