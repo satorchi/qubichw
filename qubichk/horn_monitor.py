@@ -101,7 +101,7 @@ class horn_monitor:
 
             #### plot ###################################
             delta = now - previous
-            if delta > double_horn_change_time: reset_horn_plot()    
+            if delta > double_horn_change_time: self.reset_horn_plot()    
             self.plot_horn_action()
             #############################################
 
