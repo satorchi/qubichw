@@ -130,8 +130,10 @@ class horn_monitor:
             return 'KeyboardInterrupt'
         except socket.error:
             print('ignoring socket error')
+            dat = -np.ones(4096)
         except:
             print('ignoring some kind of error')
+            dat = -0.1*np.ones(4096)
             
         
             
