@@ -13,5 +13,5 @@ run the horn switch monitor
 '''
 from qubichk.horn_monitor import horn_monitor
 
-mon = horn_monitor()
+mon = horn_monitor(plot_type='ascii')
 mon.listen_to_horns()
