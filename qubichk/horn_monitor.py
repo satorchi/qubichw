@@ -250,7 +250,7 @@ class horn_monitor:
         '''
         
         print('looking in current directory for horn switch files...')
-        pattern = 'hornswitch_?_????????T??????.fits'
+        pattern = 'hornswitch_0_????????T??????.fits'
         files = glob(pattern)
         if not files:
             print('no files found.')
