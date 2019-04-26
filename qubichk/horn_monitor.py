@@ -179,7 +179,7 @@ class horn_monitor:
         msg = dt.datetime.utcnow().strftime(self.date_fmt)
 
         if self.plot_type=='ascii':
-            gp.plot(self.dat, terminal="dumb pt '+'", _with="lines", unset="grid", title=msg )
+            gp.plot(self.dat, terminal="dumb", _with="lines", unset="grid", title=msg )
             return
         
         self.ax.plot(self.dat,label=msg)
@@ -291,10 +291,14 @@ class horn_monitor:
             dat = h[1].data.field(0)
             obsdate = str2dt(h[1].header['DATE-OBS'])
             msg = obsdate.strftime(self.date_fmt)
+            h.close()
+            
+            if self.plot_type=='ascii':
+                gp.plot(dat, terminal="dumb", _with="lines", unset="grid", title=msg )
+                continue
 
             self.ax.plot(dat,label=msg)
             self.ax.legend()
-            h.close()
         return
 
 
