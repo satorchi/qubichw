@@ -20,3 +20,6 @@ from qubichk.horn_monitor import horn_monitor
 m = horn_monitor()
 files = m.recent_files()
 m.plot_saved_event(files)
+
+ans=raw_input('Press <enter> to quit')
+print('\n')
