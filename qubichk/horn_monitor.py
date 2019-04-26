@@ -260,8 +260,8 @@ class horn_monitor:
         f0 = files[-1]
 
         # check if this is a double closure event
-        endpattern = f0.split('_')[-1]
-        pattern = 'hornswitch_?_%s?' % endpattern[:-1] # nearest microsecond
+        endpattern = f0.split('_')[-1].replace('.fits','')
+        pattern = 'hornswitch_?_%s?.fits' % endpattern[:-1] # nearest microsecond
         files = glob(pattern)
         files.sort()
         print('files found:')
