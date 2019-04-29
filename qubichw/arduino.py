@@ -283,12 +283,12 @@ class arduino:
                 #t.append(now)
                 counter += 1
             
-
+        end_time = now
         h.close()
         self.log('output file written: %s' % outfile)
-        self.log('started data acquisition at %s' %  t[0].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
-        self.log('  ended data acquisition at %s' % t[-1].strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
-        delta=t[-1]-t[0]
+        self.log('started data acquisition at %s' %  start_time.strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
+        self.log('  ended data acquisition at %s' % end_time.strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
+        delta=end_time - start_time
         self.log('total acquisition time: %.3f seconds' % tot_seconds(delta))
 
         self.clear_interrupt_flag()
