@@ -11,7 +11,12 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 run the horn switch monitor
 '''
+import sys
 from qubichk.horn_monitor import horn_monitor
 
-mon = horn_monitor(plot_type='ascii')
+plot_type = 'ascii'
+if len(sys.argv)>1 and sys.argv[1].lower()=='x':
+    plot_type = 'x'
+
+mon = horn_monitor(plot_type=plot_type)
 mon.listen_to_horns()
