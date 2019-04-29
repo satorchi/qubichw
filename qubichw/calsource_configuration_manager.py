@@ -211,10 +211,10 @@ class calsource_configuration_manager():
                 
                 try:
                     command[dev][parm] = eval(val)
-                    #print('%s %s = %f (a number)' % (dev,parm,command[dev][parm]))
+                    self.log('%s %s = %f (a number)' % (dev,parm,command[dev][parm]),verbosity=2)
                 except:
                     command[dev][parm] = val
-                    #print('%s %s = %s (a string)' % (dev,parm,command[dev][parm]))
+                    self.log('%s %s = %s (a string)' % (dev,parm,command[dev][parm]),verbosity=2)
                     
             else:
                 if devcmd=='on' or devcmd=='off':
@@ -509,7 +509,7 @@ class calsource_configuration_manager():
                 stoptime = now + delta
                 self.send_acknowledgement('Send command "save" to interrupt and save immediately',addr)
                 working = True
-                print("going into loop until %s or until 'save' command received" % stoptime.strftime('%Y-%m-%d %H:%M:%S UT'))
+                self.log("going into loop until %s or until 'save' command received" % stoptime.strftime('%Y-%m-%d %H:%M:%S UT'))
                 while working and now<stoptime:
                     received_tstamp, cmdstr, addr = self.listen_for_command()
                     now = dt.datetime.utcnow()
@@ -521,7 +521,7 @@ class calsource_configuration_manager():
                     elif now<stoptime:
                         self.send_acknowledgement("I'm busy and can only respond to the 'save' command",addr)
                     else:
-                        print('command will be carried into main loop: %s' % cmdstr)
+                        self.log('command will be carried into main loop: %s' % cmdstr)
             else:
                 cmdstr = None
 
@@ -578,7 +578,7 @@ class calsource_configuration_manager():
             self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
 
         sockname = s.getsockname()
-        print("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
+        self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
         #s.close()
         return
     
