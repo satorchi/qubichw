@@ -38,6 +38,7 @@ class calsource_configuration_manager():
         The "manager" runs on the Raspberry Pi, and interfaces directly with the hardware
         The "commander" sends commands via socket to the "manager"
         '''
+        self.verbosity = 0
         self.assign_variables(role)
         if self.role == 'manager':
             self.listen_loop()
@@ -46,10 +47,12 @@ class calsource_configuration_manager():
             
         return None
 
-    def log(self,msg):
+    def log(self,msg,verbosity=0):
         '''
         log message to screen and to a file
         '''
+        if verbosity > self.verbosity: return
+        
         filename = 'calsource_configuration_%s.log' % self.role
         h=open(filename,'a')
         h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
@@ -465,7 +468,7 @@ class calsource_configuration_manager():
                 # 
                 filename = self.device[dev].acquire(command[dev]['duration'])
                 if filename is None:
-                    ack += ' | Arduino acquistion failed'
+                    ack += ' | Arduino acquisition failed'
                 else:
                     ack += ' | Arduino data saved to file: %s' % filename
 
@@ -550,7 +553,7 @@ class calsource_configuration_manager():
 
         s.sendto(msg, (self.receiver, self.broadcast_port))
         sockname = s.getsockname()
-        print("send_command() NOT closing socket: (%s,%i)" % sockname)
+        self.log("send_command() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
         #s.close()
         return
 
@@ -575,7 +578,7 @@ class calsource_configuration_manager():
             self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
 
         sockname = s.getsockname()
-        print("send_ack() NOT closing socket: (%s,%i)" % sockname)
+        print("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
         #s.close()
         return
     
