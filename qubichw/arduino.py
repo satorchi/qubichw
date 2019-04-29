@@ -243,8 +243,8 @@ class arduino:
             client.bind(('', self.broadcast_port))
             self.log('listening to Arduino on socket port %i' % self.broadcast_port)
 
-        y=[]
-        t=[]
+        #y=[]
+        #t=[]
         start_time=dt.datetime.utcnow()
         end_time=start_time+dt_duration
         now=dt.datetime.utcnow()
@@ -260,23 +260,29 @@ class arduino:
                 val = x.strip()
                 now=dt.datetime.utcnow()
                 h.write('%s %s\n' % (now.strftime('%s.%f'),val))
-                y.append(val)
-                t.append(now)
+                #y.append(val)
+                #t.append(now)
         else:
             counter = 0
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
                 x, addr = client.recvfrom(8)
-                now = dt.datetime.utcnow()
-                val = x.strip()
-                h.write('%s %s\n' % (now.strftime('%s.%f'),val))
-                y.append(val)
-                t.append(now)
+
+                # Mon 29 Apr 2019 16:31:25 CEST
+                # now we are using the ADC on the Raspberry Pi and not the Arduino
+                # the name "arduino" remains as a nickname
+                #now = dt.datetime.utcnow()
+                #val = x.strip()
+                #h.write('%s %s\n' % (now.strftime('%s.%f'),val))
+
+                dat = x.strip().split()
+                tstamp = dat[0]
+                val = dat[1]
+                h.write('%s %s\n' % (tstamp,val))
+                
+                #y.append(val)
+                #t.append(now)
                 counter += 1
             
-
-        if len(t)==0:
-            if save: return None
-            return None,None
 
         h.close()
         self.log('output file written: %s' % outfile)
