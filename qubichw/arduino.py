@@ -265,7 +265,7 @@ class arduino:
         else:
             counter = 0
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
-                x, addr = client.recvfrom(8)
+                x, addr = client.recvfrom(1024)
 
                 # Mon 29 Apr 2019 16:31:25 CEST
                 # now we are using the ADC on the Raspberry Pi and not the Arduino
