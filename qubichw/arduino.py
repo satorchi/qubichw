@@ -270,7 +270,7 @@ class arduino:
                 # Mon 29 Apr 2019 16:31:25 CEST
                 # now we are using the ADC on the Raspberry Pi and not the Arduino
                 # the name "arduino" remains as a nickname
-                #now = dt.datetime.utcnow()
+                now = dt.datetime.utcnow()
                 #val = x.strip()
                 #h.write('%s %s\n' % (now.strftime('%s.%f'),val))
 
