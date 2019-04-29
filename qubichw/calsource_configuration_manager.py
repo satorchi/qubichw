@@ -110,10 +110,11 @@ class calsource_configuration_manager():
         self.known_hosts['qubic-central'] = "192.168.2.1"
         self.known_hosts['qubic-studio']  = "192.168.2.8"
         self.known_hosts['calsource']     = "192.168.2.5"
+        self.known_hosts['pigps'] = '192.168.2.17'
         
         self.broadcast_port = 37020
         self.nbytes = 256
-        self.receiver = self.known_hosts['calsource']
+        self.receiver = self.known_hosts['pigps']
 
         self.energenie = None
         self.hostname = None
