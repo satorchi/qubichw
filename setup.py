@@ -70,7 +70,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/copy2jupyter.py',
            'scripts/calsource2fits.py',
            'scripts/run_horn_monitor.py',
-           'scripts/plot_hornswitch.py']
+           'scripts/plot_hornswitch.py',
+           'scripts/calsource_hourly_save.py']
 if len(sys.argv)>1 and sys.argv[1]=='install':
     print('installing executable scripts...')
     for F in scripts:
