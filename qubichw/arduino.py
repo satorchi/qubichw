@@ -239,7 +239,7 @@ class arduino:
         else:            
             client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
             client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            client.settimeout(2.0)
+            #client.settimeout(2.0)
             client.bind(('', self.broadcast_port))
             self.log('listening to Arduino on socket port %i' % self.broadcast_port)
 
