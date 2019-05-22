@@ -221,16 +221,16 @@ def copy2jup():
     return copy2archive('apcjupyter')
     
 
-def write_data_fits(t,v):
+def write_calsource_fits(t,v):
     '''
-    write data to FITS file
+    write calsource data to FITS file
     '''
     if len(t)==0:
-        print('Arduino ERROR! No data.')
+        print('ERROR! No data.')
         return None
 
     npts = len(t)
-    startTime = dt.datetime.fromtimestamp(t[0])
+    startTime = dt.datetime.utcfromtimestamp(t[0])
     outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.fits')
 
     records=np.recarray(formats='>f8,>i2',names='timestamp,amplitude',shape=(npts))
@@ -283,7 +283,7 @@ def calsource2fits(filename):
     sys.stdout.flush()
     
     starttime = dt.datetime.utcnow()
-    fitsname = write_data_fits(t,v)
+    fitsname = write_calsource_fits(t,v)
     if fitsname is None: return
     endtime = dt.datetime.utcnow()
     delta = tot_seconds(endtime-starttime)
