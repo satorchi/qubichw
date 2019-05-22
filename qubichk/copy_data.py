@@ -264,10 +264,18 @@ def read_calsource_dat(filename):
         print('file not found: %s' % filename)
         return None,None
 
-    dat = np.loadtxt(filename)
-    t = dat.T[0]
-    v = dat.T[1]
-    
+    h = open(filename,'r')
+    lines = h.read().split('\n')
+    h.close()
+    del(lines[-1]) # last line is empty, or possibly incomplete if interrupted
+
+    try:
+        dat = np.loadtxt(lines)
+        t = dat.T[0]
+        v = dat.T[1]
+    except:
+        t = None
+        v = None
     return  t,v
 
 def calsource2fits(filename):
