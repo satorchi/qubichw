@@ -32,7 +32,7 @@ for f in datfiles:
     h.close()
     try:
         tstamp = eval(l1.strip().split()[0])
-        fitsname = 'calsource_%s.fits' % dt.datetime.fromtimestamp(tstamp).strftime('%Y%m%dT%H%M%S')
+        fitsname = 'calsource_%s.fits' % dt.datetime.utcfromtimestamp(tstamp).strftime('%Y%m%dT%H%M%S')
     except:
         rootname = f.replace('.dat','')
         fitsname = rootname+'.fits'
