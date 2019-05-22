@@ -22,7 +22,7 @@ import datetime as dt
 from astropy.io import fits
 
 from satorchipy.datefunctions import tot_seconds
-
+from qubichk.copy_data import copy_calsource_fits
 
 class arduino:
     '''
@@ -369,39 +369,8 @@ class arduino:
         '''
         write data to FITS file
         '''
-        if len(t)==0:
-            self.log('Arduino ERROR! No data.')
-            return None
 
-        npts = len(t)
-        startTime = dt.datetime.fromtimestamp(t[0])
-        outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.fits')
-
-        records=np.recarray(formats='>f4,>i2',names='timestamp,amplitude',shape=(npts))
-        records.timestamp = t
-        records.amplitude = v
-
-        # FITS primary header
-        prihdr=fits.Header()
-        prihdr['INSTRUME'] = 'QUBIC'
-        prihdr['EXTNAME']  = 'CALSOURCE'
-        prihdr['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S UT')
-        prihdu = fits.PrimaryHDU(header=prihdr)
-
-        cols  = fits.FITS_rec(records)
-
-        hdu1  = fits.BinTableHDU.from_columns(cols)
-        hdu1.header['INSTRUME'] = 'QUBIC'
-        hdu1.header['EXTNAME'] = 'CALSOURCE'
-        hdu1.header['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S UT')
-        
-        hdulist = [prihdu,hdu1]
-        thdulist = fits.HDUList(hdulist)
-        thdulist.writeto(outfile,overwrite=True)
-        thdulist.close()
-        
-        self.log('output file written: %s' % outfile)
-        return outfile
+        return write_calsource_fits(t,v)
 
     
     def sin_curve(self,t,period,amplitude,offset,shift):
