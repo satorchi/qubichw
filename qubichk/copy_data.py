@@ -232,6 +232,8 @@ def write_calsource_fits(t,v):
     npts = len(t)
     startTime = dt.datetime.utcfromtimestamp(t[0])
     outfile = startTime.strftime('calsource_%Y%m%dT%H%M%S.fits')
+    if os.path.isfile(outfile):
+        print('file exists!  will overwrite: %s' % outfile)
 
     records=np.recarray(formats='>f8,>i2',names='timestamp,amplitude',shape=(npts))
     records.timestamp = t
@@ -253,7 +255,7 @@ def write_calsource_fits(t,v):
         
     hdulist = [prihdu,hdu1]
     thdulist = fits.HDUList(hdulist)
-    thdulist.writeto(outfile,overwrite=False)
+    thdulist.writeto(outfile,overwrite=True)
     thdulist.close()
 
     return outfile
