@@ -31,11 +31,13 @@ for f in datfiles:
     l1 = h.readline()
     h.close()
     try:
-        tstamp = eval(l1.strip().split()[0])
+        tstamp = float(l1.strip().split()[0])
         fitsname = 'calsource_%s.fits' % dt.datetime.utcfromtimestamp(tstamp).strftime('%Y%m%dT%H%M%S')
     except:
         rootname = f.replace('.dat','')
         fitsname = rootname+'.fits'
+
+    print('expected output FITS file: %s' % fitsname)
     if not os.path.isfile(fitsname):
         calsource2fits(f)
     else:
