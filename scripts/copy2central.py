@@ -38,5 +38,9 @@ for f in datfiles:
         fitsname = rootname+'.fits'
     if not os.path.isfile(fitsname):
         calsource2fits(f)
+    else:
+        print('file exists, not overwriting: %s' % fitsname)
+
+        
 
         
