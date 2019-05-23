@@ -276,8 +276,17 @@ def read_calsource_dat(filename):
         t = dat.T[0]
         v = dat.T[1]
     except:
-        t = None
-        v = None
+        print('\nunable to read data from file: %s' % filename)
+        return None,None
+
+    if len(lines)==1:
+        new_t = np.empty(1)
+        new_t[0] = t
+        new_v = np.empty(1)
+        new_v[0] = v
+        print('\nfile has only one data point: %s' % filename)
+        return new_t,new_v
+    
     return  t,v
 
 def calsource2fits(filename):
