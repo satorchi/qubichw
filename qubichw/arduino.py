@@ -22,7 +22,6 @@ import datetime as dt
 from astropy.io import fits
 
 from satorchipy.datefunctions import tot_seconds
-from qubichk.copy_data import copy_calsource_fits
 
 class arduino:
     '''
