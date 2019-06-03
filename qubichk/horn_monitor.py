@@ -48,9 +48,20 @@ class horn_monitor:
         self.timeout = timeout
         self.fig = None
         self.ax = None
-        self.dat = None
+        self.init_data()
         return None
-    
+
+    def init_data(self):
+        '''
+        initialize the data and header
+        '''
+        self.dat = -np.ones(4096)
+        self.header = {}
+        self.header['HORN_ID'] = None
+        self.header['IS_GOOD'] = None
+        self.header['CHANNEL'] = None
+        return
+
 
     def listen_to_horns(self):
         '''
@@ -120,27 +131,44 @@ class horn_monitor:
     def next_action(self):
         '''
         get the next event
-        '''
+
+        for data unpacking, see email from Andrea Passerini, 2019-06-02:
+
+        Now the preamble packet is made from 8 bytes.
+        The former 4 represent the waveform lenght as you've already used.
+        Then:
+            2 bytes for the horn ID
+            1 byte for good (0x01) or bad(0x00)
+            1 byte for the belonging measurement channel 0x00 or 0x01.
         
+        '''
+        self.init_data()
+
         print('waiting for horn action...')
         try:
-            nbytes_bin = self.client.recv(4)
+            id_packet = self.client.recv(8)
         except KeyboardInterrupt:
             print('interrupted with ctrl-c')
             return 'KeyboardInterrupt'
         except socket.error:
             print('ignoring socket error')
-            self.dat = -np.ones(4096)
             return 'SocketError'
         except:
             print('ignoring some kind of error')
-            self.dat = -0.1*np.ones(4096)
             return 'UnknownError'
             
         
-            
+        nbytes_bin = id_packet[0][0:4]
+        horn_id_bin = id_packet[0][4:6]
+        good_bin = id_packet[0][6:7]
+        chan_bin = id_packet[0][7:8]
         
-        nbytes = struct.unpack('>L',nbytes_bin)[0]
+        self.header['HORN_ID'] = struct.unpack('>h',horn_id_bin)
+        self.header['IS_GOOD'] = struct.unpack('>b',good_bin)
+        self.header['CHANNEL'] = struct.unpack('>b',chan_bin)
+        
+        
+        nbytes = struct.unpack('>L',nbytes_bin)
         print('trying to get %i bytes' % nbytes)
         dat_bin = ''
         for idx in range(nbytes):
@@ -168,6 +196,13 @@ class horn_monitor:
         self.fig.add_axes((0.1,0.1,0.85,0.8))
         self.ax = self.fig.axes[0]
         self.fig.suptitle('Horn switch inductor profile')
+        if self.header['IS_GOOD']=='1':
+            goodbad = 'good'
+        else:
+            goodbad = 'bad'
+            
+        subttl = 'Horn: %i is %s (measured on channel %i)' % (self.header['HORN_ID'],goodbad,self['CHANNEL'])
+        self.text(0.9,0.5,subttle,ha='center')
         self.ax.set_xlabel('time / $\mu$secs')
         self.ax.set_ylabel('level / arbitrary units')
         plt.pause(0.01)
@@ -223,6 +258,8 @@ class horn_monitor:
         prihdr['INSTRUME'] = 'QUBIC'
         prihdr['EXTNAME']  = 'HORNSWITCH'
         prihdr['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT')
+        for key in self.header.keys():
+            prihdr[key] = self.header[key]
         prihdu = fits.PrimaryHDU(header=prihdr)
 
         cols  = fits.FITS_rec(records)
@@ -231,6 +268,8 @@ class horn_monitor:
         hdu1.header['INSTRUME'] = 'QUBIC'
         hdu1.header['EXTNAME'] = 'HORNSWITCH'
         hdu1.header['DATE-OBS'] = startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT')
+        for key in self.header.keys():
+            hdu1.header[key] = self.header[key]
         
         hdulist = [prihdu,hdu1]
         thdulist = fits.HDUList(hdulist)
