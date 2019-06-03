@@ -227,7 +227,7 @@ class horn_monitor:
         plot the inductance curve from the horn switch
         '''
         now_str = dt.datetime.utcnow().strftime(self.date_fmt)
-        if self.header['IS_GOOD']=='1':
+        if self.header['IS_GOOD']==1:
             goodbad = 'good'
         else:
             goodbad = 'bad'
