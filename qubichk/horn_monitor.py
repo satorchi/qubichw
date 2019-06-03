@@ -168,14 +168,14 @@ class horn_monitor:
         chan_bin = id_packet[7:8]
 
         if len(horn_id_bin)==2:
-            self.header['HORN_ID'] = struct.unpack('>h',horn_id_bin)
+            self.header['HORN_ID'] = struct.unpack('>h',horn_id_bin)[0]
         if len(good_bin)==1:
-            self.header['IS_GOOD'] = struct.unpack('>b',good_bin)
+            self.header['IS_GOOD'] = struct.unpack('>b',good_bin)[0]
         if len(chan_bin)==1:
-            self.header['CHANNEL'] = struct.unpack('>b',chan_bin)
+            self.header['CHANNEL'] = struct.unpack('>b',chan_bin)[0]
         
         if len(nbytes_bin)==4:
-            nbytes = struct.unpack('>L',nbytes_bin)
+            nbytes = struct.unpack('>L',nbytes_bin)[0]
             
             print('trying to get %i bytes' % nbytes)
             dat_bin = ''
