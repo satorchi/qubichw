@@ -196,13 +196,6 @@ class horn_monitor:
         self.fig.add_axes((0.1,0.1,0.85,0.8))
         self.ax = self.fig.axes[0]
         self.fig.suptitle('Horn switch inductor profile')
-        if self.header['IS_GOOD']=='1':
-            goodbad = 'good'
-        else:
-            goodbad = 'bad'
-            
-        subttl = 'Horn: %i is %s (measured on channel %i)' % (self.header['HORN_ID'],goodbad,self.header['CHANNEL'])
-        self.text(0.9,0.5,subttle,ha='center')
         self.ax.set_xlabel('time / $\mu$secs')
         self.ax.set_ylabel('level / arbitrary units')
         plt.pause(0.01)
@@ -224,8 +217,14 @@ class horn_monitor:
         '''
         plot the inductance curve from the horn switch
         '''
-        msg = dt.datetime.utcnow().strftime(self.date_fmt)
-
+        now_str = dt.datetime.utcnow().strftime(self.date_fmt)
+        if self.header['IS_GOOD']=='1':
+            goodbad = 'good'
+        else:
+            goodbad = 'bad'    
+        infotxt = 'Horn: %i is %s (measured on channel %i)' % (self.header['HORN_ID'],goodbad,self.header['CHANNEL'])
+        msg = '%s: %s' % (now_str,infotxt)
+        
         if self.plot_type=='ascii':
             gp.plot(self.dat, terminal="dumb", _with="points pointtype '+'", unset="grid", title=msg )
             return
