@@ -240,7 +240,7 @@ class horn_monitor:
         else:
             channel = 'unknown'
         
-        infotxt = 'Horn: %s is %s (measured on channel %s)' % (hornid,goodbad,channel)
+        infotxt = 'Horn %s is %s (measured on channel %s)' % (hornid,goodbad,channel)
         msg = '%s: %s' % (now_str,infotxt)
         
         if self.plot_type=='ascii':
@@ -345,7 +345,7 @@ class horn_monitor:
         if files is None: return
 
         self.setup_horn_plot()
-        
+
         for f in files:
             h = fits.open(f)
             if len(h)<>2\
@@ -356,10 +356,32 @@ class horn_monitor:
                 print('not a horn switch fits file: %s' % f)
                 h.close()
                 continue
-
+            
             dat = h[1].data.field(0)
             obsdate = str2dt(h[1].header['DATE-OBS'])
-            msg = obsdate.strftime(self.date_fmt)
+            obsdate_str = dt.datetime.utcnow().strftime(self.date_fmt)
+
+            keys = h[1].header.keys()
+            if 'IS_GOOD' in keys:
+                if h[1].header['IS_GOOD']==1:
+                    goodbad = 'good'
+                else:
+                    goodbad = 'bad'
+            else:
+                goodbad = 'unknown'
+                
+            if 'HORN_ID' in keys:
+                hornid = h[1].header['HORN_ID']
+            else:
+                hornid = 'unknown'
+                
+            if 'CHANNEL' in keys:
+                channel = h[1].header['CHANNEL']
+            else:
+                channel = 'unknown'
+        
+            infotxt = 'Horn %s is %s (measured on channel %s)' % (hornid,goodbad,channel)
+            msg = '%s: %s' % (obsdate_str,infotxt)
             h.close()
             
             if self.plot_type=='ascii':
