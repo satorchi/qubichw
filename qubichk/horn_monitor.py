@@ -162,6 +162,8 @@ class horn_monitor:
         horn_id_bin = id_packet[0][4:6]
         good_bin = id_packet[0][6:7]
         chan_bin = id_packet[0][7:8]
+
+        print('length of horn_id_bin: %i' % len(horn_id_bin))
         
         self.header['HORN_ID'] = struct.unpack('>h',horn_id_bin)
         self.header['IS_GOOD'] = struct.unpack('>b',good_bin)
