@@ -201,7 +201,7 @@ class horn_monitor:
         else:
             goodbad = 'bad'
             
-        subttl = 'Horn: %i is %s (measured on channel %i)' % (self.header['HORN_ID'],goodbad,self['CHANNEL'])
+        subttl = 'Horn: %i is %s (measured on channel %i)' % (self.header['HORN_ID'],goodbad,self.header['CHANNEL'])
         self.text(0.9,0.5,subttle,ha='center')
         self.ax.set_xlabel('time / $\mu$secs')
         self.ax.set_ylabel('level / arbitrary units')
