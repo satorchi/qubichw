@@ -156,6 +156,11 @@ class horn_monitor:
         except:
             print('ignoring some kind of error')
             return 'UnknownError'
+
+        print('length of id_packet: %i' % len(id_packet))
+        print('id_packet type: %s' % type(id_packet))
+        print('id_packet: %s' % id_packet)
+        
             
         
         nbytes_bin = id_packet[0][0:4]
