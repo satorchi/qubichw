@@ -157,37 +157,39 @@ class horn_monitor:
             print('ignoring some kind of error')
             return 'UnknownError'
 
+        
         print('length of id_packet: %i' % len(id_packet))
         print('id_packet type: %s' % type(id_packet))
-        print('id_packet: %s' % id_packet)
-        
-            
-        
-        nbytes_bin = id_packet[0][0:4]
-        horn_id_bin = id_packet[0][4:6]
-        good_bin = id_packet[0][6:7]
-        chan_bin = id_packet[0][7:8]
+        print('id_packet: %s' % str(id_packet))
+                
+        nbytes_bin = id_packet[0:4]
+        horn_id_bin = id_packet[4:6]
+        good_bin = id_packet[6:7]
+        chan_bin = id_packet[7:8]
 
-        print('length of horn_id_bin: %i' % len(horn_id_bin))
+        if len(horn_id_bin)==2:
+            self.header['HORN_ID'] = struct.unpack('>h',horn_id_bin)
+        if len(good_bin)==1:
+            self.header['IS_GOOD'] = struct.unpack('>b',good_bin)
+        if len(chan_bin)==1:
+            self.header['CHANNEL'] = struct.unpack('>b',chan_bin)
         
-        self.header['HORN_ID'] = struct.unpack('>h',horn_id_bin)
-        self.header['IS_GOOD'] = struct.unpack('>b',good_bin)
-        self.header['CHANNEL'] = struct.unpack('>b',chan_bin)
-        
-        
-        nbytes = struct.unpack('>L',nbytes_bin)
-        print('trying to get %i bytes' % nbytes)
-        dat_bin = ''
-        for idx in range(nbytes):
-            byte = self.client.recv(1)
-            dat_bin += byte
-        nbytes = len(dat_bin)
-        print('data received is %i bytes' % nbytes)
-        npts = nbytes//4
-        fmt = '>%iL' % npts
-        print('unpacking data array of %i elements' % npts)
-        self.dat = np.array(struct.unpack(fmt,dat_bin))
-        return 'NormalReturn'
+        if len(nbytes_bin)==4:
+            nbytes = struct.unpack('>L',nbytes_bin)
+            
+            print('trying to get %i bytes' % nbytes)
+            dat_bin = ''
+            for idx in range(nbytes):
+                byte = self.client.recv(1)
+                dat_bin += byte
+            nbytes = len(dat_bin)
+            print('data received is %i bytes' % nbytes)
+            npts = nbytes//4
+            fmt = '>%iL' % npts
+            print('unpacking data array of %i elements' % npts)
+            self.dat = np.array(struct.unpack(fmt,dat_bin))            
+            return 'NormalReturn'
+        return 'UnpackError'
 
 
     def setup_horn_plot(self):
@@ -228,8 +230,17 @@ class horn_monitor:
         if self.header['IS_GOOD']=='1':
             goodbad = 'good'
         else:
-            goodbad = 'bad'    
-        infotxt = 'Horn: %i is %s (measured on channel %i)' % (self.header['HORN_ID'],goodbad,self.header['CHANNEL'])
+            goodbad = 'bad'
+        if self.header['HORN_ID'] is not None:
+            hornid = self.header['HORN_ID']
+        else:
+            hornid = 'unknown'
+        if self.header['CHANNEL'] is not None:
+            channel = self.header['CHANNEL']
+        else:
+            channel = 'unknown'
+        
+        infotxt = 'Horn: %s is %s (measured on channel %s)' % (hornid,goodbad,channel)
         msg = '%s: %s' % (now_str,infotxt)
         
         if self.plot_type=='ascii':
