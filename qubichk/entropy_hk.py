@@ -142,8 +142,8 @@ class entropy_hk :
         a=self.sendreceive('dateTime AppStart\n')
         if a is None:return None
         
-        self.startTime=str2dt(a) # this is given in CET
-        self.startTime += dt.timedelta(hours = -1) # convert to UT
+        self.startTime=str2dt(a) # this is given in localtime (CET or CEST)
+        self.startTime += dt.timedelta(hours = -2) # convert to UT (need to do this better!!!)
         self.log('Logging start time: %s' % self.startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT'))
         return self.startTime
     
