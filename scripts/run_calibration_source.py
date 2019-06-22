@@ -18,6 +18,11 @@ from __future__ import division, print_function
 import os,sys,time
 import datetime as dt
 
+msg = '\nHello!\n  This is a test script to run a single acquisition with the calibration source.'
+msg += "\n\nAre you sure you don't want to run the calsource_commander.py instead?\n\n"
+print(msg)
+
+
 def helptxt():
     '''
     some help text
