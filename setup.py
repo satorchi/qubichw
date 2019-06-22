@@ -27,7 +27,7 @@ DOWNLOAD_URL     = 'https://github.com/satorchi/qubichw'
 VERSION          = '2.0.0'
 
 with open('README.md') as f:
-    long_description = f.readlines()
+    long_description = f.read()
 
 
 setup(install_requires=['numpy'],
@@ -71,7 +71,9 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/calsource2fits.py',
            'scripts/run_horn_monitor.py',
            'scripts/plot_hornswitch.py',
-           'scripts/calsource_hourly_save.py']
+           'scripts/calsource_hourly_save.py',
+           'scripts/start_calsource_acq.sh',
+           'scripts/start_calsource_manager.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install':
     print('installing executable scripts...')
     for F in scripts:
