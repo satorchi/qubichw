@@ -141,9 +141,13 @@ class entropy_hk :
         '''
         a=self.sendreceive('dateTime AppStart\n')
         if a is None:return None
-        
-        self.startTime=str2dt(a) # this is given in localtime (CET or CEST)
-        self.startTime += dt.timedelta(hours = -2) # convert to UT (need to do this better!!!)
+
+        # time is given in localtime of the APCBRAIN2 Windows computer (CET or CEST)
+        self.startTime=str2dt(a) 
+
+        # assume the Windows computer is on the same time as qubic-central (this computer)
+        tzone = int('%.0f' % tot_seconds( dt.datetime.utcnow() - dt.datetime.now() ))
+        self.startTime += dt.timedelta(seconds = tzone) # convert to UT
         self.log('Logging start time: %s' % self.startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT'))
         return self.startTime
     
