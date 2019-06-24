@@ -286,7 +286,7 @@ class arduino:
                 tstamp = data_tuple[1]
                 val = data_tuple[2]
 
-                h.write('%s %s\n' % (tstamp,val))
+                h.write('%.6f %i\n' % (tstamp,val))
                 
                 #y.append(val)
                 #t.append(now)
