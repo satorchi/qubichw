@@ -17,7 +17,7 @@ if ! ps -aux | grep "/usr/bin/python3 /usr/local/bin/read_calsource.py" | grep -
 	echo "Calsource acquisition not running";
 	screen -X -S calsource quit
 	echo "Starting a new screen and launching the acquisition"
-	screen -S calsource -d -m /usr/bin/python3 /home/qubic/calsource/read_calsource.py	
+	screen -S calsource -d -m /usr/bin/python3 /usr/local/bin/read_calsource.py	
 else
 	echo "Acquisition already running"
 fi
