@@ -73,7 +73,9 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/plot_hornswitch.py',
            'scripts/calsource_hourly_save.py',
            'scripts/start_calsource_acq.sh',
-           'scripts/start_calsource_manager.sh']
+           'scripts/start_calsource_manager.sh'
+           'scripts/start_bot.sh',
+           'scripts/start_hkserver.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install':
     print('installing executable scripts...')
     for F in scripts:
