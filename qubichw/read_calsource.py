@@ -18,6 +18,11 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import adafruit_ads1x15.ads1015 as ADS
 import socket
 import datetime as dt
+import numpy as np
+
+# data is sent as a numpy record, to be unpacked by QubicStudio (and others)
+rec = np.recarray(names="STX,TIMESTAMP,VALUE",formats="uint8,float64,int64",shape=(1))
+rec[0].STX = 0xAA
 
 ADC_RATE = 3300
 data_rate = 300.
@@ -58,8 +63,11 @@ while True:
     date_now = dt.datetime.utcnow()
     if(date_now-old_date>deltat):
         sdata = date_now.strftime("%s.%f") + "\t" + str(value)
+        rec[0].TIMESTAMP = float(date_now.strftime("%s.%f"))
+        rec[0].VALUE = value
         for rx in receivers:
-            s.sendto(sdata.encode(), (rx,PORT))
+            #s.sendto(sdata.encode(), (rx,PORT))
+            s.sendto(rec,(rx,PORT))
         old_date = date_now 
         count+=1
     if(date_now-old_print_date > dt.timedelta(seconds=1)):

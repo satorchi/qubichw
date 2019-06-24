@@ -18,6 +18,7 @@ from glob import glob
 import numpy as np
 from scipy.optimize import curve_fit
 import datetime as dt
+import struct
 
 from astropy.io import fits
 
@@ -273,9 +274,18 @@ class arduino:
                 #val = x.strip()
                 #h.write('%s %s\n' % (now.strftime('%s.%f'),val))
 
-                dat = x.strip().split()
-                tstamp = dat[0]
-                val = dat[1]
+
+                # Sat 22 Jun 2019 23:19:53 CEST
+                # now the Raspberry Pi PiGPS is sending packed data instead of string
+                #dat = x.strip().split()
+                #tstamp = dat[0]
+                #val = dat[1]
+                fmts = '<Bdq'
+                data_tuple = struct.unpack(fmts,x)
+                stx = data_tuple[0]
+                tstamp = data_tuple[1]
+                val = data_tuple[2]
+
                 h.write('%s %s\n' % (tstamp,val))
                 
                 #y.append(val)
