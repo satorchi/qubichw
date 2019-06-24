@@ -15,12 +15,12 @@
 # */5 * * * * /usr/local/bin/start_calsource_manager.sh
 #
 if ! ps auxw | grep "/usr/bin/python /usr/local/bin/calsource_commander.py" | grep -v -e grep -e SCREEN; then  
-	echo "Calsource Manager not running";
-	screen -X -S manager quit
-	echo "Starting a new screen and launching the calsource manager"
-	screen -S manager -d -m /usr/bin/python /usr/local/bin/calsource_commander.py manager	
+    echo "Calsource Manager not running";
+    screen -X -S manager quit
+    echo "Starting a new screen and launching the calsource manager"
+    screen -S manager -d -m /usr/bin/python /usr/local/bin/calsource_commander.py manager	
 else
-	echo "Calsource Manager already running"
+    echo "Calsource Manager already running"
 fi
 
 #start_calsource_manager.sh

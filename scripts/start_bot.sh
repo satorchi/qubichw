@@ -15,12 +15,13 @@
 # */5 * * * * /usr/local/bin/start_bot.sh
 #
 if ! ps auxw | grep "/usr/bin/python /usr/local/bin/run_bot.py" | grep -v -e grep -e SCREEN; then  
-	echo "bot not running";
-	screen -X -S bot quit
-	echo "Starting a new screen and launching the bot"
-	screen -S bot -d -m /usr/bin/python /usr/local/bin/run_bot.py
+    echo "bot not running";
+    screen -X -S bot quit
+    echo "Starting a new screen and launching the bot"
+    cd $HOME/data/temperature
+    screen -S bot -d -m /usr/bin/python /usr/local/bin/run_bot.py
 else
-	echo "bot already running"
+    echo "bot already running"
 fi
 
 #start_bot.sh
