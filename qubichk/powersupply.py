@@ -395,10 +395,6 @@ class PowerSupplies :
     '''
 
     def __init__(self):
-        self.supplylist=None
-        self.infolist=None
-        self.serialno_list=None
-        self.nsupplies=None
         self.find_PowerSupply()
         return None
 
@@ -427,6 +423,12 @@ class PowerSupplies :
     def find_PowerSupply(self):
         '''find devices
         '''
+        self.nsupplies = 0
+        self.infolist = []
+        self.serialno_list = []
+        self.supplylist = []
+        self.userlabel_left_list = []
+        self.userlabel_right_list = []
         
         devs1=glob('/dev/ttyACM*')
         #devs2=glob('/dev/ttyUSB*') # these are not TTi power supplies
