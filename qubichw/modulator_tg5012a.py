@@ -308,21 +308,21 @@ class tg5012:
             self.help()
             return
         
-        if parms['onoff'] == 'on':
-            self.switchon()
-            return
-
         if parms['onoff'] == 'off':
             self.switchoff()
+            return
+
+        if parms['onoff'] == 'on':
+            self.switchon()
+
+        if parms['status'] == 'show':
+            self.read_settings(show=True)
             return
 
         if parms['default']:
             self.configure()
             return
         
-        if parms['status'] == 'show':
-            self.read_settings(show=True)
-            return
         
         self.configure(frequency=parms['frequency'],
                        shape=parms['shape'],
