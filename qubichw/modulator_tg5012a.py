@@ -260,6 +260,9 @@ class tg5012:
         '''
         configure with default settings
         '''
+        if not self.is_connected():
+            return None
+
         self.set_frequency(self.default_settings['frequency'])
         self.set_shape(self.default_settings['shape'])
         self.set_amplitude(self.default_settings['amplitude'])
