@@ -428,7 +428,7 @@ class calsource_configuration_manager():
             if of is None:
                 msg += 'FAILED'
             else:
-                msg += 'OK.  synthesiser:frequency=%.6fGHz' % of
+                msg += ' synthesiser:frequency=%.6fGHz' % of
             self.log(msg)
             ack += ' | %s' % msg
                 
