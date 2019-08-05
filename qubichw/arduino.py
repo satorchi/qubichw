@@ -34,7 +34,7 @@ class arduino:
         initialize the arduino object.  We can connect by socket or by serial
         '''
         self.connection = connection.lower()
-        if self.connection<>'serial': self.connection='socket'
+        if self.connection!='serial': self.connection='socket'
 
         self.broadcast_port = 31337
         self.s = None
