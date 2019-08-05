@@ -165,10 +165,10 @@ class tg5012:
             self.settings['duty']='--'
 
         else:
-            self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156])
-            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace('HzHzz','Hz')
-            self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272])
-            self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384])
+            self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156]).replace(' ','')
+            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace('HzHzz','Hz').replace(' ','')
+            self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272]).replace(' ','')
+            self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384]).replace(' ','')
     
         if show:
             print("Shape:%s" % self.settings['shape'])
