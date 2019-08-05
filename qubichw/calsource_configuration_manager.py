@@ -409,7 +409,7 @@ class calsource_configuration_manager():
         if states:
             msg += 'energenie:%s ' % self.onoff(states)
             self.log(msg)
-            ack += ' %s' % msg
+            ack += '%s ' % msg
             # wait before doing other stuff
             time.sleep(3)
 
