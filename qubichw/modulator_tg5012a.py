@@ -114,7 +114,7 @@ class tg5012:
         s.settimeout(1)
         try: 
             s.connect((ip,port))
-        except socket.error, exc:
+        except socket.error:
             print("Caught exception socket.error : %s" % exc)
             return None
         print('Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d\n'% (ip,port))
@@ -133,6 +133,8 @@ class tg5012:
         '''
         read the current settings of the TTi 5012A waveform generator
         '''
+        if not self.is_connected():  return None
+        
         self.s.send("*LRN?\n")
         self.answer1 = self.read_response()
         self.s.send("*WAI\n")                   #We do this to get the full response to the LRN? command
