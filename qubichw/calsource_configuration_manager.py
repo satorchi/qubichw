@@ -330,7 +330,7 @@ class calsource_configuration_manager():
         '''
         msg = ''
         dev = 'amplifier'
-        msg += '%s: ' % dev
+        msg += '%s:' % dev
         if self.amp_on is not None:
             if self.amp_on:
                 msg += 'ON'
@@ -340,7 +340,7 @@ class calsource_configuration_manager():
             msg += 'UNKNOWN'
 
         for dev in ['arduino','calsource','modulator']:
-            msg += ' | %s: ' % dev
+            msg += ' %s:' % dev
             if self.device[dev].is_connected():
                 msg += 'ON'
             else:
@@ -350,7 +350,7 @@ class calsource_configuration_manager():
         if self.device[dev].is_connected():
             settings = self.device[dev].read_settings(show=False)
             if settings is None:
-                msg += ' | %s: FAILED TO READ SETTINGS' % dev
+                msg += ' %s:UNKNOWN' % dev
             else:
                 '''
                 # for the HP3312A
@@ -362,7 +362,7 @@ class calsource_configuration_manager():
                      settings['offset'],
                      settings['duty'])
                 '''
-                msg += '| %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
+                msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
                     (dev,settings['shape'],
                      dev,settings['frequency'],
                      dev,settings['amplitude'],
@@ -405,11 +405,11 @@ class calsource_configuration_manager():
                     state = False
                 if state is not None:
                     states[self.powersocket[dev]] = state
-                    msg += 'switch %s %s: ' % (command[dev][parm],dev)
+                    msg += '%s:%s ' % (dev,command[dev][parm])
         if states:
-            msg += 'power on/off command %s' % self.onoff(states)
+            msg += 'energenie:%s ' % self.onoff(states)
             self.log(msg)
-            ack += ' | %s' % msg
+            ack += ' %s' % msg
             # wait before doing other stuff
             time.sleep(3)
 
@@ -430,7 +430,7 @@ class calsource_configuration_manager():
             else:
                 msg += 'synthesiser:frequency=%.6fGHz' % of
             self.log(msg)
-            ack += ' | %s' % msg
+            ack += '%s ' % msg
                 
 
         # the modulator configuration
@@ -446,7 +446,7 @@ class calsource_configuration_manager():
             time.sleep(1)
             settings = self.device[dev].read_settings(show=False)
             if settings is None:
-                msg = '%s:COMMAND_FAILED' % dev
+                msg = '%s:FAILED' % dev
             else:
                 msg = '%s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
                     (dev,settings['shape'],
@@ -456,29 +456,28 @@ class calsource_configuration_manager():
                      dev,settings['duty'])
                     
             self.log(msg)
-            ack += ' | %s' % msg
+            ack += '%s ' % msg
 
 
         # run the Arduino last of all
         dev = 'arduino'
         if dev in command.keys():
             if 'duration' in command[dev].keys():
-                # 
                 filename = self.device[dev].acquire(command[dev]['duration'])
                 if filename is None:
-                    ack += ' | Arduino acquisition failed'
+                    ack += '%s:acquisition=failed ' % dev
                 else:
-                    ack += ' | Arduino data saved to file: %s' % filename
+                    ack += '%s:file=%s ' % (dev,filename)
 
             if 'save' in command[dev].keys():
                 self.device[dev].interrupt()
 
         # STATUS
         if command['all']['status']:
-            ack += ' | %s' % self.status()
+            ack += '%s ' % self.status()
             
 
-        retval.append(ack)
+        retval.append(ack.strip())
         return retval
 
 
