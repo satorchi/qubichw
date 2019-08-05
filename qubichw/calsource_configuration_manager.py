@@ -362,13 +362,12 @@ class calsource_configuration_manager():
                      settings['offset'],
                      settings['duty'])
                 '''
-                msg += '| %s: SHAPE=%s FREQUENCY=%s AMPLITUDE=%s OFFSET=%s DUTY CYCLE=%s' % \
-                    (dev,
-                     settings['shape'],
-                     settings['frequency'],
-                     settings['amplitude'],
-                     settings['offset'],
-                     settings['duty'])
+                msg += '| %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
+                    (dev,settings['shape'],
+                     dev,settings['frequency'],
+                     dev,settings['amplitude'],
+                     dev,settings['offset'],
+                     dev,settings['duty'])
         
             
         return msg
@@ -429,7 +428,7 @@ class calsource_configuration_manager():
             if of is None:
                 msg += 'FAILED'
             else:
-                msg += 'OK.  synthesiser frequency=%.6fGHz' % of
+                msg += 'OK.  synthesiser:frequency=%.6fGHz' % of
             self.log(msg)
             ack += ' | %s' % msg
                 
@@ -447,15 +446,14 @@ class calsource_configuration_manager():
             time.sleep(1)
             settings = self.device[dev].read_settings(show=False)
             if settings is None:
-                msg = '%s: COMMAND FAILED' % dev
+                msg = '%s:COMMAND_FAILED' % dev
             else:
-                msg = '%s: SHAPE=%s FREQUENCY=%s AMPLITUDE=%s OFFSET=%s DUTY CYCLE=%s' % \
-                    (dev,
-                     settings['shape'],
-                     settings['frequency'],
-                     settings['amplitude'],
-                     settings['offset'],
-                     settings['duty'])
+                msg = '%s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
+                    (dev,settings['shape'],
+                     dev,settings['frequency'],
+                     dev,settings['amplitude'],
+                     dev,settings['offset'],
+                     dev,settings['duty'])
                     
             self.log(msg)
             ack += ' | %s' % msg
