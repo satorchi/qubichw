@@ -348,11 +348,11 @@ class horn_monitor:
 
         for f in files:
             h = fits.open(f)
-            if len(h)<>2\
+            if len(h)!=2\
                or 'INSTRUME' not in h[1].header.keys()\
-               or h[1].header['INSTRUME']<>'QUBIC'\
+               or h[1].header['INSTRUME']!='QUBIC'\
                or 'EXTNAME' not in h[1].header.keys()\
-               or h[1].header['EXTNAME']<>'HORNSWITCH':
+               or h[1].header['EXTNAME']!='HORNSWITCH':
                 print('not a horn switch fits file: %s' % f)
                 h.close()
                 continue
