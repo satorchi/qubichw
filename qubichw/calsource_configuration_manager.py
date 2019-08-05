@@ -378,7 +378,7 @@ class calsource_configuration_manager():
         this method is called by the "manager"
         '''
 
-        ack = '%s' % dt.datetime.utcnow().strftime('%s.%f')
+        ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
@@ -565,9 +565,11 @@ class calsource_configuration_manager():
         now=dt.datetime.utcnow()
         now_str = now.strftime('%s.%f')
         len_nowstr = len(now_str)
-        len_remain = self.nbytes - len_nowstr - 3
-        fmt = '%%%is | %%%is' % (len_nowstr,len_remain)
-        msg = fmt % (now_str,ack)
+        len_ack = len(ack)
+        len_remain = self.nbytes - len_nowstr - 1
+        buf = ''
+        for n in range(len_remain): buf+=' '
+        msg = '%s %s%s' % (now_str,ack,buf)
         self.log('sending acknowledgement: %s' % msg)
         try:
             s.sendto(msg, (addr, self.broadcast_port))
