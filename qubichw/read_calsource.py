@@ -21,7 +21,7 @@ import datetime as dt
 import numpy as np
 
 # data is sent as a numpy record, to be unpacked by QubicStudio (and others)
-rec = np.recarray(names="STX,TIMESTAMP,VALUE",formats="uint8,float64,uint64",shape=(1))
+rec = np.recarray(names="STX,TIMESTAMP,VALUE",formats="uint8,float64,int64",shape=(1))
 rec[0].STX = 0xAA
 
 ADC_RATE = 3300

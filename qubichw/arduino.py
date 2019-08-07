@@ -280,7 +280,7 @@ class arduino:
                 #dat = x.strip().split()
                 #tstamp = dat[0]
                 #val = dat[1]
-                fmts = '<BdQ'
+                fmts = '<Bdq'
                 data_tuple = struct.unpack(fmts,x)
                 stx = data_tuple[0]
                 tstamp = data_tuple[1]
