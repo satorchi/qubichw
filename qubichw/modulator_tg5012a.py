@@ -166,7 +166,7 @@ class tg5012:
 
         else:
             self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156]).replace(' ','')
-            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace('HzHzz','Hz').replace(' ','')
+            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace('HzHzz','Hz').replace(' ','').replace('Hzzz','Hz')
             self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272]).replace(' ','')
             self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384]).replace(' ','')
     
