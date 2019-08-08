@@ -63,8 +63,8 @@ while True:
     date_now = dt.datetime.utcnow()
     if(date_now-old_date>deltat):
         sdata = date_now.strftime("%s.%f") + "\t" + str(value)
-        rec[0].TIMESTAMP = float(date_now.strftime("%s.%f"))
-        rec[0].VALUE = value
+        rec[0].TIMESTAMP = np.float64(date_now.strftime("%s.%f"))
+        rec[0].VALUE = np.int64(value)
         for rx in receivers:
             #s.sendto(sdata.encode(), (rx,PORT))
             s.sendto(rec,(rx,PORT))
