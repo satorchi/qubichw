@@ -72,10 +72,10 @@ while True:
         old_date = date_now 
         count+=1
     if(date_now-old_print_date > dt.timedelta(seconds=1)):
-        t_hex_B = hex(struct.unpack('>Q',struct.pack('<d',rec[0].TIMESTAMP))[0]).upper().replace('X','x')
-        t_hex_L = hex(struct.unpack('<Q',struct.pack('<d',rec[0].TIMESTAMP))[0]).upper().replace('X','x')
+        t_hex_B = struct.unpack('>Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
+        t_hex_L = struct.unpack('<Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
         
-        string_to_print = "%s %s %s\tRate:% d" % (t_hex_B,t_hex_L,sdata,count)
+        string_to_print = "%016X %016X %s\tRate:% d" % (t_hex_B,t_hex_L,sdata,count)
         print(string_to_print, end='\r',flush=True)
         old_print_date = date_now
         count=0
