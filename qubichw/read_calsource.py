@@ -19,6 +19,7 @@ import adafruit_ads1x15.ads1015 as ADS
 import socket
 import datetime as dt
 import numpy as np
+import struct
 
 # data is sent as a numpy record, to be unpacked by QubicStudio (and others)
 rec = np.recarray(names="STX,TIMESTAMP,VALUE",formats="uint8,float64,int64",shape=(1))
