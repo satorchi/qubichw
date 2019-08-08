@@ -44,9 +44,9 @@ IP_QUBIC_CENTRAL = "192.168.2.1"
 IP_PIGPS = "192.168.2.17"
 IP_QUBICSTUDIO = "192.168.2.8"
 
-receivers = [IP_QUBIC_CENTRAL,
-             IP_PIGPS,
-             IP_QUBICSTUDIO ]
+receivers = [IP_QUBICSTUDIO,
+             IP_QUBIC_CENTRAL,
+             IP_PIGPS]
 
 
 PORT = 31337
