@@ -90,6 +90,7 @@ class calsource_configuration_manager():
         self.role = role
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
+        print('DEBUG:assign_variables:setting amp_on to None')
         self.amp_on = None   # need to find a way to detect this
         self.lamp_on = None  # need to find a way to detect this
 
