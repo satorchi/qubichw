@@ -319,7 +319,8 @@ class calsource_configuration_manager():
                 self.amp_on = states[3]
             if 2 in states.keys():
                 self.lamp_on = states[2]
-    
+
+        print('DEBUG:ONOFF:ACK=%s' % ack)
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         return ack
 
@@ -337,7 +338,8 @@ class calsource_configuration_manager():
             else:
                 msg += 'OFF'
         else:
-            msg += 'UNKNOWN'
+            #msg += 'UNKNOWN'
+            msg += type(self.amp_on) # for debugging
 
         for dev in ['arduino','calsource','modulator']:
             msg += ' %s:' % dev
