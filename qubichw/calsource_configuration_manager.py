@@ -317,7 +317,7 @@ class calsource_configuration_manager():
         if ack=='OK':
             if 3 in states.keys():
                 self.amp_on = states[3]
-                print('DEBUG:ONOFF:amp_on=%s' % self.amp_on)
+                print('DEBUG:ONOFF:states=%s' % states)
             if 2 in states.keys():
                 self.lamp_on = states[2]
 
