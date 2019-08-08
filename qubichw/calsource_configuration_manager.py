@@ -333,6 +333,7 @@ class calsource_configuration_manager():
         '''
         return status of all the components
         '''
+        print('DEBUG:STATUS:amp_on=%s' % self.amp_on)
         msg = ''
         dev = 'amplifier'
         msg += '%s:' % dev
@@ -494,6 +495,7 @@ class calsource_configuration_manager():
         cmdstr = None
         keepgoing = True
         while keepgoing:
+            print('DEBUG:LISTEN_LOOP:amp_on=%s' % self.amp_on)
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             command = self.parse_command_string(cmdstr)
