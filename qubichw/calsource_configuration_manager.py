@@ -317,6 +317,7 @@ class calsource_configuration_manager():
         if ack=='OK':
             if 3 in states.keys():
                 self.amp_on = states[3]
+                print('DEBUG:ONOFF:amp_on=%s' % self.amp_on)
             if 2 in states.keys():
                 self.lamp_on = states[2]
 
@@ -339,7 +340,7 @@ class calsource_configuration_manager():
                 msg += 'OFF'
         else:
             #msg += 'UNKNOWN'
-            msg += type(self.amp_on) # for debugging
+            msg += str(type(self.amp_on)) # for debugging
 
         for dev in ['arduino','calsource','modulator']:
             msg += ' %s:' % dev
