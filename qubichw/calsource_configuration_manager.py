@@ -318,10 +318,11 @@ class calsource_configuration_manager():
             if 3 in states.keys():
                 self.amp_on = states[3]
                 print('DEBUG:ONOFF:states=%s' % states)
+                print('DEBUG:ONOFF:states[3]=%s' % states[3])
+                print('DEBUG:ONOFF:amp_on=%s' % self.amp_on)
             if 2 in states.keys():
                 self.lamp_on = states[2]
 
-        print('DEBUG:ONOFF:ACK=%s' % ack)
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         return ack
 
