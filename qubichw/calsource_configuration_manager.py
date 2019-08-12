@@ -492,7 +492,7 @@ class calsource_configuration_manager():
             ack += '%s ' % self.status()
             
 
-        retval.append(ack.strip())
+        retval['ACK'] = ack.strip()
         print('DEBUG:INTERPRET_COMMANDS 3:amp_on=%s' % self.amplifier_on)
         return retval
 
@@ -516,7 +516,7 @@ class calsource_configuration_manager():
 
             # interpret the commands in a separate process and continue listening
             manager = multiprocessing.Manager()
-            retval = manager.list()
+            retval = manager.dict()
             proc = multiprocessing.Process(target=self.interpret_commands, args=(command,retval))
             proc.start()
             print('DEBUG:LISTEN_LOOP 3:amp_on=%s' % self.amplifier_on)
@@ -548,7 +548,9 @@ class calsource_configuration_manager():
             if len(retval)==0:
                 ack = 'no acknowledgement'
             else:
-                ack = retval[0]
+                ack = retval['ACK']
+            if 'amplifier_on' in retval.keys():
+                self.amplifier_on = retval['amplifier_on']
             print('DEBUG:LISTEN_LOOP B4ACK:amp_on=%s' % self.amplifier_on)
             self.send_acknowledgement(ack,addr)
             print('DEBUG:LISTEN_LOOP RELOOPING:amp_on=%s' % self.amplifier_on)
