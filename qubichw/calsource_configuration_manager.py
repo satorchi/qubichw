@@ -51,7 +51,6 @@ class calsource_configuration_manager():
         '''
         log message to screen and to a file
         '''
-        print('DEBUG:LOG 0:amp_on=%s' % self.amplifier_on)
         if verbosity > self.verbosity: return
         
         filename = 'calsource_configuration_%s.log' % self.role
@@ -59,7 +58,6 @@ class calsource_configuration_manager():
         h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)
-        print('DEBUG:LOG 1:amp_on=%s' % self.amplifier_on)
         return
 
     def command_help(self):
@@ -92,7 +90,6 @@ class calsource_configuration_manager():
         self.role = role
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
-        print('DEBUG:assign_variables:setting amp_on to None')
         self.amplifier_on = None   # need to find a way to detect this
         self.lamp_on = None  # need to find a way to detect this
 
@@ -320,14 +317,10 @@ class calsource_configuration_manager():
         if ack=='OK':
             if 3 in states.keys():
                 self.amplifier_on = states[3]
-                print('DEBUG:ONOFF:states=%s' % states)
-                print('DEBUG:ONOFF:states[3]=%s' % states[3])
-                print('DEBUG:ONOFF:amp_on=%s' % self.amplifier_on)
             if 2 in states.keys():
                 self.lamp_on = states[2]
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
-        print('DEBUG:ONOFF:amp_on=%s' % self.amplifier_on)
         return ack
 
 
@@ -335,7 +328,6 @@ class calsource_configuration_manager():
         '''
         return status of all the components
         '''
-        print('DEBUG:STATUS:amp_on=%s' % self.amplifier_on)
         msg = ''
         dev = 'amplifier'
         msg += '%s:' % dev
@@ -386,8 +378,6 @@ class calsource_configuration_manager():
         interpret the dictionary of commands, and take the necessary steps
         this method is called by the "manager"
         '''
-        print('DEBUG:INTERPRET_COMMANDS 0:amp_on=%s' % self.amplifier_on)
-
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
 
         # add None to modulator parameters that are to be set by default
@@ -418,7 +408,6 @@ class calsource_configuration_manager():
                     msg += '%s:%s ' % (dev,command[dev][parm])
         if states:
             msg += 'energenie:%s ' % self.onoff(states)
-            print('DEBUG:INTERPRET_COMMANDS 1:amp_on=%s' % self.amplifier_on)
             retval['amplifier_on'] = self.amplifier_on
             self.log(msg)
             ack += '%s ' % msg
@@ -430,8 +419,6 @@ class calsource_configuration_manager():
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket]:
                     self.device[dev].set_default_settings()
-        print('DEBUG:INTERPRET_COMMANDS 2:amp_on=%s' % self.amplifier_on)
-
 
         # do configuration command for calsource
         dev = 'calsource'
@@ -492,7 +479,6 @@ class calsource_configuration_manager():
             
 
         retval['ACK'] = ack.strip()
-        print('DEBUG:INTERPRET_COMMANDS 3:amp_on=%s' % self.amplifier_on)
         return retval
 
 
@@ -503,12 +489,9 @@ class calsource_configuration_manager():
         cmdstr = None
         keepgoing = True
         while keepgoing:
-            print('DEBUG:LISTEN_LOOP 0:amp_on=%s' % self.amplifier_on)
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
-            print('DEBUG:LISTEN_LOOP 1:amp_on=%s' % self.amplifier_on)
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             command = self.parse_command_string(cmdstr)
-            print('DEBUG:LISTEN_LOOP 2:amp_on=%s' % self.amplifier_on)
             sent_date = dt.datetime.fromtimestamp(command['timestamp']['sent'])
             self.log('command sent:     %s' % sent_date.strftime(self.date_fmt))
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
@@ -518,7 +501,6 @@ class calsource_configuration_manager():
             retval = manager.dict()
             proc = multiprocessing.Process(target=self.interpret_commands, args=(command,retval))
             proc.start()
-            print('DEBUG:LISTEN_LOOP 3:amp_on=%s' % self.amplifier_on)
             if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
                 delta = dt.timedelta(seconds=command['arduino']['duration'])
                 now = dt.datetime.utcnow()
@@ -541,20 +523,15 @@ class calsource_configuration_manager():
             else:
                 cmdstr = None
 
-            print('DEBUG:LISTEN_LOOP B4 JOIN:amp_on=%s' % self.amplifier_on)
             proc.join()
-            print('DEBUG:LISTEN_LOOP AFTER JOIN:amp_on=%s' % self.amplifier_on)
             if len(retval)==0:
                 ack = 'no acknowledgement'
             else:
                 ack = retval['ACK']
             if 'amplifier_on' in retval.keys():
                 self.amplifier_on = retval['amplifier_on']
-            print('DEBUG:LISTEN_LOOP B4ACK:amp_on=%s' % self.amplifier_on)
             self.send_acknowledgement(ack,addr)
-            print('DEBUG:LISTEN_LOOP RELOOPING:amp_on=%s' % self.amplifier_on)
 
-        print('DEBUG:LISTEN_LOOP OUT:amp_on=%s' % self.amplifier_on)    
         return
                 
     def send_command(self,cmd_str):
@@ -583,7 +560,6 @@ class calsource_configuration_manager():
         '''
         send an acknowledgement to the commander
         '''
-        print('DEBUG:SEND_ACK 0:amp_on=%s' % self.amplifier_on)
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
@@ -605,7 +581,6 @@ class calsource_configuration_manager():
         sockname = s.getsockname()
         self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
         #s.close()
-        print('DEBUG:SEND_ACK END:amp_on=%s' % self.amplifier_on)
         return
     
     def command_loop(self):
