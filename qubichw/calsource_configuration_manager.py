@@ -504,8 +504,10 @@ class calsource_configuration_manager():
         while keepgoing:
             print('DEBUG:LISTEN_LOOP 0:amp_on=%s' % self.amplifier_on)
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
+            print('DEBUG:LISTEN_LOOP 1:amp_on=%s' % self.amplifier_on)
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             command = self.parse_command_string(cmdstr)
+            print('DEBUG:LISTEN_LOOP 2:amp_on=%s' % self.amplifier_on)
             sent_date = dt.datetime.fromtimestamp(command['timestamp']['sent'])
             self.log('command sent:     %s' % sent_date.strftime(self.date_fmt))
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
@@ -515,6 +517,7 @@ class calsource_configuration_manager():
             retval = manager.list()
             proc = multiprocessing.Process(target=self.interpret_commands, args=(command,retval))
             proc.start()
+            print('DEBUG:LISTEN_LOOP 3:amp_on=%s' % self.amplifier_on)
             if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
                 delta = dt.timedelta(seconds=command['arduino']['duration'])
                 now = dt.datetime.utcnow()
@@ -542,9 +545,8 @@ class calsource_configuration_manager():
                 ack = 'no acknowledgement'
             else:
                 ack = retval[0]
-            print('DEBUG:LISTEN_LOOP 1:amp_on=%s' % self.amplifier_on)
             self.send_acknowledgement(ack,addr)
-            print('DEBUG:LISTEN_LOOP 2:amp_on=%s' % self.amplifier_on)
+            print('DEBUG:LISTEN_LOOP RELOOPING:amp_on=%s' % self.amplifier_on)
 
         print('DEBUG:LISTEN_LOOP OUT:amp_on=%s' % self.amplifier_on)    
         return
