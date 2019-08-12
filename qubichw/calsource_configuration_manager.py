@@ -386,6 +386,7 @@ class calsource_configuration_manager():
         interpret the dictionary of commands, and take the necessary steps
         this method is called by the "manager"
         '''
+        print('DEBUG:INTERPRET_COMMANDS 0:amp_on=%s' % self.amplifier_on)
 
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
 
@@ -417,6 +418,7 @@ class calsource_configuration_manager():
                     msg += '%s:%s ' % (dev,command[dev][parm])
         if states:
             msg += 'energenie:%s ' % self.onoff(states)
+            print('DEBUG:INTERPRET_COMMANDS 1:amp_on=%s' % self.amplifier_on)
             self.log(msg)
             ack += '%s ' % msg
             # wait before doing other stuff
