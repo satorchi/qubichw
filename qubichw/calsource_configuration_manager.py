@@ -502,7 +502,7 @@ class calsource_configuration_manager():
         cmdstr = None
         keepgoing = True
         while keepgoing:
-            print('DEBUG:LISTEN_LOOP:amp_on=%s' % self.amplifier_on)
+            print('DEBUG:LISTEN_LOOP 0:amp_on=%s' % self.amplifier_on)
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             command = self.parse_command_string(cmdstr)
@@ -542,9 +542,11 @@ class calsource_configuration_manager():
                 ack = 'no acknowledgement'
             else:
                 ack = retval[0]
+            print('DEBUG:LISTEN_LOOP 1:amp_on=%s' % self.amplifier_on)
             self.send_acknowledgement(ack,addr)
+            print('DEBUG:LISTEN_LOOP 2:amp_on=%s' % self.amplifier_on)
 
-            
+        print('DEBUG:LISTEN_LOOP OUT:amp_on=%s' % self.amplifier_on)    
         return
                 
     def send_command(self,cmd_str):
