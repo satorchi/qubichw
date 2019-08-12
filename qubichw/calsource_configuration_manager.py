@@ -429,6 +429,8 @@ class calsource_configuration_manager():
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket]:
                     self.device[dev].set_default_settings()
+        print('DEBUG:INTERPRET_COMMANDS 2:amp_on=%s' % self.amplifier_on)
+
 
         # do configuration command for calsource
         dev = 'calsource'
@@ -489,6 +491,7 @@ class calsource_configuration_manager():
             
 
         retval.append(ack.strip())
+        print('DEBUG:INTERPRET_COMMANDS 3:amp_on=%s' % self.amplifier_on)
         return retval
 
 
