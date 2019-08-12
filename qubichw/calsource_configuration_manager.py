@@ -51,6 +51,7 @@ class calsource_configuration_manager():
         '''
         log message to screen and to a file
         '''
+        print('DEBUG:LOG 0:amp_on=%s' % self.amplifier_on)
         if verbosity > self.verbosity: return
         
         filename = 'calsource_configuration_%s.log' % self.role
@@ -58,6 +59,7 @@ class calsource_configuration_manager():
         h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)
+        print('DEBUG:LOG 1:amp_on=%s' % self.amplifier_on)
         return
 
     def command_help(self):
@@ -577,6 +579,7 @@ class calsource_configuration_manager():
         '''
         send an acknowledgement to the commander
         '''
+        print('DEBUG:SEND_ACK 0:amp_on=%s' % self.amplifier_on)
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
@@ -598,6 +601,7 @@ class calsource_configuration_manager():
         sockname = s.getsockname()
         self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
         #s.close()
+        print('DEBUG:SEND_ACK END:amp_on=%s' % self.amplifier_on)
         return
     
     def command_loop(self):
