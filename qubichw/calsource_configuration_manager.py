@@ -304,7 +304,6 @@ class calsource_configuration_manager():
         reset_delta = self.energenie_timeout # minimum time to wait
         now = dt.datetime.utcnow()
         delta = tot_seconds(now - self.energenie_lastcommand_date)
-        amp_on = False
 
         if delta < reset_delta:
             extra_wait = reset_delta - delta
@@ -320,14 +319,13 @@ class calsource_configuration_manager():
         # check for the amplifier and lamp
         if ack=='OK':
             if 3 in states.keys():
-                amp_on = states[3]
+                self.amplifier_on = states[3]
                 print('DEBUG:ONOFF:states=%s' % states)
                 print('DEBUG:ONOFF:states[3]=%s' % states[3])
-                print('DEBUG:ONOFF:amp_on=%s' % amp_on)
+                print('DEBUG:ONOFF:amp_on=%s' % self.amplifier_on)
             if 2 in states.keys():
                 self.lamp_on = states[2]
 
-        self.amplifier_on = amp_on
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         print('DEBUG:ONOFF:amp_on=%s' % self.amplifier_on)
         return ack
@@ -421,6 +419,7 @@ class calsource_configuration_manager():
         if states:
             msg += 'energenie:%s ' % self.onoff(states)
             print('DEBUG:INTERPRET_COMMANDS 1:amp_on=%s' % self.amplifier_on)
+            retval['amplifier_on'] = self.amplifier_on
             self.log(msg)
             ack += '%s ' % msg
             # wait before doing other stuff
