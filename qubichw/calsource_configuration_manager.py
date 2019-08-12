@@ -542,7 +542,9 @@ class calsource_configuration_manager():
             else:
                 cmdstr = None
 
+            print('DEBUG:LISTEN_LOOP B4 JOIN:amp_on=%s' % self.amplifier_on)
             proc.join()
+            print('DEBUG:LISTEN_LOOP AFTER JOIN:amp_on=%s' % self.amplifier_on)
             if len(retval)==0:
                 ack = 'no acknowledgement'
             else:
