@@ -91,7 +91,7 @@ class calsource_configuration_manager():
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
         print('DEBUG:assign_variables:setting amp_on to None')
-        self.amp_on = None   # need to find a way to detect this
+        self.amplifier_on = None   # need to find a way to detect this
         self.lamp_on = None  # need to find a way to detect this
 
         self.valid_commands = {}
@@ -325,9 +325,9 @@ class calsource_configuration_manager():
             if 2 in states.keys():
                 self.lamp_on = states[2]
 
-        self.amp_on = amp_on
+        self.amplifier_on = amp_on
         self.energenie_lastcommand_date = dt.datetime.utcnow()
-        print('DEBUG:ONOFF:amp_on=%s' % self.amp_on)
+        print('DEBUG:ONOFF:amp_on=%s' % self.amplifier_on)
         return ack
 
 
@@ -335,18 +335,18 @@ class calsource_configuration_manager():
         '''
         return status of all the components
         '''
-        print('DEBUG:STATUS:amp_on=%s' % self.amp_on)
+        print('DEBUG:STATUS:amp_on=%s' % self.amplifier_on)
         msg = ''
         dev = 'amplifier'
         msg += '%s:' % dev
-        if self.amp_on is not None:
-            if self.amp_on:
+        if self.amplifier_on is not None:
+            if self.amplifier_on:
                 msg += 'ON'
             else:
                 msg += 'OFF'
         else:
             msg += 'UNKNOWN'
-            #msg += str(type(self.amp_on)) # for debugging
+            #msg += str(type(self.amplifier_on)) # for debugging
 
         for dev in ['arduino','calsource','modulator']:
             msg += ' %s:' % dev
@@ -497,7 +497,7 @@ class calsource_configuration_manager():
         cmdstr = None
         keepgoing = True
         while keepgoing:
-            print('DEBUG:LISTEN_LOOP:amp_on=%s' % self.amp_on)
+            print('DEBUG:LISTEN_LOOP:amp_on=%s' % self.amplifier_on)
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             command = self.parse_command_string(cmdstr)
