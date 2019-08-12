@@ -547,6 +547,7 @@ class calsource_configuration_manager():
                 ack = 'no acknowledgement'
             else:
                 ack = retval[0]
+            print('DEBUG:LISTEN_LOOP B4ACK:amp_on=%s' % self.amplifier_on)
             self.send_acknowledgement(ack,addr)
             print('DEBUG:LISTEN_LOOP RELOOPING:amp_on=%s' % self.amplifier_on)
 
