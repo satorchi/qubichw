@@ -356,7 +356,7 @@ class calsource_configuration_manager():
             else:
                 msg += ' %s:frequency=UNKNOWN' % dev
             if self.synthesiser_frequency is not None:
-                msg += ' synthesiser:frequency=%.02fGHz' % (dev,self.synthesiser_frequency)
+                msg += ' synthesiser:frequency=%.02fGHz' % self.synthesiser_frequency
             else:
                 msg += ' synthesiser:frequency=UNKNOWN'
             
