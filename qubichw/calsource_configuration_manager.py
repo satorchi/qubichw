@@ -92,6 +92,8 @@ class calsource_configuration_manager():
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
         self.amplifier_on = None   # need to find a way to detect this
         self.lamp_on = None  # need to find a way to detect this
+        self.calsource_frequency = None # it would be better if we could read this from the device
+        self.synthesiser_frequency = None # or this one
 
         self.valid_commands = {}
         self.valid_commands['modulator'] = ['on','off','frequency','amplitude','offset','duty','shape']
@@ -347,6 +349,17 @@ class calsource_configuration_manager():
             else:
                 msg += 'OFF'
 
+        dev = 'calsource'
+        if self.device[dev].is_connected():
+            if self.calsource_frequency is not None:
+                msg += ' %s:frequency=%.02fGHz' % (dev,self.calsource_frequency)
+            else:
+                msg += ' %s:frequency=UNKNOWN' % dev
+            if self.synthesiser_frequency is not None:
+                msg += ' synthesiser:frequency=%.02fGHz' % (dev,self.synthesiser_frequency)
+            else:
+                msg += ' synthesiser:frequency=UNKNOWN'
+            
         dev = 'modulator'
         if self.device[dev].is_connected():
             settings = self.device[dev].read_settings(show=False)
@@ -428,8 +441,12 @@ class calsource_configuration_manager():
             msg = '%s:%s=%.1fGHz ' % (dev,parm,command[dev][parm])
             if of is None:
                 msg += 'FAILED'
+                retval['calsource_frequency'] = None
+                retval['synthesiser_frequency'] = None
             else:
                 msg += 'synthesiser:frequency=%.6fGHz' % of
+                retval['calsource_frequency'] = command[dev][parm]
+                retval['synthesiser_frequency'] = of
             self.log(msg)
             ack += '%s ' % msg
                 
@@ -530,6 +547,11 @@ class calsource_configuration_manager():
                 ack = retval['ACK']
             if 'amplifier_on' in retval.keys():
                 self.amplifier_on = retval['amplifier_on']
+            if 'calsource_frequency' in retval.keys():
+                self.calsource_frequency = retval['calsource_frequency']
+            if 'synthesiser_frequency' in retval.keys():
+                self.synthesiser_frequency = retval['synthesiser_frequency']
+            
             self.send_acknowledgement(ack,addr)
 
         return
