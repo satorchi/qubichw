@@ -352,11 +352,11 @@ class calsource_configuration_manager():
         dev = 'calsource'
         if self.device[dev].is_connected():
             if self.calsource_frequency is not None:
-                msg += ' %s:frequency=%.02fGHz' % (dev,self.calsource_frequency)
+                msg += ' %s:frequency=%.06fGHz' % (dev,self.calsource_frequency)
             else:
                 msg += ' %s:frequency=UNKNOWN' % dev
             if self.synthesiser_frequency is not None:
-                msg += ' synthesiser:frequency=%.02fGHz' % self.synthesiser_frequency
+                msg += ' synthesiser:frequency=%.06fGHz' % self.synthesiser_frequency
             else:
                 msg += ' synthesiser:frequency=UNKNOWN'
             
