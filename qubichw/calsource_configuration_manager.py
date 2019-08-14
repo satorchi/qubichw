@@ -352,11 +352,11 @@ class calsource_configuration_manager():
         dev = 'calsource'
         if self.device[dev].is_connected():
             if self.calsource_frequency is not None:
-                msg += ' %s:frequency=%.06fGHz' % (dev,self.calsource_frequency)
+                msg += ' %s:frequency=%+06fGHz' % (dev,self.calsource_frequency)
             else:
                 msg += ' %s:frequency=UNKNOWN' % dev
             if self.synthesiser_frequency is not None:
-                msg += ' synthesiser:frequency=%.06fGHz' % self.synthesiser_frequency
+                msg += ' synthesiser:frequency=%+06fGHz' % self.synthesiser_frequency
             else:
                 msg += ' synthesiser:frequency=UNKNOWN'
             
@@ -438,13 +438,13 @@ class calsource_configuration_manager():
         parm =  'frequency'
         if dev in command.keys() and parm in command[dev].keys():
             of = self.device[dev].set_Frequency(command[dev][parm])
-            msg = '%s:%s=%.6fGHz ' % (dev,parm,command[dev][parm])
+            msg = '%s:%s=%+06fGHz ' % (dev,parm,command[dev][parm])
             if of is None:
                 msg += 'FAILED'
                 retval['calsource_frequency'] = None
                 retval['synthesiser_frequency'] = None
             else:
-                msg += 'synthesiser:frequency=%.6fGHz' % of
+                msg += 'synthesiser:frequency=%+06fGHz' % of
                 retval['calsource_frequency'] = command[dev][parm]
                 retval['synthesiser_frequency'] = of
             self.log(msg)
