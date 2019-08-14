@@ -118,7 +118,7 @@ class calsource_configuration_manager():
         self.known_hosts['pigps'] = '192.168.2.17'
         
         self.broadcast_port = 37020
-        self.nbytes = 256
+        self.nbytes = 512
         self.receiver = self.known_hosts['pigps']
 
         self.energenie = None
