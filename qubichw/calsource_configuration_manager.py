@@ -438,7 +438,7 @@ class calsource_configuration_manager():
         parm =  'frequency'
         if dev in command.keys() and parm in command[dev].keys():
             of = self.device[dev].set_Frequency(command[dev][parm])
-            msg = '%s:%s=%.1fGHz ' % (dev,parm,command[dev][parm])
+            msg = '%s:%s=%.6fGHz ' % (dev,parm,command[dev][parm])
             if of is None:
                 msg += 'FAILED'
                 retval['calsource_frequency'] = None

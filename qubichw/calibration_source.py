@@ -99,12 +99,15 @@ class calibration_source:
         check if the calibration source is connected
         '''
         if self.s is None:
+            print('DEBUG:CALSOURCE is_connected:self.s is None')
             return False
 
         if self.port is None:
+            print('DEBUG:CALSOURCE is_connected:self.port is None')
             return False
 
         if not os.path.exists(self.port):
+            print('DEBUG:CALSOURCE is_connected:self.port does not exist: %s' % self.port)
             self.clear_connection()
             return False
         
