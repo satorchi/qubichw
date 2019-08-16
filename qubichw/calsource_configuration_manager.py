@@ -512,7 +512,7 @@ class calsource_configuration_manager():
                 sent_date = dt.datetime.fromtimestamp(command['timestamp']['sent'])
                 self.log('command sent:     %s' % sent_date.strftime(self.date_fmt))
             except:
-                self.log('command sent:     %s' % command['timestamp']['sent']
+                self.log('command sent:     %s' % command['timestamp']['sent'])
                          
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
