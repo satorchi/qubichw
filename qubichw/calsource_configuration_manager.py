@@ -507,10 +507,14 @@ class calsource_configuration_manager():
         keepgoing = True
         while keepgoing:
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
-            received_date = dt.datetime.fromtimestamp(received_tstamp)
             command = self.parse_command_string(cmdstr)
-            sent_date = dt.datetime.fromtimestamp(command['timestamp']['sent'])
-            self.log('command sent:     %s' % sent_date.strftime(self.date_fmt))
+            try:
+                sent_date = dt.datetime.fromtimestamp(command['timestamp']['sent'])
+                self.log('command sent:     %s' % sent_date.strftime(self.date_fmt))
+            except:
+                self.log('command sent:     %s' % command['timestamp']['sent']
+                         
+            received_date = dt.datetime.fromtimestamp(received_tstamp)
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
             # interpret the commands in a separate process and continue listening
