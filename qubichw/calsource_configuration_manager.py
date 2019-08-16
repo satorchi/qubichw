@@ -169,12 +169,12 @@ class calsource_configuration_manager():
         
         command_lst = cmdstr.strip().lower().split()
         tstamp_str = command_lst[0]
-        try:
+        try: # in case the commander forgot to send the timestamp before the command
             command['timestamp']['sent'] = eval(tstamp_str)
+            command_lst = command_lst[1:]
         except:
-            command['timestamp']['sent'] = tstamp_str
+            command['timestamp']['sent'] = 0.0
         
-        command_lst = command_lst[1:]
         dev = 'unknown'
         for cmd in command_lst:
             if cmd=='status':
