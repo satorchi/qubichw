@@ -134,6 +134,9 @@ class tg5012:
         read the current settings of the TTi 5012A waveform generator
         '''
         if not self.is_connected():  return None
+
+
+        debugfile = open('modulator_tg5012a.debug.log','a')
         
         self.s.send("*LRN?\n")
         self.answer1 = self.read_response()
@@ -143,10 +146,11 @@ class tg5012:
         # correct some weirdness in the answer
         answer = self.answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
         answer_list = re.split('[+-]',answer)
-        print('\nDEBUG:read_settings split answer=')
+        debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         for idx,item in enumerate(answer_list):
-            print('%02i: %s' % (idx,item))
-        print('\n=============================\n')
+            debugfile.write('%02i: %s' % (idx,item))
+        debugfile.write('\n=============================\n')
+        debugfile.close()
         self.settings = {}
         
         try:
