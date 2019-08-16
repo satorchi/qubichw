@@ -145,11 +145,21 @@ class tg5012:
         self.answer2 = self.read_response()
         self.answer = self.answer1 + self.answer2
         # correct some weirdness in the answer
-        answer = self.answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+        answer = self.answer
         answer_list = re.split('[+-]',answer)
+        id_list = {}
+        id_list[1] = 'frequency'
+        id_list[5] = 'amplitude'
+        id_list[9] = 'offset'
+        id_list[13] = 'duty cycle'
         debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         for idx,item in enumerate(answer_list):
-            debugfile.write('\n%02i: %s' % (idx,item))
+            clean_item = item.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+            clean_item = re.sub(' \.$','',clean_item)
+            item_id = 'unknown'
+            if idx in id.keys():
+                item_id = id_list[idx]
+            debugfile.write('\n%02i: %s: %s' % (idx,item_id,clean_item))
         debugfile.write('\n=============================\n')
         debugfile.close()
         self.settings = {}
