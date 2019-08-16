@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 remote control of the TTi 5012A Signal Generator
 '''
 from __future__ import division, print_function
-import time,os,sys,socket,struct,string
+import time,os,sys,socket,struct,string,re
 from PyMS import PMSDevice
 
 class tg5012:
@@ -141,8 +141,8 @@ class tg5012:
         self.answer2 = self.read_response()
         self.answer = self.answer1 + self.answer2
         # correct some weirdness in the answer
-        self.answer = self.answer.replace('HzHzz','Hz').replace('Hzzz','Hz').replace('Hzz','Hz')
-        print('DEBUG:read_settings answer=%s' % self.answer)
+        self.answer = self.answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+        print('\nDEBUG:read_settings split answer=\n%s\n\n' % re.split('[+-]',self.answer))
 
         self.settings = {}
         
