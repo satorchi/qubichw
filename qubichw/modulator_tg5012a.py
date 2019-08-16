@@ -140,6 +140,10 @@ class tg5012:
         self.s.send("*WAI\n")                   #We do this to get the full response to the LRN? command
         self.answer2 = self.read_response()
         self.answer = self.answer1 + self.answer2
+        # correct some weirdness in the answer
+        self.answer = self.answer.replace('HzHzz','Hz').replace('Hzzz','Hz').replace('Hzz','Hz')
+        print('DEBUG:read_settings answer=%s' % self.answer)
+
         self.settings = {}
         
         try:
@@ -166,7 +170,7 @@ class tg5012:
 
         else:
             self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156]).replace(' ','')
-            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace('HzHzz','Hz').replace(' ','').replace('Hzzz','Hz')
+            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace(' ','')
             self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272]).replace(' ','')
             self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384]).replace(' ','')
     
