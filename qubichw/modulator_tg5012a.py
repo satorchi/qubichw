@@ -160,10 +160,11 @@ class tg5012:
             if idx in id_list.keys():
                 item_id = id_list[idx]
                 match = re.search('[a-zA-Z]',item)
-                val_str = item[:match.start()]
-                val = eval(val_str)
-                units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
-                clean_item = '%+06f%s' % (val,units)
+                if match:
+                    val_str = item[:match.start()]
+                    val = eval(val_str)
+                    units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+                    clean_item = '%+06f%s' % (val,units)
             debugfile.write('\n%02i: %s: %s' % (idx,item_id,clean_item))
 
             
