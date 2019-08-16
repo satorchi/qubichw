@@ -135,7 +135,7 @@ class tg5012:
         read the current settings of the TTi 5012A waveform generator
         '''
         if not self.is_connected():  return None
-
+        self.settings = {}
 
         debugfile = open('modulator_tg5012a.debug.log','a')
         
@@ -172,7 +172,6 @@ class tg5012:
             
         debugfile.write('\n=============================\n')
         debugfile.close()
-        self.settings = {}
         
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
