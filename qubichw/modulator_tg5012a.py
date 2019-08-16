@@ -157,7 +157,7 @@ class tg5012:
             clean_item = item.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
             clean_item = re.sub(' \.$','',clean_item)
             item_id = 'unknown'
-            if idx in id.keys():
+            if idx in id_list.keys():
                 item_id = id_list[idx]
             debugfile.write('\n%02i: %s: %s' % (idx,item_id,clean_item))
         debugfile.write('\n=============================\n')
