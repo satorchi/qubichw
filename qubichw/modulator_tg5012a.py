@@ -149,10 +149,11 @@ class tg5012:
         answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
         answer_list = re.split('[+-]',answer)
         id_list = {}
-        id_list[1] = 'frequency'
-        id_list[5] = 'amplitude'
-        id_list[9] = 'offset'
-        id_list[13] = 'duty cycle'
+        id_list[1]  = 'frequency'
+        id_list[5]  = 'amplitude'
+        id_list[9]  = 'offset'
+        id_list[13] = 'duty'
+        id_list[33] = 'dc offset'
         debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         for idx,item in enumerate(answer_list):
             clean_item = re.sub(' \.$','',item)
@@ -165,7 +166,8 @@ class tg5012:
                     val = eval(val_str)
                     units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
                     clean_item = '%+06f %s' % (val,units)
-            debugfile.write('\n%02i: %40s: %s' % (idx,item_id,clean_item))
+                    self.settings[item_id] = '%+06f%s' % (val,units)
+            debugfile.write('\n%02i: %12s: %s' % (idx,item_id,clean_item))
 
             
         debugfile.write('\n=============================\n')
@@ -177,7 +179,7 @@ class tg5012:
             self.shape_value = ord(struct.unpack("c",self.answer[918])[0]) 
         except:
             print("Error while reading the shape")
-            return False
+            self.shape_value = -1
 
         self.shape_dict = {
             0: 'SINE',
@@ -189,16 +191,18 @@ class tg5012:
         self.settings['shape'] = self.shape_dict.get(self.shape_value, "UNKNOWN")
         # Filtering non printable characters and an s at the beginning
         if(self.settings['shape'] ==  'DC'):
-            self.settings['offset'] = filter(lambda x: x in string.printable, self.answer[923:950])
+            #self.settings['offset'] = filter(lambda x: x in string.printable, self.answer[923:950])
+            self.settings['offset'] = self.settings['dc offset']
             self.settings['amplitude'] = '--'
             self.settings['frequency'] = '--'
             self.settings['duty']='--'
-
+        '''
         else:
             self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156]).replace(' ','')
             self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace(' ','')
             self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272]).replace(' ','')
             self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384]).replace(' ','')
+        '''
     
         if show:
             print("Shape:%s" % self.settings['shape'])
