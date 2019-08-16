@@ -141,9 +141,12 @@ class tg5012:
         self.answer2 = self.read_response()
         self.answer = self.answer1 + self.answer2
         # correct some weirdness in the answer
-        self.answer = self.answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
-        print('\nDEBUG:read_settings split answer=\n%s\n\n' % re.split('[+-]',self.answer))
-
+        answer = self.answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+        answer_list = re.split('[+-]',answer)
+        print('\nDEBUG:read_settings split answer=')
+        for idx,item in enumerate(answer_list):
+            print('%02i: %s' % (idx,item))
+        print('\n=============================\n')
         self.settings = {}
         
         try:
