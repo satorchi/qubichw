@@ -145,7 +145,8 @@ class tg5012:
         self.answer2 = self.read_response()
         self.answer = self.answer1 + self.answer2
         # correct some weirdness in the answer
-        answer = self.answer
+        answer = filter(lambda x: x in string.printable, self.answer)
+        answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
         answer_list = re.split('[+-]',answer)
         id_list = {}
         id_list[1] = 'frequency'
@@ -154,8 +155,7 @@ class tg5012:
         id_list[13] = 'duty cycle'
         debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         for idx,item in enumerate(answer_list):
-            clean_item = item.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
-            clean_item = re.sub(' \.$','',clean_item)
+            clean_item = re.sub(' \.$','',item)
             item_id = 'unknown'
             if idx in id_list.keys():
                 item_id = id_list[idx]
@@ -163,9 +163,9 @@ class tg5012:
                 if match:
                     val_str = item[:match.start()]
                     val = eval(val_str)
-                    units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHzz','mHz').replace('mHzkHz','mHz')
+                    units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
                     clean_item = '%+06f %s' % (val,units)
-            debugfile.write('\n%02i: %s: %s' % (idx,item_id,clean_item))
+            debugfile.write('\n%02i: %40s: %s' % (idx,item_id,clean_item))
 
             
         debugfile.write('\n=============================\n')
