@@ -12,6 +12,7 @@ remote control of the TTi 5012A Signal Generator
 '''
 from __future__ import division, print_function
 import time,os,sys,socket,struct,string,re
+import datetime as dt
 from PyMS import PMSDevice
 
 class tg5012:
