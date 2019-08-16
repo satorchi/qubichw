@@ -149,7 +149,7 @@ class tg5012:
         answer_list = re.split('[+-]',answer)
         debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         for idx,item in enumerate(answer_list):
-            debugfile.write('%02i: %s' % (idx,item))
+            debugfile.write('\n%02i: %s' % (idx,item))
         debugfile.write('\n=============================\n')
         debugfile.close()
         self.settings = {}
