@@ -359,10 +359,9 @@ class horn_monitor:
             
             dat = h[1].data.field(0)
             obsdate = str2dt(h[1].header['DATE-OBS'])
-            obsdate_str = dt.datetime.utcnow().strftime(self.date_fmt)
+            obsdate_str = obsdate.strftime(self.date_fmt)
 
-            keys = h[1].header.keys()
-            if 'IS_GOOD' in keys:
+            if 'IS_GOOD' in h[1].header.keys():
                 if h[1].header['IS_GOOD']==1:
                     goodbad = 'good'
                 else:
@@ -370,12 +369,12 @@ class horn_monitor:
             else:
                 goodbad = 'unknown'
                 
-            if 'HORN_ID' in keys:
+            if 'HORN_ID' in h[1].header.keys():
                 hornid = h[1].header['HORN_ID']
             else:
                 hornid = 'unknown'
                 
-            if 'CHANNEL' in keys:
+            if 'CHANNEL' in h[1].header.keys():
                 channel = h[1].header['CHANNEL']
             else:
                 channel = 'unknown'
