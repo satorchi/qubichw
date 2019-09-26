@@ -129,6 +129,22 @@ class calsource_configuration_manager():
         if self.hostname is None and 'HOST' in os.environ.keys():
             self.hostname = os.environ['HOST']
             
+        # try to get hostname from the ethernet device
+        cmd = '/sbin/ifconfig -a'
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = proc.communicate()
+        match = re.match('.* inet (192\.168\.2\..*?) ',out.replace('\n',' '))
+        if match:
+            ip_addr = match.groups()[0]
+            if ip_addr in self.known_hosts.values():
+                self.hostname = next(key for key,val in self.known_hosts.items() if val==ip_addr)
+            else:
+                self.hostname = ip_addr
+
+        # finally, if still undefined
+        if self.hostname is None:
+            self.hostname = 'localhost'
+
         if role is None and (self.hostname=='calsource' or self.hostname=='pigps'):
             role = 'manager'
         self.role = role
@@ -140,19 +156,6 @@ class calsource_configuration_manager():
             self.device['calsource'] = calibration_source('LF')
             self.device['arduino']   = arduino()
             self.device['amplifier'] = amplifier()
-
-        # try to get hostname from the ethernet device
-        cmd = '/sbin/ifconfig -a'
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = proc.communicate()
-        match = re.match('.* inet (192\.168\.2\..*?) ',out.replace('\n',' '))
-        if match:
-            ip_addr = match.groups()[0]
-            self.hostname = ip_addr
-
-        # finally, if still undefined
-        if self.hostname is None:
-            self.hostname = 'localhost'
 
         self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
         return None
