@@ -27,7 +27,7 @@ class amplifier:
         self.s = None
         self.port = None
         self.init(port=port)
-        self.default_settings()
+        self.set_default_settings()
         return None
 
 
