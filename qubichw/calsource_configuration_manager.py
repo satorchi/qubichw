@@ -417,6 +417,7 @@ class calsource_configuration_manager():
         devlist.remove('all')
         devlist.remove('timestamp')
         for dev in devlist:
+            self.log('running onoff for %s' % dev,verbosity=1)
             if parm in command[dev].keys():
                 state = None
                 if command[dev][parm] == 'on':
