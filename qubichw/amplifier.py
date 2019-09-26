@@ -81,7 +81,7 @@ class amplifier:
         return True
     
     
-    def set_default_settings():
+    def set_default_settings(self):
         if not self.is_connected():return False
         self.s.write('LALL\n')    # tell device to listen
         self.s.write('FLTM 1\n')  # filter mode: 6dB low pass
