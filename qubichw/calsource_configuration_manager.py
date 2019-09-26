@@ -21,6 +21,9 @@ from PyMS import PMSDevice
 # the calibration source
 from qubichw.calibration_source import calibration_source
 
+# the low noise amplifier
+from qubichw.amplifier import amplifier
+
 # the signal generator for modulating the calibration source
 #from qubichw.modulator import modulator
 from qubichw.modulator_tg5012a import tg5012 as modulator
@@ -126,7 +129,7 @@ class calsource_configuration_manager():
         if self.hostname is None and 'HOST' in os.environ.keys():
             self.hostname = os.environ['HOST']
             
-        if role is None and self.hostname=='calsource':
+        if role is None and (self.hostname=='calsource' or self.hostname=='pigps'):
             role = 'manager'
         self.role = role
                 
@@ -136,6 +139,7 @@ class calsource_configuration_manager():
             self.device['modulator'] = modulator()
             self.device['calsource'] = calibration_source('LF')
             self.device['arduino']   = arduino()
+            self.device['amplifier'] = amplifier()
 
         # try to get hostname from the ethernet device
         cmd = '/sbin/ifconfig -a'
@@ -428,7 +432,7 @@ class calsource_configuration_manager():
             time.sleep(3)
 
             # initialize devices that need initializing
-            for dev in ['modulator','calsource']:
+            for dev in ['modulator','calsource','amplifier']:
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket]:
                     self.device[dev].set_default_settings()
