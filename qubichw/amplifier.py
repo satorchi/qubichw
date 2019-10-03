@@ -337,11 +337,11 @@ class amplifier:
         show the current configuration
         '''
         msg  = 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
-        msg += 'amplifier:dynamic=%s' % self.state['dynamic'].replace(' ','_')
-        msg += 'amplifier:gain=%i' % self.state['gain']
+        msg += ' amplifier:dynamic=%s' % self.state['dynamic'].replace(' ','_')
+        msg += ' amplifier:gain=%i' % self.state['gain']
         if self.state['filter low frequency'] is not None:
-            msg += 'amplifier:low_frequency=%.2fHz' % self.state['filter low frequency']
+            msg += ' amplifier:low_frequency=%.2fHz' % self.state['filter low frequency']
         if self.state['filter high frequency'] is not None:
-            msg += 'amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
-        msg += 'amplifier:coupling=%s' % self.state['coupling']
+            msg += ' amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
+        msg += ' amplifier:coupling=%s' % self.state['coupling']
         return msg
