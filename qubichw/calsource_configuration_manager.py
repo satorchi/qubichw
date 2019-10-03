@@ -355,6 +355,10 @@ class calsource_configuration_manager():
             msg += 'UNKNOWN'
             #msg += str(type(self.amplifier_on)) # for debugging
 
+        if (self.amplifier_on is None or self.amplifier_on) and self.device[dev].is_connected():
+            msg += ' '+self.device[dev].status()
+            
+
         for dev in ['arduino','calsource','modulator']:
             msg += ' %s:' % dev
             if self.device[dev].is_connected():
@@ -396,9 +400,6 @@ class calsource_configuration_manager():
                      dev,settings['offset'],
                      dev,settings['duty'])
 
-        dev = 'amplifier'
-        if self.device[dev].is_connected():
-            msg += ' '+self.device[dev].status()
             
         return msg
     
