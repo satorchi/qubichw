@@ -31,7 +31,7 @@ class amplifier:
         self.state['filter low frequency'] = None
         self.state['filter high frequency'] = None
         self.state['coupling'] = None
-        self.state['dynamic range'] = None
+        self.state['dynamic'] = None
         self.state['gain'] = None
         
         self.init(port=port)
@@ -102,7 +102,7 @@ class amplifier:
         self.state['filter mode'] = '6dB low pass'
         self.state['filter low frequency'] = 30.0
         self.state['coupling'] = 'DC'
-        self.state['dynamic range'] = 'high'
+        self.state['dynamic'] = 'high'
         self.state['gain'] = 2000
         return
 
@@ -284,7 +284,7 @@ class amplifier:
             return 'amplifier:disconnected'
 
         valid_settings = ['filter_mode',
-                          'dynamic_range',
+                          'dynamic',
                           'gain',
                           'low_frequency',
                           'high_frequency',
@@ -299,11 +299,11 @@ class amplifier:
                 return 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
             return 'amplifier:filter_mode=FAILED'
 
-        if setting=='dynamic_range':
+        if setting=='dynamic':
             chk = self.set_dynamic(value)
             if chk:
-                return 'amplifier:dynamic_range=%s' % self.state['dynamic'].replace(' ','_')
-            return 'amplifier:dynamic_range=FAILED'
+                return 'amplifier:dynamic=%s' % self.state['dynamic'].replace(' ','_')
+            return 'amplifier:dynamic=FAILED'
 
         if setting=='gain':
             chk = self.set_gain(value)
@@ -337,7 +337,7 @@ class amplifier:
         show the current configuration
         '''
         msg  = 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
-        msg += 'amplifier:dynamic_range=%s' % self.state['dynamic'].replace(' ','_')
+        msg += 'amplifier:dynamic=%s' % self.state['dynamic'].replace(' ','_')
         msg += 'amplifier:gain=%i' % self.state['gain']
         if self.state['filter low frequency'] is not None:
             msg += 'amplifier:low_frequency=%.2fHz' % self.state['filter low frequency']

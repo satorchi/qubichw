@@ -103,7 +103,7 @@ class calsource_configuration_manager():
         self.valid_commands['calsource'] = ['on','off','frequency']
         self.valid_commands['amplifier'] = ['on','off',
                                             'filter_mode',
-                                            'dynamic_range',
+                                            'dynamic',
                                             'gain',
                                             'low_frequency',
                                             'high_frequency',
