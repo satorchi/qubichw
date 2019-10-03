@@ -395,7 +395,10 @@ class calsource_configuration_manager():
                      dev,settings['amplitude'],
                      dev,settings['offset'],
                      dev,settings['duty'])
-        
+
+        dev = 'amplifier'
+        if self.device[dev].is_connected():
+            msg += self.device[dev].status()
             
         return msg
     
@@ -495,7 +498,8 @@ class calsource_configuration_manager():
         dev = 'amplifier'
         if dev in command.keys():
             for parm in command[dev].keys():
-                ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
+                if parm!='onoff': # ignore on/off.  This is executed above.
+                    ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
         
         # run the Arduino last of all
         dev = 'arduino'

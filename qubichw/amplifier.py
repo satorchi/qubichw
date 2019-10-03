@@ -291,7 +291,7 @@ class amplifier:
                           'coupling']
         setting = setting.lower()
         if setting not in valid_settings:
-            return 'amplifer:INVALID_REQUEST'
+            return 'amplifier:INVALID_REQUEST__%s=%s' % (setting,value)
 
         if setting=='filter_mode':
             chk = self.set_filter_mode(value.replace('_',' '))
@@ -305,7 +305,6 @@ class amplifier:
                 return 'amplifier:dynamic_range=%s' % self.state['dynamic'].replace(' ','_')
             return 'amplifier:dynamic_range=FAILED'
 
-        
         if setting=='gain':
             chk = self.set_gain(value)
             if chk:
@@ -333,3 +332,16 @@ class amplifier:
         return 'amplifier:%s=NOTFOUND' % setting
     
     
+    def status(self):
+        '''
+        show the current configuration
+        '''
+        msg  = 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
+        msg += 'amplifier:dynamic_range=%s' % self.state['dynamic'].replace(' ','_')
+        msg += 'amplifier:gain=%i' % self.state['gain']
+        if self.state['filter low frequency'] is not None:
+            msg += 'amplifier:low_frequency=%.2fHz' % self.state['filter low frequency']
+        if self.state['filter high frequency'] is not None:
+            msg += 'amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
+        msg += 'amplifier:coupling=%s' % self.state['coupling']
+        return msg
