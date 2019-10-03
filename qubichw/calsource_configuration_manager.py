@@ -101,7 +101,13 @@ class calsource_configuration_manager():
         self.valid_commands = {}
         self.valid_commands['modulator'] = ['on','off','frequency','amplitude','offset','duty','shape']
         self.valid_commands['calsource'] = ['on','off','frequency']
-        self.valid_commands['amplifier'] = ['on','off']
+        self.valid_commands['amplifier'] = ['on','off',
+                                            'filter_mode',
+                                            'dynamic_range',
+                                            'gain',
+                                            'low_frequency',
+                                            'high_frequency',
+                                            'coupling']
         self.valid_commands['lamp' ]     = ['on','off']
         self.valid_commands['arduino']   = ['duration']
         
@@ -485,6 +491,12 @@ class calsource_configuration_manager():
             ack += '%s ' % msg
 
 
+        # the amplifier configuration
+        dev = 'amplifier'
+        if dev in command.keys():
+            for parm in self.command[dev].keys():
+                ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
+        
         # run the Arduino last of all
         dev = 'arduino'
         if dev in command.keys():
