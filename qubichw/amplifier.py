@@ -174,7 +174,7 @@ class amplifier:
             valid_args = valid_args[0:12]
 
         if frequency not in valid_args:
-            print('ERROR! Invalid filter frequency requested: %.1f Hz' % frequency)
+            print('ERROR! Invalid filter frequency requested: %s' % frequency)
             return False
 
         mode_idx = -1
@@ -191,7 +191,7 @@ class amplifier:
             return False # should never get here.
             
         self.s.write('%s %i\n' % (cmd,mode_idx))
-        self.state['pass %s frequency' % type] = valid_args[mode_idx]
+        self.state['filter %s frequency' % type] = valid_args[mode_idx]
         return True
 
     
