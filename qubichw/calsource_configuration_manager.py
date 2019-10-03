@@ -494,7 +494,7 @@ class calsource_configuration_manager():
         # the amplifier configuration
         dev = 'amplifier'
         if dev in command.keys():
-            for parm in self.command[dev].keys():
+            for parm in command[dev].keys():
                 ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
         
         # run the Arduino last of all
