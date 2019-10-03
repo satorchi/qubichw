@@ -398,7 +398,7 @@ class calsource_configuration_manager():
 
         dev = 'amplifier'
         if self.device[dev].is_connected():
-            msg += self.device[dev].status()
+            msg += ' '+self.device[dev].status()
             
         return msg
     
