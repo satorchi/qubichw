@@ -14,6 +14,7 @@ configure the amplifier in the Calibration Source setup
 from __future__ import division, print_function
 import os,serial
 import numpy as np
+import datetime as dt
 
 class amplifier:
     '''
