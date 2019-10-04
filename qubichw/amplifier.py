@@ -229,6 +229,7 @@ class amplifier:
 
         self.s.write('GAIN %i\n' % mode_idx)
         self.state['gain'] = valid_args[mode_idx]
+        print('DEBUG:AMPLIFIER gain set to %i' % self.state['gain'])
         return True
 
     def set_coupling(self,coupling):
