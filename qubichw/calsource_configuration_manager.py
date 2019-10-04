@@ -500,6 +500,7 @@ class calsource_configuration_manager():
             for parm in command[dev].keys():
                 if parm!='onoff': # ignore on/off.  This is executed above.
                     ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
+                    retval['amplifier state'] = self.device[dev].state
         
         # run the Arduino last of all
         dev = 'arduino'
@@ -516,7 +517,6 @@ class calsource_configuration_manager():
 
         # STATUS
         if command['all']['status']:
-            print('DEBUG:CALSOURCE MANAGER: running status command')
             ack += '%s ' % self.status()
             
 
@@ -580,8 +580,12 @@ class calsource_configuration_manager():
                 self.calsource_frequency = retval['calsource_frequency']
             if 'synthesiser_frequency' in retval.keys():
                 self.synthesiser_frequency = retval['synthesiser_frequency']
+            if 'amplifier state' in retval.keys():
+                # reassign amplifier state in the amplifier object
+                # this is a weirdness I don't quite understand because of using multiprocess
+                # does it make a temporary copy of the amplifier object?
+                self.device['amplifier'].state = retval['amplifier state']
 
-            print('DEBUG:CALSOURCE MANAGER:ack=%s' % ack)
             self.send_acknowledgement(ack,addr)
 
         return
