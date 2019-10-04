@@ -25,6 +25,8 @@ class amplifier:
         initialization of the amplifier object
         '''
         print('DEBUG:AMPLIFIER instantiating new amplifier object')
+        self.creation = dt.datetime.utcnow()
+        self.creation_str = self.creation.strftime('%Y-%m-%d %H:%M:%S')
         self.s = None
         self.port = None
         self.state = {}
@@ -232,6 +234,7 @@ class amplifier:
         self.s.write('GAIN %i\n' % mode_idx)
         self.state['gain'] = valid_args[mode_idx]
         print('DEBUG:AMPLIFIER gain set to %i' % self.state['gain'])
+        print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
         return True
 
     def set_coupling(self,coupling):
@@ -350,4 +353,5 @@ class amplifier:
             msg += ' amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
         print('DEBUG:AMPLIFIER returning status message: %s' % msg)
+        print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
         return msg
