@@ -116,7 +116,7 @@ class tg5012:
         try: 
             s.connect((ip,port))
         except socket.error:
-            print("Caught exception socket.error")
+            #print("Caught exception socket.error")
             return None
         print('Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d\n'% (ip,port))
         self.s = s

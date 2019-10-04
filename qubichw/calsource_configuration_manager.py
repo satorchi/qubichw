@@ -358,7 +358,6 @@ class calsource_configuration_manager():
         if (self.amplifier_on is None or self.amplifier_on) and self.device[dev].is_connected():
             msg += ' '+self.device[dev].status()
             
-
         for dev in ['arduino','calsource','modulator']:
             msg += ' %s:' % dev
             if self.device[dev].is_connected():
@@ -517,6 +516,7 @@ class calsource_configuration_manager():
 
         # STATUS
         if command['all']['status']:
+            print('DEBUG:CALSOURCE MANAGER: running status command')
             ack += '%s ' % self.status()
             
 
@@ -580,7 +580,8 @@ class calsource_configuration_manager():
                 self.calsource_frequency = retval['calsource_frequency']
             if 'synthesiser_frequency' in retval.keys():
                 self.synthesiser_frequency = retval['synthesiser_frequency']
-            
+
+            print('DEBUG:CALSOURCE MANAGER:ack=%s' % ack)
             self.send_acknowledgement(ack,addr)
 
         return
