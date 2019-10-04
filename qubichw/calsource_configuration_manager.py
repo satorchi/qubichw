@@ -449,6 +449,7 @@ class calsource_configuration_manager():
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket]:
                     self.device[dev].set_default_settings()
+                    retval['%s state' % dev] = self.device[dev].state
 
         # do configuration command for calsource
         dev = 'calsource'

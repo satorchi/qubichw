@@ -24,6 +24,7 @@ class tg5012:
         self.energenie = None
         self.ip = ip
         self.port = port
+        self.state = {}
         self.default_settings = {}
         self.default_settings['frequency'] = 1
         self.default_settings['shape'] = 'SINE'
@@ -307,23 +308,28 @@ class tg5012:
 
     def set_frequency(self,frequency):
         self.s.send("FREQ %.5f\n" % frequency)
+        self.state['frequency'] = frequency
         return True
 
     def set_shape(self,shape):
         self.s.send("WAVE %s\n" % shape)
+        self.state['shape'] = shape
         return True
 
     def set_amplitude(self,amplitude):
         self.s.send("AMPL %.2f\n" % amplitude)
+        self.state['amplitude'] = amplitude
         return True
 
     def set_offset(self,offset):
         self.s.send("DCOFFS %.2f\n" % offset)
         self.s.send("ARBDCOFFS %.2f\n" % offset)
+        self.state['offset'] = offset
         return True
     
     def set_duty(self,duty):
         self.s.send("SQRSYMM %.2f\n" % duty)
+        self.state['duty'] = duty
         return True
 
     def tg5012a_disconnect():

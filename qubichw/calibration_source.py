@@ -45,6 +45,7 @@ class calibration_source:
         self.s = None
         self.port = None
         self.calsource = None
+        self.state = {}
         self.init(source=source)
         return None
 
@@ -163,6 +164,7 @@ class calibration_source:
         if of is None:
             of = self.send_set_Frequency(f)
 
+        self.state['frequency'] = f
         return of
     
 
