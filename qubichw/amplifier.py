@@ -75,13 +75,15 @@ class amplifier:
         check if the amplifier is connected
         '''
         if self.s is None:
+            print('DEBUG:AMPLIFIER is_connected:self.s is None')
             return False
 
         if self.port is None:
+            print('DEBUG:AMPLIFIER is_connected:self.port is None')
             return False
 
         if not os.path.exists(self.port):
-            print('AMPLIFIER port does not exist: %s' % self.port)
+            print('DEBUG:AMPLIFIER port does not exist: %s' % self.port)
             self.s = None
             return False
         
@@ -344,4 +346,5 @@ class amplifier:
         if self.state['filter high frequency'] is not None:
             msg += ' amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
+        print('DEBUG:AMPLIFIER returning status message: %s' % msg)
         return msg
