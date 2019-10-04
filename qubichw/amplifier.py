@@ -24,6 +24,7 @@ class amplifier:
         '''
         initialization of the amplifier object
         '''
+        print('DEBUG:AMPLIFIER instantiating new amplifier object')
         self.s = None
         self.port = None
         self.state = {}
@@ -43,6 +44,7 @@ class amplifier:
         '''
         initialize the amplifier
         '''
+        print('DEBUG:AMPLIFIER initializing')
         if port is None: port = self.port
         if port is None: port = '/dev/rs232'
 
