@@ -255,7 +255,7 @@ class hk_broadcast :
             recname = 'TEMPERATURE%02i' % (idx+1)
             tstamp = self.current_timestamp()
             self.record[recname][0] = val
-            if data_ok: self.log_hk(recname,tstamp,val)
+            if data_ok and val>0: self.log_hk(recname,tstamp,val)
                     
         return self.record
 
