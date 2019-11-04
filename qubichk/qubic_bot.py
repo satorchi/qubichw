@@ -592,9 +592,10 @@ class qubic_bot :
 
 
     def _assign_entropy_labels(self):
-        '''                                                                                                      
+        '''
         read temperature labels from the Entropy Windows machine, shared by Samba
         '''
+        print('assigning entropy labels')
         # default labels
         self.entropy_channel_title={}
         self.entropy_channel_title['AVS47_1']=[]
@@ -611,9 +612,9 @@ class qubic_bot :
         # read the configured labels
         self.entropy_nchannels=0
         filelist=glob(tempdir+'/*')
+        match_str = '.* AVS47 (AVS47_[12]) Ch ([0-7]) '
         for f in filelist:
             chan_str = re.sub('\.log','',os.path.basename(f))
-            match_str = '.* AVS47 (AVS47_[12]) Ch ([0-7]) '
             match = re.match(match_str,chan_str)
             chan_str = re.sub(match_str,'',chan_str)
             if match:
