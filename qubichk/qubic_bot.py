@@ -204,7 +204,7 @@ class qubic_bot :
         self.args['YMAX']=None
         self.args['DMIN']=None
         self.args['DMAX']=None
-        self.args['LOGPLOT']=False
+        self.args['LOG']=False
         for key in self.hktypes:
             self.args[key] = []
         
@@ -624,6 +624,7 @@ class qubic_bot :
                 self.entropy_nchannels+=1
                                 
 
+        # debug message
         for avs in self.entropy_channel_title.keys():
             print(avs)
             for ttl in self.entropy_channel_title[avs]:
@@ -927,7 +928,10 @@ class qubic_bot :
         msg += '\n - dates should be given in ISO format, for example: 2019-01-15T20:18:00'
         msg += '\n\nusage:  Plot [PRESSURE] [T=<channel list>]'
         msg += ' [AVS1=<channel list>] [AVS2=<channel list>] [DMIN=<start date>] [DMAX=<end date>]'
-        msg += ' [MIN=<min value>] [MAX=<max value>]'
+        msg += ' [MIN=<min value>] [MAX=<max value>] [LOG]'
+        msg += '\n\n to get a list of temperature labels, send the command "list"'
+        msg += '\n\n Example:  plot temperature diodes 1,3,4 and AVS47 controller 1 channel 3 starting from 25 October, 2019 at 15hr.'
+        msg += '\n    plot T=1,3,4 avs1=3 dmin=2019-10-25T15:00:00'
         self._send_message(msg)
         return
     
@@ -980,6 +984,7 @@ class qubic_bot :
             ttl = 'Temperatures'
 
         # plot AVS47 temperatures
+        self._assign_entropy_labels()
         for controller in [1,2]:
             avs = 'AVS47_%i' % controller
             if self.args[avs]:
@@ -1052,6 +1057,8 @@ class qubic_bot :
         ax.set_ylabel(ylabel)
         fig.suptitle(ttl)
         plt.legend()
+        plt.grid()
+        if self.args['LOG']: plt.yscale("log")
         fig.savefig('hk_plot.png',format='png',dpi=100,bbox_inches='tight')
         plt.close()
         with open('hk_plot.png','r') as plot:
@@ -1062,6 +1069,7 @@ class qubic_bot :
         '''
         return a list of all the temperature channels
         '''
+        self._assign_entropy_labels()
         answer = ''
         # entropy
         for avs in ['AVS47_1','AVS47_2']:
