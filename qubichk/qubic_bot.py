@@ -624,6 +624,10 @@ class qubic_bot :
                 self.entropy_nchannels+=1
                                 
 
+        for avs in self.entropy_channel_title.keys():
+            print(avs)
+            for ttl in self.entropy_channel_title[avs]:
+                print(ttl)
         return
     
     def entropy_temp(self):
