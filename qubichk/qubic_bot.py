@@ -1054,9 +1054,12 @@ class qubic_bot :
         ax.set_xlim((dmin,dmax))
         ax.set_ylim((Tmin,Tmax))
         ax.set_xlabel('date',fontsize=20)
+        plt.xticks(fontsize=20)
         ax.set_ylabel(ylabel,fontsize=20)
+        plt.yticks(fontsize=20)
         fig.suptitle(ttl,fontsize=20)
         plt.legend(fontsize=20)
+        
         plt.grid()
         if self.args['LOG']: plt.yscale("log")
         fig.savefig('hk_plot.png',format='png',dpi=100,bbox_inches='tight')
