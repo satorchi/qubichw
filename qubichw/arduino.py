@@ -16,7 +16,7 @@ from __future__ import division, print_function
 import socket,serial,time,multiprocessing,os,pathlib
 from glob import glob
 import numpy as np
-from scipy.optimize import curve_fit
+#from scipy.optimize import curve_fit
 import datetime as dt
 import struct
 
@@ -392,7 +392,8 @@ class arduino:
 
 
 
-    
+    ###### the following is never used, and the Raspberry Pi is having trouble installing scipy ####
+    """
     def fit_signal(self,t,a,period=None,amplitude=None,offset=None,shift=None):
         '''
         fit the signal data to a sine curve
@@ -415,7 +416,8 @@ class arduino:
         result['shift']=popt[3]
 
         return result
-
+    """
+    
 
     #############################################################################################
     #### The following was intended to be a method within the qubicpack object
