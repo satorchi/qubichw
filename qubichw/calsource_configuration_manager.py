@@ -329,13 +329,13 @@ class calsource_configuration_manager():
             ack = 'FAILED'
 
 
-        # check for the amplifier and lamp
+        # check for the on/off status
         if ack=='OK':
-            for item in self.powersocket.items()
-            key = item[0]
-            dev = item[1]
-            if key in states.keys():
-                self.device_on[dev] =states[key]
+            for item in self.powersocket.items():
+                key = item[0]
+                dev = item[1]
+                if key in states.keys():
+                    self.device_on[dev] = states[key]
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         return ack
