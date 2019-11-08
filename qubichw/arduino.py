@@ -20,8 +20,6 @@ import numpy as np
 import datetime as dt
 import struct
 
-from astropy.io import fits
-
 from satorchipy.datefunctions import tot_seconds
 
 class arduino:
