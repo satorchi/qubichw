@@ -93,9 +93,6 @@ class calsource_configuration_manager():
         self.role = role
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
-        self.device_on = {}
-        for dev in self.device_list:
-            self.device_on[dev] = None
         self.calsource_frequency = None # it would be better if we could read this from the device
         self.synthesiser_frequency = None # or this one
 
@@ -114,10 +111,12 @@ class calsource_configuration_manager():
         
         self.device = {}
         self.powersocket = {}
+        self.device_on = {}
         for idx,dev in enumerate(self.device_list):
             self.powersocket[dev] = idx
             self.device[dev] = None
-
+            self.device_on[dev] = None
+            
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         self.energenie_timeout = 10
 
@@ -332,8 +331,8 @@ class calsource_configuration_manager():
         # check for the on/off status
         if ack=='OK':
             for item in self.powersocket.items():
-                key = item[0]
-                dev = item[1]
+                dev = item[0]
+                key = item[1]
                 if key in states.keys():
                     self.device_on[dev] = states[key]
 
