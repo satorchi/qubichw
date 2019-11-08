@@ -202,7 +202,7 @@ class calibration_source:
             self.clear_connection()
             return None
 
-        if(response[0]==85):
+        if(len(response)>0 and response[0]==85):
             of=self.output_Frequency(response[1:])
         else:
             print("Communication error:  Invalid response.")
