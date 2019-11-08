@@ -70,6 +70,8 @@ class qubic_bot :
         self.nHeaters = 6
         self.nMHS = 2
         self.nPressure = 1
+
+        self.labelsize = 20
         
         # this list could be generated with inspect...
         self.commands = {'/start': self.start,
@@ -765,9 +767,10 @@ class qubic_bot :
         ax.set_xlim(dmin,dmax)
         
         
-        ax.set_xlabel('date')
-        ax.set_ylabel('temperature / K')
-        fig.suptitle(title)
+        ax.set_xlabel('date',fontsize=self.labelsize)
+        ax.set_ylabel('temperature / K',fontsize=self.labelsize)
+        ax.tick_params(labelsize=self.labelsize)
+        fig.suptitle(title,fontsize=self.labelsize)
         savefig_fmt='png'
         fig.savefig('temperature_plot.'+savefig_fmt,format=savefig_fmt,dpi=100,bbox_inches='tight')
     
@@ -907,10 +910,11 @@ class qubic_bot :
             Tmax = max(Tmaxlist)
         ax=fig.axes[0]
         ax.set_ylim((Tmin,Tmax))
-        ax.set_xlabel('date')
-        ax.set_ylabel('temperature / K')
-        fig.suptitle('Temperatures from the AVS47')
-        plt.legend()
+        ax.set_xlabel('date',fontsize=self.labelsize)
+        ax.set_ylabel('temperature / K',fontsize=self.labelsize)
+        ax.tick_params(labelsize=self.labelsize)
+        fig.suptitle('Temperatures from the AVS47',fontsize=self.labelsize)
+        plt.legend(fontsize=self.labelsize)
         fig.savefig('temperature_plot.png',format='png',dpi=100,bbox_inches='tight')
         plt.close()
         with open('temperature_plot.png','r') as plot:
@@ -1053,12 +1057,12 @@ class qubic_bot :
         ax=fig.axes[0]
         ax.set_xlim((dmin,dmax))
         ax.set_ylim((Tmin,Tmax))
-        ax.set_xlabel('date',fontsize=20)
-        plt.xticks(fontsize=20)
-        ax.set_ylabel(ylabel,fontsize=20)
-        plt.yticks(fontsize=20)
-        fig.suptitle(ttl,fontsize=20)
-        plt.legend(fontsize=20)
+        ax.set_xlabel('date',fontsize=self.labelsize)
+        plt.xticks(fontsize=self.labelsize)
+        ax.set_ylabel(ylabel,fontsize=self.labelsize)
+        plt.yticks(fontsize=self.labelsize)
+        fig.suptitle(ttl,fontsize=self.labelsize)
+        plt.legend(fontsize=self.labelsize)
         
         plt.grid()
         if self.args['LOG']: plt.yscale("log")
