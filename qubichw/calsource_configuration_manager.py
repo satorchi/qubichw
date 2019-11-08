@@ -350,11 +350,11 @@ class calsource_configuration_manager():
         for dev in self.device_list:
             if self.device_on[dev] is not None:
                 if self.device_on[dev]:
-                    msg += '%s:ON' % dev
+                    msg += ' %s:ON' % dev
                 else:
-                    msg += '%s:OFF' % dev
+                    msg += ' %s:OFF' % dev
             else:
-                msg += '%s:UNKNOWN' % dev
+                msg += ' %s:UNKNOWN' % dev
 
         dev = 'amplifier'
         if (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
