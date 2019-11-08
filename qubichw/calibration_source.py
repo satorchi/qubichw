@@ -207,12 +207,17 @@ class calibration_source:
             self.clear_connection()
             return None
         
-        if(len(response[0]!=85):
+        if response[0]!=85:
             print("calsource communication error:  Invalid response.")
             self.clear_connection()
             return None
+
+        if len(response)<2:
+            print("calsource error: no frequency value returned.")
+            self.clear_connection()
+            return None
+        
         of=self.output_Frequency(response[1:])
-    
         print('The output frequency is %.3f GHz' % of)
         return of
 
