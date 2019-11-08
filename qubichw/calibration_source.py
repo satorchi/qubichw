@@ -62,16 +62,16 @@ class calibration_source:
             print('Please enter the calibration source: HF or LF')
             return None
 
-        if source.upper()=='LF':
-            dev='/dev/calsource-LF'
-            which_freq='Low'
-            self.calsource = 'LF'
-            self.factor = 12.
-        else:
+        if source.upper()=='HF':
             dev='/dev/calsource-HF'
             which_freq='High'
             self.calsource = 'HF'
             self.factor = 24.
+        else:
+            dev='/dev/calsource-LF'
+            which_freq='Low'
+            self.calsource = 'LF'
+            self.factor = 12.
 
         
         if not os.path.exists(dev):
@@ -100,6 +100,10 @@ class calibration_source:
         '''
         check if the calibration source is connected
         '''
+        if self.s is None:
+            print('DEBUG:CALSOURCE is_connected:self.s is None.  initializing.')
+            self.init()
+        
         if self.s is None:
             print('DEBUG:CALSOURCE is_connected:self.s is None')
             return False

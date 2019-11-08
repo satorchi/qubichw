@@ -93,8 +93,9 @@ class calsource_configuration_manager():
         self.role = role
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
-        self.amplifier_on = None   # need to find a way to detect this
-        self.lamp_on = None  # need to find a way to detect this
+        self.device_on = {}
+        for dev in self.device_list:
+            self.device_on[dev] = None
         self.calsource_frequency = None # it would be better if we could read this from the device
         self.synthesiser_frequency = None # or this one
 
@@ -330,10 +331,11 @@ class calsource_configuration_manager():
 
         # check for the amplifier and lamp
         if ack=='OK':
-            if 3 in states.keys():
-                self.amplifier_on = states[3]
-            if 2 in states.keys():
-                self.lamp_on = states[2]
+            for item in self.powersocket.items()
+            key = item[0]
+            dev = item[1]
+            if key in states.keys():
+                self.device_on[dev] =states[key]
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         return ack
@@ -344,37 +346,29 @@ class calsource_configuration_manager():
         return status of all the components
         '''
         msg = ''
-        dev = 'amplifier'
-        msg += '%s:' % dev
-        if self.amplifier_on is not None:
-            if self.amplifier_on:
-                msg += 'ON'
-            else:
-                msg += 'OFF'
-        else:
-            msg += 'UNKNOWN'
-            #msg += str(type(self.amplifier_on)) # for debugging
 
-        if (self.amplifier_on is None or self.amplifier_on) and self.device[dev].is_connected():
+        for dev in self.device_list:
+            if self.device_on[dev] is not None:
+                if self.device_on[dev]:
+                    msg += '%s:ON' % dev
+                else:
+                    msg += '%s:OFF' % dev
+            else:
+                msg += '%s:UNKNOWN' % dev
+
+        dev = 'amplifier'
+        if (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
             msg += ' '+self.device[dev].status()
             
-        for dev in ['arduino','calsource','modulator']:
-            msg += ' %s:' % dev
-            if self.device[dev].is_connected():
-                msg += 'ON'
-            else:
-                msg += 'OFF'
-
         dev = 'calsource'
-        if self.device[dev].is_connected():
-            if self.calsource_frequency is not None:
-                msg += ' %s:frequency=%+06fGHz' % (dev,self.calsource_frequency)
-            else:
-                msg += ' %s:frequency=UNKNOWN' % dev
-            if self.synthesiser_frequency is not None:
-                msg += ' synthesiser:frequency=%+06fGHz' % self.synthesiser_frequency
-            else:
-                msg += ' synthesiser:frequency=UNKNOWN'
+        if self.calsource_frequency is not None:
+            msg += ' %s:frequency=%+06fGHz' % (dev,self.calsource_frequency)
+        else:
+            msg += ' %s:frequency=UNKNOWN' % dev
+        if self.synthesiser_frequency is not None:
+            msg += ' synthesiser:frequency=%+06fGHz' % self.synthesiser_frequency
+        else:
+            msg += ' synthesiser:frequency=UNKNOWN'
             
         dev = 'modulator'
         if self.device[dev].is_connected():
@@ -438,7 +432,7 @@ class calsource_configuration_manager():
                     msg += '%s:%s ' % (dev,command[dev][parm])
         if states:
             msg += 'energenie:%s ' % self.onoff(states)
-            retval['amplifier_on'] = self.amplifier_on
+            retval['device_on'] = self.device_on
             self.log(msg)
             ack += '%s ' % msg
             # wait before doing other stuff
@@ -575,8 +569,8 @@ class calsource_configuration_manager():
                 ack = 'no acknowledgement'
             else:
                 ack = retval['ACK']
-            if 'amplifier_on' in retval.keys():
-                self.amplifier_on = retval['amplifier_on']
+            if 'device_on' in retval.keys():
+                self.device_on = retval['device_on']
             if 'calsource_frequency' in retval.keys():
                 self.calsource_frequency = retval['calsource_frequency']
             if 'synthesiser_frequency' in retval.keys():
