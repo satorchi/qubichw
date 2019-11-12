@@ -45,7 +45,7 @@ class calibration_source:
         self.s = None
         self.port = None
         self.calsource = None
-        self.state = {}
+        self.state = None
         self.init(source=source)
         return None
 

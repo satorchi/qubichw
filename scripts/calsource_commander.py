@@ -23,7 +23,7 @@ import sys
 
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 
-role = 'commander'
+role = None
 for arg in sys.argv:
     if arg.lower() == 'manager':
         role = 'manager'
