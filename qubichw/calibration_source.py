@@ -100,6 +100,8 @@ class calibration_source:
         '''
         check if the calibration source is connected
         '''
+
+        
         if self.s is None:
             print('DEBUG:CALSOURCE is_connected:self.s is None.  initializing.')
             self.init()
@@ -223,6 +225,7 @@ class calibration_source:
         
         of=self.output_Frequency(response[1:])
         print('The output frequency is %.3f GHz' % of)
+        self.state = {}
         self.state['frequency'] = f
         self.state['synthesizer_frequency'] = of
         return of

@@ -154,7 +154,7 @@ class calsource_configuration_manager():
         self.role = role
                 
         if role=='manager':
-            print('I am the calsource configuration manager')
+            self.log('I am the calsource configuration manager')
             self.energenie = PMSDevice('energenie', '1')
             self.device['modulator'] = modulator()
             self.device['calsource'] = calibration_source('LF')
