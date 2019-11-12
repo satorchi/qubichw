@@ -49,7 +49,7 @@ class amplifier:
         '''
         print('DEBUG:AMPLIFIER initializing')
         if port is None: port = self.port
-        if port is None: port = '/dev/rs232'
+        if port is None: port = '/dev/rs232_1'
 
         # check of the requested device exists
         if not os.path.exists(port):
