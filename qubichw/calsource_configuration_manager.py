@@ -539,6 +539,7 @@ class calsource_configuration_manager():
             # interpret the commands in a separate process and continue listening
             manager = multiprocessing.Manager()
             retval = manager.dict()
+            retval['ACK'] = 'no acknowledgement'
             proc = multiprocessing.Process(target=self.interpret_commands, args=(command,retval))
             proc.start()
             if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
