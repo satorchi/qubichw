@@ -169,7 +169,6 @@ class calibration_source:
         if of is None:
             of = self.send_set_Frequency(f)
 
-        self.state['frequency'] = f
         return of
     
 
@@ -178,7 +177,8 @@ class calibration_source:
         set the frequency.  Note that this will send the command to the device.
         the method set_FreqCommand() only formats the command without sending
         '''
-
+        self.state = None
+        
         if self.calsource is None:
             print('Please initialize the calibration source')
             return None
@@ -223,6 +223,8 @@ class calibration_source:
         
         of=self.output_Frequency(response[1:])
         print('The output frequency is %.3f GHz' % of)
+        self.state['frequency'] = f
+        self.state['synthesizer_frequency'] = of
         return of
 
     def set_default_settings(self):

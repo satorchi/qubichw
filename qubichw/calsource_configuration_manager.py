@@ -93,8 +93,6 @@ class calsource_configuration_manager():
         self.role = role
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
-        self.calsource_frequency = None # it would be better if we could read this from the device
-        self.synthesiser_frequency = None # or this one
 
         self.valid_commands = {}
         self.valid_commands['modulator'] = ['on','off','frequency','amplitude','offset','duty','shape']
@@ -360,14 +358,12 @@ class calsource_configuration_manager():
             msg += ' '+self.device[dev].status()
             
         dev = 'calsource'
-        if self.calsource_frequency is not None:
-            msg += ' %s:frequency=%+06fGHz' % (dev,self.calsource_frequency)
+        if self.device[dev].state is not None:
+            msg += ' %s:frequency=%+06fGHz' % (dev,self.device[dev].state['frequency'])
+            msg += ' synthesizer:frequency=%+06fGHz' % self.device[dev].state['synthesizer_frequency']
         else:
             msg += ' %s:frequency=UNKNOWN' % dev
-        if self.synthesiser_frequency is not None:
-            msg += ' synthesiser:frequency=%+06fGHz' % self.synthesiser_frequency
-        else:
-            msg += ' synthesiser:frequency=UNKNOWN'
+            msg += ' synthesizer:frequency=UNKNOWN'
             
         dev = 'modulator'
         if self.device[dev].is_connected():
@@ -452,12 +448,10 @@ class calsource_configuration_manager():
             msg = '%s:%s=%+06fGHz ' % (dev,parm,command[dev][parm])
             if of is None:
                 msg += 'FAILED'
-                retval['calsource_frequency'] = None
-                retval['synthesiser_frequency'] = None
+                retval['%s state' % dev] = None
             else:
-                msg += 'synthesiser:frequency=%+06fGHz' % of
-                retval['calsource_frequency'] = command[dev][parm]
-                retval['synthesiser_frequency'] = of
+                msg += 'synthesizer:frequency=%+06fGHz' % of
+                retval['%s state' % dev] = self.device[dev].state
             self.log(msg)
             ack += '%s ' % msg
                 
@@ -494,7 +488,7 @@ class calsource_configuration_manager():
             for parm in command[dev].keys():
                 if parm!='onoff': # ignore on/off.  This is executed above.
                     ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
-                    retval['amplifier state'] = self.device[dev].state
+                    retval['%s state' % dev] = self.device[dev].state
         
         # run the Arduino last of all
         dev = 'arduino'
@@ -571,10 +565,8 @@ class calsource_configuration_manager():
                 ack = retval['ACK']
             if 'device_on' in retval.keys():
                 self.device_on = retval['device_on']
-            if 'calsource_frequency' in retval.keys():
-                self.calsource_frequency = retval['calsource_frequency']
-            if 'synthesiser_frequency' in retval.keys():
-                self.synthesiser_frequency = retval['synthesiser_frequency']
+            if 'calsource state' in retval.keys():
+                self.device['calsource'].state = retval['calsource state']
             if 'amplifier state' in retval.keys():
                 # reassign amplifier state in the amplifier object
                 # this is a weirdness I don't quite understand because of using multiprocess
