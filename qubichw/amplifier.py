@@ -267,7 +267,7 @@ class amplifier:
         '''
     
         if not self.is_connected():return False
-        valid_args = ['low noise','high','calibration']
+        valid_args = ['low_noise','high','calibration']
         dynamic = dynamic.lower()
         
         if dynamic not in valid_args:
