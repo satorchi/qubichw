@@ -122,15 +122,15 @@ class amplifier:
           "6 dB low pass"
           "12 dB low pass"
           "6 dB high pass"
-          "12 dB highpass"
+          "12 dB high pass"
           "bandpass"
         '''
         if not self.is_connected():return False
         valid_args = ["bypass",
-                      "6 dB low pass",
-                      "12 dB low pass",
-                      "6 dB high pass",
-                      "12 dB highpass",
+                      "6_db_low_pass",
+                      "12_db_low_pass",
+                      "6_db_high_pass",
+                      "12_db_high_pass",
                       "bandpass"]
         filter_mode = filter_mode.lower()
 
