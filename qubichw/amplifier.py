@@ -101,16 +101,16 @@ class amplifier:
         '''
         if not self.is_connected():return False
         self.s.write('LALL\n')    # tell device to listen
-        self.s.write('FLTM 1\n')  # filter mode: 6dB low pass
-        self.s.write('LFRQ 6\n')  # pass freq: 30Hz
+        self.s.write('FLTM 2\n')  # filter mode: 12dB low pass
+        self.s.write('LFRQ 6\n')  # low pass freq: 30Hz
         self.s.write('CPLG 1\n')  # coupling: DC
         self.s.write('DYNR 1\n')  # dynamic range: high dynamic range
-        self.s.write('GAIN 10\n') # gain: 2000
-        self.state['filter mode'] = '6db_low_pass'
+        self.s.write('GAIN 12\n') # gain: 10000
+        self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 30.0
         self.state['coupling'] = 'DC'
         self.state['dynamic'] = 'high'
-        self.state['gain'] = 2000
+        self.state['gain'] = 10000
         return
 
 
