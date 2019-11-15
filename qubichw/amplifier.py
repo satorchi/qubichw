@@ -303,7 +303,7 @@ class amplifier:
             return 'amplifier:INVALID_REQUEST__%s=%s' % (setting,value)
 
         if setting=='filter_mode':
-            chk = self.set_filter_mode(value.replace('_',' '))
+            chk = self.set_filter_mode(value)
             if chk:
                 return 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
             return 'amplifier:filter_mode=FAILED'
