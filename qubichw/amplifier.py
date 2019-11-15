@@ -106,7 +106,7 @@ class amplifier:
         self.s.write('CPLG 1\n')  # coupling: DC
         self.s.write('DYNR 1\n')  # dynamic range: high dynamic range
         self.s.write('GAIN 10\n') # gain: 2000
-        self.state['filter mode'] = '6dB low pass'
+        self.state['filter mode'] = '6db_low_pass'
         self.state['filter low frequency'] = 30.0
         self.state['coupling'] = 'DC'
         self.state['dynamic'] = 'high'
@@ -127,10 +127,10 @@ class amplifier:
         '''
         if not self.is_connected():return False
         valid_args = ["bypass",
-                      "6_db_low_pass",
-                      "12_db_low_pass",
-                      "6_db_high_pass",
-                      "12_db_high_pass",
+                      "6db_low_pass",
+                      "12db_low_pass",
+                      "6db_high_pass",
+                      "12db_high_pass",
                       "bandpass"]
         filter_mode = filter_mode.lower()
 
