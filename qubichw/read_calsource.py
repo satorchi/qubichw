@@ -63,11 +63,9 @@ while True:
     value = chan0.value
     date_now = dt.datetime.utcnow()
     if(date_now-old_date>deltat):
-        sdata = date_now.strftime("%s.%f") + "\t" + str(value)
         rec[0].TIMESTAMP = np.float64(date_now.strftime("%s.%f"))
         rec[0].VALUE = np.int64(value)
         for rx in receivers:
-            #s.sendto(sdata.encode(), (rx,PORT))
             s.sendto(rec,(rx,PORT))
         old_date = date_now 
         count+=1
@@ -75,7 +73,7 @@ while True:
         t_hex_B = struct.unpack('>Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
         t_hex_L = struct.unpack('<Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
         
-        string_to_print = "%016X %016X %s\tRate:% d" % (t_hex_B,t_hex_L,sdata,count)
+        string_to_print = "%016X %016X %017.6f %+06i Rate:%0d" % (t_hex_B,t_hex_L,rec[0].TIMESTAMP,rec[0].VALUE,count)
         print(string_to_print, end='\r',flush=True)
         old_print_date = date_now
         count=0
