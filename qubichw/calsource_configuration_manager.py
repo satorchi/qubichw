@@ -12,7 +12,7 @@ A class with methods to send/receive configuration command for the calibration s
 Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
 '''
 from __future__ import division, print_function
-import socket,subprocess,time,re,os,multiprocessing
+import socket,subprocess,time,re,os,multiprocessing,sys
 import datetime as dt
 
 # the Energenie powerbar
@@ -45,6 +45,8 @@ class calsource_configuration_manager():
         self.assign_variables(role)
         if self.role == 'manager':
             self.listen_loop()
+        elif self.role == 'bot':
+            pass # create object but don't go into the Command Line Interface loop.
         else:
             self.command_loop()
             
@@ -139,7 +141,7 @@ class calsource_configuration_manager():
         cmd = '/sbin/ifconfig -a'
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
-        match = re.match('.* inet (192\.168\.2\..*?) ',out.replace('\n',' '))
+        match = re.match('.* inet (192\.168\.2\..*?) ',out.decode().replace('\n',' '))
         if match:
             ip_addr = match.groups()[0]
             if ip_addr in self.known_hosts.values():
@@ -632,9 +634,14 @@ class calsource_configuration_manager():
         '''
         command line interface to send commands
         '''
+        pythonmajor = sys.version_info[0]
         keepgoing = True
+        prompt = 'Enter command ("help" for list): '
         while keepgoing:
-            ans=raw_input('Enter command ("help" for list): ')
+            if pythonmajor==2:
+                ans = raw_input(prompt)
+            else:
+                ans = input(prompt)
             cmd_str = ans.strip().lower()
             cmd_list = cmd_str.split()
             if 'help' in cmd_list or 'h' in cmd_list:
