@@ -165,7 +165,8 @@ class tg5012:
         answer2 = self.read_response()
         answer = answer1 + answer2
         shape_byte = answer[918]
-        debugfile.write('\nshape byte: %i' % shape_byte)
+        debugfile.write('\nshape byte: -->%s<--' % shape_byte)
+        debugfile.write('\nshape byte: -->%i<--' % ord(shape_byte))
         # correct some weirdness in the answer
         #answer = filter(lambda x: x in string.printable, answer)
         answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
