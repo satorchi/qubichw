@@ -92,7 +92,6 @@ class calsource_configuration_manager():
         initialize variables, depending on the role
         if the role is "manager", we need to connect to the hardware
         '''
-        self.log('calsource configuration manager: assigning variables: role=%s' % role,verbosity=2)
         self.role = role
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
