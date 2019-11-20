@@ -160,12 +160,12 @@ class tg5012:
         debugfile = open('modulator_tg5012a.debug.log','a')
         
         self.send_command("*LRN?\n")
-        self.answer1 = self.read_response()
+        answer1 = self.read_response()
         self.send_command("*WAI\n")                   #We do this to get the full response to the LRN? command
-        self.answer2 = self.read_response()
-        self.answer = self.answer1 + self.answer2
+        answer2 = self.read_response()
+        self.answer = answer1 + answer2
         # correct some weirdness in the answer
-        answer = filter(lambda x: x in string.printable, self.answer)
+        #answer = filter(lambda x: x in string.printable, self.answer)
         answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
         answer_list = re.split('[+-]',answer)
         id_list = {}
