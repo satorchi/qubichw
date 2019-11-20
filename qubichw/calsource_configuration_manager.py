@@ -335,7 +335,7 @@ class calsource_configuration_manager():
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
         try:
-            states_list = self.energenie.get_socket_states(states)
+            states_list = self.energenie.get_socket_states()
             ack += 'OK'
             self.log('retrieved energenie states: %s' % states_list,verbosity=2)
         except:
@@ -430,7 +430,6 @@ class calsource_configuration_manager():
         devlist.remove('all')
         devlist.remove('timestamp')
         for dev in devlist:
-            self.log('running onoff for %s' % dev,verbosity=1)
             if parm in command[dev].keys():
                 state = None
                 if command[dev][parm] == 'on':
