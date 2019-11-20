@@ -163,9 +163,9 @@ class tg5012:
         answer1 = self.read_response()
         self.send_command("*WAI\n")                   #We do this to get the full response to the LRN? command
         answer2 = self.read_response()
-        self.answer = answer1 + answer2
+        answer = answer1 + answer2
         # correct some weirdness in the answer
-        #answer = filter(lambda x: x in string.printable, self.answer)
+        #answer = filter(lambda x: x in string.printable, answer)
         answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
         answer_list = re.split('[+-]',answer)
         id_list = {}
@@ -195,7 +195,7 @@ class tg5012:
         
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
-            self.shape_value = ord(struct.unpack("c",self.answer[918])[0]) 
+            self.shape_value = ord(struct.unpack("c",answer[918])[0]) 
         except:
             print("Error while reading the shape")
             self.shape_value = -1
@@ -210,17 +210,17 @@ class tg5012:
         self.settings['shape'] = self.shape_dict.get(self.shape_value, "UNKNOWN")
         # Filtering non printable characters and an s at the beginning
         if(self.settings['shape'] ==  'DC'):
-            #self.settings['offset'] = filter(lambda x: x in string.printable, self.answer[923:950])
+            #self.settings['offset'] = filter(lambda x: x in string.printable, answer[923:950])
             self.settings['offset'] = self.settings['dc offset']
             self.settings['amplitude'] = '--'
             self.settings['frequency'] = '--'
             self.settings['duty']='--'
         '''
         else:
-            self.settings['amplitude'] = filter(lambda x: x in string.printable, self.answer[128:156]).replace(' ','')
-            self.settings['frequency'] = filter(lambda x :x in string.printable, self.answer[8:36]).replace(' ','')
-            self.settings['offset'] = filter(lambda x :x in string.printable, self.answer[244:272]).replace(' ','')
-            self.settings['duty'] = filter(lambda x :x in string.printable, self.answer[356:384]).replace(' ','')
+            self.settings['amplitude'] = filter(lambda x: x in string.printable, answer[128:156]).replace(' ','')
+            self.settings['frequency'] = filter(lambda x :x in string.printable, answer[8:36]).replace(' ','')
+            self.settings['offset'] = filter(lambda x :x in string.printable, answer[244:272]).replace(' ','')
+            self.settings['duty'] = filter(lambda x :x in string.printable, answer[356:384]).replace(' ','')
         '''
     
         if show:
@@ -231,7 +231,7 @@ class tg5012:
             print("Duty:%s" % self.settings['duty'])
         
         if full_response:
-            return self.answer
+            return answer
         else:
             return self.settings
    
