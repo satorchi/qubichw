@@ -125,7 +125,7 @@ class entropy_hk :
             return None
             
                      
-        self.socket.send(cmd)
+        self.socket.send(cmd.encode())
         try:
             a=self.socket.recv(self.MAX_MSGLEN)
         except:

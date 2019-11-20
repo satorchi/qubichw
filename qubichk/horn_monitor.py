@@ -308,7 +308,7 @@ class horn_monitor:
         s.settimeout(0.2)
         s.bind(('192.168.2.1',1700))
         msg='close %i\r\nswread %i\r\n' % (horn,horn)
-        s.sendto(msg, (receiver, 1700))
+        s.sendto(msg.encode(), (receiver, 1700))
         return
 
 
