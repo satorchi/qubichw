@@ -79,10 +79,6 @@ class amplifier:
         '''
         check if the amplifier is connected
         '''
-        if self.s is None:
-            print('DEBUG:AMPLIFIER is_connected:self.s is None')
-            return False
-
         if self.port is None:
             print('DEBUG:AMPLIFIER is_connected:self.port is None')
             return False
@@ -91,21 +87,36 @@ class amplifier:
             print('DEBUG:AMPLIFIER port does not exist: %s' % self.port)
             self.s = None
             return False
+
+        if self.s is None:
+            print('DEBUG:AMPLIFIER is_connected:self.s is None')
+            return False
         
         return True
-    
+
+    def send_command(self,cmd):
+        '''
+        send a command to the amplifier
+        '''
+        if not self.is_connected(): return False
+
+        try:
+            self.s.write(cmd.encode())
+        except:
+            return False
+        return True
     
     def set_default_settings(self):
         '''
         default settings for the amplifier
         '''
         if not self.is_connected():return False
-        self.s.write('LALL\n')    # tell device to listen
-        self.s.write('FLTM 2\n')  # filter mode: 12dB low pass
-        self.s.write('LFRQ 6\n')  # low pass freq: 30Hz
-        self.s.write('CPLG 1\n')  # coupling: DC
-        self.s.write('DYNR 1\n')  # dynamic range: high dynamic range
-        self.s.write('GAIN 12\n') # gain: 10000
+        self.send_command('LALL\n')    # tell device to listen
+        self.send_command('FLTM 2\n')  # filter mode: 12dB low pass
+        self.send_command('LFRQ 6\n')  # low pass freq: 30Hz
+        self.send_command('CPLG 1\n')  # coupling: DC
+        self.send_command('DYNR 1\n')  # dynamic range: high dynamic range
+        self.send_command('GAIN 12\n') # gain: 10000
         self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 30.0
         self.state['coupling'] = 'DC'
@@ -144,7 +155,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.s.write('FLTM %i\n' % mode_idx)
+        self.send_command('FLTM %i\n' % mode_idx)
         self.state['filter mode'] = valid_args[mode_idx]
         return True
         
@@ -197,7 +208,7 @@ class amplifier:
         else:
             return False # should never get here.
             
-        self.s.write('%s %i\n' % (cmd,mode_idx))
+        self.send_command('%s %i\n' % (cmd,mode_idx))
         self.state['filter %s frequency' % type] = valid_args[mode_idx]
         return True
 
@@ -232,7 +243,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.s.write('GAIN %i\n' % mode_idx)
+        self.send_command('GAIN %i\n' % mode_idx)
         self.state['gain'] = valid_args[mode_idx]
         #print('DEBUG:AMPLIFIER gain set to %i' % self.state['gain'])
         #print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
@@ -256,7 +267,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.s.write('CPLG %i\n' % mode_idx)
+        self.send_command('CPLG %i\n' % mode_idx)
         self.state['coupling'] = valid_args[mode_idx]
         return True
 
@@ -280,7 +291,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.s.write('DYNR %i\n' % mode_idx)
+        self.send_command('DYNR %i\n' % mode_idx)
         self.state['dynamic'] = valid_args[mode_idx]
         return True
 
