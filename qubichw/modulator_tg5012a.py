@@ -81,7 +81,7 @@ class tg5012:
                 #finished = True
 
         try:
-            ret = answer.decode(errors='ignore')
+            ret = answer.decode(errors='replace')
         except:
             print('could not decode: %s' % answer)
             ret = 'FAILED_TO_READ_TG5012A'
@@ -164,6 +164,7 @@ class tg5012:
         self.send_command("*WAI\n")                   #We do this to get the full response to the LRN? command
         answer2 = self.read_response()
         answer = answer1 + answer2
+        shape_byte = answer[918]
         # correct some weirdness in the answer
         #answer = filter(lambda x: x in string.printable, answer)
         answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
@@ -184,8 +185,13 @@ class tg5012:
                 if match:
                     val_str = item[:match.start()]
                     val = eval(val_str)
-                    debugfile.write('\ncleaning units: %s' % item[match.start():])
-                    units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+                    units = item[match.start():]
+                    debugfile.write('\ncleaning units: -->%s<--' % units)
+                    units = re.sub('Hzzz','Hz',units)
+                    units = re.sub('Hzz','Hz',units)
+                    units = re.sub('Hzhz','Hz',units)
+                    units = re.sub('mHzkH','mHz',units)
+                    debugfile.write('\ncleaned units: -->%s<--' % units)
                     clean_item = '%+06f %s' % (val,units)
                     self.settings[item_id] = '%+06f%s' % (val,units)
             debugfile.write('\n%02i: %12s: %s' % (idx,item_id,clean_item))
@@ -194,8 +200,8 @@ class tg5012:
         
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
-            debugfile.write('\nshape byte: %i' % answer[918])
-            self.shape_value = ord(struct.unpack("c",answer[918])[0]) 
+            debugfile.write('\nshape byte: %i' % shape_byte)
+            self.shape_value = ord(struct.unpack("c",shape_byte)[0]) 
         except:
             debugfile.write("\nError while reading the shape")
             self.shape_value = -1
