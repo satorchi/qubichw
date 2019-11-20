@@ -35,13 +35,13 @@ from satorchipy.datefunctions import tot_seconds
 
 class calsource_configuration_manager():
 
-    def __init__(self,role=None):
+    def __init__(self,role=None, verbosity=0):
         '''
         initialize the object.  The role can be either "commander" or "manager"
         The "manager" runs on the Raspberry Pi, and interfaces directly with the hardware
         The "commander" sends commands via socket to the "manager"
         '''
-        self.verbosity = 0
+        self.verbosity = verbosity
         self.assign_variables(role)
         if self.role == 'manager':
             self.listen_loop()
@@ -92,7 +92,7 @@ class calsource_configuration_manager():
         initialize variables, depending on the role
         if the role is "manager", we need to connect to the hardware
         '''
-        print('calsource configuration manager: assigning variables: role=%s' % role)
+        self.log('calsource configuration manager: assigning variables: role=%s' % role,verbosity=2)
         self.role = role
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
@@ -121,7 +121,7 @@ class calsource_configuration_manager():
             self.device_on[dev] = None
             
         self.energenie_lastcommand_date = dt.datetime.utcnow()
-        self.energenie_timeout = 2
+        self.energenie_timeout = 5
 
         self.known_hosts = {}
         self.known_hosts['qubic-central'] = "192.168.2.1"
@@ -328,9 +328,9 @@ class calsource_configuration_manager():
         if states is not None:
             try:
                 self.energenie.set_socket_states(states)
-                ack = 'OK:'
+                ack = 'OK-'
             except:
-                ack = 'FAILED_SET_STATES:'
+                ack = 'FAILED_SET_STATES-'
 
                 
         # check for the on/off status
@@ -338,8 +338,10 @@ class calsource_configuration_manager():
         try:
             states_list = self.energenie.get_socket_states(states)
             ack += 'OK'
+            self.log('retrieved energenie states: %s' % states_list,verbosity=2)
         except:
             ack += 'FAILED_GET_STATES'
+            self.log('FAILED to get energenie states',verbosity=2)
             
         if ack.find('FAILED_GET_STATES')<0:
             for idx,state in enumerate(states_list):
