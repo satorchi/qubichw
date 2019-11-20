@@ -69,17 +69,23 @@ class tg5012:
         read response from the instrument to a single command
         '''
         finished = False
-        answer=[]
+        answer = b''
         while not finished:
             try:
                 ans = self.s.recv(1)
-                answer.append(ans.decode())
+                answer += ans
             except socket.timeout:
                 finished = True
             except:
-                print('could not decode: %s' % ans)
+                print('could not concatenate: %s' % ans)
                 #finished = True
-        return ''.join(answer)
+
+        try:
+            ret = answer.decode()
+        except:
+            print('could not decode: %s' % answer)
+            ret = answer
+        return answer
 
     def ask_id(self):
         '''
