@@ -165,6 +165,7 @@ class tg5012:
         answer2 = self.read_response()
         answer = answer1 + answer2
         shape_byte = answer[918]
+        debugfile.write('\nshape byte: %i' % shape_byte)
         # correct some weirdness in the answer
         #answer = filter(lambda x: x in string.printable, answer)
         answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
@@ -200,8 +201,8 @@ class tg5012:
         
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
-            debugfile.write('\nshape byte: %i' % shape_byte)
-            self.shape_value = ord(struct.unpack("c",shape_byte)[0]) 
+            #self.shape_value = ord(struct.unpack("c",shape_byte)[0])
+            self.shape_value = shape_byte
         except:
             debugfile.write("\nError while reading the shape")
             self.shape_value = -1
