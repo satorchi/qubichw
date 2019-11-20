@@ -158,6 +158,7 @@ class tg5012:
         self.settings = {}
 
         debugfile = open('modulator_tg5012a.debug.log','a')
+        debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         
         self.send_command("*LRN?\n")
         answer1 = self.read_response()
@@ -177,7 +178,6 @@ class tg5012:
         id_list[9]  = 'offset'
         id_list[13] = 'duty'
         id_list[33] = 'dc offset'
-        debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         for idx,item in enumerate(answer_list):
             clean_item = re.sub(' \.$','',item)
             item_id = 'unknown'
@@ -203,7 +203,7 @@ class tg5012:
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
             #self.shape_value = ord(struct.unpack("c",shape_byte)[0])
-            self.shape_value = shape_byte
+            self.shape_value = ord(shape_byte)
         except:
             debugfile.write("\nError while reading the shape")
             self.shape_value = -1
