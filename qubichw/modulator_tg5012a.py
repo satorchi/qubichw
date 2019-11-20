@@ -81,7 +81,7 @@ class tg5012:
                 #finished = True
 
         try:
-            ret = answer.decode(errors='replace')
+            ret = answer.decode(errors='ignore')
         except:
             print('could not decode: %s' % answer)
             ret = 'FAILED_TO_READ_TG5012A'
