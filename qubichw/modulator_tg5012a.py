@@ -184,6 +184,7 @@ class tg5012:
                 if match:
                     val_str = item[:match.start()]
                     val = eval(val_str)
+                    debugfile.write('\ncleaning units: %s' % item[match.start():])
                     units = item[match.start():].replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
                     clean_item = '%+06f %s' % (val,units)
                     self.settings[item_id] = '%+06f%s' % (val,units)
@@ -193,7 +194,7 @@ class tg5012:
         
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
-            debugfile.write('\nshape byte: %s' % answer[918])
+            debugfile.write('\nshape byte: %i' % answer[918])
             self.shape_value = ord(struct.unpack("c",answer[918])[0]) 
         except:
             debugfile.write("\nError while reading the shape")
