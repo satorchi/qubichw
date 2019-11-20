@@ -81,10 +81,10 @@ class tg5012:
                 #finished = True
 
         try:
-            ret = answer.decode()
+            ret = answer.decode(errors='replace')
         except:
             print('could not decode: %s' % answer)
-            ret = str(answer)
+            ret = 'FAILED_TO_READ_TG5012A'
         return ret
 
     def ask_id(self):
