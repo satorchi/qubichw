@@ -96,6 +96,7 @@ class calsource_configuration_manager():
         self.role = role
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
+        # the device list is in the order that they are plugged into the Energenie powerbar
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
 
         self.valid_commands = {}
@@ -310,7 +311,7 @@ class calsource_configuration_manager():
         return received_tstamp, ack
     
 
-    def onoff(self,states):
+    def onoff(self,states=None):
         '''
         switch on or off devices
         we have to wait for the Energenie powerbar to reset
@@ -323,20 +324,27 @@ class calsource_configuration_manager():
             extra_wait = reset_delta - delta
             time.sleep(extra_wait)
 
-        try:
-            self.energenie.set_socket_states(states)
-            ack = 'OK'
-        except:
-            ack = 'FAILED'
+        ack = ''
+        if states is not None:
+            try:
+                self.energenie.set_socket_states(states)
+                ack = 'OK:'
+            except:
+                ack = 'FAILED_SET_STATES:'
 
-
+                
         # check for the on/off status
-        if ack=='OK':
-            for item in self.powersocket.items():
-                dev = item[0]
-                key = item[1]
-                if key in states.keys():
-                    self.device_on[dev] = states[key]
+        time.sleep(tot_seconds(reset_delta)) # wait a bit before sending another command
+        try:
+            states_list = self.energenie.get_socket_states(states)
+            ack += 'OK'
+        except:
+            ack += 'FAILED_GET_STATES'
+            
+        if ack.find('FAILED_GET_STATES')<0:
+            for idx,state in enumerate(states_list):
+                dev = self.device_list[idx]
+                self.device_on[dev] = state
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         return ack
@@ -348,6 +356,8 @@ class calsource_configuration_manager():
         '''
         msg = ''
 
+        # get on/off status from Energenie powerbar
+        ack = self.onoff()
         for dev in self.device_list:
             if self.device_on[dev] is not None:
                 if self.device_on[dev]:
@@ -597,7 +607,7 @@ class calsource_configuration_manager():
         msg = fmt % (now_str,cmd_str)
         #self.log('sending socket data: %s' % msg)
 
-        s.sendto(msg, (self.receiver, self.broadcast_port))
+        s.sendto(msg.encode(), (self.receiver, self.broadcast_port))
         sockname = s.getsockname()
         self.log("send_command() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
         #s.close()
@@ -621,7 +631,7 @@ class calsource_configuration_manager():
         msg = '%s %s%s' % (now_str,ack,buf)
         self.log('sending acknowledgement: %s' % msg)
         try:
-            s.sendto(msg, (addr, self.broadcast_port))
+            s.sendto(msg.encode(), (addr, self.broadcast_port))
         except:
             self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
 
