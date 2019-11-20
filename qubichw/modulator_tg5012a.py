@@ -85,7 +85,7 @@ class tg5012:
         except:
             print('could not decode: %s' % answer)
             ret = str(answer)
-        return answer
+        return ret
 
     def ask_id(self):
         '''
