@@ -264,7 +264,7 @@ class calsource_configuration_manager():
         try:
             cmdstr, addr_tple = s.recvfrom(self.nbytes)
             addr = addr_tple[0]
-            cmdstr_clean = ' '.join(cmdstr.strip().split())
+            cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
         except socket.error:
             addr = 'NONE'
             cmdstr_clean = '%s SOCKET ERROR' % now.strftime('%s.%f')
