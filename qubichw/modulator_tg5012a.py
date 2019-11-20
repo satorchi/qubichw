@@ -69,11 +69,11 @@ class tg5012:
         read response from the instrument to a single command
         '''
         finished = False
-        answer = b''
+        answer = bytearray()
         while not finished:
             try:
                 ans = self.s.recv(1)
-                answer += ans
+                answer.extend(ans)
             except socket.timeout:
                 finished = True
             except:
@@ -84,7 +84,7 @@ class tg5012:
             ret = answer.decode()
         except:
             print('could not decode: %s' % answer)
-            ret = answer
+            ret = str(answer)
         return answer
 
     def ask_id(self):
