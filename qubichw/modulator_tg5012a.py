@@ -72,10 +72,13 @@ class tg5012:
         answer=[]
         while not finished:
             try:
-                ans=self.s.recv(1)
+                ans = self.s.recv(1)
                 answer.append(ans.decode())
             except socket.timeout:
-                finished=True
+                finished = True
+            except:
+                print('could not decode: %s' % ans)
+                #finished = True
         return ''.join(answer)
 
     def ask_id(self):
