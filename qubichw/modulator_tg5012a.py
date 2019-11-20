@@ -73,7 +73,7 @@ class tg5012:
         while not finished:
             try:
                 ans=self.s.recv(1)
-                answer.append(ans)
+                answer.append(ans.decode())
             except socket.timeout:
                 finished=True
         return ''.join(answer)
