@@ -373,12 +373,13 @@ class calsource_configuration_manager():
             msg += ' '+self.device[dev].status()
             
         dev = 'calsource'
-        if self.device[dev].state is not None:
-            msg += ' %s:frequency=%+06fGHz' % (dev,self.device[dev].state['frequency'])
-            msg += ' synthesizer:frequency=%+06fGHz' % self.device[dev].state['synthesizer_frequency']
-        else:
-            msg += ' %s:frequency=UNKNOWN' % dev
-            msg += ' synthesizer:frequency=UNKNOWN'
+        if self.device_on[dev]:
+            if self.device[dev].state is not None:
+                msg += ' %s:frequency=%+06fGHz' % (dev,self.device[dev].state['frequency'])
+                msg += ' synthesizer:frequency=%+06fGHz' % self.device[dev].state['synthesizer_frequency']
+            else:
+                msg += ' %s:frequency=UNKNOWN' % dev
+                msg += ' synthesizer:frequency=UNKNOWN'
             
         dev = 'modulator'
         if self.device[dev].is_connected():
