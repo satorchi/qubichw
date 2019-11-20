@@ -188,7 +188,11 @@ class tg5012:
                     val_str = item[:match.start()]
                     val = eval(val_str)
                     units = item[match.start():]
+                    units_list = []
+                    for ch in units:
+                        units_list.append(ord(ch))
                     debugfile.write('\ncleaning units: -->%s<--' % units)
+                    debugfile.write('\nunits list: %s' % units_list)
                     units = re.sub('Hzzz','Hz',units)
                     units = re.sub('Hzz','Hz',units)
                     units = re.sub('Hzhz','Hz',units)
