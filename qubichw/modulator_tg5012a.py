@@ -190,15 +190,17 @@ class tg5012:
             debugfile.write('\n%02i: %12s: %s' % (idx,item_id,clean_item))
 
             
-        debugfile.write('\n=============================\n')
-        debugfile.close()
         
         try:
             #Byte 918 of the response has the information of the wave shape 0=SINE, 1=SQUARE, etc.
+            debugfile.write('\nshape byte: %s' % answer[918])
             self.shape_value = ord(struct.unpack("c",answer[918])[0]) 
         except:
-            print("Error while reading the shape")
+            debugfile.write("\nError while reading the shape")
             self.shape_value = -1
+
+        debugfile.write('\n=============================\n')
+        debugfile.close()
 
         self.shape_dict = {
             0: 'SINE',
