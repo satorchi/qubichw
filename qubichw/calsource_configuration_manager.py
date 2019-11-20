@@ -121,7 +121,7 @@ class calsource_configuration_manager():
             self.device_on[dev] = None
             
         self.energenie_lastcommand_date = dt.datetime.utcnow()
-        self.energenie_timeout = 10
+        self.energenie_timeout = 2
 
         self.known_hosts = {}
         self.known_hosts['qubic-central'] = "192.168.2.1"
@@ -334,7 +334,7 @@ class calsource_configuration_manager():
 
                 
         # check for the on/off status
-        time.sleep(tot_seconds(reset_delta)) # wait a bit before sending another command
+        time.sleep(reset_delta) # wait a bit before sending another command
         try:
             states_list = self.energenie.get_socket_states(states)
             ack += 'OK'
