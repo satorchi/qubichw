@@ -54,6 +54,18 @@ class tg5012:
 
         return True
 
+    def send_command(self,cmd):
+        '''
+        send a command to the modulator
+        '''
+        if not self.is_connected(): return False
+
+        try:
+            self.s.send(cmd.encode())
+        except:
+            return False
+        return True
+
     def read_response(self):
         '''
         read response from the instrument to a single command
@@ -72,7 +84,7 @@ class tg5012:
         '''
         ask for the id of the intrument and return it
         '''
-        self.s.send("*IDN?\n")
+        self.send_command("*IDN?\n")
         answer=self.read_response()
         return answer
 
@@ -140,9 +152,9 @@ class tg5012:
 
         debugfile = open('modulator_tg5012a.debug.log','a')
         
-        self.s.send("*LRN?\n")
+        self.send_command("*LRN?\n")
         self.answer1 = self.read_response()
-        self.s.send("*WAI\n")                   #We do this to get the full response to the LRN? command
+        self.send_command("*WAI\n")                   #We do this to get the full response to the LRN? command
         self.answer2 = self.read_response()
         self.answer = self.answer1 + self.answer2
         # correct some weirdness in the answer
@@ -281,16 +293,16 @@ class tg5012:
 
     def set_modulation_off(self, offset):
         self.set_output_off()
-        self.s.send("WAVE ARB\n")
-        self.s.send("ARBLOAD DC\n")
-        if offset: self.s.send("ARBDCOFFS %.2f\n" % offset)
+        self.send_command("WAVE ARB\n")
+        self.send_command("ARBLOAD DC\n")
+        if offset: self.send_command("ARBDCOFFS %.2f\n" % offset)
         self.set_output_on()
 
     def set_output_off(self):
-        self.s.send("OUTPUT OFF\n")
+        self.send_command("OUTPUT OFF\n")
 
     def set_output_on(self):
-        self.s.send("OUTPUT ON\n")
+        self.send_command("OUTPUT ON\n")
 
     def set_default_settings(self):
         '''
@@ -307,28 +319,28 @@ class tg5012:
         return True
 
     def set_frequency(self,frequency):
-        self.s.send("FREQ %.5f\n" % frequency)
+        self.send_command("FREQ %.5f\n" % frequency)
         self.state['frequency'] = frequency
         return True
 
     def set_shape(self,shape):
-        self.s.send("WAVE %s\n" % shape)
+        self.send_command("WAVE %s\n" % shape)
         self.state['shape'] = shape
         return True
 
     def set_amplitude(self,amplitude):
-        self.s.send("AMPL %.2f\n" % amplitude)
+        self.send_command("AMPL %.2f\n" % amplitude)
         self.state['amplitude'] = amplitude
         return True
 
     def set_offset(self,offset):
-        self.s.send("DCOFFS %.2f\n" % offset)
-        self.s.send("ARBDCOFFS %.2f\n" % offset)
+        self.send_command("DCOFFS %.2f\n" % offset)
+        self.send_command("ARBDCOFFS %.2f\n" % offset)
         self.state['offset'] = offset
         return True
     
     def set_duty(self,duty):
-        self.s.send("SQRSYMM %.2f\n" % duty)
+        self.send_command("SQRSYMM %.2f\n" % duty)
         self.state['duty'] = duty
         return True
 
