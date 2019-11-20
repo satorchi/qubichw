@@ -186,7 +186,7 @@ class tg5012:
                 if match:
                     val_str = item[:match.start()]
                     val = eval(val_str)
-                    units = item[match.start():]
+                    units = item[match.start():].strip()
                     units_list = []
                     for ch in units:
                         units_list.append(ord(ch))
