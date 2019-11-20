@@ -169,8 +169,7 @@ class tg5012:
         debugfile.write('\nshape byte: -->%s<--' % shape_byte)
         debugfile.write('\nshape byte: -->%i<--' % ord(shape_byte))
         # correct some weirdness in the answer
-        #answer = filter(lambda x: x in string.printable, answer)
-        answer = answer.replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
+        answer = answer.replace('\x00','').replace('Hzzz','Hz').replace('Hzz','Hz').replace('HzHz','Hz').replace('mHzkHz','mHz')
         answer_list = re.split('[+-]',answer)
         id_list = {}
         id_list[1]  = 'frequency'
