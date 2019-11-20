@@ -58,8 +58,6 @@ class tg5012:
         '''
         send a command to the modulator
         '''
-        if not self.is_connected(): return False
-
         try:
             self.s.send(cmd.encode())
         except:
