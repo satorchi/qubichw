@@ -13,11 +13,11 @@
 # the following line should appear in crontab
 # */5 * * * * /usr/local/bin/start_calsource_acq.sh
 #
-if ! ps -aux | grep "/usr/bin/python3 /usr/local/bin/read_calsource.py" | grep -v -e grep -e SCREEN; then  
+if ! ps -aux | grep "read_calsource.py" | grep -v -e grep -e SCREEN; then  
 	echo "Calsource acquisition not running";
 	screen -X -S calsource quit
 	echo "Starting a new screen and launching the acquisition"
-	screen -S calsource -d -m /usr/local/bin/read_calsource.py	
+	screen -S calsource -d -m read_calsource.py	
 else
 	echo "Acquisition already running"
 fi
