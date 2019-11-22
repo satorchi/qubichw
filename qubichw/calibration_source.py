@@ -227,7 +227,7 @@ class calibration_source:
         print('The output frequency is %.3f GHz' % of)
         self.state = {}
         self.state['frequency'] = f
-        self.state['synthesizer_frequency'] = of
+        self.state['synthesiser_frequency'] = of
         return of
 
     def set_default_settings(self):
