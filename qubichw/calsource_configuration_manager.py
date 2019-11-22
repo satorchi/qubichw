@@ -502,7 +502,7 @@ class calsource_configuration_manager():
         if dev in command.keys():
             for parm in command[dev].keys():
                 if parm!='onoff': # ignore on/off.  This is executed above.
-                    ack += '%s' % self.device[dev].set_setting(parm,command[dev][parm])
+                    ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
                     retval['%s state' % dev] = self.device[dev].state
         
         # run the Arduino last of all
