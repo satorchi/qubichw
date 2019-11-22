@@ -103,10 +103,10 @@ class calsource_configuration_manager():
         self.valid_commands['calsource'] = ['on','off','frequency']
         self.valid_commands['amplifier'] = ['on','off',
                                             'filter_mode',
-                                            'dynamic',
+                                            'dynamic_range',
                                             'gain',
-                                            'low_frequency',
-                                            'high_frequency',
+                                            'filter_low_frequency',
+                                            'filter_high_frequency',
                                             'coupling']
         self.valid_commands['lamp' ]     = ['on','off']
         self.valid_commands['arduino']   = ['duration']
@@ -376,10 +376,10 @@ class calsource_configuration_manager():
         if self.device_on[dev]:
             if self.device[dev].state is not None:
                 msg += ' %s:frequency=%+06fGHz' % (dev,self.device[dev].state['frequency'])
-                msg += ' synthesizer:frequency=%+06fGHz' % self.device[dev].state['synthesizer_frequency']
+                msg += ' synthesiser:frequency=%+06fGHz' % self.device[dev].state['synthesiser_frequency']
             else:
                 msg += ' %s:frequency=UNKNOWN' % dev
-                msg += ' synthesizer:frequency=UNKNOWN'
+                msg += ' synthesiser:frequency=UNKNOWN'
             
         dev = 'modulator'
         if self.device[dev].is_connected():
@@ -465,7 +465,7 @@ class calsource_configuration_manager():
                 msg += 'FAILED'
                 retval['%s state' % dev] = None
             else:
-                msg += 'synthesizer:frequency=%+06fGHz' % of
+                msg += 'synthesiser:frequency=%+06fGHz' % of
                 retval['%s state' % dev] = self.device[dev].state
             self.log(msg)
             ack += '%s ' % msg
