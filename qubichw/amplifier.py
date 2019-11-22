@@ -35,7 +35,7 @@ class amplifier:
         self.state['filter low frequency'] = None
         self.state['filter high frequency'] = None
         self.state['coupling'] = None
-        self.state['dynamic'] = None
+        self.state['dynamic range'] = None
         self.state['gain'] = None
         
         self.init(port=port)
@@ -120,7 +120,7 @@ class amplifier:
         self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 30.0
         self.state['coupling'] = 'DC'
-        self.state['dynamic'] = 'high'
+        self.state['dynamic range'] = 'high'
         self.state['gain'] = 10000
         return
 
@@ -292,7 +292,7 @@ class amplifier:
                 break
 
         self.send_command('DYNR %i\n' % mode_idx)
-        self.state['dynamic'] = valid_args[mode_idx]
+        self.state['dynamic range'] = valid_args[mode_idx]
         return True
 
 
@@ -304,10 +304,10 @@ class amplifier:
             return 'amplifier:disconnected'
 
         valid_settings = ['filter_mode',
-                          'dynamic',
+                          'dynamic_range',
                           'gain',
-                          'low_frequency',
-                          'high_frequency',
+                          'filter_low_frequency',
+                          'filter_high_frequency',
                           'coupling']
         setting = setting.lower()
         if setting not in valid_settings:
@@ -322,8 +322,8 @@ class amplifier:
         if setting=='dynamic':
             chk = self.set_dynamic(value)
             if chk:
-                return 'amplifier:dynamic=%s' % self.state['dynamic'].replace(' ','_')
-            return 'amplifier:dynamic=FAILED'
+                return 'amplifier:dynamic_range=%s' % self.state['dynamic'].replace(' ','_')
+            return 'amplifier:dynamic_range=FAILED'
 
         if setting=='gain':
             chk = self.set_gain(value)
@@ -331,17 +331,17 @@ class amplifier:
                 return 'amplifier:gain=%i' % self.state['gain']
             return 'amplifier:gain=FAILED'
 
-        if setting=='low_frequency':
+        if setting=='filter_low_frequency':
             chk = self.set_filter_frequency(value,type='low')
             if chk:
-                return 'amplifier:low_frequency=%.2fHz' % self.state['filter low frequency']
-            return 'amplifier:low_frequency:FAILED'
+                return 'amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
+            return 'amplifier:filter_low_frequency:FAILED'
 
-        if setting=='high_frequency':
+        if setting=='filter_high_frequency':
             chk = self.set_filter_frequency(value,type='high')
             if chk:
-                return 'amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
-            return 'amplifier:high_frequency:FAILED'
+                return 'amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
+            return 'amplifier:filter_high_frequency:FAILED'
 
         if setting=='coupling':
             chk = self.set_coupling(value)
@@ -357,12 +357,12 @@ class amplifier:
         show the current configuration
         '''
         msg  = 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
-        msg += ' amplifier:dynamic=%s' % self.state['dynamic'].replace(' ','_')
+        msg += ' amplifier:dynamic_range=%s' % self.state['dynamic range'].replace(' ','_')
         msg += ' amplifier:gain=%i' % self.state['gain']
         if self.state['filter low frequency'] is not None:
-            msg += ' amplifier:low_frequency=%.2fHz' % self.state['filter low frequency']
+            msg += ' amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
         if self.state['filter high frequency'] is not None:
-            msg += ' amplifier:high_frequency=%.2fHz' % self.state['filter high frequency']
+            msg += ' amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
         #print('DEBUG:AMPLIFIER returning status message: %s' % msg)
         #print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
