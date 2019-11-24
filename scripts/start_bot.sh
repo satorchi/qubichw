@@ -14,12 +14,12 @@
 # the following line should appear in crontab
 # */5 * * * * /usr/local/bin/start_bot.sh
 #
-if ! ps auxw | grep "/usr/bin/python /usr/local/bin/run_bot.py" | grep -v -e grep -e SCREEN; then  
+if ! ps auxw | grep "/usr/local/bin/run_bot.py" | grep -v -e grep -e SCREEN; then  
     echo "bot not running";
     screen -X -S bot quit
     echo "Starting a new screen and launching the bot"
     cd $HOME/data/temperature
-    screen -S bot -d -m /usr/bin/python /usr/local/bin/run_bot.py
+    screen -S bot -d -m /usr/local/bin/run_bot.py
 else
     echo "bot already running"
 fi
