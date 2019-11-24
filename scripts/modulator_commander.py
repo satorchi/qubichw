@@ -9,9 +9,9 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           redistribute it.  There is NO WARRANTY, to the extent
           permitted by law.
 
-a command line interface to the HP33120A signal generator
+a command line interface to the TTi 5012A Signal Generator
 '''
-from qubichw.modulator import modulator
+from qubichw.modulator_tg5012a import tg5012 as modulator
 
-hp = modulator()
-hp.command_loop()
+sigmod = modulator()
+sigmod.command_loop()
