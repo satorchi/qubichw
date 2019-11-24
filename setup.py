@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 '''
 $Id: setup.py <qubichw>
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -11,7 +11,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 setup.py for qubichw
 '''
-from __future__ import division, print_function
 import os,sys,subprocess
 from setuptools import setup
 
@@ -76,7 +75,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/start_calsource_acq.sh',
            'scripts/start_calsource_manager.sh',
            'scripts/start_bot.sh',
-           'scripts/start_hkserver.sh']
+           'scripts/start_hkserver.sh',
+           'scripts/fast_mmr.py']
 if len(sys.argv)>1 and sys.argv[1]=='install':
     print('installing executable scripts...')
     for F in scripts:
