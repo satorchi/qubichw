@@ -304,7 +304,7 @@ class calsource_configuration_manager():
         self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)))
         # clean up the acknowledgement
         ack_cleaned = ''
-        for line in ack.strip().split('|'):
+        for line in ack.decode().strip().split('|'):
             ack_cleaned += '%s\n' % line.strip()
         self.log(ack_cleaned)
         return received_tstamp, ack
