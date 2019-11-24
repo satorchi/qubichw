@@ -434,7 +434,7 @@ class modulator:
         parms = self.parseargs(argslist)
         while not parms['quit']:
             self.run_commands(parms)
-            ans=raw_input('Enter command ("help" for list): ')
+            ans = input('Enter command ("help" for list): ')
             argslist = ans.strip().split()
             parms = self.parseargs(argslist)
 
