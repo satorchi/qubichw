@@ -72,7 +72,7 @@ class Pfeiffer :
 
         msg = '%s\r\n' % cmd
         try:
-            self.s.write(msg)
+            self.s.write(msg.encode())
         except:
             self.device_ok = False
             return False
@@ -97,7 +97,7 @@ class Pfeiffer :
             self.log('ERROR! Could not read device: %s' % self.port)
             return None
 
-        return ans.strip()
+        return ans.decode().strip()
 
     def read_pressure(self):
         '''send the command to read the pressure
