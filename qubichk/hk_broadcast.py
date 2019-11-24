@@ -347,7 +347,7 @@ class hk_broadcast :
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             out,err = proc.communicate()
             devs = []
-            for line in out.split('\n'):
+            for line in out.decode().split('\n'):
                 match = re.match('^(eth[0-9])',line)
                 if match:
                    devs.append(match.groups()[0])
@@ -360,7 +360,7 @@ class hk_broadcast :
         cmd = '/sbin/ifconfig %s' % eth
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out,err = proc.communicate()
-        for line in out.split('\n'):
+        for line in out.decode().split('\n'):
             if line.find('inet ')>0: break
         hostname = line.split()[1]
         self.log('server: hostname=%s' % hostname)

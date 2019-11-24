@@ -79,10 +79,10 @@ class PowerSupply :
         cmd='/sbin/udevadm info -a %s|grep serial|head -1' % self.port
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out,err=proc.communicate()
-        serialno=out.split('==')[1].replace('"','').strip()
+        serialno=out.decode().split('==')[1].replace('"','').strip()
 
         s=serial.Serial(port=self.port,timeout=2)
-        s.write('*IDN?\n')
+        s.write('*IDN?\n'.encode())
         a=s.readline()
         a_list=a.strip().split(',')
         if len(a_list)<2:
@@ -120,7 +120,7 @@ class PowerSupply :
     def get_nsupplies(self):
         '''get the number of supplies
         '''
-        self.s.write('CONFIG?\n')
+        self.s.write('CONFIG?\n'.encode())
         a=self.read_reply()
         try:
             nsupplies=eval(a)
@@ -223,7 +223,7 @@ class PowerSupply :
 
         try:
             self.s.flush() 
-            response=self.s.write(cmd)
+            response=self.s.write(cmd.encode())
         except:
             self.log('ERROR! Could not write command to powersupply: %s, %s, id# %s' % (self.port,self.supplyname,self.serialno))
             self.device_ok = False

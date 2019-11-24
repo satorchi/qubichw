@@ -24,7 +24,7 @@ hk=entropy_hk()
 cmd='/sbin/ifconfig eth0'
 proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 out,err=proc.communicate()
-for line in out.split('\n'):
+for line in out.decode().split('\n'):
     if line.find('inet ')>0: break
 hostname=line.split()[1]
 print('hostname=%s' % hostname)

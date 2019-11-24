@@ -120,9 +120,9 @@ def files_on_archive(server):
     cmd = 'find %s -type f \\( -name "*.fits" -o -name "*.dat" \\)' % datadir
     out,err = archive_command(server,cmd)
     if err:
-        print(err)
+        print(err.decode())
 
-    filelist = out.split('\n')
+    filelist = out.decode().split('\n')
     filelist_relative = make_relative_filelist(datadir,filelist)
     return filelist, filelist_relative
         
