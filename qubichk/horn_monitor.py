@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 $Id: horn_monitor.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>

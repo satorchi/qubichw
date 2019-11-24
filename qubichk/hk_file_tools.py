@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 $Id: hk_file_tools.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 $Id: qubic_bot.py
 $auth: Manuel Gonzalez <manuel.gonzalez@ib.edu.ar>
@@ -142,7 +141,7 @@ class qubic_bot :
         if 'HOME' in os.environ:
             homedir = os.environ['HOME']
         else:
-            homedir = '/home/pi'
+            homedir = '/home/qubic'
         self.hk_dir = homedir+'/data/temperature/broadcast'
 
         # this is not used since we implemented HK socket broadcasting 20181212
@@ -757,7 +756,7 @@ class qubic_bot :
 
         plt.ioff()
         fig=plt.figure(figsize=(20.48,7.68))
-        plt.plot(t,v)
+        plt.plot(t,v,ls='none',marker='D')
         ax=fig.axes[0]
         if Tmin is None:Tmin=min(v)
         if Tmax is None:Tmax=max(v)
@@ -903,7 +902,7 @@ class qubic_bot :
                 Tminlist.append(min(v))
                 Tmaxlist.append(max(v))
                 avs = match.groups()[0]
-                if t is not None:plt.plot(t,v,label=self.entropy_channel_title[avs][ch])
+                if t is not None:plt.plot(t,v,ls='none',marker='D',label=self.entropy_channel_title[avs][ch])
         if Tmin is None:
             Tmin = min(Tminlist)
         if Tmax is None:
@@ -978,7 +977,7 @@ class qubic_bot :
             if (t is not None) and (v is not None):
                 something2plot = True
                 channel_label=self.temperature_headings[ch_idx]
-                plt.plot(t,v,label=channel_label)
+                plt.plot(t,v,ls='none',marker='D',label=channel_label)
                 tmax_list.append(max(v))
                 tmin_list.append(min(v))
                 dmax_list.append(max(t))
@@ -999,7 +998,7 @@ class qubic_bot :
                 if (t is not None) and (v is not None):
                     something2plot = True
                     entropy_label=self.entropy_channel_title[avs][ch]
-                    plt.plot(t,v,label=entropy_label)                
+                    plt.plot(t,v,ls='none',marker='D',label=entropy_label)                
                     tmax_list.append(max(v))
                     tmin_list.append(min(v))
                     dmax_list.append(max(t))
@@ -1012,7 +1011,7 @@ class qubic_bot :
             if (t is not None) and (v is not None):
                 something2plot = True
                 channel_label='HEATER%i' % ch
-                plt.plot(t,v,label=channel_label)
+                plt.plot(t,v,ls='none',marker='D',label=channel_label)
                 tmax_list.append(max(v))
                 tmin_list.append(min(v))
                 dmax_list.append(max(t))
@@ -1027,7 +1026,7 @@ class qubic_bot :
             if (t is not None) and (v is not None):
                 something2plot = True
                 channel_label='PRESSURE%i' % ch
-                plt.plot(t,v,label=channel_label)
+                plt.plot(t,v,ls='none',marker='D',label=channel_label)
                 tmax_list.append(max(v))
                 tmin_list.append(min(v))
                 dmax_list.append(max(t))
