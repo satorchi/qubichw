@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: plot_hornswitch.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -11,7 +11,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 plot the latest horn switch inductance curves
 '''
-from __future__ import division, print_function
 from glob import glob
 
 from qubichk.horn_monitor import horn_monitor
@@ -21,5 +20,5 @@ m = horn_monitor()
 files = m.recent_files()
 m.plot_saved_event(files)
 
-ans=raw_input('Press <enter> to quit')
+ans = input('Press <enter> to quit')
 print('\n')

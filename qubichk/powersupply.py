@@ -673,8 +673,8 @@ if __name__=='__main__':
             for info in ps.infolist:
                 print('%s' % info['supplyname'])
 
-        ans=raw_input('Enter command ("help" for list): ')
-        command=ps.parseargs(ans.split())
-        keep_going=not command['quit']
+        ans = input('Enter command ("help" for list): ')
+        command = ps.parseargs(ans.split())
+        keep_going = not command['quit']
         
     
