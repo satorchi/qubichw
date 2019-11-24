@@ -14,7 +14,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 get temperatures from the temperature diodes
 '''
-from __future__ import division, print_function
 import os,sys,serial,subprocess
 from glob import glob
 import time
@@ -126,7 +125,7 @@ class temperature_hk :
             return None
 
         # clean the datlist from possible crap.  Sometimes the diodes return '\x00' in the middle of the number
-        ans = ans.replace('\x00','')
+        ans = ans.decode().replace('\x00','')
         return ans.strip()
     
             

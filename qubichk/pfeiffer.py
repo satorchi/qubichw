@@ -10,7 +10,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 read the Pfeiffer pressure sensor
 '''
-from __future__ import division, print_function
 import os,sys,serial
 import datetime as dt
 
