@@ -11,7 +11,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 send commands to the HP33120A wave form generator
 This is used to modulate the calibration source
 '''
-from __future__ import division, print_function
 import serial,time,os,sys
 import readline
 readline.parse_and_bind('tab: complete')
@@ -48,7 +47,7 @@ class modulator:
         if self.s is None:
             return False
         
-        self.s.write('*IDN?\n')
+        self.s.write('*IDN?\n'.encode())
         id = self.s.readline()
         if id=='':  return False        
         
@@ -119,7 +118,7 @@ class modulator:
                         rtscts=False)
 
         print('Establishing communication with the HP33120A wave generator on port %s' % port)
-        s.write('*IDN?\n')
+        s.write('*IDN?\n'.encode())
         id=s.readline()
         if id=='':
             print('ERROR! unable to communicate!')
@@ -127,9 +126,9 @@ class modulator:
 
         print('The device says: %s' % id)
 
-        s.write('\n*CLS\n')
+        s.write('\n*CLS\n'.encode())
         time.sleep(0.5)
-        s.write('SYST:REM\n')
+        s.write('SYST:REM\n'.encode())
         time.sleep(0.5)
 
         self.s=s
@@ -177,10 +176,10 @@ class modulator:
         if shape.upper().find('SQ') >= 0: shape='SQU'
 
         cmd='APPL:%s %.5E, %.2f, %.2f\n' % (shape.upper(),frequency,amplitude,offset)
-        self.s.write(cmd)
+        self.s.write(cmd.encode())
         time.sleep(0.5)
         cmd='PULS:DCYC %.2f\n' % duty
-        self.s.write(cmd)
+        self.s.write(cmd.encode())
         time.sleep(0.5)
         return True
 
@@ -199,7 +198,7 @@ class modulator:
             s=self.init_hp33120a()
             if s is None:return None
 
-        self.s.write('APPL?\n')
+        self.s.write('APPL?\n'.encode())
         ans=self.s.readline().strip()
         if  not ans:
             print('signal generator appears to be off')
@@ -223,7 +222,7 @@ class modulator:
             return None
             
             
-        self.s.write('PULS:DCYC?\n')
+        self.s.write('PULS:DCYC?\n'.encode())
         ans=self.s.readline()
         val=ans.strip()
         try:
@@ -247,7 +246,7 @@ class modulator:
             if s is None:return False
         
     
-        self.s.write('FREQ?\n')
+        self.s.write('FREQ?\n'.encode())
         freq_str=self.s.readline()
         freq=eval(freq_str.strip())
         print('HP33120A is set to %.6f Hz' % freq)
@@ -263,7 +262,7 @@ class modulator:
             if s is None:return False
         
     
-        self.s.write('FUNC:SHAPE?\n')
+        self.s.write('FUNC:SHAPE?\n'.encode())
         shape=self.s.readline().strip()
         print('HP33120A is running a %s modulation' % shape)
         return shape
@@ -277,7 +276,7 @@ class modulator:
             if s is None:return False
         
     
-        self.s.write('PULS:DCYC?\n')
+        self.s.write('PULS:DCYC?\n'.encode())
         ans=self.s.readline()
         val=ans.strip()
         duty=eval(val)
