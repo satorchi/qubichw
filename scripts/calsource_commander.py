@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: calsource_commander.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -18,7 +18,6 @@ It has two components:
 by default, this script will run as the "commander"
 invoke with command line argument "manager" to run the "manager"
 '''
-from __future__ import division, print_function
 import sys
 
 from qubichw.calsource_configuration_manager import calsource_configuration_manager

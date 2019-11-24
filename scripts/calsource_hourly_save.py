@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: calsource_hourly_save.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -13,8 +13,6 @@ save the calibration source data regularly
 
 this should be run on qubic-central in directory /archive/calsource/hourly
 '''
-from __future__ import division, print_function
-
 from qubichw.arduino import arduino
 
 cs = arduino()

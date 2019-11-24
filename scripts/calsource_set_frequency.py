@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: calsource_set_frequency.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -11,7 +11,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 simple script to set the frequency of the calibration source
 '''
-from __future__ import division, print_function
 import sys
 
 # import the calibration_source class

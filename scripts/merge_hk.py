@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''$Id: merge_hk.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
 $created: Fri 28 Dec 2018 05:50:50 CET
@@ -14,7 +14,6 @@ this is probably a one-off script to re-organize the HK data taken
 while the system was undergoing changes.
 
 '''
-from __future__ import division, print_function
 import sys,os,re,time
 import datetime as dt
 from glob import glob
