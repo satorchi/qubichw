@@ -343,53 +343,53 @@ class hk_broadcast :
         '''
 
         if eth is None:
-            cmd='/sbin/ifconfig -a'
+            cmd = '/sbin/ifconfig -a'
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            out,err=proc.communicate()
-            devs=[]
+            out,err = proc.communicate()
+            devs = []
             for line in out.split('\n'):
-                match=re.match('^(eth[0-9])',line)
+                match = re.match('^(eth[0-9])',line)
                 if match:
                    devs.append(match.groups()[0])
             if devs:
-                eth=devs[-1]
+                eth = devs[-1]
             else:
-                eth='lo'
+                eth = 'lo'
 
             
-        cmd='/sbin/ifconfig %s' % eth
+        cmd = '/sbin/ifconfig %s' % eth
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
+        out,err = proc.communicate()
         for line in out.split('\n'):
             if line.find('inet ')>0: break
-        hostname=line.split()[1]
+        hostname = line.split()[1]
         self.log('server: hostname=%s' % hostname)
         self.log('server: receiver=%s' % self.RECEIVER)
-        now=dt.datetime.utcnow()
-        stoptime=now+dt.timedelta(days=1000)
+        now = dt.datetime.utcnow()
+        stoptime = now+dt.timedelta(days=1000)
 
         if test:
-            hostname='127.0.0.1' # for testing
-            self.RECEIVER='127.0.0.1'
+            hostname = '127.0.0.1' # for testing
+            self.RECEIVER = '127.0.0.1'
             self.log('server: hostname=%s for testing' % hostname)
-            stoptime=now+dt.timedelta(minutes=5)
+            stoptime = now+dt.timedelta(minutes=5)
 
 
-        s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
         s.bind((hostname,15000))
         
-        msg=self.record
-        counter=0
+        rec = self.record
+        counter = 0
         while now < stoptime:
 
 
             if not test:
-                msg=self.get_all_hk()
+                rec = self.get_all_hk()
             else:
-                msg[0].DATE=self.current_timestamp()
-            s.sendto(msg, (self.RECEIVER, self.BROADCAST_PORT))
+                rec[0].DATE = self.current_timestamp()
+            s.sendto(rec, (self.RECEIVER, self.BROADCAST_PORT))
 
             ###################################################################################
             #### we do not log the record here.  It is done by the get_<controller>_hk() methods
@@ -397,7 +397,7 @@ class hk_broadcast :
             ###################################################################################
             
             time.sleep(self.sampling_period)
-            now=dt.datetime.utcnow()
+            now = dt.datetime.utcnow()
             counter+=1
 
         s.close()
