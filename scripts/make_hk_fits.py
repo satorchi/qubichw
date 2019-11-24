@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: make_hk_fits.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -12,7 +12,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 make a FITS file with all the housekeeping data recorded on qubic-central
 the data are found in /home/qubic/data/temperature/broadcast
 '''
-from __future__ import division, print_function
 import sys,os,re,time
 import datetime as dt
 from glob import glob

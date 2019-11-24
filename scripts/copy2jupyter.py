@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: copy2jupyter.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>

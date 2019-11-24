@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: powersupply.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -16,7 +16,6 @@ The TTi PL303QMD-P power supply has two supplies
   2) on the left hand side
 
 '''
-from __future__ import division, print_function
 import os,sys,serial,subprocess
 from glob import glob
 import numpy as np
