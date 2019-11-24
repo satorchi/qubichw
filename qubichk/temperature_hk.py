@@ -146,7 +146,7 @@ class temperature_hk :
             self.log('ERROR! Could not find calibration directory: %s' % caldir)
             return False
 
-        calibration_files = map(lambda x: caldir+'/calibration_ch'+str(x).zfill(2)+'.dat',range(self.nT))
+        calibration_files = list(map(lambda x: caldir+'/calibration_ch'+str(x).zfill(2)+'.dat',range(self.nT)))
         # check for file existence
         for fname in calibration_files:
             if not os.path.exists(fname):
