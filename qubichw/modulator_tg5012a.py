@@ -10,7 +10,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 remote control of the TTi 5012A Signal Generator
 '''
-from __future__ import division, print_function
 import time,os,sys,socket,struct,string,re
 import datetime as dt
 from PyMS import PMSDevice
@@ -517,7 +516,7 @@ class tg5012:
         parms = self.parseargs(argslist)
         while not parms['quit']:
             self.run_commands(parms)
-            ans=raw_input('Enter command ("help" for list): ')
+            ans = input('Enter command ("help" for list): ')
             argslist = ans.strip().split()
             parms = self.parseargs(argslist)
 
