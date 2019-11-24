@@ -284,7 +284,7 @@ class entropy_hk :
         else:
             cmd='device %s %i stop\n' % (self.devlist[self.mech_idx],ch)
         
-        self.socket.send(cmd)
+        self.socket.send(cmd.encode())
         return True
 
     def mech_open(self,ch=None,steps=None):
