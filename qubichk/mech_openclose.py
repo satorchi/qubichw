@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: mech_openclose.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -11,7 +11,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 open/close the Mechanical heat switches at 20K intervals
 '''
-from __future__ import division, print_function
 import sys,os,subprocess,time,socket
 import numpy as np
 import datetime as dt
