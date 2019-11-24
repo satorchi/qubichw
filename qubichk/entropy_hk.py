@@ -126,13 +126,14 @@ class entropy_hk :
                      
         self.socket.send(cmd.encode())
         try:
-            a=self.socket.recv(self.MAX_MSGLEN)
+            a = self.socket.recv(self.MAX_MSGLEN)
+            return a.encode()
         except:
             self.log("ERROR!  Communication error.  Trying to re-initialize socket.")
             self.socket.close()
             self.init_socket()
-            a=None
-        return a
+            return None
+        return None
 
     def get_startTime(self):
         '''get the start time for logging temperatures
