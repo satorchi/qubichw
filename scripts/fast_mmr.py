@@ -62,7 +62,7 @@ while True:
             break
 
         #if idx==2: print(ret)
-        val_str = ret.strip()
+        val_str = ret.decode().strip()
         now = dt.datetime.utcnow()
         tstamp_str = now.strftime('%s.%f')
         handle[idx].write('%s %s\n' % (tstamp_str,val_str))

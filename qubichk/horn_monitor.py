@@ -159,7 +159,7 @@ class horn_monitor:
         
         print('length of id_packet: %i' % len(id_packet))
         print('id_packet type: %s' % type(id_packet))
-        print('id_packet: %s' % str(id_packet))
+        print('id_packet: %s' % id_packet.decode())
                 
         nbytes_bin = id_packet[0:4]
         horn_id_bin = id_packet[4:6]

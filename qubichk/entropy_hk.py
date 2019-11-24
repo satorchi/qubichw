@@ -104,7 +104,7 @@ class entropy_hk :
             self.socket.connect((self.hostname,2002))
             self.socket.settimeout(0.2)
             a=self.socket.recv(self.MAX_MSGLEN)
-            self.debugmsg(a)
+            self.debugmsg(a.decode())
             self.connected=True
         except:
             self.debugmsg('Unable to connect to Major Tom!')
@@ -127,7 +127,7 @@ class entropy_hk :
         self.socket.send(cmd.encode())
         try:
             a = self.socket.recv(self.MAX_MSGLEN)
-            return a.encode()
+            return a.decode()
         except:
             self.log("ERROR!  Communication error.  Trying to re-initialize socket.")
             self.socket.close()
