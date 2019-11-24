@@ -803,7 +803,7 @@ class qubic_bot :
 
         result=self.plot_temperature(t,v,self.entropy_channel_title[avs][channel],
                                      dmin=dmin,dmax=dmax,Tmin=Tmin,Tmax=Tmax,logscale=logscale)
-        with open('temperature_plot.png','r') as plot:
+        with open('temperature_plot.png','rb') as plot:
             self.bot.sendPhoto(self.chat_id,plot)
         return
 
@@ -875,7 +875,7 @@ class qubic_bot :
         Tmax=max(v[imin:])
     
         result=self.plot_temperature(t,v,self.entropy_channel_title[avs][channel],dmin,dmax,Tmin,Tmax)
-        with open('temperature_plot.png','r') as plot:
+        with open('temperature_plot.png','rb') as plot:
             self._send_photo(plot)
         return
 
@@ -916,7 +916,7 @@ class qubic_bot :
         plt.legend(fontsize=self.labelsize)
         fig.savefig('temperature_plot.png',format='png',dpi=100,bbox_inches='tight')
         plt.close()
-        with open('temperature_plot.png','r') as plot:
+        with open('temperature_plot.png','rb') as plot:
             self._send_photo(plot)
         return
 
@@ -1067,7 +1067,7 @@ class qubic_bot :
         if self.args['LOG']: plt.yscale("log")
         fig.savefig('hk_plot.png',format='png',dpi=100,bbox_inches='tight')
         plt.close()
-        with open('hk_plot.png','r') as plot:
+        with open('hk_plot.png','rb') as plot:
             self._send_photo(plot)
         return
 
