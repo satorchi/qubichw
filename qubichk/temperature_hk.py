@@ -229,7 +229,7 @@ class temperature_hk :
             return None
 
         try:
-            rawData = map(int,datlist)
+            rawData = list(map(int,datlist))
             #self.log('temperature diode rawData length = %i' % len(rawData))
         except:
             self.log('ERROR! Bad reply from Temperature diodes: npts=%i, datlist=%s' % (npts,datlist))
