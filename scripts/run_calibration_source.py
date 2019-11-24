@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 $Id: run_calibration_source.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -14,7 +14,6 @@ run a measurement with the calibration source
   - configure modulator, calibration source
   - acquire data using the arduino
 '''
-from __future__ import division, print_function
 import os,sys,time
 import datetime as dt
 
@@ -58,7 +57,7 @@ if duration_seconds is None:
 
 
 # qubichw tools for commanding various hardware
-from qubichw.modulator import modulator
+from qubichw.modulator_tg5012a import tg5012 as modulator
 from qubichw.arduino import arduino
 from qubichw.calibration_source import calibration_source
 
