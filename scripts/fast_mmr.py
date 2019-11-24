@@ -54,8 +54,13 @@ while True:
 
     for idx,ch in enumerate(interesting_channels):
         cmd = 'MMR3GET %i' % ch
-        res = sock.sendto(cmd.encode(), (mmr_ip,mmr_port))
-        ret = sock.recv(1024)
+        try:
+            res = sock.sendto(cmd.encode(), (mmr_ip,mmr_port))
+            ret = sock.recv(1024)
+        except KeyboardInterrupt:
+            print('stopped by ctrl-c')
+            break
+
         #if idx==2: print(ret)
         val_str = ret.strip()
         now = dt.datetime.utcnow()
