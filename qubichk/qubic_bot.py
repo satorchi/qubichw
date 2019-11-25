@@ -1111,7 +1111,7 @@ class qubic_bot :
         tstamp0 = float(msg_list[0]) # when info was gathered by PiGPS
         tstamp1 = float(msg_list[1]) # when info was requested by bot
 
-        answer = 'Calsource configuration at %s\n' % dt.datetime.fromtimestamp(tstamp0).strftime('%Y-%m-%d %H:%M:%S')
+        answer = 'Calsource configuration at %s\n' % dt.datetime.utcfromtimestamp(tstamp0).strftime('%Y-%m-%d %H:%M:%S')
         for item in msg_list[2:]:
     
             cols = item.split(':')
