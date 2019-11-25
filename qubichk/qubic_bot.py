@@ -1100,11 +1100,19 @@ class qubic_bot :
         role = 'bot'
         cli = calsource_configuration_manager(role=role, verbosity=0)
         cli.send_command('status')
-        tstamp,ack = cli.listen_for_acknowledgement(timeout=20)
+        tstamp,ack = cli.listen_for_acknowledgement(timeout=20) # tstamp is when the info was received
 
-        answer = ''
         msg_list = ack.decode().split()
-        for item in msg_list:
+        if len(msg_list) < 3:
+            answer = 'Calsource calibration configuration unknown\n  response: %s' % ack
+            self._send_message(answer)
+            return
+        
+        tstamp0 = float(msg_list[0]) # when info was gathered by PiGPS
+        tstamp1 = float(msg_list[1]) # when info was requested by bot
+
+        answer = 'Calsource configuration at %s\n' % dt.datetime.fromtimestamp(tstamp0).strftime('%Y-%m-%d %H:%M:%S')
+        for item in msg_list[2:]:
     
             cols = item.split(':')
             if len(cols)==1:
