@@ -700,8 +700,8 @@ class qubic_bot :
             print('this is not a file: %s' % filename)
             return None,None
 
-        h=open(filename,'r')
-        lines=h.read().split('\n')
+        h=open(filename,'rb')
+        lines=h.read().decode().split('\n')
         h.close()
 
         # go through the lines
