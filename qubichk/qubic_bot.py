@@ -24,6 +24,7 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
 from satorchipy.datefunctions import str2dt
+from qubichw.calsource_configuration_manager import calsource_configuration_manager
 
 class dummy_bot:
     '''
