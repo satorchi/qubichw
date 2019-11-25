@@ -80,6 +80,7 @@ class qubic_bot :
                          '/heaters': self.read_heaters,
                          '/pressure': self.read_pressure,
                          '/mech': self.read_mech,
+                         '/calsource': self.calsource,
                          '/photo': self.photo,
                          '/photo2': self.photo2,
                          '/plot' : self.plot,
@@ -1091,6 +1092,39 @@ class qubic_bot :
         self._send_message(answer)
         return
     
+    def calsource(self):
+        '''
+        return the status of the calibration source
+        '''
+        role = 'bot'
+        cli = calsource_configuration_manager(role=role, verbosity=0)
+        cli.send_command('status')
+        tstamp,ack = cli.listen_for_acknowledgement(timeout=20)
+
+        answer = ''
+        msg_list = ack.decode().split()
+        for item in msg_list:
+    
+            cols = item.split(':')
+            if len(cols)==1:
+                answer += item.ljust(18,' ')+'\n'
+                continue
+            line = cols[0].ljust(18,' ')
+        
+            parmval = cols[1].split('=')
+            if len(parmval)==1:
+                line += ' = '.rjust(23,' ')+parmval[0]
+                answer += line+'\n'
+                continue
+        
+            line += parmval[0].rjust(20,' ')+' = '+parmval[1]
+            answer += line+'\n'
+
+        self._send_message(answer)
+        return
+        
+
+
     def _default_answer(self):
         '''
         the default reply to unknown commands
