@@ -84,7 +84,7 @@ class PowerSupply :
         s=serial.Serial(port=self.port,timeout=2)
         s.write('*IDN?\n'.encode())
         a=s.readline()
-        a_list=a.strip().split(',')
+        a_list=a.decode().strip().split(',')
         if len(a_list)<2:
             self.log('ERROR! This does not appear to be a TTi Power Supply')
             self.device_ok=False
