@@ -140,6 +140,7 @@ class PowerSupply :
         
         configfile = homedir + os.sep + 'powersupply.conf'
         if not os.path.isfile(configfile):
+            print('No user supplied configuration file: %s' % configfile)
             return
         
         h = open(configfile,'r')
