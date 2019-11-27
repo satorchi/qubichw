@@ -140,9 +140,10 @@ class PowerSupply :
         
         configfile = homedir + os.sep + 'powersupply.conf'
         if not os.path.isfile(configfile):
-            print('No user supplied configuration file: %s' % configfile)
+            self.log('No user supplied configuration file: %s' % configfile)
             return
-        
+
+        self.log('Reading user supplied configuration file: %s' % configfile)
         h = open(configfile,'r')
         lines = h.read().split('\n')
         for line in lines:
@@ -150,6 +151,7 @@ class PowerSupply :
             if match:
                 label = match.groups()[0]
                 userlabel = match.groups()[1]
+                self.log('found user label %s = %s' % (label,userlabel))
                 if label==self.info['label_left']:
                     self.info['userlabel_left']=userlabel
                     continue
