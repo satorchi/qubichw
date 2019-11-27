@@ -240,9 +240,11 @@ class PowerSupply :
         '''
         try:
             ans=self.s.readline()
+            return ans.decode()
         except:
-            ans=None
-        return ans
+            ans = None
+            return None
+        return None
         
     def set_Voltage(self,V,supply='left'):
         '''set the voltage
