@@ -152,11 +152,14 @@ class PowerSupply :
                 label = match.groups()[0]
                 userlabel = match.groups()[1]
                 self.log('found user label %s = %s' % (label,userlabel))
+                self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']))
                 if label==self.info['label_left']:
                     self.info['userlabel_left']=userlabel
+                    self.log('assigning userlabel left: %s' % userlabel)
                     continue
                 if label==self.info['label_right']:
                     self.info['userlabel_right']=userlabel
+                    self.log('assigning userlabel right: %s' % userlabel)
                     continue
             
         return
