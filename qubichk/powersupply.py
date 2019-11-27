@@ -103,7 +103,9 @@ class PowerSupply :
         info['label_right']='Right'
 
         # check if this is a known supply
-        serialnos=list(known_supplies.serial_number)
+        serialnos = []
+        for snum_byte in known_supplies.serial_number:
+            serialnos.append(snum_byte.decode())
         self.log('known powersupply serial numbers: %s' % serialnos)
         idx=None
         if serialno in serialnos:
