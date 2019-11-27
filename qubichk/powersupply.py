@@ -111,8 +111,8 @@ class PowerSupply :
         if serialno in serialnos:
             idx = serialnos.index(serialno)
             label = known_supplies[idx].label
-            info['label_left']=known_supplies[idx].label_left
-            info['label_right']=known_supplies[idx].label_right
+            info['label_left']=known_supplies[idx].label_left.decode()
+            info['label_right']=known_supplies[idx].label_right.decode()
             self.log('found known supply with serialno %s:  Left: %s, Right: %s' % (serialno,info['label_left'],info['label_right']))
         
         self.info=info
