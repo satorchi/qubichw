@@ -80,6 +80,7 @@ class PowerSupply :
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out,err=proc.communicate()
         serialno=out.decode().split('==')[1].replace('"','').strip()
+        self.log('found powersupply with serialno %s' % serialno)
 
         s=serial.Serial(port=self.port,timeout=2)
         s.write('*IDN?\n'.encode())
@@ -108,6 +109,7 @@ class PowerSupply :
             label = known_supplies[idx].label
             info['label_left']=known_supplies[idx].label_left
             info['label_right']=known_supplies[idx].label_right
+            self.log('found known supply with serialno %s:  Left: %s, Right: %s' % (serialno,info['label_left'],info['label_right']))
         
         self.info=info
         self.read_userlabels()
