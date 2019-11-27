@@ -97,12 +97,14 @@ class PowerSupply :
         info['serialno']=serialno
         info['id_string']=a.strip()
         info['supplyname']=supplyname
+        self.log('powersupply with serialno %s is %s' % (serialno,supplyname))
         info['nsupplies']=self.get_nsupplies()
         info['label_left']='Left'
         info['label_right']='Right'
 
         # check if this is a known supply
         serialnos=list(known_supplies.serial_number)
+        self.log('known powersupply serial numbers: %s' % serialnos)
         idx=None
         if serialno in serialnos:
             idx = serialnos.index(serialno)
