@@ -646,12 +646,17 @@ class qubic_bot :
         answer=''
         filelist=glob(tempdir+'/*')
         for f in filelist:
-            chan_str=re.sub('\.log','',os.path.basename(f))
-            chan_str=re.sub('.* AVS47 AVS47_[12] Ch [0-7] ','',chan_str)
-            h=open(f,'rb')
-            lines=h.read().decode().split('\n')
+            chan_str = re.sub('\.log','',os.path.basename(f))
+            chan_str = re.sub('.* AVS47 AVS47_[12] Ch [0-7] ','',chan_str)
+            h = open(f,'rb')
+            dat = h.read()
             h.close()
             del(h)
+            try:
+                lines = dat.decode().split('\n')
+            except:  # hack to get around a weird file text error in python3
+                lines = str(dat).replace('\\t','\t').replace('\\r','').split('\\n')
+                            
 
             for line in lines:
                 if line.find('#Log session timestamp:')==0:
