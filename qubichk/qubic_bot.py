@@ -653,8 +653,8 @@ class qubic_bot :
             h.close()
             del(h)
             try:
-                lines = dat.decode().split('\n')
-            except:  # hack to get around a weird file text error in python3
+                lines = dat.decode('iso-8859-1').split('\n')
+            except:  # hack in case iso-8859-1 is not correct
                 lines = str(dat).replace('\\t','\t').replace('\\r','').split('\\n')
                             
 
