@@ -164,7 +164,7 @@ class entropy_hk :
             if line[0:3]==' - ':
                 dev=line[3:].strip()
                 devlist.append(dev)
-                match=re.match('.*[Mm]ech.*',dev)
+                match=re.match('MHS|[Mm]ech',dev)
                 if match:
                     self.mech_idx=idx
                 idx+=1
