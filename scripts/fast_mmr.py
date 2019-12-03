@@ -48,14 +48,14 @@ for ch in interesting_channels:
     handle.append(open('mmr_chan%i.dat' % ch,'a'))
     
 
-
+cmd = 'MMR3GET %i' % ch
+cmd_encode = cmd.encode()
 counter = 0
 while True:
 
     for idx,ch in enumerate(interesting_channels):
-        cmd = 'MMR3GET %i' % ch
         try:
-            res = sock.sendto(cmd.encode(), (mmr_ip,mmr_port))
+            res = sock.sendto(cmd_encode, (mmr_ip,mmr_port))
             ret = sock.recv(1024)
         except KeyboardInterrupt:
             print('stopped by ctrl-c')
