@@ -706,8 +706,12 @@ class qubic_bot :
             return None,None
 
         h=open(filename,'rb')
-        lines=h.read().decode().split('\n')
+        dat = h.read()
         h.close()
+        try:
+            lines = dat.decode('iso-8859-1').split('\n')
+        except:  # hack in case iso-8859-1 is not correct
+            lines = str(dat).replace('\\t','\t').replace('\\r','').split('\\n')
 
         # go through the lines
         t=[]
