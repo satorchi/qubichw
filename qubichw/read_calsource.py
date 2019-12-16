@@ -69,13 +69,13 @@ while True:
             s.sendto(rec,(rx,PORT))
         old_date = date_now 
         count+=1
-    if(date_now-old_print_date > dt.timedelta(seconds=1)):
-        t_hex_B = struct.unpack('>Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
+    if(date_now-old_print_date > dt.timedelta(seconds=0.2)):
+        #t_hex_B = struct.unpack('>Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
         t_hex_L = struct.unpack('<Q',struct.pack('<d',rec[0].TIMESTAMP))[0]
 
         date_str = dt.datetime.fromtimestamp(rec[0].TIMESTAMP).strftime('%Y-%m-%d %H:%M:%S.%f')
         
-        string_to_print = "%016X %016X %017.6f %s %+06i Rate:%0d" % (t_hex_B,t_hex_L,rec[0].TIMESTAMP,date_str,rec[0].VALUE,count)
+        string_to_print = "%016X %017.6f %s %+06i Rate:%0d" % (t_hex_L,rec[0].TIMESTAMP,date_str,rec[0].VALUE,count)
         print(string_to_print, end='\r',flush=True)
         old_print_date = date_now
         count=0
