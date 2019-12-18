@@ -422,6 +422,11 @@ class calsource_configuration_manager():
             else:
                 command['modulator'][parm] = None
                 
+        # get current on/off status from Energenie powerbar
+        onoff_ack = self.onoff()
+        device_off = {}
+        for dev in self.device_on.keys():
+            device_off[dev] = not self.device_on[dev]
 
         # do all on/off commands first
         parm = 'onoff'
@@ -451,7 +456,7 @@ class calsource_configuration_manager():
             # initialize devices that need initializing
             for dev in ['modulator','calsource','amplifier']:
                 powersocket = self.powersocket[dev]
-                if powersocket in states.keys() and states[powersocket]:
+                if powersocket in states.keys() and states[powersocket] and device_off[dev]:
                     self.device[dev].set_default_settings()
                     retval['%s state' % dev] = self.device[dev].state
 
