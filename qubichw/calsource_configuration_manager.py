@@ -107,7 +107,8 @@ class calsource_configuration_manager():
                                             'gain',
                                             'filter_low_frequency',
                                             'filter_high_frequency',
-                                            'coupling']
+                                            'coupling',
+                                            'invert']
         self.valid_commands['lamp' ]     = ['on','off']
         self.valid_commands['arduino']   = ['duration']
         
