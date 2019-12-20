@@ -134,22 +134,23 @@ class tg5012:
         if port is None: port = self.port
         if ip is None: ip = self.ip
 
+        print('modulator: Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d\n'% (ip,port))
+        
         s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1)
         try: 
             s.connect((ip,port))
         except socket.error:
-            #print("Caught exception socket.error")
+            print("modulator: Caught exception socket.error")
             return None
-        print('Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d\n'% (ip,port))
         self.s = s
         sockname = s.getsockname()
-        print("init_tg5012a() socket: (%s,%i)" % sockname)
+        print("modulator: init_tg5012a() socket: (%s,%i)" % sockname)
         id = self.ask_id()
         if id=='':
             print('ERROR! unable to communicate!')
             return None
-        print('The device says: %s\n' % id)
+        print('modulator: The device says: %s\n' % id)
         
         return s
 
