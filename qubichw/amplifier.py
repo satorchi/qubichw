@@ -36,6 +36,7 @@ class amplifier:
         self.state['coupling'] = None
         self.state['dynamic range'] = None
         self.state['gain'] = None
+        self.state['invert'] = None
         
         self.init(port=port)
         self.set_default_settings()
@@ -116,13 +117,30 @@ class amplifier:
         self.send_command('CPLG 1\n')  # coupling: DC
         self.send_command('DYNR 1\n')  # dynamic range: high dynamic range
         self.send_command('GAIN 12\n') # gain: 10000
+        self.send_command('INVT 1\n')  # inverted
         self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 30.0
         self.state['coupling'] = 'DC'
         self.state['dynamic range'] = 'high'
         self.state['gain'] = 10000
+        self.state['invert'] = 'on'
         return
 
+
+    def set_invert_mode(self,invert_mode):
+        '''
+        set the invert mode:  on or off
+        '''
+        if not self.is_connected():return False
+        if invert_mode.upper()=='ON':
+            self.send_command('INVT 1\n')
+            self.state['invert'] = invert_mode.upper()
+            return True
+
+        self.send_command('INVT 0\n')
+        self.state['invert'] = 'OFF'
+        return True
+                
 
     def set_filter_mode(self,filter_mode):
         '''
@@ -307,7 +325,8 @@ class amplifier:
                           'gain',
                           'filter_low_frequency',
                           'filter_high_frequency',
-                          'coupling']
+                          'coupling',
+                          'invert']
         setting = setting.lower()
         if setting not in valid_settings:
             return 'amplifier:INVALID_REQUEST__%s=%s' % (setting,value)
@@ -347,7 +366,13 @@ class amplifier:
             if chk:
                 return 'amplifier:coupling=%s' % self.state['coupling']
             return 'amplifier:coupling:FAILED'
-            
+
+        if setting=='invert':
+            chk = self.set_invert_mode(value)
+            if chk:
+                return 'amplifier:invert:%s' % self.state['invert']
+            return 'amplifier:invert:FAILED'
+        
         return 'amplifier:%s=NOTFOUND' % setting
     
     
@@ -363,6 +388,7 @@ class amplifier:
         if self.state['filter high frequency'] is not None:
             msg += ' amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
+        msg += ' amplifier:invert=%s' % self.state['invert']
         #print('DEBUG:AMPLIFIER returning status message: %s' % msg)
         #print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
         return msg
