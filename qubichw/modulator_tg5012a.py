@@ -43,13 +43,17 @@ class tg5012:
         '''
         if self.s is None:
             # try to connect
+            print('modulator: no socket defined. attempting to initialize')
             self.init_tg5012a()
 
         if self.s is None:
+            print('modulator: no socket defined after an attempt to initialize.')
             return False
 
         id = self.ask_id()
-        if id=='':  return False
+        if id=='':
+            print("modulator: did not return it's ID.")
+            return False
 
         return True
 
@@ -317,12 +321,15 @@ class tg5012:
         self.send_command("ARBLOAD DC\n")
         if offset: self.send_command("ARBDCOFFS %.2f\n" % offset)
         self.set_output_on()
+        return
 
     def set_output_off(self):
         self.send_command("OUTPUT OFF\n")
+        return
 
     def set_output_on(self):
         self.send_command("OUTPUT ON\n")
+        return
 
     def set_default_settings(self):
         '''
