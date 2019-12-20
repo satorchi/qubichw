@@ -197,14 +197,14 @@ class calibration_source:
         try:
             self.s.write(cmd)
         except:
-            print("Communication error: Could not send command.")
+            print("calsource communication error: Could not send command.")
             self.clear_connection()
             return None
 
         try:
             response=bytearray(self.s.read(6))
         except:
-            print("Communication error:  Could not receive response.")
+            print("calsource communication error:  Could not receive response.")
             self.clear_connection()
             return None
 
