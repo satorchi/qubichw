@@ -28,7 +28,7 @@ class tg5012:
         self.default_settings['frequency'] = 1
         self.default_settings['shape'] = 'SINE'
         self.default_settings['amplitude'] = 2
-        self.default_settings['offset'] = 2.5
+        self.default_settings['offset'] = 1.5
         self.default_settings['duty'] = 50
         self.default_settings['DCoffset'] = 10
         
