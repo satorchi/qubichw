@@ -48,6 +48,12 @@ class tg5012:
 
         if self.s is None:
             print('modulator: no socket defined after an attempt to initialize.')
+            print('modulator: waiting 5 seconds and trying again.')
+            time.sleep(5)
+            self.init_tg5012a()
+            
+        if self.s is None:
+            print('modulator: no socket defined after a second attempt to initialize.')
             return False
 
         id = self.ask_id()
@@ -134,7 +140,7 @@ class tg5012:
         if port is None: port = self.port
         if ip is None: ip = self.ip
 
-        print('modulator: Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d\n'% (ip,port))
+        print('modulator: Establishing communication with the TTi 5012A wave generator on ip:port: %s:%d'% (ip,port))
         
         s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1)
