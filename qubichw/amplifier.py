@@ -113,13 +113,13 @@ class amplifier:
         if not self.is_connected():return False
         self.send_command('LALL\n')    # tell device to listen
         self.send_command('FLTM 2\n')  # filter mode: 12dB low pass
-        self.send_command('LFRQ 6\n')  # low pass freq: 30Hz
+        self.send_command('LFRQ 2\n')  # low pass freq: 0.3Hz
         self.send_command('CPLG 1\n')  # coupling: DC
         self.send_command('DYNR 1\n')  # dynamic range: high dynamic range
         self.send_command('GAIN 12\n') # gain: 10000
         self.send_command('INVT 1\n')  # inverted
         self.state['filter mode'] = '12db_low_pass'
-        self.state['filter low frequency'] = 30.0
+        self.state['filter low frequency'] = 0.3
         self.state['coupling'] = 'DC'
         self.state['dynamic range'] = 'high'
         self.state['gain'] = 10000
@@ -177,15 +177,15 @@ class amplifier:
         return True
         
 
-    def set_filter_frequency(self,frequency,type='low'):
+    def set_filter_frequency(self,frequency,lowhigh='low'):
         '''
         set the frequency limit for the low-pass or high-pass or bandpass filter
         '''
         if not self.is_connected():return False
         valid_types = ['low','high']
-        type = type.lower()
-        if type not in valid_types:
-            print('ERROR! Invalid frequency limit: %s' % type)
+        lowhigh = lowhigh.lower()
+        if lowhigh not in valid_lowhighs:
+            print('ERROR! Invalid frequency limit: %s' % lowhigh)
             return False
         
         valid_args = [0.03,
@@ -205,7 +205,7 @@ class amplifier:
                       300000.0,
                       1000000.0]
 
-        if type=='high':
+        if lowhigh=='high':
             valid_args = valid_args[0:12]
 
         if frequency not in valid_args:
@@ -218,15 +218,15 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        if type=='low':
+        if lowhigh=='low':
             cmd = 'LFRQ'
-        elif type=='high':
+        elif lowhigh=='high':
             cmd = 'HFRQ'
         else:
             return False # should never get here.
             
         self.send_command('%s %i\n' % (cmd,mode_idx))
-        self.state['filter %s frequency' % type] = valid_args[mode_idx]
+        self.state['filter %s frequency' % lowhigh] = valid_args[mode_idx]
         return True
 
     
@@ -350,13 +350,13 @@ class amplifier:
             return 'amplifier:gain=FAILED'
 
         if setting=='filter_low_frequency':
-            chk = self.set_filter_frequency(value,type='low')
+            chk = self.set_filter_frequency(value,lowhigh='low')
             if chk:
                 return 'amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
             return 'amplifier:filter_low_frequency:FAILED'
 
         if setting=='filter_high_frequency':
-            chk = self.set_filter_frequency(value,type='high')
+            chk = self.set_filter_frequency(value,lowhigh='high')
             if chk:
                 return 'amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
             return 'amplifier:filter_high_frequency:FAILED'
