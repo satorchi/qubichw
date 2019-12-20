@@ -452,7 +452,7 @@ class calsource_configuration_manager():
             self.log(msg)
             ack += '%s ' % msg
             # wait before doing other stuff
-            time.sleep(3)
+            time.sleep(5)
 
             # initialize devices that need initializing
             for dev in ['modulator','calsource','amplifier']:
