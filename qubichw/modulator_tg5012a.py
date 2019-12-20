@@ -328,7 +328,9 @@ class tg5012:
         '''
         configure with default settings
         '''
+        print('modulator: setting default settings')
         if not self.is_connected():
+            print('modulator: asked for default settings but not connected')
             return None
 
         self.set_frequency(self.default_settings['frequency'])
