@@ -93,14 +93,15 @@ class qubic_bot :
                          '/plot1k': self.entropy_plot1K
                          }
 
-        self.known_users={504421997: 'Michel',    
-                          600802212: 'Jean-Christophe',
-                          610304074: 'Steve',
-                          789306705: 'Jean-Pierre',
-                          328583495: 'Guillaume',
-                          430106452: 'Manuel',
-                          102363677: 'Giuseppe',
-                          776665951: 'Jean-Pierre',
+        self.known_users={ 504421997: 'Michel',    
+                           600802212: 'Jean-Christophe',
+                           610304074: 'Steve',
+                           328583495: 'Guillaume',
+                           430106452: 'Manuel',
+                           102363677: 'Giuseppe',
+                           789306705: 'Jean-Pierre',
+                           776665951: 'Jean-Pierre',
+                          1006925691:'Jean-Pierre',
                           0: 'Test Bot'}
 
         self.temperature_headings = ['40K filters',
@@ -745,7 +746,7 @@ class qubic_bot :
         if tstart>0:
             t+=tstart
             for tstamp in t:
-                tdate.append(dt.datetime.fromtimestamp(tstamp))
+                tdate.append(dt.datetime.utcfromtimestamp(tstamp))
         else:
             tdate=t
 
