@@ -76,6 +76,7 @@ def mes_acquisition(sock):
     '''
     
     counter = 0
+    t0 = None
     while counter<121:
         print('=== %04i ===' % counter)
         try:
@@ -104,7 +105,6 @@ def mes_acquisition(sock):
         npacks = int(pack_bytes/62)
         print('number of packets: %i' % npacks)
         ch = 0
-        t_prev = 0
         for ctr in range(npacks):
             ret = bigpack[ctr*62:ctr*62+62]
 
@@ -114,8 +114,12 @@ def mes_acquisition(sock):
             nsecs = struct.unpack('<I',ret[6:10])[0]
             nmillisecs = struct.unpack('<H',ret[10:12])[0]
             t = nsecs + 0.001*nmillisecs
-            tstamp = float(dt.datetime.utcnow().strftime('%s.%f'))
-            t0 = tstamp - t
+            if t0 is None:
+                tstamp = float(dt.datetime.utcnow().strftime('%s.%f'))
+                t0 = tstamp - t
+            else:
+                tstamp = t0 + t
+            
                                 
             val = struct.unpack('<d',ret[30:38])[0]
             
