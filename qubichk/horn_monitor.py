@@ -179,7 +179,7 @@ class horn_monitor:
             print('trying to get %i bytes' % nbytes)
             dat_bin = ''
             for idx in range(nbytes):
-                byte = self.client.recv(1).decode()
+                byte = self.client.recv(1).decode('iso-8859-1')
                 dat_bin += byte
             nbytes = len(dat_bin)
             print('data received is %i bytes' % nbytes)
