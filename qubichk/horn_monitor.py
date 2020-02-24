@@ -177,10 +177,11 @@ class horn_monitor:
             nbytes = struct.unpack('>L',nbytes_bin)[0]
             
             print('trying to get %i bytes' % nbytes)
-            dat_bin = ''
+            dat_bin = []
             for idx in range(nbytes):
-                byte = self.client.recv(1).decode('iso-8859-1')
-                dat_bin += byte
+                byte = self.client.recv(1)
+                dat_bin.append(byte)
+            dat_bin = np.array(dat_bin)
             nbytes = len(dat_bin)
             print('data received is %i bytes' % nbytes)
             npts = nbytes//4
