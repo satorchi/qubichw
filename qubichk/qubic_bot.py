@@ -642,7 +642,7 @@ class qubic_bot :
         tempdir=self.entropy_latest_temperature_dir()
         if tempdir is None:return tempdir
 
-        latest_date = dt.datetime.fromtimestamp(0)
+        latest_date = dt.datetime.utcfromtimestamp(0)
     
         answer=''
         filelist=glob(tempdir+'/*')
@@ -664,7 +664,7 @@ class qubic_bot :
                     # get start time from header
                     tstart_str=line.replace('#Log session timestamp:','')
                     try:
-                        tstart=eval(tstart_str)*1e-3 - 3600
+                        tstart=eval(tstart_str)*1e-3 
                     except:
                         tstart=-1
                     break
@@ -685,7 +685,7 @@ class qubic_bot :
                 answer+=tempans
 
             tstamp = 1e-3*eval(cols[0]) + tstart
-            reading_date = dt.datetime.fromtimestamp(tstamp)
+            reading_date = dt.datetime.utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
             
