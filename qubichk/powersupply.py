@@ -496,11 +496,11 @@ class PowerSupplies :
         command['status']=False
         command['readings']=False
     
-        supplylist = np.array(known_supplies.supplyname,dtype=str)
-        supplylabels = np.array(known_supplies.label,dtype=str)
-        supplylabels_left = np.array(known_supplies.label_left,dtype=str)
-        supplylabels_right = np.array(known_supplies.label_right,dtype=str)
-        serialnos = np.array(known_supplies.serial_number,dtype=str)
+        supplylist = list(np.array(known_supplies.supplyname,dtype=str))
+        supplylabels = list(np.array(known_supplies.label,dtype=str))
+        supplylabels_left = list(np.array(known_supplies.label_left,dtype=str))
+        supplylabels_right = list(np.array(known_supplies.label_right,dtype=str))
+        serialnos = list(np.array(known_supplies.serial_number,dtype=str))
     
         for arg in argv:
             arg=arg.strip()
@@ -588,7 +588,7 @@ class PowerSupplies :
         '''run the commands on the requested power supply
         the argument is a dictionary returned from parseargs()
         '''
-        known_serialnos = np.array(known_supplies.serial_number,dtype=str)
+        known_serialnos = list(np.array(known_supplies.serial_number,dtype=str))
         serialnos = self.serialno_list
         ret=None
         if command['serialno'] in serialnos:
@@ -596,7 +596,7 @@ class PowerSupplies :
             label=''
             if command['serialno'] in known_serialnos:
                 known_idx=known_serialnos.index(command['serialno'])
-                label = np.array(known_supplies.label,dtype=str)[known_idx]
+                label = list(np.array(known_supplies.label,dtype=str))[known_idx]
             if not quiet: self.log('applying commands on supply %s: %s' % (self.supplylist[idx].supplyname,label))
             p=self.supplylist[idx]
             ret=p.runCommands(command)
