@@ -102,7 +102,7 @@ class hk_broadcast :
                 dummy_val+=1
 
         # the Mechanical Heat Switch positions
-        for idx in range(2):
+        for idx in range(self.nMECH):
             mhs='MHS%i' % (idx+1)
             names.append(mhs)
             fmts.append('i4')
@@ -111,7 +111,7 @@ class hk_broadcast :
 
         # the power supplies (heaters)
         for meastype in ['Volt','Amp']:
-            for idx in range(8):
+            for idx in range(self.nHEATER):
                 heater='HEATER%i' % (idx+1)
                 names.append('%s_%s' % (heater,meastype))
                 fmts.append('f8')
@@ -119,7 +119,7 @@ class hk_broadcast :
                 dummy_val+=1
 
         # the pressure sensor
-        for idx in range(8):
+        for idx in range(self.nPRESSURE):
             pressure_sensor='PRESSURE%i' % (idx+1)
             names.append('%s' % pressure_sensor)
             fmts.append('f8')
