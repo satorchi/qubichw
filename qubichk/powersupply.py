@@ -622,7 +622,7 @@ class PowerSupplies :
 # The serial numbers of known power supplies, and how many ports they have        
 fmts_headings=['serial_number','id_number','supplyname','id_string','nsupplies','label','label_left','label_right']
 fmts=['a8','a6','a16','a60','i1','a20','a20','a20']
-known_supplies=np.recarray(formats=fmts,names=fmts_headings,shape=(5))
+known_supplies=np.recarray(formats=fmts,names=fmts_headings,shape=(6))
 known_supplies[0]=('D5E588EA',
                    '426040',
                    'PL303QMD-P',
