@@ -668,6 +668,14 @@ known_supplies[4]=('ftCYWB2W',
                    '',
                    '')
 
+known_supplies[5]=('431969',
+                   '431969',
+                   'PL303-P',
+                   'THURLBY THANDAR, PL303-P, 431969, 3.02-4.00',
+                   1,
+                   'PL303-P',
+                   'None',
+                   'HEATER7')
 
 
 if __name__=='__main__':
