@@ -37,7 +37,7 @@ class hk_broadcast :
         self.sampling_period = 2.0
         self.nENTROPY_TEMPERATURE = 8
         self.nMECH = 2
-        self.nHEATER = 6
+        self.nHEATER = 7
         self.nPRESSURE = 1
         self.record = self.define_hk_record()
         self.hk_entropy = None
