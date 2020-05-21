@@ -573,7 +573,7 @@ class qubic_bot :
         cmd='scp -p pigps:webcamshot.jpg .'
         subprocess.call(cmd.split())
         with open('webcamshot.jpg','rb') as photo:
-            self._send_photo(photo)
+            if photo is not None: self._send_photo(photo)
         return
 
     def photo2(self):
@@ -586,7 +586,7 @@ class qubic_bot :
         cmd='scp -p pitemps:webcamshot.jpg .'
         subprocess.call(cmd.split())
         with open('webcamshot.jpg','rb') as photo:
-            self._send_photo(photo)
+            if photo is not None: self._send_photo(photo)
         return
 
     def webcam(self,camname):
