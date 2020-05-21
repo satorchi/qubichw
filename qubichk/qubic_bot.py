@@ -232,6 +232,9 @@ class qubic_bot :
         '''
         send an image from the bot
         '''
+        if self.bot is None:
+            print('ERROR!  Bot is not initialized.  Photo not sent.')
+            return
         self.bot.sendPhoto(self.chat_id,image)
         return
 
