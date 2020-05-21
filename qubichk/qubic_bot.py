@@ -83,10 +83,10 @@ class qubic_bot :
                          '/pressure': self.read_pressure,
                          '/mech': self.read_mech,
                          '/calsource': self.calsource,
-                         '/photo': self.photo(1),
-                         '/photo2': self.photo(2),
-                         '/photo3': self.photo(3),
-                         '/photo4': self.photo(4),
+                         '/photo': self.photo1,
+                         '/photo2': self.photo2,
+                         '/photo3': self.cam26,
+                         '/photo4': self.cam27,
                          '/plot' : self.plot,
                          '/list' : self.list_channels,
                          '/entropy': self.entropy_temp,
@@ -553,7 +553,7 @@ class qubic_bot :
             except:
                 pass
         return t,v
-
+    
     def photo(self,camnum):
         '''
         wrapper for webcams
@@ -607,6 +607,20 @@ class qubic_bot :
         self._send_photo(imgfile)
         imgfile.close()
         return
+
+    def cam26(self):
+        '''
+        take a picture of the APC QUBIC Integration Lab
+        with webcam26
+        '''
+        return self.webcam('cam26')
+    
+    def cam27(self):
+        '''
+        take a picture of the APC QUBIC Integration Lab
+        with webcam27
+        '''
+        return self.webcam('cam27')
     
     def entropy_latest_temperature_dir(self):
         '''
