@@ -15,10 +15,11 @@ https://web.telegram.org/#/im?p=@QUBIC_bot
 
 '''
 from __future__ import division, print_function
-import sys,os,re,time,subprocess,inspect
+import sys,os,re,time,subprocess,inspect,urllib
 import datetime as dt
 from glob import glob
 import numpy as np
+
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
@@ -82,8 +83,10 @@ class qubic_bot :
                          '/pressure': self.read_pressure,
                          '/mech': self.read_mech,
                          '/calsource': self.calsource,
-                         '/photo': self.photo,
-                         '/photo2': self.photo2,
+                         '/photo': self.photo(1),
+                         '/photo2': self.photo(2),
+                         '/photo3': self.photo(3),
+                         '/photo4': self.photo(4),
                          '/plot' : self.plot,
                          '/list' : self.list_channels,
                          '/entropy': self.entropy_temp,
@@ -547,12 +550,24 @@ class qubic_bot :
             except:
                 pass
         return t,v
+
+    def photo(self,camnum):
+        '''
+        wrapper for webcams
+        '''
+        if camnum==1:return self.photo1()
+        if camnum==2:return self.photo2()
+        if camnum==3:return self.webcam('cam26')
+        if camnum==4:return self.webcam('cam27')
+        
+        return
     
-    def photo(self):
+
+    def photo1(self):
         '''
         take a picture of the APC QUBIC Integration Lab
+        with the webcam near the calibration source
         '''
-        #use the web cam Pi1
         cmd='ssh pigps ./snapshot.sh'
         subprocess.call(cmd.split())
         cmd='scp -p pigps:webcamshot.jpg .'
@@ -564,14 +579,30 @@ class qubic_bot :
     def photo2(self):
         '''
         take a picture of the APC QUBIC Integration Lab
+        with the webcam on the electronics rack
         '''
-        #use the web cam Pitemps
         cmd='ssh pitemps ./snapshot.sh'
         subprocess.call(cmd.split())
         cmd='scp -p pitemps:webcamshot.jpg .'
         subprocess.call(cmd.split())
         with open('webcamshot.jpg','rb') as photo:
             self._send_photo(photo)
+        return
+
+    def webcam(self,camname):
+        '''
+        take a picture of the APC QUBIC Integration Lab
+        with webcam26 or webcam27
+        '''
+        if camname=='cam26':
+            camurl = 'http://192.168.2.26:81/snapshot.cgi?user=admin&pwd=coucou'
+        else:
+            camurl = 'http://192.168.2.27:81/snapshot.cgi?user=admin&pwd='
+        
+        requester = urllib.request.Request(camurl)
+        imgfile = urllib.request.urlopen(requester)
+        self._send_photo(imgfile)
+        imgfile.close()
         return
     
     def entropy_latest_temperature_dir(self):
@@ -1087,18 +1118,26 @@ class qubic_bot :
         '''
         return a list of all the temperature channels
         '''
-        self._assign_entropy_labels()
         answer = ''
+
         # entropy
+        self._assign_entropy_labels()
         for avs in ['AVS47_1','AVS47_2']:
             for ch in range(8):
                 txt='%s_ch%i = %s\n' % (avs,ch,self.entropy_channel_title[avs][ch])
                 answer += txt
             answer += '\n'
 
+        # temperature diodes
         for idx,label in enumerate(self.temperature_headings):
             txt = 'TEMPERATURE%02i = %s\n' % (idx+1,label)
             answer += txt
+
+        # heaters
+        answer += '\n'
+        self._assign_heater_labels()
+        for key in self.heater_label.keys():
+            txt = '%s = %s\n' % (key,self.heater_label[key])
 
         self._send_message(answer)
         return
