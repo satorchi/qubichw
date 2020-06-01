@@ -82,9 +82,16 @@ class PowerSupply :
         serialno=out.decode().split('==')[1].replace('"','').strip()
         self.log('found powersupply with serialno %s' % serialno)
 
-        s=serial.Serial(port=self.port,timeout=2)
-        s.write('*IDN?\n'.encode())
-        a=s.readline()
+        try:
+            s=serial.Serial(port=self.port,timeout=2)
+            s.write('*IDN?\n'.encode())
+            a=s.readline()
+        except:
+            self.log('ERROR! Could not read device.')
+            self.device_ok=False
+            return None
+
+            
         a_list=a.decode().strip().split(',')
         if len(a_list)<2:
             self.log('ERROR! This does not appear to be a TTi Power Supply')
