@@ -107,7 +107,7 @@ class PowerSupply :
         info['serialno']=serialno
         info['id_string']=a.strip()
         info['supplyname']=supplyname
-        self.log('powersupply with serialno %s is %s' % (serialno,supplyname),verbosity=1)
+        self.log('powersupply with serialno %s is %s' % (serialno,supplyname),verbosity=2)
         info['nsupplies']=self.get_nsupplies()
         info['label_left']='Left'
         info['label_right']='Right'
