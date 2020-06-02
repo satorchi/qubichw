@@ -55,11 +55,27 @@ setup(install_requires=['numpy'],
 )
 
 # install the executable scripts, if we have permission
-exec_dir = '/usr/local/bin'
-tmp_file = 'qubicpack_installation_temporary_file_%s.txt' % dt.datetime.now().strftime('%Y%m%dT%H%M%S')
-cmd = 'touch %s/%s' % (exec_dir,tmp_file)
-proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-out,err=proc.communicate()
+exec_dir_list = ['/usr/local/bin']
+if 'HOME' in os.environ.keys():
+    localbin = os.environ['HOME']+'/.local/bin'
+    exec_dir_list.append(localbin)
+
+exec_dir_ok = False
+for exec_dir in exec_dir_list:
+    if not os.path.isdir(exec_dir):
+        cmd = 'mkdir --parents %s' % exec_dir
+        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out,err=proc.communicate()
+    tmp_file = 'qubicpack_installation_temporary_file_%s.txt' % dt.datetime.now().strftime('%Y%m%dT%H%M%S')
+    cmd = 'touch %s/%s' % (exec_dir,tmp_file)
+    proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    out,err=proc.communicate()
+    if err:
+        continue
+    else:
+        exec_dir_ok = True
+        break
+    
 scripts = ['scripts/calsource_commander.py',
            'scripts/calsource_set_frequency.py',
            'scripts/calsource_step_frequency.py',
@@ -84,7 +100,7 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/fast_mmr.py',
            'scripts/lampon.py',
            'scripts/lampoff.py']
-if len(sys.argv)>1 and sys.argv[1]=='install' and not err:
+if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
         basename = os.path.basename(F)
