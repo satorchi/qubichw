@@ -1154,7 +1154,7 @@ class qubic_bot :
         answer += '\n'
         self._assign_heater_labels()
         for key in self.heater_label.keys():
-            txt = '%s = %s\n' % (key,self.heater_label[key])
+            answer += '%s = %s\n' % (key,self.heater_label[key])
 
         self._send_message(answer)
         return
