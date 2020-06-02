@@ -12,6 +12,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 setup.py for qubichw
 '''
 import os,sys,subprocess
+import datetime as dt
 from setuptools import setup
 
 DISTNAME         = 'qubichw'
@@ -53,8 +54,12 @@ setup(install_requires=['numpy'],
           'Topic :: Scientific/Engineering'],
 )
 
-# install the executable scripts
+# install the executable scripts, if we have permission
 exec_dir = '/usr/local/bin'
+tmp_file = 'qubicpack_installation_temporary_file_%s.txt' % dt.datetime.now().strftime('%Y%m%dT%H%M%S')
+cmd = 'touch %s/%s' % (exec_dir,tmp_file)
+proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+out,err=proc.communicate()
 scripts = ['scripts/calsource_commander.py',
            'scripts/calsource_set_frequency.py',
            'scripts/calsource_step_frequency.py',
@@ -79,7 +84,7 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/fast_mmr.py',
            'scripts/lampon.py',
            'scripts/lampoff.py']
-if len(sys.argv)>1 and sys.argv[1]=='install':
+if len(sys.argv)>1 and sys.argv[1]=='install' and not err:
     print('installing executable scripts...')
     for F in scripts:
         basename = os.path.basename(F)
