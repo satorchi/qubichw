@@ -231,6 +231,10 @@ class PowerSupply :
     def send_Command(self,cmd,supply='left'):
         '''send a command to the power supply
         '''
+        if not self.device_ok:
+            self.log('ERROR!  Device is not okay.')
+            return False
+
         supplyno=self.supplyno(supply)
         if supplyno is None:return False
 
@@ -238,6 +242,7 @@ class PowerSupply :
             self.log('ERROR! This power supply does not have that many supplies: %s, S# %s, on port %s'\
                      % (self.info['supplyname'],self.info['serialno'],self.info['port']))
             return False
+
         cmd=cmd % supplyno
 
         try:
