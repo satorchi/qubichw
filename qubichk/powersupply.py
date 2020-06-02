@@ -28,25 +28,28 @@ readline.parse_and_bind('set editing-mode vi')
 
 class PowerSupply :
 
-    def __init__(self,port=None):
+    def __init__(self,port=None, verbosity=1):
         '''initialize an instance of PowerSupply
         '''
-        self.port=None
-        self.nsupplies=0
-        self.info=None
-        self.device_ok=False
+        self.port = None
+        self.nsupplies = 0
+        self.info = None
+        self.device_ok = False
+        self.verbosity_threshold = verbosity
 
         if port is None:
             print('NOTE: Please give a device (e.g. port="/dev/ttyACM0")')
             return None
 
-        self.log('PowerSupply to be initiated with port=%s' % port)
+        self.log('PowerSupply to be initiated with port=%s' % port,verbosity=3)
         self.init_TTiPowerSupply(port=port)
         return None
 
-    def log(self,msg):
+    def log(self,msg,verbosity=5):
         '''messages to log file and to screen
         '''
+        if verbosity<self.verbosity_threshold:
+            return
 
         if 'HOME' in os.environ.keys():
             homedir = os.environ['HOME']
@@ -71,7 +74,7 @@ class PowerSupply :
         '''
 
         if self.port is None:
-            self.log('ERROR! Please give a device to identify (e.g. /dev/ttyACM0)')
+            self.log('ERROR! Please give a device to identify (e.g. /dev/ttyACM0)',verbosity=0)
             self.device_ok=False
             return  None
         
@@ -80,21 +83,21 @@ class PowerSupply :
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out,err=proc.communicate()
         serialno=out.decode().split('==')[1].replace('"','').strip()
-        self.log('found powersupply with serialno %s' % serialno)
+        self.log('found powersupply with serialno %s' % serialno,verbosity=3)
 
         try:
             s=serial.Serial(port=self.port,timeout=2)
             s.write('*IDN?\n'.encode())
             a=s.readline()
         except:
-            self.log('ERROR! Could not read device.')
+            self.log('ERROR! Could not read device %s' % serialno,verbosity=0)
             self.device_ok=False
             return None
 
             
         a_list=a.decode().strip().split(',')
         if len(a_list)<2:
-            self.log('ERROR! This does not appear to be a TTi Power Supply')
+            self.log('ERROR! This does not appear to be a TTi Power Supply: %s' % serialno,verbosity=0)
             self.device_ok=False
             return None
 
@@ -104,7 +107,7 @@ class PowerSupply :
         info['serialno']=serialno
         info['id_string']=a.strip()
         info['supplyname']=supplyname
-        self.log('powersupply with serialno %s is %s' % (serialno,supplyname))
+        self.log('powersupply with serialno %s is %s' % (serialno,supplyname),verbosity=1)
         info['nsupplies']=self.get_nsupplies()
         info['label_left']='Left'
         info['label_right']='Right'
@@ -113,21 +116,21 @@ class PowerSupply :
         serialnos = []
         for snum_byte in known_supplies.serial_number:
             serialnos.append(snum_byte.decode())
-        self.log('known powersupply serial numbers: %s' % serialnos)
+        self.log('known powersupply serial numbers: %s' % serialnos,verbosity=5)
         idx=None
         if serialno in serialnos:
             idx = serialnos.index(serialno)
             label = known_supplies[idx].label
             info['label_left']=known_supplies[idx].label_left.decode()
             info['label_right']=known_supplies[idx].label_right.decode()
-            self.log('found known supply with serialno %s:  Left: %s, Right: %s' % (serialno,info['label_left'],info['label_right']))
+            self.log('found known supply with serialno %s:  Left: %s, Right: %s' % (serialno,info['label_left'],info['label_right']),verbosity=4)
         
         self.info=info
         self.read_userlabels()
         self.supplyname=supplyname
         self.serialno=serialno
         self.device_ok=True
-        self.log('%s on port %s is okay' % (supplyname,self.port))
+        self.log('%s on port %s is okay' % (supplyname,self.port),verbosity=2)
         return info
 
     def get_nsupplies(self):
@@ -153,10 +156,10 @@ class PowerSupply :
         
         configfile = homedir + os.sep + 'powersupply.conf'
         if not os.path.isfile(configfile):
-            self.log('No user supplied configuration file: %s' % configfile)
+            self.log('No user supplied configuration file: %s' % configfile,verbosity=0)
             return
 
-        self.log('Reading user supplied configuration file: %s' % configfile)
+        self.log('Reading user supplied configuration file: %s' % configfile,verbosity=2)
         h = open(configfile,'r')
         lines = h.read().split('\n')
         for line in lines:
@@ -164,15 +167,15 @@ class PowerSupply :
             if match:
                 label = match.groups()[0]
                 userlabel = match.groups()[1]
-                self.log('found user label %s = %s' % (label,userlabel))
-                self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']))
+                self.log('found user label %s = %s' % (label,userlabel),verbosity=3)
+                self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']),verbosity=4)
                 if label==self.info['label_left']:
                     self.info['userlabel_left']=userlabel
-                    self.log('assigning userlabel left: %s' % userlabel)
+                    self.log('assigning userlabel left: %s' % userlabel,verbosity=4)
                     continue
                 if label==self.info['label_right']:
                     self.info['userlabel_right']=userlabel
-                    self.log('assigning userlabel right: %s' % userlabel)
+                    self.log('assigning userlabel right: %s' % userlabel,verbosity=4)
                     continue
             
         return
@@ -194,7 +197,7 @@ class PowerSupply :
             errmsg='ERROR! Device does not exist.'
 
         if errmsg is not None:
-            self.log(errmsg)
+            self.log(errmsg,verbosity=0)
             self.port=None
             self.nsupplies=0
             self.supplyname=None
@@ -222,8 +225,8 @@ class PowerSupply :
             supplyno=supply
 
         if supplyno not in [1,2]:
-            self.log('ERROR! Unknown power supply: %s' % supply)
-            self.log('Please tell me if its "left" or "right" or "1" or "2"')
+            self.log('ERROR! Unknown power supply: %s' % supply,verbosity=0)
+            self.log('Please tell me if its "left" or "right" or "1" or "2"',verbosity=0)
             return None
 
         return supplyno
@@ -232,7 +235,7 @@ class PowerSupply :
         '''send a command to the power supply
         '''
         if not self.device_ok:
-            self.log('ERROR!  Device is not okay.')
+            self.log('ERROR!  Device is not okay.',verbosity=1)
             return False
 
         supplyno=self.supplyno(supply)
@@ -240,7 +243,7 @@ class PowerSupply :
 
         if supplyno>self.nsupplies:
             self.log('ERROR! This power supply does not have that many supplies: %s, S# %s, on port %s'\
-                     % (self.info['supplyname'],self.info['serialno'],self.info['port']))
+                     % (self.info['supplyname'],self.info['serialno'],self.info['port']),verbosity=0)
             return False
 
         cmd=cmd % supplyno
@@ -249,7 +252,7 @@ class PowerSupply :
             self.s.flush() 
             response=self.s.write(cmd.encode())
         except:
-            self.log('ERROR! Could not write command to powersupply: %s, %s, id# %s' % (self.port,self.supplyname,self.serialno))
+            self.log('ERROR! Could not write command to powersupply: %s, %s, id# %s' % (self.port,self.supplyname,self.serialno),verbosity=1)
             self.device_ok = False
             return False
         
@@ -419,11 +422,12 @@ class PowerSupplies :
     '''a class to manage multiple power supplies
     '''
 
-    def __init__(self):
+    def __init__(self,verbosity=1):
+        self.verbosity_threshold=verbosity
         self.find_PowerSupply()
         return None
 
-    def log(self,msg):
+    def log(self,msg,verbosity=5):
         '''messages to log file and to screen
         '''
 
@@ -459,7 +463,7 @@ class PowerSupplies :
         #devs2=glob('/dev/ttyUSB*') # these are not TTi power supplies
         devs=devs1
         if not devs:
-            self.log('No power supplies found!')
+            self.log('No power supplies found!',verbosity=0)
             return None
 
         devs.sort()
@@ -469,7 +473,7 @@ class PowerSupplies :
         userlabel_left_list = []
         userlabel_right_list = []
         for dev in devs:
-            p=PowerSupply(dev)
+            p=PowerSupply(dev,verbosity=self.verbosity_threshold)
             if p.device_ok:
                 supplylist.append(p)
                 infolist.append(p.info)
@@ -522,7 +526,7 @@ class PowerSupplies :
                     V=eval(a.split('=')[1])
                     command['V']=V
                 except:
-                    self.log('Could not read voltage value: %s' % arg)
+                    self.log('Could not read voltage value: %s' % arg,verbosity=0)
                 continue
         
             if a=='ON':
@@ -609,7 +613,7 @@ class PowerSupplies :
             if command['serialno'] in known_serialnos:
                 known_idx=known_serialnos.index(command['serialno'])
                 label = list(np.array(known_supplies.label,dtype=str))[known_idx]
-            if not quiet: self.log('applying commands on supply %s: %s' % (self.supplylist[idx].supplyname,label))
+            if not quiet: self.log('applying commands on supply %s: %s' % (self.supplylist[idx].supplyname,label),verbosity=2)
             p=self.supplylist[idx]
             ret=p.runCommands(command)
         
@@ -692,7 +696,7 @@ known_supplies[5]=('431969',
 
 if __name__=='__main__':
 
-    ps=PowerSupplies()
+    ps=PowerSupplies(verbosity=1)
     command=ps.parseargs(sys.argv)
     keep_going=not command['quit']
     while keep_going:
