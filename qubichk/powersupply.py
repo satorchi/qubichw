@@ -48,7 +48,7 @@ class PowerSupply :
     def log(self,msg,verbosity=5):
         '''messages to log file and to screen
         '''
-        if verbosity<self.verbosity_threshold:
+        if verbosity>self.verbosity_threshold:
             return
 
         if 'HOME' in os.environ.keys():
