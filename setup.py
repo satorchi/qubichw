@@ -97,7 +97,7 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/start_calsource_manager.sh',
            'scripts/start_bot.sh',
            'scripts/start_hkserver.sh',
-           'scripts/fast_mmr.py',
+           'scripts/mmr_mes1.py',
            'scripts/lampon.py',
            'scripts/lampoff.py']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
