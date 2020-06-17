@@ -15,6 +15,9 @@ read fast temperature data from the iMACRT
 import sys,socket,time
 import datetime as dt
 
+print('DEPRECATED!  This script is deprecated.  Please use mmr_mes1.py instead')
+exit
+
 mmr_ip = '192.168.2.213'
 mmr_port = 12000 + int(mmr_ip.split('.')[-1])
 
