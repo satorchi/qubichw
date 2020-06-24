@@ -113,17 +113,19 @@ class amplifier:
         if not self.is_connected():return False
         self.send_command('LALL\n')    # tell device to listen
         self.send_command('FLTM 2\n')  # filter mode: 12dB low pass
-        self.send_command('LFRQ 2\n')  # low pass freq: 0.3Hz
+        self.send_command('LFRQ 5\n')  # low pass freq: 10Hz
+        self.send_command('HFRQ 2\n')  # high pass freq: 0.3Hz
         self.send_command('CPLG 1\n')  # coupling: DC
-        self.send_command('DYNR 1\n')  # dynamic range: high dynamic range
+        self.send_command('DYNR 0\n')  # dynamic range: low noise
         self.send_command('GAIN 12\n') # gain: 10000
-        self.send_command('INVT 1\n')  # inverted
+        self.send_command('INVT 0\n')  # not inverted
         self.state['filter mode'] = '12db_low_pass'
-        self.state['filter low frequency'] = 0.3
+        self.state['filter low frequency'] = 10.0
+        self.state['filter high frequency'] = 0.3
         self.state['coupling'] = 'DC'
-        self.state['dynamic range'] = 'high'
+        self.state['dynamic range'] = 'low_noise'
         self.state['gain'] = 10000
-        self.state['invert'] = 'on'
+        self.state['invert'] = 'off'
         return
 
 
