@@ -337,10 +337,10 @@ class amplifier:
                 return 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
             return 'amplifier:filter_mode=FAILED'
 
-        if setting=='dynamic':
+        if setting=='dynamic_range':
             chk = self.set_dynamic(value)
             if chk:
-                return 'amplifier:dynamic_range=%s' % self.state['dynamic'].replace(' ','_')
+                return 'amplifier:dynamic_range=%s' % self.state['dynamic range'].replace(' ','_')
             return 'amplifier:dynamic_range=FAILED'
 
         if setting=='gain':
