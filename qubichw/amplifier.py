@@ -184,7 +184,7 @@ class amplifier:
         if not self.is_connected():return False
         valid_types = ['low','high']
         lowhigh = lowhigh.lower()
-        if lowhigh not in valid_lowhighs:
+        if lowhigh not in valid_types:
             print('ERROR! Invalid frequency limit: %s' % lowhigh)
             return False
         
