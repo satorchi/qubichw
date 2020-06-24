@@ -16,7 +16,7 @@ import busio
 from digitalio import DigitalInOut, Direction
 from adafruit_ads1x15.analog_in import AnalogIn
 import adafruit_ads1x15.ads1015 as ADS
-import socket
+import socket,time
 import datetime as dt
 import numpy as np
 import struct
@@ -58,9 +58,19 @@ date_now = dt.datetime.utcnow()
 old_date = date_now
 old_print_date = date_now
 count = 0
+trycount = 0
 
 while True:
-    value = chan0.value
+    try:
+        value = chan0.value
+    except:
+        trycount+=1
+        if trycount>10000:
+            print('ERROR! possible I/O error.')
+            quit()
+        time.sleep(0.1)
+        continue
+    
     date_now = dt.datetime.utcnow()
     if(date_now-old_date>deltat):
         rec[0].TIMESTAMP = np.float64(date_now.strftime("%s.%f"))
