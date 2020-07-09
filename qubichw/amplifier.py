@@ -117,7 +117,7 @@ class amplifier:
         self.send_command('HFRQ 2\n')  # high pass freq: 0.3Hz
         self.send_command('CPLG 1\n')  # coupling: DC
         self.send_command('DYNR 0\n')  # dynamic range: low noise
-        self.send_command('GAIN 12\n') # gain: 10000
+        self.send_command('GAIN 10\n') # gain: 2000
         self.send_command('INVT 0\n')  # not inverted
         self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 10.0
