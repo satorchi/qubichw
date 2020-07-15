@@ -33,5 +33,6 @@ rsync -av $QS_DIR/ $ARCHIVE_DIR
 rsync -av $ARCHIVE_DIR/ cc:$CC_DIR
 
 # use rsync to copy to apcjupyter
-rsync -av $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
+## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
+## rsync -av $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
 
