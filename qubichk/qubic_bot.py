@@ -104,7 +104,8 @@ class qubic_bot :
                            102363677: 'Giuseppe',
                            789306705: 'Jean-Pierre',
                            776665951: 'Jean-Pierre',
-                          1006925691:'Jean-Pierre',
+                          1006925691: 'Jean-Pierre',
+                           962622089: 'Sotiris',
                           0: 'Test Bot'}
 
         self.temperature_headings = ['40K filters',
