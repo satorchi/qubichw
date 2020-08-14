@@ -235,7 +235,7 @@ class PowerSupply :
         '''send a command to the power supply
         '''
         if not self.device_ok:
-            self.log('ERROR!  Device is not okay.',verbosity=1)
+            self.log('ERROR!  Device is not okay.',verbosity=2)
             return False
 
         supplyno=self.supplyno(supply)
