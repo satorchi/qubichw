@@ -212,7 +212,7 @@ class temperature_hk :
         '''
 
         if self.ser is None:
-            self.log('ERROR! Please setup the Temperature Diode device.  run connect()')
+            self.log('ERROR! Please setup the Temperature Diode device.  run connect()',verbosity=2)
             return None
         
         voltageData = []
@@ -222,21 +222,21 @@ class temperature_hk :
         if a is None: return None
         data_length = len(a)
         if data_length == 0:
-            self.log('ERROR! Temperature diodes returned data length 0')
+            self.log('ERROR! Temperature diodes returned data length 0',verbosity=2)
             return None
 
         datlist = a.split()
         npts = len(datlist)
         
         if npts<=self.nT:
-            self.log('Insufficient data.  length=%i, rawData: %s' % (npts,datlist))
+            self.log('Insufficient data.  length=%i, rawData: %s' % (npts,datlist),verbosity=2)
             return None
 
         try:
             rawData = list(map(int,datlist))
             #self.log('temperature diode rawData length = %i' % len(rawData))
         except:
-            self.log('ERROR! Bad reply from Temperature diodes: npts=%i, datlist=%s' % (npts,datlist))
+            self.log('ERROR! Bad reply from Temperature diodes: npts=%i, datlist=%s' % (npts,datlist),verbosity=1)
             return None
         
         for idx in range(self.nT):
