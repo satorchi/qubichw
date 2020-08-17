@@ -27,7 +27,7 @@ class temperature_hk :
     ''' a class to gather temperatures from the temperature diodes
     there are 21 channels, of which 18 are used
     '''
-    def __init__(self,port='/dev/cryo_temperatures',caldir=None,dumpraw=False,verbosity=2):
+    def __init__(self,port='/dev/cryo_temperatures',caldir=None,dumpraw=False,verbosity=1):
  
         self.nchannel = 21
         self.nT = 18
