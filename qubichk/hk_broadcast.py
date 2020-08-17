@@ -268,8 +268,11 @@ class hk_broadcast :
         # the pressure gauge (this should be expanded into a loop for multiple pressure gauges)
         gauge = 'PRESSURE1'
         dat = self.hk_pressure.read_pressure()
-        if not dat or isinstance(dat,str):
+        if dat is None:
             self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=2)
+            
+        if isinstance(dat,str):
+            self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=1)
             dat = None
                 
         # if no data (maybe gauge not connected) return -1 and do not log
@@ -445,7 +448,7 @@ class hk_broadcast :
     def log(self,msg,verbosity=1):
         '''messages to log file and to screen
         '''
-        if verbosity<self.verbosity_threshold: return
+        if verbosity>self.verbosity_threshold: return
         
         now=dt.datetime.utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
