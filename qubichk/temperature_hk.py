@@ -27,7 +27,7 @@ class temperature_hk :
     ''' a class to gather temperatures from the temperature diodes
     there are 21 channels, of which 18 are used
     '''
-    def __init__(self,port='/dev/cryo_temperatures',caldir=None,dumpraw=False):
+    def __init__(self,port='/dev/cryo_temperatures',caldir=None,dumpraw=False,verbosity=2):
  
         self.nchannel = 21
         self.nT = 18
@@ -35,6 +35,7 @@ class temperature_hk :
         self.connected=False
         self.port=port
         self.dumpraw=dumpraw
+        self.verbosity_threshold = verbosity
         homedir='/home/pi'
         if 'HOME' in os.environ.keys():
             homedir=os.environ['HOME']
@@ -68,9 +69,11 @@ class temperature_hk :
         if not res: self.connected=False
         return None
 
-    def log(self,msg):
+    def log(self,msg,verbosity=1):
         '''messages to log file and to screen
         '''
+        if verbosity>self.verbosity_threshold: return
+        
         now=dt.datetime.utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
         h=open('hk_temperature.log','a')
