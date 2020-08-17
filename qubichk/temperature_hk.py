@@ -62,8 +62,9 @@ class temperature_hk :
                      '1K-4HS-D-1',
                      '1K-4CP-D-1']
 
-        self.connected=self.connect(port=port)
         res = self.setup_calibration(caldir)
+
+        self.connected=self.connect(port=port)
         if not res: self.connected=False
         return None
 
@@ -143,14 +144,14 @@ class temperature_hk :
             caldir=self.caldir
             
         if not os.path.isdir(caldir):
-            self.log('ERROR! Could not find calibration directory: %s' % caldir)
+            self.log('ERROR! Could not find calibration directory: %s' % caldir,verbosity=0)
             return False
 
         calibration_files = list(map(lambda x: caldir+'/calibration_ch'+str(x).zfill(2)+'.dat',range(self.nT)))
         # check for file existence
         for fname in calibration_files:
             if not os.path.exists(fname):
-                self.log('ERROR! Could not find calibration file: %s' % fname)
+                self.log('ERROR! Could not find calibration file: %s' % fname,verbosit=0)
                 return False    
         self.calibration_tables = list(map(lambda x: np.loadtxt(x),calibration_files))
 
