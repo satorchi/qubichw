@@ -25,7 +25,7 @@ class hk_broadcast :
     '''a class for broadcasting  and receiving QUBIC housekeeping data
     '''
 
-    def __init__(self):
+    def __init__(self,verbosity=1):
         self.BROADCAST_PORT = 4005
         self.RECEIVER = '<broadcast>'      # server broadcasts
         self.RECEIVER = '134.158.187.21'   # server sends only to QubicStudio
@@ -45,6 +45,7 @@ class hk_broadcast :
         self.hk_temperature = None
         self.dump_diode_rawData = True
         self.hk_pressure = None
+        self.verbosity_threshold = verbosity
         return None
 
     def millisecond_timestamp(self):
@@ -203,7 +204,7 @@ class hk_broadcast :
             cmd=self.powersupply.parseargs(argv)
             dat=self.powersupply.runCommands(cmd)
             if not dat or isinstance(dat,str) or len(dat)!=3 or isinstance(dat[0],str) or isinstance(dat[1],str):
-                self.log('ERROR! Strange reply from power supply %s: %s' % (heater,str(dat)))
+                self.log('ERROR! Strange reply from power supply %s: %s' % (heater,str(dat)),verbosity=2)
                 dat = None
                 
 
@@ -268,7 +269,7 @@ class hk_broadcast :
         gauge = 'PRESSURE1'
         dat = self.hk_pressure.read_pressure()
         if not dat or isinstance(dat,str):
-            self.log('ERROR! Strange reply from power supply: %s' % str(dat))
+            self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=2)
             dat = None
                 
         # if no data (maybe gauge not connected) return -1 and do not log
@@ -420,7 +421,7 @@ class hk_broadcast :
             else:
                 line = '%f %e %s\n' % (tstamp,data,str(data2))
         except:
-            self.log('ERROR! Could not convert timestamp,data for log_hk()')
+            self.log('ERROR! Could not convert timestamp,data for log_hk()',verbosity=2)
             return False
         
         filename='%s.txt' % rootname
@@ -441,9 +442,11 @@ class hk_broadcast :
             self.log_hk(name,tstamp,dat)
         return True
 
-    def log(self,msg):
+    def log(self,msg,verbosity=1):
         '''messages to log file and to screen
         '''
+        if verbosity<self.verbosity_threshold: return
+        
         now=dt.datetime.utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
         h=open('hk_broadcast.log','a')
