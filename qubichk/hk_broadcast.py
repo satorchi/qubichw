@@ -240,14 +240,14 @@ class hk_broadcast :
             self.hk_temperature.connect()
             
         if not self.hk_temperature.connected:
-            self.log('ERROR! Temperature diodes not communicating')
+            self.log('ERROR! Temperature diodes not communicating',verbosity=2)
             data_ok = False
             temperatures = -np.ones(self.hk_temperature.nT)
         else:
             temperatures = self.hk_temperature.get_temperatures()
 
         if temperatures is None:
-            self.log('ERROR! Bad reply from Temperature diodes')
+            self.log('ERROR! Bad reply from Temperature diodes',verbosity=2)
             temperatures = -np.ones(self.hk_temperature.nT)
             data_ok = False
             
