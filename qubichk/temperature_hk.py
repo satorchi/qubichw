@@ -229,7 +229,7 @@ class temperature_hk :
         npts = len(datlist)
         
         if npts<=self.nT:
-            self.log('Insufficient data.  length=%i, rawData: %s' % (npts,datlist),verbosity=2)
+            self.log('Insufficient data.  length=%i, rawData: %s' % (npts,datlist),verbosity=1)
             return None
 
         try:
