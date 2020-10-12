@@ -1,0 +1,5 @@
+let n=1
+while [ $n -le 4 ]; do
+  sispmctl -f $n
+  let n+=1
+done

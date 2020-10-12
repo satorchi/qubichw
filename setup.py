@@ -97,7 +97,17 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/start_hkserver.sh',
            'scripts/mmr_mes1.py',
            'scripts/lampon.py',
-           'scripts/lampoff.py']
+           'scripts/lampoff.py',
+           'scripts/qubic_poweron',
+           'scripts/qubic_poweroff',
+           'scripts/qubic_hwpon',
+           'scripts/qubic_hwpoff',
+           'scripts/qubic_hornon',
+           'scripts/qubic_hornoff',
+           'scripts/qubic_thermoson',
+           'scripts/qubic_thermosoff',
+           'scripts/qubic_heaterson',
+           'scripts/qubic_heatersoff']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
