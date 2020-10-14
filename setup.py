@@ -107,7 +107,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/qubic_thermoson',
            'scripts/qubic_thermosoff',
            'scripts/qubic_heaterson',
-           'scripts/qubic_heatersoff']
+           'scripts/qubic_heatersoff',
+           'scripts/hk_ok.py']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
