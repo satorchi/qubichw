@@ -102,7 +102,7 @@ def check_network():
         retval[machine] = ping(machine)
         if not retval[machine]['ok']:
             retval['ok'] = False
-            retval['message'] += ' %s: %s' % (machine,retval[machine]['message'])
+            retval['message'] += ' | %s %s' % (machine,retval[machine]['message'])
             if machine=='modulator':
                 retval['message'] += ' OK if Calsource is OFF'
 
