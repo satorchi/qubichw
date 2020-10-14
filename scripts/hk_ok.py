@@ -102,7 +102,7 @@ def check_network():
         retval[machine] = ping(machine)
         if not retval[machine]['ok']:
             retval['ok'] = False
-            retval['message'] += ' | %s %s' % (machine,retval[machine]['message'])
+            retval['message'] += ' %s %s |' % (machine,retval[machine]['message'])
             if machine=='modulator':
                 retval['message'] += ' OK if Calsource is OFF'
 
@@ -146,7 +146,7 @@ def check_power():
         msg = '%s is %s' % (subsys,state)
         if state=='off':
             retval['ok'] = False
-            retval['message'] += ' '+msg
+            retval['message'] += ' %s |' % msg
             msg += '\n--> Please switch on %s with the command "qubic_poweron" (no quotes)' % subsys
         else:
             msg += '... OK'
