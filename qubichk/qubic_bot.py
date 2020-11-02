@@ -262,7 +262,7 @@ class qubic_bot :
         '''
         read temperatures from the Housekeeping broadcast
         '''
-        latest_date = dt.datetime.fromtimestamp(0)
+        latest_date = dt.datetime.utcfromtimestamp(0)
         fmt_str = '\n%%%is:  %%7.3fK' % self.temperature_heading_maxlen
         answer = 'Temperatures:'
         for ch_idx in self.temperature_display_order:
@@ -272,17 +272,23 @@ class qubic_bot :
                 answer += '\n%s:\tno data' % self.temperature_headings[ch_idx]
             
             else:
-                h = open(fullname,'r')
-                lines = h.read().split('\n')
-                h.close()
-                lastline = lines[-2]
-                cols = lastline.split()
-                tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.fromtimestamp(tstamp)
-                if reading_date > latest_date:
-                    latest_date = reading_date
-                reading = eval(cols[1])
-                answer += fmt_str % (self.temperature_headings[ch_idx],reading)
+                h = open(fullname,'rb')
+                nbytes = h.seek(0,os.SEEK_END)
+                if nbytes < 35:
+                    h.close()
+                    answer += '\n%s:\tinsufficient data' % self.temperature_headings[ch_idx]
+                else:
+                    h.seek(-35,os.SEEK_END)
+                    lines = h.read().decode().split('\n')
+                    h.close()
+                    lastline = lines[-2]
+                    cols = lastline.split()
+                    tstamp = self.timestamp_factor*float(cols[0])
+                    reading_date = dt.datetime.utcfromtimestamp(tstamp)
+                    if reading_date > latest_date:
+                        latest_date = reading_date
+                    reading = eval(cols[1])
+                    answer += fmt_str % (self.temperature_headings[ch_idx],reading)
 
         answer += '\n\nTime: %s' % latest_date.strftime(self.time_fmt)    
         self._send_message(answer)
@@ -307,7 +313,7 @@ class qubic_bot :
             cols = line.split()
             try:
                 tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.fromtimestamp(tstamp)
+                reading_date = dt.datetime.utcfromtimestamp(tstamp)
                 reading = eval(cols[1])
                 t.append(reading_date)
                 v.append(reading)
@@ -350,7 +356,7 @@ class qubic_bot :
         '''
         read the status of the heaters (power supplies)
         '''
-        latest_date = dt.datetime.fromtimestamp(0)
+        latest_date = dt.datetime.utcfromtimestamp(0)
         fmt_str = '\n%20s:  %7.3f %s %s'
         units = ['V','mA']
         answer = 'Heaters:'
@@ -370,7 +376,7 @@ class qubic_bot :
                 lastline = lines[-2]
                 cols = lastline.split()
                 tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.fromtimestamp(tstamp)
+                reading_date = dt.datetime.utcfromtimestamp(tstamp)
                 if reading_date > latest_date:
                     latest_date = reading_date
                 reading = eval(cols[1])
@@ -454,7 +460,7 @@ class qubic_bot :
         t = np.array(t_volt)
         dates = []
         for idx,tstamp in enumerate(t):
-            dates.append(dt.datetime.fromtimestamp(tstamp))
+            dates.append(dt.datetime.utcfromtimestamp(tstamp))
             p = power[idx]
             if p==-1:
                 v = volt[idx]
@@ -470,7 +476,7 @@ class qubic_bot :
         '''
         read the mechanical heat switch positions
         '''
-        latest_date = dt.datetime.fromtimestamp(0)
+        latest_date = dt.datetime.utcfromtimestamp(0)
         fmt_str = '\n%7s:  %8i'
         answer = 'Mechanical Heat Switch Positions:\n'
         for idx in range(2):
@@ -485,7 +491,7 @@ class qubic_bot :
             lastline = lines[-2]
             cols = lastline.split()
             tstamp = self.timestamp_factor*float(cols[0])
-            reading_date = dt.datetime.fromtimestamp(tstamp)
+            reading_date = dt.datetime.utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
             reading = eval(cols[1])
@@ -499,7 +505,7 @@ class qubic_bot :
         '''
         read the pressure
         '''
-        latest_date = dt.datetime.fromtimestamp(0)
+        latest_date = dt.datetime.utcfromtimestamp(0)
         fmt_str = '\n%10s:  %10.3e mbar'
         answer = 'Pressure:\n'
 
@@ -518,7 +524,7 @@ class qubic_bot :
         lastline = lines[-2]
         cols = lastline.split()
         tstamp = self.timestamp_factor*float(cols[0])
-        reading_date = dt.datetime.fromtimestamp(tstamp)
+        reading_date = dt.datetime.utcfromtimestamp(tstamp)
         if reading_date > latest_date:
             latest_date = reading_date
         reading = eval(cols[1])
@@ -547,7 +553,7 @@ class qubic_bot :
             cols = line.split()
             try:
                 tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.fromtimestamp(tstamp)
+                reading_date = dt.datetime.utcfromtimestamp(tstamp)
                 reading = eval(cols[1])
                 t.append(reading_date)
                 v.append(reading)
