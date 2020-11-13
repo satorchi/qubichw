@@ -113,7 +113,7 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/compressor1on',
            'scripts/compressor1off',
            'scripts/compressor2on',
-           'scripts/compressor2off'
+           'scripts/compressor2off',
            'scripts/compressorstatus']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
