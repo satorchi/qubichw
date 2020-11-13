@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 $Id: compressor_commander.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
@@ -21,7 +22,7 @@ def usage():
     msg += '\nvalid compressors are: 1 or 2'
     msg += '\nvalid commands are: status, on, off\n'
     print(msg)
-    return
+    return None
 
 
 def parseargs():
@@ -57,11 +58,11 @@ def parseargs():
 # main program
 if __name__=='__main__':
     parms = parseargs()
-    if not parms['ok']:
+    if parms is None: 
         usage()
         quit()
 
-    c = compressor(parms['compressor'])
+    c = compressor(int(parms['compressor']))
 
 
     print('Compressor %s' % parms['compressor'])
