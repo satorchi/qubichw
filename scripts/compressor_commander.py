@@ -76,4 +76,4 @@ if __name__=='__main__':
         c.off()
               
 
-    print(c.status_message)
+    print(c.status_message())
