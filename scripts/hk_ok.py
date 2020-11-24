@@ -96,16 +96,21 @@ def check_network():
     retval = {}
     retval['ok'] = True
     retval['message'] = ''
+    msg_list = []
     print('\n============ checking network access ============')
 
     for machine in machines:
         retval[machine] = ping(machine)
         if not retval[machine]['ok']:
             retval['ok'] = False
-            retval['message'] += ' %s %s |' % (machine,retval[machine]['message'])
+            msg = '%s %s' % (machine,retval[machine]['message'])
             if machine=='modulator':
-                retval['message'] += ' OK if Calsource is OFF'
+                msg += ' OK if Calsource is OFF'
+            msg_list.append(msg)
 
+
+    if len(msg_list)>0:
+        retval['message'] += ' | '.join(msg_list)
     return retval
 
 def check_power():
@@ -161,6 +166,7 @@ def check_mounts():
     '''
     retval = {}
     retval['ok'] = True
+    retval['message'] = ''
     print('\n============ checking for remote disk shares ============')
     smbmounts = ['qs2','entropy']
     cmd = 'mount'
@@ -170,15 +176,20 @@ def check_mounts():
     for smbshare in match:
         retval[smbshare] = 'ok'
         print('%s... OK' % smbshare)
-        
+
+    errmsg_list = []
     if len(match)<len(smbmounts):
         for smbshare in smbmounts:
             if smbshare not in retval.keys():
                 retval['ok'] = False
                 retval[smbshare] = 'missing'
-                print('ERROR! Missing Windows mount: %s' % smbshare)
+                msg = 'ERROR! Missing Windows mount: %s' % smbshare
+                errmsg_list.append(msg)
+                print(msg)
                 
-        
+                
+    if len(errmsg_list)>0:
+        retval['message'] += '\n'.join(errmsg_list)
     return retval
 
 def check_diskspace():
@@ -187,6 +198,7 @@ def check_diskspace():
     '''
     retval = {}
     retval['ok'] = True
+    retval['message'] = ''
     space_warning = 10*1024**2 # 10GB minimum disk space (df gives results in 1k blocks)
     print('\n============ checking for disk space ============')
     parts = ['home','archive','entropy','qs2']
@@ -195,7 +207,7 @@ def check_diskspace():
     
     cmd = 'df'
     out,err = shellcommand(cmd)
-    
+    msg_list = []
     for line in out.split('\n'):
         cols = line.split()
         if len(cols)==0: continue
@@ -219,6 +231,7 @@ def check_diskspace():
             if remain_space < space_warning:
                 msg += '\n-->WARNING! Risk of running out of space!'
                 retval['ok'] = False
+                msg_list.append(msg)
             print(msg)
             
             retval[part] = disk_info
@@ -227,7 +240,8 @@ def check_diskspace():
         if part not in retval.keys():
             retval['ok'] = False
             msg = 'ERROR! Could not find "%s"' % part
-            msg += '\n--> Please investigate.  You should probably run the command "mount /%s" (no quotes)'
+            msg_list.append(msg)
+            msg += '\n--> Please investigate.  You should probably run the command "mount /%s" (no quotes)' % part
             print(msg)
             disk_info['total'] = 0
             disk_info['used'] = 0
@@ -235,6 +249,8 @@ def check_diskspace():
             disk_info['dir'] = '/'+part
             retval[part] = disk_info
 
+    if len(msg_list)>0:
+        retval['message'] += '\n'.join(msg_list)
     return retval
 
 def check_servers():
@@ -401,7 +417,10 @@ def hk_ok():
             continue
         if not retval[key]['ok']:
             ok = False
-            message += '\n%s: %s' % (key,retval[key]['message'])
+            if 'message' not in retval[key].keys():
+                message += '\n%s: no message' % key
+            else:
+                message += '\n%s: %s' % (key,retval[key]['message'])
 
     if not ok:
         print('\n***************** There were problems/warnings ****************')
