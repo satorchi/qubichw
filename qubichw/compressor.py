@@ -228,11 +228,13 @@ class compressor:
             msg += status['msg']
             return msg
 
-        # status() already checked that everything is oky
+        # status() already checked that everything is okay
         msg = ''
         for key in status.keys():
             if key!='status' and key!='msg':
-                msg += '\n%s: %s ... OK' % (key,status[key])
+                msg += '\n%s: %s' % (key,status[key])
+                if key.find('alarm')>0 or key=='Solonoid' or key=='System ON':
+                    msg += ' ... OK'
                     
         return msg
 
