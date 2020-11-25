@@ -124,6 +124,8 @@ class compressor:
         return the status of the compressors
         '''
         retval = {}
+        retval['status'] = True
+        retval['msg'] = 'ok'
 
         if not self.ok():
             retval['status'] = False
@@ -200,12 +202,20 @@ class compressor:
             return retval
         
 
+        errmsg_list = []
         for bit in self.statusbits.keys():
             bitstatus = (statbits & 2**bit) > 0
-            retval[self.statusbits[bit]] = bitstatus
-        
-        retval['status'] = True
-        retval['msg'] = 'ok'
+            key = self.statusbits[bit]
+            retval[key] = bitstatus
+            if key.find('alarm')>0 and bitstatus:
+                retval['status'] = False
+                errmsg_list.append('ERROR! %s' % key)
+            if (key=='Solonoid' or key=='System ON') and not bitstatus:
+                retval['status'] = False
+                errmsg_list.append('ERROR! %s = %s' % (key,bitstatus))            
+                
+        if len(errmsg_list)>0:
+            retval['msg'] = '\n'.join(errmsg_list)
         return retval
 
     def status_message(self):
@@ -218,10 +228,12 @@ class compressor:
             msg += status['msg']
             return msg
 
+        # status() already checked that everything is oky
         msg = ''
         for key in status.keys():
             if key!='status' and key!='msg':
-                msg += '\n%s: %s' % (key,status[key])
+                msg += '\n%s: %s ... OK' % (key,status[key])
+                    
         return msg
 
     def on(self):
