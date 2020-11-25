@@ -16,6 +16,8 @@ import subprocess,re,os
 from glob import glob
 import datetime as dt
 
+from qubichw.compressor import compressor
+
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
 machines = ['PiGPS','qubicstudio','hwp','platform','energenie','majortom','horns','modulator','mgc','mmr','pitemps']
@@ -405,6 +407,26 @@ def check_calsource():
     
     return retval
 
+def check_compressors():
+    '''
+    check the status of the pulse tube compressors
+    '''
+    retval = {}
+    retval['ok'] = True
+    retval['message'] = ''
+
+    msg_list = []
+    errmsg_list = []
+    for c_num in range(1,3):
+        c = compressor(c_num)
+        info = c.status()
+        msg_list.append('Compressor %s' % c_num)
+        msg_list.append(c.status_message())
+        if not info['ok']:
+            retval['ok'] = False
+            
+    if len(msg_list)>0: retval['message'] = '\n'.join(msg_list)
+    return retval
 
 def hk_ok():
     '''
