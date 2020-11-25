@@ -18,7 +18,7 @@ import datetime as dt
 
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
-machines = ['PiGPS','qubicstudio','hwp','platform','energenie','majortom','horns','modulator','mgc','mmr']
+machines = ['PiGPS','qubicstudio','hwp','platform','energenie','majortom','horns','modulator','mgc','mmr','pitemps']
 
 # list of sockets in the Energenie powerbar on the housekeeping electronics rack
 # also called the "Remote Controlled Power Bar 2" (RCPB2) in Emiliano's wiring diagram
@@ -120,6 +120,7 @@ def check_power():
     retval = {}
     retval['ok'] = True
     retval['message'] = ''
+    errmsg_list = []
     print('\n============ checking for power connections ============')
 
     energenie_manager = 'sispmctl'
@@ -151,12 +152,14 @@ def check_power():
         msg = '%s is %s' % (subsys,state)
         if state=='off':
             retval['ok'] = False
-            retval['message'] += ' %s |' % msg
+            errmsg_list.append(msg)
             msg += '\n--> Please switch on %s with the command "qubic_poweron" (no quotes)' % subsys
         else:
             msg += '... OK'
         print(msg)
 
+    if len(errmsg_list)>0:
+        retval['message'] = ' | '.join(errmsg_list)
     return retval
     
 
@@ -170,7 +173,11 @@ def check_mounts():
     print('\n============ checking for remote disk shares ============')
     smbmounts = ['qs2','entropy']
     cmd = 'mount'
-    out,err = shellcommand(cmd)
+    out1,err = shellcommand(cmd)
+    # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
+    cmd = 'ssh pitemps mount'
+    out2,err = shellcommand(cmd)
+    out = out1+'\n'+out2
     find_str = '(%s) type cifs' % '|'.join(smbmounts)
     match = re.findall(find_str,out)
     for smbshare in match:
@@ -206,7 +213,11 @@ def check_diskspace():
     find_str = '/'+'|/'.join(parts)
     
     cmd = 'df'
-    out,err = shellcommand(cmd)
+    out1,err = shellcommand(cmd)
+    # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
+    cmd = 'ssh pitemps df'
+    out2,err = shellcommand(cmd)
+    out = out1+'\n'+out2
     msg_list = []
     for line in out.split('\n'):
         cols = line.split()
