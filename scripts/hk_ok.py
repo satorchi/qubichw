@@ -17,6 +17,7 @@ from glob import glob
 import datetime as dt
 
 from qubichw.compressor import compressor
+from qubichk.send_telegram import send_telegram
 
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
@@ -447,7 +448,8 @@ def hk_ok():
     retval['temps'] = check_temps()
     retval['compressor'] = check_compressors()
 
-    for key in retval.keys():
+    message_list = []
+    for key in retval.keys():        
         if 'ok' not in retval[key].keys():
             print('missing ok key for %s' % key)
             continue
@@ -457,12 +459,22 @@ def hk_ok():
                 message += '\n%s: no message' % key
             else:
                 message += '\n%s: %s' % (key,retval[key]['message'])
+        message_list.append('============= %s ================' % key)
+        message_list.append(retval[key]['message'])
+
 
     if not ok:
-        print('\n***************** There were problems/warnings ****************')
+        ttl = '\n***************** There were problems/warnings ****************'
+        message_list.append(ttl)
+        message_list.append(message)
+        print(ttl)
         print(message)
     retval['message'] = message
     retval['ok'] = ok
+
+    full_message = '\n'.join(message_list)
+    send_telegram(full_message)
+    
     return retval
 
 if __name__=='__main__':
