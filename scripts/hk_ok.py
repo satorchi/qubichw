@@ -414,18 +414,20 @@ def check_compressors():
     retval = {}
     retval['ok'] = True
     retval['message'] = ''
+    print('\n============ checking pulse tube compressors ============')
 
     msg_list = []
     errmsg_list = []
     for c_num in range(1,3):
         c = compressor(c_num)
         info = c.status()
-        msg_list.append('Compressor %s' % c_num)
+        msg_list.append('\nCompressor %s' % c_num)
         msg_list.append(c.status_message())
-        if not info['ok']:
+        if not info['status']:
             retval['ok'] = False
             
     if len(msg_list)>0: retval['message'] = '\n'.join(msg_list)
+    print(retval['message'])
     return retval
 
 def hk_ok():
@@ -443,6 +445,7 @@ def hk_ok():
     retval['calsource'] = check_calsource()
     retval['servers'] = check_servers()
     retval['temps'] = check_temps()
+    retval['compressor'] = check_compressors()
 
     for key in retval.keys():
         if 'ok' not in retval[key].keys():
