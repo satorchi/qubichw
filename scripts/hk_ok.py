@@ -431,6 +431,7 @@ def check_calsource():
         find_str = 'python.*%s' % daemon
         match = re.search(find_str,out)
         if match is None:
+            retval['ok'] = False
             print('not running')
             msg += 'not running'
             errmsg_list.append(msg)
