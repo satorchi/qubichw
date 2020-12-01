@@ -18,7 +18,7 @@ if ! ps auxw | grep "calsource_commander.py" | grep -v -e grep -e SCREEN; then
     echo "Calsource Manager not running";
     screen -X -S manager quit
     echo "Starting a new screen and launching the calsource manager"
-    screen -S manager -d -m calsource_commander.py manager	
+    screen -S manager -d -m /usr/local/bin/calsource_commander.py manager	
 else
     echo "Calsource Manager already running"
 fi
