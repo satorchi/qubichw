@@ -41,7 +41,7 @@ def shellcommand(cmd):
     return out.decode(),err.decode()
 
 
-def ping(machine):
+def ping(machine,verbosity=1):
     '''
     ping a machine to make sure it's online
     '''
@@ -53,7 +53,7 @@ def ping(machine):
 
     msg = 'checking connection to %s...' % machine
     retval['message'] = msg
-    print(msg, end='', flush=True)
+    if verbosity>1: print(msg, end='', flush=True)
     
     cmd = 'ping -c1 %s' % machine
     out,err = shellcommand(cmd)
@@ -63,7 +63,7 @@ def ping(machine):
         retval['ok'] = False
         msg = 'Could not determine network packet loss to %s' % machine
         retval['error_message'] = msg
-        print('ERROR!\n--> %s' % msg)
+        if verbosity>1: print('ERROR!\n--> %s' % msg)
         return retval
 
     packet_loss_str = match.groups()[0].replace('%','')
@@ -77,7 +77,7 @@ def ping(machine):
             msg += ' This is okay if Calsource is off.'
         else:
             msg += ' Please make sure it is switched on and connected to the housekeeping network'
-        print(msg)
+        if verbosity>1: print(msg)
         return retval
     
     if packet_loss > 0.0:
@@ -85,16 +85,16 @@ def ping(machine):
         retval['error_message'] = 'Unstable network'
         msg = 'ERROR!\n--> Unstable network to %s.' % machine
         msg += '  Please make sure the ethernet cable is well connected'
-        print(msg)
+        if verbosity>1: print(msg)
         return retval
 
     retval['message'] += 'OK'
-    print('OK')
+    if verbosity>1: print('OK')
     
     return retval
 
 
-def check_network():
+def check_network(verbosity=1):
     '''
     ping the machines on the network
     '''
@@ -104,7 +104,7 @@ def check_network():
     retval['message'] = ''
     errmsg_list = []
     msg_list = []
-    print('\n============ checking network access ============')
+    if verbosity>1: print('\n============ checking network access ============')
 
     for machine in machines:
         retval[machine] = ping(machine)
@@ -122,7 +122,7 @@ def check_network():
     retval['message'] = '\n'.join(msg_list)
     return retval
 
-def check_power():
+def check_power(verbosity=1):
     '''
     check if the components attached to the Energenie power bar are switched on
     '''
@@ -132,7 +132,7 @@ def check_power():
     retval['message'] = ''
     errmsg_list = []
     msg_list = []
-    print('\n============ checking for power connections ============')
+    if verbosity>1: print('\n============ checking for power connections ============')
 
     energenie_manager = 'sispmctl'
     
@@ -144,7 +144,7 @@ def check_power():
         retval['error_message'] = '%s application not found.' % energenie_manager
         msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % retval['error_message']
         retval['message'] = msg
-        print(msg)
+        if verbosity>1: print(msg)
         return retval
         
     cmd = 'sispmctl -g all'
@@ -158,7 +158,7 @@ def check_power():
             retval['error_message'] = 'Energenie powerbar not detected'
             msg = 'ERROR! %s\n-->Please check USB connection'
             retval['message'] = msg
-            print(msg)
+            if verbosity>1: print(msg)
             return retval
 
         subsys = energenie[socket]
@@ -172,7 +172,7 @@ def check_power():
             msg += '\n--> Please switch on %s with the command "qubic_poweron" (no quotes)' % subsys
         else:
             msg += '... OK'
-        print(msg)
+        if verbosity>1: print(msg)
 
     if len(errmsg_list)>0:
         retval['error_message'] = ' | '.join(errmsg_list)
@@ -180,7 +180,7 @@ def check_power():
     return retval
     
 
-def check_mounts():
+def check_mounts(verbosity=1):
     '''
     check for remote mounted disks (Major Tom and QubicStudio)
     '''
@@ -190,7 +190,7 @@ def check_mounts():
     msg_list = []
     errmsg_list = []
 
-    print('\n============ checking for remote disk shares ============')
+    if verbosity>1: print('\n============ checking for remote disk shares ============')
     smbmounts = ['qs2','entropy']
     cmd = 'mount'
     out1,err = shellcommand(cmd)
@@ -203,7 +203,7 @@ def check_mounts():
     for smbshare in match:
         retval[smbshare] = 'ok'
         msg = '%s... OK' % smbshare
-        print(msg)
+        if verbosity>1: print(msg)
         msg_list.append(msg)
 
     if len(match)<len(smbmounts):
@@ -213,7 +213,7 @@ def check_mounts():
                 retval[smbshare] = 'missing'
                 msg = 'ERROR! Missing Windows mount: %s' % smbshare
                 errmsg_list.append(msg)
-                print(msg)
+                if verbosity>1: print(msg)
                 
                 
     if len(errmsg_list)>0:
@@ -221,7 +221,7 @@ def check_mounts():
     retval['message'] = '\n'.join(msg_list)
     return retval
 
-def check_diskspace():
+def check_diskspace(verbosity=1):
     '''
     check for sufficient disk space
     '''
@@ -232,7 +232,7 @@ def check_diskspace():
     errmsg_list = []
     
     space_warning = 10*1024**2 # 10GB minimum disk space (df gives results in 1k blocks)
-    print('\n============ checking for disk space ============')
+    if verbosity>1: print('\n============ checking for disk space ============')
     parts = ['home','archive','entropy','qs2']
         
     find_str = '/'+'|/'.join(parts)
@@ -268,7 +268,7 @@ def check_diskspace():
                 retval['ok'] = False
                 errmsg_list.append(msg)
             msg_list.append(msg)
-            print(msg)
+            if verbosity>1: print(msg)
             
             retval[part] = disk_info
 
@@ -278,7 +278,7 @@ def check_diskspace():
             msg = 'ERROR! Could not find "%s"' % part
             errmsg_list.append(msg)
             msg += '\n--> Please investigate.  You should probably run the command "mount /%s" (no quotes)' % part
-            print(msg)
+            if verbosity>1: print(msg)
             disk_info['total'] = 0
             disk_info['used'] = 0
             disk_info['available'] = 0
@@ -290,7 +290,7 @@ def check_diskspace():
     retval['message'] = '\n'.join(msg_list)
     return retval
 
-def check_servers():
+def check_servers(verbosity=1):
     '''
     check that the housekeeping server is running
     check that the bot is running
@@ -304,24 +304,24 @@ def check_servers():
     start_command['run_hkserver.py'] = 'start_hkserver.sh'
     start_command['run_bot.py'] = 'start_bot.sh'
 
-    print('\n============ checking housekeeping daemons')
+    if verbosity>1: print('\n============ checking housekeeping daemons')
     cmd = 'ps axwu'
     out,err = shellcommand(cmd)
 
     for daemon in start_command.keys():
-        print('%s ...' % daemon,end='',flush=True)
+        if verbosity>1: print('%s ...' % daemon,end='',flush=True)
         find_str = 'python.*%s' % daemon
         match = re.search(find_str,out)
         if match is None:
             retval['ok'] = False
             msg = 'not running'
-            print(msg)
+            if verbosity>1: print(msg)
             errmsg_list.append('%s %s' % (daemon,msg))
             retval[daemon] = msg
-            print('\n--> Please run the command "%s" (no quotes)' % start_command[daemon])
+            if verbosity>1: print('\n--> Please run the command "%s" (no quotes)' % start_command[daemon])
         else:
             msg = 'OK'
-            print(msg)
+            if verbosity>1: print(msg)
             retval[daemon] = msg
         msg_list.append('%s %s' % (daemon,msg))
             
@@ -330,7 +330,7 @@ def check_servers():
     return retval
 
 
-def check_temps():
+def check_temps(verbosity=1):
     '''
     check that the most recent recorded housekeeping are from now
     '''
@@ -340,7 +340,7 @@ def check_temps():
     msg_list = []
     nfiles = 47 # total number expected
     delta_max = 6 # seconds. if latest HK is earlier than this, we have a problem
-    print('\n============ checking recent housekeeping values...',end='',flush=True)
+    if verbosity>1: print('\n============ checking recent housekeeping values...',end='',flush=True)
     hk_dir = '/home/qubic/data/temperature/broadcast'
 
     patterns = ['TEMPERATURE??.txt','AVS47*.txt','MHS*.txt','HEATER*.txt','PRESSURE*.txt']
@@ -354,7 +354,7 @@ def check_temps():
     if len(hk_files)<nfiles:
         retval['ok'] = False
         msg = 'missing HK data files.  Found %i out of %i.' % (len(hk_files),nfiles)
-        print('\nERROR! %s' % msg)
+        if verbosity>1: print('\nERROR! %s' % msg)
         retval['error_message'] += msg
 
     for F in hk_files:
@@ -374,7 +374,7 @@ def check_temps():
             retval['ok'] = False
             info['error_message'] = 'unable to read timestamp'
             msg = 'unable to read timestamp for %s' % info['name']
-            print('\nERROR! %s' % msg,end='')
+            if verbosity>1: print('\nERROR! %s' % msg,end='')
             retval['error_message'] += msg
             retval[F] = info
             continue
@@ -386,19 +386,19 @@ def check_temps():
             info['ok'] = False
             retval['ok'] = False
             msg = 'too long since last data for %s: %f seconds' % (info['name'],delta)
-            print('\nERROR! %s' % msg,end='')
+            if verbosity>1: print('\nERROR! %s' % msg,end='')
             retval['error_message'] += '\n'+msg
 
         retval[info['name']] = info
 
     if retval['ok']:
         retval['message'] = 'housekeeping values ... OK'
-        print('OK')
+        if verbosity>1: print('OK')
     else:
         retval['message'] = 'housekeeping values ... ERROR!'
     return retval
 
-def check_calsource():
+def check_calsource(verbosity=1):
     '''
     check that the calibration source manager is running on PiGPS
     check that the calibration source broadcaster is running on PiGPS
@@ -410,7 +410,7 @@ def check_calsource():
     start_command['calsource_commander.py'] = 'start_calsource_manager.sh'
     start_command['read_calsource.py'] = 'start_calsource_acq.sh'
 
-    print('\n============ checking calsource daemons ============')
+    if verbosity>1: print('\n============ checking calsource daemons ============')
     cmd = 'ssh pigps ps axwu'
     out,err = shellcommand(cmd)
     if len(out)==0:
@@ -418,7 +418,7 @@ def check_calsource():
         retval['message'] = msg
         retval['error_message'] = msg
         msg += '\n--> Please check network connections'
-        print(msg)
+        if verbosity>1: print(msg)
         for daemon in start_command.keys():
             retval[daemon] = 'could not connect'
         return retval
@@ -427,18 +427,18 @@ def check_calsource():
     errmsg_list = []
     for daemon in start_command.keys():
         msg = '%s ...' % daemon
-        print(msg,end='',flush=True)
+        if verbosity>1: print(msg,end='',flush=True)
         find_str = 'python.*%s' % daemon
         match = re.search(find_str,out)
         if match is None:
             retval['ok'] = False
-            print('not running')
+            if verbosity>1: print('not running')
             msg += 'not running'
             errmsg_list.append(msg)
             retval[daemon] = 'not running'
-            print('\n--> Please log onto PiGPS and run the command "%s" (no quotes)' % start_command[daemon])
+            if verbosity>1: print('\n--> Please log onto PiGPS and run the command "%s" (no quotes)' % start_command[daemon])
         else:
-            print('OK')
+            if verbosity>1: print('OK')
             msg += 'OK'
             retval[daemon] = msg
         msg_list.append(msg)
@@ -449,7 +449,7 @@ def check_calsource():
     
     return retval
 
-def check_compressors():
+def check_compressors(verbosity=1):
     '''
     check the status of the pulse tube compressors
     '''
@@ -458,7 +458,7 @@ def check_compressors():
     retval['error_message'] = ''
     retval['message'] = ''
     
-    print('\n============ checking pulse tube compressors ============')
+    if verbosity>1: print('\n============ checking pulse tube compressors ============')
 
     msg_list = []
     errmsg_list = []
@@ -473,10 +473,10 @@ def check_compressors():
             
     if len(errmsg_list)>0: retval['error_message'] = '\n'.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
-    print(retval['message'])
+    if verbosity>1: print(retval['message'])
     return retval
 
-def hk_ok():
+def hk_ok(verbosity=1):
     '''
     check that housekeeping is okay
     '''
@@ -496,7 +496,7 @@ def hk_ok():
     message_list = []
     for key in retval.keys():        
         if 'ok' not in retval[key].keys():
-            print('missing ok key for %s' % key)
+            if verbosity>1: print('missing ok key for %s' % key)
             continue
         if not retval[key]['ok']:
             ok = False
@@ -515,12 +515,13 @@ def hk_ok():
         ttl += '\n*** There were problems/warnings ***'
         message_list.append(ttl)
         message_list.append(message)
-        print(ttl)
-        print(message)
+        if verbosity>1: print(ttl)
+        if verbosity>1: print(message)
     retval['error_message'] = message
     retval['ok'] = ok
 
     full_message = '\n'.join(message_list)
+    retval['full_message'] = full_message
     send_telegram(full_message)
     
     return retval
