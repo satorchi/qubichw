@@ -14,6 +14,16 @@ send a message on the Telegram messaging service
 import os,sys
 import telepot
 
+chatid = { 'Michel' : 504421997,    
+           'Jean-Christophe' : 600802212,
+           'Steve' : 610304074,
+           'Guillaume' : 328583495,
+           'Manuel' : 430106452,
+           'Giuseppe' : 102363677,
+           'Jean-Pierre' : 1006925691,
+           'Sotiris' : 962622089}
+
+
 def _get_bot_id(filename=None):
     '''
     get the bot Id information, which is not kept on the GitHub server
@@ -37,19 +47,20 @@ def _get_bot_id(filename=None):
     botId = line.strip()
     return botId
 
-def send_telegram(msg,chat_id=None):
+def send_telegram(msg,rx=None):
     '''
     send a message on the Telegram messaging service from the QUBIC bot
     '''
     botId = _get_bot_id()
-    if botId is None:
-        return False
-
-    if chat_id is None:
-        chat_id = 610304074 # Steve
-        
+    if botId is None:return False
     bot = telepot.Bot(botId)
 
-    bot.sendMessage(chat_id,msg)
+    if rx is None: rx = 'Steve'
+    if rx not in chatid.keys():
+        bot.sendMessage(chatid['Steve'],'Trying to send message to unknown user: %s' % rx)
+        rx = 'Steve'
+        
+    id = chatid[rx]        
+    bot.sendMessage(id,msg)
     return
 
