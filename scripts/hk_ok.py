@@ -12,12 +12,17 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 check if QUBIC housekeeping is running
 '''
 
-import subprocess,re,os
+import subprocess,re,os,sys
 from glob import glob
 import datetime as dt
 
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram
+
+# the Energenie powerbar
+from PyMS import PMSDevice
+energenie_cal = PMSDevice('energenie', '1')
+
 
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
@@ -25,11 +30,11 @@ machines = ['PiGPS','qubicstudio','hwp','platform','energenie','majortom','horns
 
 # list of sockets in the Energenie powerbar on the housekeeping electronics rack
 # also called the "Remote Controlled Power Bar 2" (RCPB2) in Emiliano's wiring diagram
-energenie = {}
-energenie[1] = 'horn'
-energenie[2] = 'heaters'
-energenie[3] = 'hwp'
-energenie[4] = 'thermos'
+energenie_socket = {}
+energenie_socket[1] = 'horn'
+energenie_socket[2] = 'heaters'
+energenie_socket[3] = 'hwp'
+energenie_socket[4] = 'thermos'
 
 def shellcommand(cmd):
     '''
@@ -150,7 +155,7 @@ def check_power(verbosity=1):
     cmd = 'sispmctl -g all'
     out,err = shellcommand(cmd)
         
-    for socket in energenie.keys():
+    for socket in energenie_socket.keys():
         find_str = '(Status of outlet %i:\t)(off|on)' % socket
         match = re.search(find_str,out)
         if match is None:
@@ -161,7 +166,7 @@ def check_power(verbosity=1):
             if verbosity>1: print(msg)
             return retval
 
-        subsys = energenie[socket]
+        subsys = energenie_socket[socket]
         state = match.groups()[1]
         retval[subsys] = state
         msg = '%s is %s' % (subsys,state)
@@ -525,10 +530,13 @@ def hk_ok(verbosity=1):
 
     full_message = '\n'.join(message_list)
     retval['full_message'] = full_message
-    send_telegram(full_message)
+    if verbosity>0: send_telegram(full_message)
     
     return retval
 
 if __name__=='__main__':
-    ret = hk_ok()
+    verbosity = 1
+    for arg in sys.argv:
+        if arg=='--silent': verbosity = 0
+    ret = hk_ok(verbosity=verbosity)
     
