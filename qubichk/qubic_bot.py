@@ -1211,7 +1211,7 @@ class qubic_bot :
         '''
         the default reply to unknown commands
         '''
-        ans="I don't understand that command yet."
+        ans="I don't understand."
         if self.chat_id in self.known_users.keys():
             ans='Sorry %s, %s' % (self.known_users[self.chat_id],ans)
         self._send_message(ans)
