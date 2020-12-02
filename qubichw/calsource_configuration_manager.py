@@ -154,8 +154,11 @@ class calsource_configuration_manager():
         if self.hostname is None:
             self.hostname = 'localhost'
 
-        if role is None and (self.hostname=='calsource' or self.hostname=='pigps'):
-            role = 'manager'
+        if role is None:
+            if self.hostname=='calsource' or self.hostname=='pigps':
+                role = 'manager'
+            else:
+                role = 'commander'
         self.role = role
                 
         if role=='manager':
