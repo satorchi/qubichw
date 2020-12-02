@@ -511,12 +511,15 @@ def hk_ok(verbosity=1):
 
 
     if not ok:
-        ttl =  '\n************************************'
-        ttl += '\n*** There were problems/warnings ***'
+        ttl =  '\n********************************************'
+        ttl += '\n*** QUBIC Housekeeping problems/warnings ***'
         message_list.append(ttl)
         message_list.append(message)
         if verbosity>1: print(ttl)
         if verbosity>1: print(message)
+        errmsg = ttl+'\n'+message
+        send_telegram(errmsg)
+        
     retval['error_message'] = message
     retval['ok'] = ok
 
