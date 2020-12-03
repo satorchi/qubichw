@@ -93,7 +93,8 @@ class qubic_bot :
                          '/entropy_plotall': self.entropy_plotall,
                          '/plot300mkzoom': self.entropy_plot300mKzoom,
                          '/plot300mk': self.entropy_plot300mK,
-                         '/plot1k': self.entropy_plot1K
+                         '/plot1k': self.entropy_plot1K,
+                         '/ip': self.ip
                          }
 
         self.known_users={ 504421997: 'Michel',    
@@ -1204,7 +1205,24 @@ class qubic_bot :
 
         self._send_message(answer)
         return
-        
+
+    def ip(self):
+        '''
+        send the IP address
+        '''
+        cmd='hostname'
+        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out,err=proc.communicate()
+        hostname=out.decode().strip()
+
+        cmd='/sbin/ifconfig -a'
+        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out,err=proc.communicate()
+        msg = out.decode()
+
+        answer = 'IP Address from %s\n\n%s' % (hostname,msg)
+        self._send_message(answer)
+        return
 
 
     def _default_answer(self):
