@@ -1220,7 +1220,11 @@ class qubic_bot :
         out,err=proc.communicate()
         msg = out.decode()
 
-        answer = 'IP Address from %s\n\n%s' % (hostname,msg)
+        cmd='/usr/bin/uptime'
+        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out,err=proc.communicate()
+        answer = 'IP Address from %s\n\n%s\n\n%s' % (hostname,msg,out.decode())
+
         self._send_message(answer)
         return
 
