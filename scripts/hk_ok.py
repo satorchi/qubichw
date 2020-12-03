@@ -236,7 +236,7 @@ def check_power(verbosity=1):
         if match is None:
             retval['ok'] = False
             retval['error_message'] = 'Energenie powerbar not detected'
-            msg = 'ERROR! %s\n-->Please check USB connection'
+            msg = 'ERROR! %s\n-->Please check USB connection' % retval['error_message']
             retval['message'] = msg
             if verbosity>0: print(msg)
             return retval
