@@ -78,6 +78,7 @@ def ping(machine,verbosity=1):
     if packet_loss > 99.0:
         retval['ok'] = False
         retval['error_message'] = 'unreachable'
+        retval['message'] += 'UNREACHABLE'
         msg = 'ERROR!\n--> %s is unreachable.' % machine
         if machine=='modulator':
             msg += ' This is okay if Calsource is off.'
@@ -89,6 +90,7 @@ def ping(machine,verbosity=1):
     if packet_loss > 0.0:
         retval['ok'] = False
         retval['error_message'] = 'Unstable network'
+        retval['message'] += 'UNREACHABLE'
         msg = 'ERROR!\n--> Unstable network to %s.' % machine
         msg += '  Please make sure the ethernet cable is well connected'
         if verbosity>0: print(msg)
