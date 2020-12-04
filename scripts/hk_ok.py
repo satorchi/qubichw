@@ -27,7 +27,19 @@ energenie_cal_device_list = ['modulator','calsource','lamp','amplifier']
 
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
-machines = ['PiGPS','qubicstudio','hwp','platform','energenie','majortom','horns','modulator','mgc','mmr','pitemps']
+machines = ['PiGPS',
+            'qubicstudio',
+            'hwp',
+            'platform',
+            'energenie',
+            'majortom',
+            'horns',
+            'modulator',
+            'mgc',
+            'mmr',
+            'pitemps',
+            'cam26',
+            'cam27']
 
 # list of sockets in the Energenie powerbar on the housekeeping electronics rack
 # also called the "Remote Controlled Power Bar 2" (RCPB2) in Emiliano's wiring diagram
