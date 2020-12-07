@@ -126,29 +126,35 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
     errmsg_list = []
     msg_list = []
 
-    try:
-        msg = 'checking for calsource Energenie socket states'
-        if verbosity>0: print(msg)
-        states_list = energenie_cal.get_socket_states()
-        for idx,dev in enumerate(energenie_cal_device_list):
-            if states_list[idx]:
-                msg = '%s is ON' % dev
-            else:
-                msg = '%s is OFF' % dev
+    error_counter = 0
+    max_count = 3
+    states_list = None
+    while (states_list is None and error_counter<max_count):
+        try:
+            msg = 'checking for calsource Energenie socket states'
+            if verbosity>0: print(msg)
+            states_list = energenie_cal.get_socket_states()
+            for idx,dev in enumerate(energenie_cal_device_list):
+                if states_list[idx]:
+                    msg = '%s is ON' % dev
+                else:
+                    msg = '%s is OFF' % dev
+                    if verbosity>0: print(msg)
+                    msg_list.append(msg)
+
+        except:
+            error_counter += 1
+            states_list = None
+            msg = '%i Could not get socket states from the calsource Energenie powerbar' % error_counter
             if verbosity>0: print(msg)
             msg_list.append(msg)
+            errmsg_list.append(msg)
+            if error_counter<count_max: time.sleep(5)
 
-    except:
-        states_list = None
+    retval['states_list'] = states_list
+    if states_list is None:
         retval['ok'] = False
-        msg = 'Could not get socket states from the calsource Energenie powerbar'
-        if verbosity>0: print(msg)
-        msg_list.append(msg)
-        errmsg_list.append(msg)
-
-    retval['states_list'] = states_list    
-
-    if states_list is not None:
+    else:
         if modulator_state and not states_list[0]: # switch on for a ping
             states_list_tmp = states_list.copy()
             states_list_tmp[0] = modulator_state
