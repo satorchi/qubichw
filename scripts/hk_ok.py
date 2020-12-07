@@ -149,7 +149,7 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
             if verbosity>0: print(msg)
             msg_list.append(msg)
             errmsg_list.append(msg)
-            if error_counter<count_max: time.sleep(5)
+            if error_counter<max_count: time.sleep(5)
 
     retval['states_list'] = states_list
     if states_list is None:
