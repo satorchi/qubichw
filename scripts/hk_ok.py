@@ -133,6 +133,7 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
         try:
             msg = 'checking for calsource Energenie socket states'
             if verbosity>0: print(msg)
+            time.sleep(3)
             states_list = energenie_cal.get_socket_states()
             for idx,dev in enumerate(energenie_cal_device_list):
                 if states_list[idx]:
@@ -149,7 +150,6 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
             if verbosity>0: print(msg)
             msg_list.append(msg)
             errmsg_list.append(msg)
-            if error_counter<max_count: time.sleep(5)
 
     retval['states_list'] = states_list
     if states_list is None:
@@ -256,6 +256,8 @@ def check_power(verbosity=1):
         if match is None:
             retval['ok'] = False
             retval['error_message'] = 'Energenie powerbar not detected'
+            if err: retval['error_message'] += '\n'+err
+            if out: retval['error_message'] += '\n'+out
             msg = 'ERROR! %s\n-->Please check USB connection' % retval['error_message']
             retval['message'] = msg
             if verbosity>0: print(msg)
