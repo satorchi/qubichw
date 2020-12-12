@@ -246,21 +246,42 @@ def check_power(verbosity=1):
         retval['message'] = msg
         if verbosity>0: print(msg)
         return retval
-        
+
+
+    # try a few times to connect to the Energenie USB powerbar
+    error_counter = 0
+    max_count = 3
+    match = None
+    find_str = '(Status of outlet [1-4]:\t)(off|on)'
     cmd = 'sispmctl -g all'
-    out,err = shellcommand(cmd)
-        
+    while match is None and error_counter<max_count:
+        out,err = shellcommand(cmd)
+        match = re.search(find_str,out)
+        if match is None:
+            error_counter += 1
+            retval['error_message'] = 'Energenie powerbar not detected: error count=%i' % error_counter
+            if err: retval['error_message'] += '\n'+err
+            if out: retval['error_message'] += '\n'+out
+            msg =  retval['error_message']
+            retval['message'] = msg
+            if verbosity>0: print(msg)
+            if error_counter<max_count: time.sleep(3)
+
+    if match is None:
+        retval['ok'] = False
+        msg = 'ERROR! %s\n-->Please check USB connection' % retval['error_message']
+        if verbosity>0: print(msg)    
+        return retval
+            
     for socket in energenie_socket.keys():
         find_str = '(Status of outlet %i:\t)(off|on)' % socket
         match = re.search(find_str,out)
         if match is None:
             retval['ok'] = False
-            retval['error_message'] = 'Energenie powerbar not detected'
-            if err: retval['error_message'] += '\n'+err
-            if out: retval['error_message'] += '\n'+out
-            msg = 'ERROR! %s\n-->Please check USB connection' % retval['error_message']
+            msg = 'Could not find Energenie power status for %s' % energenie_socket[socket]
+            retval['error_message'] = msg
             retval['message'] = msg
-            if verbosity>0: print(msg)
+            if verbosity>0: print('\nERROR! %s' % msg)
             return retval
 
         subsys = energenie_socket[socket]
