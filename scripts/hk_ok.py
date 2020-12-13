@@ -146,7 +146,7 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
         except:
             error_counter += 1
             states_list = None
-            msg = '%i Could not get socket states from the calsource Energenie powerbar' % error_counter
+            msg = 'Could not get socket states from calsource Energenie powerbar: error count=%i' % error_counter
             if verbosity>0: print(msg)
             msg_list.append(msg)
             errmsg_list.append(msg)
@@ -259,7 +259,7 @@ def check_power(verbosity=1):
         match = re.search(find_str,out)
         if match is None:
             error_counter += 1
-            retval['error_message'] = 'Energenie powerbar not detected: error count=%i' % error_counter
+            retval['error_message'] = 'USB Energenie powerbar not detected: error count=%i' % error_counter
             if err: retval['error_message'] += '\n'+err
             if out: retval['error_message'] += '\n'+out
             msg =  retval['error_message']
