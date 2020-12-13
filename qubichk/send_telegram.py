@@ -13,54 +13,37 @@ send a message on the Telegram messaging service
 '''
 import os,sys
 import telepot
-
-chatid = { 'Michel' : 504421997,    
-           'Jean-Christophe' : 600802212,
-           'Steve' : 610304074,
-           'Guillaume' : 328583495,
-           'Manuel' : 430106452,
-           'Giuseppe' : 102363677,
-           'Jean-Pierre' : 1006925691,
-           'Sotiris' : 962622089}
-
-
-def _get_bot_id(filename=None):
-    '''
-    get the bot Id information, which is not kept on the GitHub server
-    '''
-    errflag = False
-    botId_file=filename
-    if botId_file is None:botId_file='botId.txt'
-    if not os.path.isfile(botId_file):
-        if 'HOME' not in os.environ.keys():
-            print('ERROR! Could not find telebot Id: %s' % botId_file)
-            return None                    
-        homedir = os.environ['HOME']
-        botId_file = '%s/botId.txt' % homedir
-        if not os.path.isfile(botId_file):
-            print('ERROR! Could not find telebot Id: %s' % botId_file)
-            return None
-        
-    h = open(botId_file,'r')
-    line = h.readline()
-    h.close()
-    botId = line.strip()
-    return botId
+from qubichk.qubic_bot import get_botId, get_TelegramAddresses
 
 def send_telegram(msg,rx=None):
     '''
     send a message on the Telegram messaging service from the QUBIC bot
     '''
-    botId = _get_bot_id()
+    botId = get_botId()
     if botId is None:return False
-    bot = telepot.Bot(botId)
 
-    if rx is None: rx = 'Steve'
-    if rx not in chatid.keys():
-        bot.sendMessage(chatid['Steve'],'Trying to send message to unknown user: %s' % rx)
-        rx = 'Steve'
+    chatid_dict = get_TelegramAddresses()
+
+    # make reverse lookup
+    users_dict = {}
+    for chatid in chatid_dict.keys():
+        users_dict[chatid_dict[chatid]] = chatid
         
-    id = chatid[rx]        
-    bot.sendMessage(id,msg)
-    return
+    
+    bot = telepot.Bot(botId)
+    
+    if rx is None: rx = 'Steve'
+    if rx not in users_dict.keys():
+        print('ERROR! Telegram not sent.  Could not find id for user: %s' % rx)
+
+        if 'Steve' not in users_dict.keys():
+            print('BIG ERROR!  Could not find id for Steve!')
+            return False
+        
+        bot.sendMessage(users_dict['Steve'],'Trying to send message to unknown user: %s' % rx)
+        return False
+        
+    chatid = users_dict[rx]        
+    bot.sendMessage(chatid,msg)
+    return True
 
