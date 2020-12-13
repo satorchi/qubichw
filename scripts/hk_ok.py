@@ -91,7 +91,7 @@ def ping(machine,verbosity=1):
         retval['ok'] = False
         retval['error_message'] = 'unreachable'
         retval['message'] += 'UNREACHABLE'
-        msg = 'ERROR!\n--> %s is unreachable.' % machine
+        msg = 'UNREACHABLE!\n--> %s is unreachable.' % machine
         if machine=='modulator':
             msg += ' This is okay if Calsource is off.'
         else:
