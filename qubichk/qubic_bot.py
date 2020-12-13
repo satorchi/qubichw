@@ -27,6 +27,63 @@ from matplotlib import pyplot as plt
 from satorchipy.datefunctions import str2dt
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 
+def telegram_datafile(filename=None):
+    '''
+    get the full path to the desired Telegram data file
+    filename can be botId.txt or telegram_addressbook
+    '''
+    search_dirs = []
+    if 'XDG_DATA_HOME' in os.environ.keys():
+        search_dirs.append('%s/qubic' % os.environ['XDG_DATA_HOME'])
+    if 'HOME' in os.environ.keys():
+        homedir = os.environ['HOME']        
+    else:
+        homedir = '/home/qubic'
+    search_dirs.append('%s/.local/share/qubic' % homedir)
+    search_dirs.append('./')
+
+    for d in search_dirs:
+        fullpath = '%s/%s' % (d,filename)
+        if os.path.isfile(fullpath):
+            return fullpath
+
+    return None
+
+def get_botId():
+    '''
+    get the bot Id information, which is not kept on the GitHub server
+    '''
+    botId_file = telegram_datafile('botId.txt')
+    if botId_file is None:
+        print('ERROR! Could not find telebot Id: botId.txt')
+        return None
+
+    h = open(botId_file,'r')
+    line = h.readline()
+    h.close()
+    botId = line.strip()
+    return botId
+
+def get_TelegramAddresses():
+    '''
+    read the known chat Id's
+    '''
+    addrbook_file = telegram_datafile('telegram-addresses')
+    if addrbook_file is None: return None
+
+    h = open(addrbook_file,'r')
+    lines = h.read().split('\n')
+    h.close()
+    del(lines[-1])
+    known_users = {}
+    for line in lines:
+        id_str,user_str = line.split(':')
+        chatid = int(id_str.strip())
+        user = user_str.strip()
+        known_users[chatid] = user
+
+    return known_users
+
 class dummy_bot:
     '''
     a dummy bot for testing
@@ -97,17 +154,7 @@ class qubic_bot :
                          '/ip': self.ip
                          }
 
-        self.known_users={ 504421997: 'Michel',    
-                           600802212: 'Jean-Christophe',
-                           610304074: 'Steve',
-                           328583495: 'Guillaume',
-                           430106452: 'Manuel',
-                           102363677: 'Giuseppe',
-                           789306705: 'Jean-Pierre',
-                           776665951: 'Jean-Pierre',
-                          1006925691: 'Jean-Pierre',
-                           962622089: 'Sotiris',
-                          0: 'Test Bot'}
+        self.known_users = get_TelegramAdresses()
 
         self.temperature_headings = ['40K filters',
                                      '40K sd',
@@ -164,22 +211,6 @@ class qubic_bot :
             self._begin_bot()
             
         return None
-
-    def _get_bot_id(self,filename=None):
-        '''
-        get the bot Id information, which is not kept on the GitHub server
-        '''
-        botId_file=filename
-        if botId_file is None:botId_file='botId.txt'
-        if not os.path.isfile(botId_file):
-            print('ERROR! Could not find telebot Id: %s' % botId_file)
-            return False
-
-        h = open(botId_file,'r')
-        line = h.readline()
-        h.close()
-        self.botId = line.strip()
-        return True
 
     def _init_bot(self):
         '''
