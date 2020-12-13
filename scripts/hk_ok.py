@@ -81,7 +81,7 @@ def ping(machine,verbosity=1):
         retval['ok'] = False
         msg = 'Could not determine network packet loss to %s' % machine
         retval['error_message'] = msg
-        if verbosity>0: print('ERROR!\n--> %s' % msg)
+        if verbosity>0: print('UNREACHABLE!\n--> %s' % msg)
         return retval
 
     packet_loss_str = match.groups()[0].replace('%','')
@@ -647,6 +647,10 @@ def hk_ok(verbosity=1,fulltest=False):
     retval['ok'] = ok
 
     full_message = '\n'.join(message_list)
+    # for debugging
+    if full_message.lower().find('error')>0:
+        send_telegram(full_message)
+        
     retval['full_message'] = full_message
     if verbosity>0: send_telegram(full_message)
     
