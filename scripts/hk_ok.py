@@ -647,12 +647,7 @@ def hk_ok(verbosity=1,fulltest=False):
     retval['ok'] = ok
 
     full_message = '\n'.join(message_list)
-    # for debugging
-    if full_message.lower().find('error')>0:
-        send_telegram(full_message)
-        
     retval['full_message'] = full_message
-    if verbosity>0: send_telegram(full_message)
     
     return retval
 
@@ -668,4 +663,7 @@ if __name__=='__main__':
             fulltest=True
         
     ret = hk_ok(verbosity=verbosity,fulltest=fulltest)
+
+    if verbosity>0: send_telegram(ret['full_message'])
+
     
