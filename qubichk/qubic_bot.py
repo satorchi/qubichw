@@ -154,7 +154,7 @@ class qubic_bot :
                          '/ip': self.ip
                          }
 
-        self.known_users = get_TelegramAdresses()
+        self.known_users = get_TelegramAddresses()
 
         self.temperature_headings = ['40K filters',
                                      '40K sd',
