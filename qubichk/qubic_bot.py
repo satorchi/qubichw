@@ -205,7 +205,7 @@ class qubic_bot :
         self.time_fmt='%Y-%m-%d %H:%M:%S UT'
         
         self._init_args()
-        self.botId = get_bot_id()
+        self.botId = get_botId()
         if self.botId is not None:
             self._init_bot()
             self._begin_bot()
