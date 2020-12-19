@@ -11,6 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 check if QUBIC housekeeping is running
 '''
+import sys
 
 from qubichk.hk_verify import hk_ok
 from qubichk.send_telegram import send_telegram
