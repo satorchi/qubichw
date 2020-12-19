@@ -62,9 +62,9 @@ def listen_for_command():
     received_date = dt.datetime.utcnow()
     received_tstamp = eval(received_date.strftime('%s.%f'))
     if rx_port is None:
-        logmsg('ERROR! %s' % cmdstr_clean)
+        writelog('ERROR! %s' % cmdstr_clean)
     else:
-        logmsg('received a command from %s:%i at %s: %s' % (rx_addr,rx_port,received_date.strftime(date_fmt),cmdstr_clean))
+        writelog('received a command from %s:%i at %s: %s' % (rx_addr,rx_port,received_date.strftime(date_fmt),cmdstr_clean))
 
     retval = {}
     retval['timestamp'] = received_tstamp
