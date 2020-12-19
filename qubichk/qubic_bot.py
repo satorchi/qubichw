@@ -152,7 +152,9 @@ class qubic_bot :
                          '/plot300mkzoom': self.entropy_plot300mKzoom,
                          '/plot300mk': self.entropy_plot300mK,
                          '/plot1k': self.entropy_plot1K,
-                         '/ip': self.ip
+                         '/ip': self.ip,
+                         '/pt': self.pt,
+                         '/diskspace': self.diskspace
                          }
 
         self.known_users = get_TelegramAddresses()
