@@ -26,6 +26,7 @@ from matplotlib import pyplot as plt
 
 from satorchipy.datefunctions import str2dt
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
+from qubichk.hk_verify import check_compressors,check_diskspace
 
 def telegram_datafile(filename=None):
     '''
@@ -1257,6 +1258,22 @@ class qubic_bot :
         answer = 'IP Address from %s\n\n%s\n\n%s' % (hostname,msg,out.decode())
 
         self._send_message(answer)
+        return
+
+    def pt(self):
+        '''
+        status of the pulse tube compressors
+        '''
+        ret = check_compressors()
+        self._send_message(ret['message'])
+        return
+
+    def diskspace(self):
+        '''
+        check available disk space
+        '''
+        ret = check_diskspace()
+        self._send_message(ret['message'])
         return
 
 
