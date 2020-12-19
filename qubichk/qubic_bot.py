@@ -1212,7 +1212,7 @@ class qubic_bot :
         '''
         status of the pulse tube compressors
         '''
-        ret = check_compressors()
+        ret = check_compressors(verbosity=0)
         self._send_message(ret['message'])
         return
 
@@ -1220,7 +1220,7 @@ class qubic_bot :
         '''
         check available disk space
         '''
-        ret = check_diskspace()
+        ret = check_diskspace(verbosity=0)
         self._send_message(ret['message'])
         return
 
