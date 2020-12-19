@@ -83,17 +83,17 @@ def set_compressor(compressor_num,cmd):
     print('\nCompressor %i' % compressor_num)
 
     if cmd == 'on':
-        logmsg('Switching on compressor %i' % compressor_num)
+        writelog('Switching on compressor %i' % compressor_num)
         c.on()
         return
 
     if cmd == 'off':
-        logmsg('Switching off compressor %i' % compressor_num)
+        writelog('Switching off compressor %i' % compressor_num)
         c.off()
         return
               
 
-    logmsg('Invalid command to compressor %i: %s' % (compressor_num,cmd))
+    writelog('Invalid command to compressor %i: %s' % (compressor_num,cmd))
     return
 
 if __name__=='__main__':
@@ -121,7 +121,7 @@ if __name__=='__main__':
             set_compressor(2,'off')
             continue
 
-        logmsg('unknown command: %s' % ret['cmd'])
+        writelog('unknown command: %s' % ret['cmd'])
 
               
             
