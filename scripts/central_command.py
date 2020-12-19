@@ -20,6 +20,18 @@ listener = '192.168.2.1' # qubic-central
 port = 4100
 nbytes = 2048
 date_fmt = '%Y%m%d-%H%M%S.%f'
+
+def writelog(msg):
+    '''
+    log message to a file
+    '''
+    filename = 'central_command.log'
+    h=open(filename,'a')
+    h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(date_fmt),msg))
+    h.close()
+    return
+
+
 def listen_for_command():
     '''
     listen for a command string arriving on socket from QubicStudio
@@ -50,9 +62,9 @@ def listen_for_command():
     received_date = dt.datetime.utcnow()
     received_tstamp = eval(received_date.strftime('%s.%f'))
     if rx_port is None:
-        print('ERROR! %s' % cmdstr_clean)
+        logmsg('ERROR! %s' % cmdstr_clean)
     else:
-        print('received a command from %s:%i at %s: %s' % (rx_addr,rx_port,received_date.strftime(date_fmt),cmdstr_clean))
+        logmsg('received a command from %s:%i at %s: %s' % (rx_addr,rx_port,received_date.strftime(date_fmt),cmdstr_clean))
 
     retval = {}
     retval['timestamp'] = received_tstamp
@@ -71,17 +83,17 @@ def set_compressor(compressor_num,cmd):
     print('\nCompressor %i' % compressor_num)
 
     if cmd == 'on':
-        print('Switching on compressor %i' % compressor_num)
+        logmsg('Switching on compressor %i' % compressor_num)
         c.on()
         return
 
     if cmd == 'off':
-        print('Switching off compressor %i' % compressor_num)
+        logmsg('Switching off compressor %i' % compressor_num)
         c.off()
         return
               
 
-    print('Invalid command to compressor %i: %s' % (compressor_num,cmd))
+    logmsg('Invalid command to compressor %i: %s' % (compressor_num,cmd))
     return
 
 if __name__=='__main__':
@@ -109,7 +121,7 @@ if __name__=='__main__':
             set_compressor(2,'off')
             continue
 
-        print('unknown command: %s' % ret['cmd']
+        logmsg('unknown command: %s' % ret['cmd'])
 
               
             
