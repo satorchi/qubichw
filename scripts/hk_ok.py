@@ -592,6 +592,7 @@ def check_compressors(verbosity=1):
         msg_list.append(c.status_message())
         if not info['status']:
             retval['ok'] = False
+            errmsg_list.append('\nCompressor %s' % c_num)
             errmsg_list.append(info['msg'])
             
     if len(errmsg_list)>0: retval['error_message'] = '\n'.join(errmsg_list)
