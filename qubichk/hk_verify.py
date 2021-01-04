@@ -196,8 +196,8 @@ def check_network(verbosity=1,fulltest=False):
         calret = check_energenie_cal(modulator_state=True,verbosity=verbosity)
     else: # partial test: don't switch on modulator.  assume it's ok if Energenie is accessible
         calret = check_energenie_cal(modulator_state=False,verbosity=verbosity)
-    msg_list.append(calret['message'])
-    errmsg_list.append(calret['error_message'])
+    if len(calret['message'])>0: msg_list.append(calret['message'])
+    if len(calret['error_message'])>0: errmsg_list.append(calret['error_message'])
     states_list = calret['states_list']
     if states_list is None: retval['ok'] = False
     
