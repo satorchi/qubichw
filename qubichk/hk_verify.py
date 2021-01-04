@@ -174,7 +174,7 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
                 retval['ok'] = False
 
             
-    if len(errmsg_list)>0: retval['error_message'] += ' | '.join(errmsg_list)    
+    if len(errmsg_list)>0: retval['error_message'] += '\n  '.join(errmsg_list)    
     retval['message'] = '\n'.join(msg_list)
     return retval
     
@@ -218,7 +218,7 @@ def check_network(verbosity=1,fulltest=False):
         energenie_cal.set_socket_states(states_list)
         msg_list.append(msg)        
 
-    if len(errmsg_list)>0: retval['error_message'] += ' | '.join(errmsg_list)
+    if len(errmsg_list)>0: retval['error_message'] += '\n  '.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
     return retval
 
