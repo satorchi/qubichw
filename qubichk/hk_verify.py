@@ -298,7 +298,7 @@ def check_power(verbosity=1):
         if verbosity>0: print(msg)
 
     if len(errmsg_list)>0:
-        retval['error_message'] = ' | '.join(errmsg_list)
+        retval['error_message'] = '\n  '.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
     return retval
     
@@ -340,7 +340,7 @@ def check_mounts(verbosity=1):
                 
                 
     if len(errmsg_list)>0:
-        retval['error_message'] += '\n'.join(errmsg_list)
+        retval['error_message'] += '\n  '.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
     return retval
 
@@ -409,7 +409,7 @@ def check_diskspace(verbosity=1):
             retval[part] = disk_info
 
     if len(errmsg_list)>0:
-        retval['error_message'] += '\n'.join(errmsg_list)
+        retval['error_message'] += '\n  '.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
     return retval
 
@@ -449,7 +449,7 @@ def check_servers(verbosity=1):
         msg_list.append('%s %s' % (daemon,msg))
             
     retval['message'] = '\n'.join(msg_list)
-    if len(errmsg_list)>0: retval['error_message'] = '\n'.join(errmsg_list)
+    if len(errmsg_list)>0: retval['error_message'] = '\n  '.join(errmsg_list)
     return retval
 
 
@@ -568,7 +568,7 @@ def check_calsource(verbosity=1):
 
             
     retval['message'] = '\n'.join(msg_list)
-    if len(errmsg_list)>0: retval['error_message'] = '\n'.join(errmsg_list)
+    if len(errmsg_list)>0: retval['error_message'] = '\n  '.join(errmsg_list)
     
     return retval
 
@@ -596,7 +596,7 @@ def check_compressors(verbosity=1):
             errmsg_list.append(info['msg'])
             
     if len(errmsg_list)>0: retval['error_message'] = '\n'.join(errmsg_list)
-    retval['message'] = '\n'.join(msg_list)
+    retval['message'] = '\n  '.join(msg_list)
     if verbosity>0: print(retval['message'])
     return retval
 
@@ -627,7 +627,7 @@ def hk_ok(verbosity=1,fulltest=False):
             if 'error_message' not in retval[key].keys():
                 message += '\n%s: no message' % key
             else:
-                message += '\n%s: %s' % (key,retval[key]['error_message'])
+                message += '\n%s:\n  %s' % (key,retval[key]['error_message'])
 
         
         message_list.append('============= %s ================' % key)
@@ -635,8 +635,8 @@ def hk_ok(verbosity=1,fulltest=False):
 
 
     if not ok:
-        ttl =  '\n********************************************'
-        ttl += '\n*** QUBIC Housekeeping problems/warnings ***'
+        ttl =  '\n*******************************'
+        ttl += '\n* QUBIC Housekeeping problems *'
         message_list.append(ttl)
         message_list.append(message)
         if verbosity>0: print(ttl)
