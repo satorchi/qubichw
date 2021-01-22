@@ -595,7 +595,7 @@ def check_compressors(verbosity=1):
             errmsg_list.append('\nCompressor %s' % c_num)
             errmsg_list.append(info['msg'])
             
-    if len(errmsg_list)>0: retval['error_message'] = '\n'.join(errmsg_list)
+    if len(errmsg_list)>0: retval['error_message'] = '\n  '.join(errmsg_list)
     retval['message'] = '\n  '.join(msg_list)
     if verbosity>0: print(retval['message'])
     return retval
