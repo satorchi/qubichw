@@ -1,1 +1,1 @@
-sispmctl -o 3
+sispmctl -d 0 -o 3
