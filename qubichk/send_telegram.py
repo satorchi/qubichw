@@ -28,6 +28,7 @@ def telegram_datafile(filename=None):
         homedir = '/home/qubic'
     search_dirs.append('%s/.local/share/qubic' % homedir)
     search_dirs.append('./')
+    search_dirs.append('/home/qubic/.local/share/qubic')
 
     for d in search_dirs:
         fullpath = '%s/%s' % (d,filename)
