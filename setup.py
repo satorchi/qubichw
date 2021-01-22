@@ -116,7 +116,9 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/compressor2off',
            'scripts/compressorstatus',
            'scripts/central_command.py',
-           'scripts/ups_alarm.py']
+           'scripts/ups_alarm.py',
+           'scripts/calsource_on',
+           'scripts/calsource_off']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
