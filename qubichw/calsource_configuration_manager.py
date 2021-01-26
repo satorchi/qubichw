@@ -332,7 +332,7 @@ class calsource_configuration_manager():
         ack = ''
         if states is not None:
             info = energenie_set_socket_states(states)
-            if not info['ok']:
+            if info['ok']:
                 ack = 'OK-'
             else:
                 ack = 'FAILED_SET_STATES-'
