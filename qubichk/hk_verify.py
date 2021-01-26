@@ -133,7 +133,14 @@ def energenie_cal_get_socket_states():
     get the socket states of the Energenie powerbar powering the calsource (RCPB1)
     '''
     states = {}
-    cmd = 'ssh pigps sispmctl -g all'
+
+    # check if we're local or remote
+    out,err = shellcommand('hostname')
+    if out.find('pigps')>=0:
+        cmd = 'sispmctl -g all'
+    else:
+        cmd = 'ssh pigps sispmctl -g all'
+        
     out,err = shellcommand(cmd)
     find_str = '(Status of outlet [1-4]:\t)(off|on)'
     match = re.search(find_str,out)
@@ -165,6 +172,13 @@ def energenie_cal_set_socket_states(states):
     '''
     set the socket states of the calibration source Energenie powerbar (RCPB1)
     '''
+    # check if we're local or remote
+    out,err = shellcommand('hostname')
+    if out.find('pigps')>=0:
+        sispmctl = 'sispmctl'
+    else:
+        sispmctl = 'ssh pigps sispmctl'
+
     retval = {}
     retval['ok'] = True
     errmsg_list = []
@@ -173,9 +187,9 @@ def energenie_cal_set_socket_states(states):
     off_cmd = '-f'
     for socket in states.keys():
         if states[socket]:
-            cmd = 'ssh pigps sispmctl %s %i' % (on_cmd,socket)
+            cmd = '%s %s %i' % (sispmctl,on_cmd,socket)
         else:
-            cmd = 'ssh pigps sispmctl %s %i' % (off_cmd,socket)
+            cmd = '%s %s %i' % (sispmctl,off_cmd,socket)
         out,err = shellcommand(cmd)
         msg_list.append(out.strip())
         if err: errmsg_list.append(err.strip())
