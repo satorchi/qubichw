@@ -100,7 +100,23 @@ def send_telegram(msg,rx=None):
         bot.sendMessage(users_dict['Steve'],'Trying to send message to unknown user: %s' % rx)
         return False
         
-    chatid = users_dict[rx]        
-    bot.sendMessage(chatid,msg)
+    chatid = users_dict[rx]
+
+    # check for message size.  There is a Telegram limit of 4096 bytes
+    if len(msg)<=4096:
+        bot.sendMessage(chatid,msg)
+        return True
+
+    msg_lines = msg.split('\n')
+    byte_count = 0
+    for line_idx,line in enumerate(msg_lines):
+        line_no = line_idx + 1
+        byte_count += len(line)
+        if byte_count>=4096: break
+    msg1 = '\n'.join(msg_lines[:line_no])
+    msg2 = '\n'.join(msg_lines[line_no:])
+    bot.sendMessage(chatid,msg1)
+    bot.sendMessage(chatid,msg2)
+                     
     return True
 
