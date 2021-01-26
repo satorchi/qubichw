@@ -136,7 +136,7 @@ def energenie_cal_get_socket_states():
 
     # check if we're local or remote
     out,err = shellcommand('hostname')
-    if out.find('pigps')>=0:
+    if out.lower().find('pigps')>=0:
         cmd = 'sispmctl -g all'
     else:
         cmd = 'ssh pigps sispmctl -g all'
@@ -174,7 +174,7 @@ def energenie_cal_set_socket_states(states):
     '''
     # check if we're local or remote
     out,err = shellcommand('hostname')
-    if out.find('pigps')>=0:
+    if out.lower().find('pigps')>=0:
         sispmctl = 'sispmctl'
     else:
         sispmctl = 'ssh pigps sispmctl'
