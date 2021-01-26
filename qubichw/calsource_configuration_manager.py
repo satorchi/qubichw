@@ -17,7 +17,8 @@ import datetime as dt
 
 # the Energenie powerbar
 #from PyMS import PMSDevice
-from qubichk.hk_verify import energenie_cal_set_socket_states, energenie_cal_get_socket_states
+from qubichk.hk_verify import energenie_cal_set_socket_states as energenie_set_socket_states
+from qubichk.hk_verify import energenie_cal_get_socket_states as energenie_get_socket_states
 
 # the calibration source
 from qubichw.calibration_source import calibration_source
