@@ -16,7 +16,8 @@ import socket,subprocess,time,re,os,multiprocessing,sys
 import datetime as dt
 
 # the Energenie powerbar
-from PyMS import PMSDevice
+#from PyMS import PMSDevice
+from qubichk.hk_verify import energenie_cal_set_socket_states, energenie_cal_get_socket_states
 
 # the calibration source
 from qubichw.calibration_source import calibration_source
@@ -330,7 +331,7 @@ class calsource_configuration_manager():
         ack = ''
         if states is not None:
             try:
-                self.energenie.set_socket_states(states)
+                info = energenie_set_socket_states(states)
                 ack = 'OK-'
             except:
                 ack = 'FAILED_SET_STATES-'
@@ -339,16 +340,18 @@ class calsource_configuration_manager():
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
         try:
-            states_list = self.energenie.get_socket_states()
+            states_read = energenie_get_socket_states()
             ack += 'OK'
-            self.log('retrieved energenie states: %s' % states_list,verbosity=2)
+            self.log('retrieved energenie states: %s' % states_read,verbosity=2)
         except:
             ack += 'FAILED_GET_STATES'
             self.log('FAILED to get energenie states',verbosity=2)
             
         if ack.find('FAILED_GET_STATES')<0:
-            for idx,state in enumerate(states_list):
-                dev = self.device_list[idx]
+            for socket_no in states.keys():
+                socket_idx = socket_no - 1
+                state = states[socket_no]
+                dev = self.device_list[socket_idx]
                 self.device_on[dev] = state
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
