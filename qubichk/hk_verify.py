@@ -19,17 +19,6 @@ import datetime as dt
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram
 
-# the Energenie powerbar.
-# Mon 25 Jan 2021 13:25:27 CET: The network Energenie is replaced by a USB Energenie
-#from PyMS import PMSDevice
-#energenie_cal = PMSDevice('energenie', '1')
-energenie_cal_socket = {}
-energenie_cal_socket[1] ='modulator'
-energenie_cal_socket[2] ='calsource'
-energenie_cal_socket[3] ='lamp'
-energenie_cal_socket[4] ='amplifier'
-
-
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
 machines = ['PiGPS',
@@ -45,6 +34,16 @@ machines = ['PiGPS',
             'cam26',
             'cam27']
 
+# the Energenie powerbar.
+# Mon 25 Jan 2021 13:25:27 CET: The network Energenie is replaced by a USB Energenie
+#from PyMS import PMSDevice
+#energenie_cal = PMSDevice('energenie', '1')
+energenie_cal_socket = {}
+energenie_cal_socket[1] ='modulator'
+energenie_cal_socket[2] ='calsource'
+energenie_cal_socket[3] ='lamp'
+energenie_cal_socket[4] ='amplifier'
+
 # list of sockets in the Energenie powerbar on the housekeeping electronics rack
 # also called the "Remote Controlled Power Bar 2" (RCPB2) in Emiliano's wiring diagram
 energenie_socket = {}
@@ -52,6 +51,18 @@ energenie_socket[1] = 'horn'
 energenie_socket[2] = 'heaters'
 energenie_socket[3] = 'hwp'
 energenie_socket[4] = 'thermos'
+
+# Energenie socket numbers for various components (ie. reverse lookup)
+energenie_socket_number = {}
+energenie_socket_number['horn'] = 1
+energenie_socket_number['heaters'] = 2
+energenie_socket_number['hwp'] = 3
+energenie_socket_number['thermos'] = 4
+energenie_socket_number['modulator'] = 1
+energenie_socket_number['calsource'] = 2
+energenie_socket_number['lamp'] = 3
+energenie_socket_number['amplifier'] = 4
+
 
 def shellcommand(cmd):
     '''
@@ -220,9 +231,9 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
     if states is None:
         retval['ok'] = False
     else:
-        if modulator_state and not states[1]: # switch on for a ping
+        if modulator_state and not states[energenie_socket_number['modulator']]: # switch on for a ping
             states_tmp = states.copy()
-            states_tmp[1] = modulator_state
+            states_tmp[energenie_socket_number['modulator']] = modulator_state
             msg = 'switching on modulator for a ping'
             if verbosity>0: print(msg)
             msg_list.append(msg)
@@ -273,13 +284,13 @@ def check_network(verbosity=1,fulltest=False):
         msg_list.append(retval[machine]['message'])
         if not retval[machine]['ok']:
             msg = '%s %s' % (machine,retval[machine]['error_message'])
-            if machine=='modulator' and states is not None and not states[0]:
+            if machine=='modulator' and states is not None and not states[energenie_socket_number['modulator']]:
                 msg += ' OK. Calsource is OFF'
             else:
                 retval['ok'] = False
             errmsg_list.append(msg)
 
-    if fulltest and states is not None and not states[1]: # switch off the modulator again
+    if fulltest and states is not None and not states[energenie_socket_number['modulator']]: # switch off the modulator again
         msg = 'switching off modulator after the ping'
         if verbosity>0: print(msg)
         info = energenie_cal_set_socket_states(states)
