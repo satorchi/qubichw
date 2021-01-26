@@ -330,20 +330,20 @@ class calsource_configuration_manager():
 
         ack = ''
         if states is not None:
-            try:
-                info = energenie_set_socket_states(states)
+            info = energenie_set_socket_states(states)
+            if not info['ok']:
                 ack = 'OK-'
-            except:
+            else:
                 ack = 'FAILED_SET_STATES-'
 
                 
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
-        try:
-            states_read = energenie_get_socket_states()
+        states_read = energenie_get_socket_states()
+        if states_read is not None:
             ack += 'OK'
             self.log('retrieved energenie states: %s' % states_read,verbosity=2)
-        except:
+        else:
             ack += 'FAILED_GET_STATES'
             self.log('FAILED to get energenie states',verbosity=2)
             
