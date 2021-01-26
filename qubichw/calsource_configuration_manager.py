@@ -336,7 +336,9 @@ class calsource_configuration_manager():
                 ack = 'OK-'
             else:
                 ack = 'FAILED_SET_STATES-'
-
+                self.log('energenie error: %s' % info['error_message'])
+            self.log('energenie message: %s' % info['message'])
+            
                 
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
