@@ -19,10 +19,15 @@ import datetime as dt
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram
 
-# the Energenie powerbar
-from PyMS import PMSDevice
-energenie_cal = PMSDevice('energenie', '1')
-energenie_cal_device_list = ['modulator','calsource','lamp','amplifier']
+# the Energenie powerbar.
+# Mon 25 Jan 2021 13:25:27 CET: The network Energenie is replaced by a USB Energenie
+#from PyMS import PMSDevice
+#energenie_cal = PMSDevice('energenie', '1')
+energenie_cal_socket = {}
+energenie_cal_socket[1] ='modulator'
+energenie_cal_socket[2] ='calsource'
+energenie_cal_socket[3] ='lamp'
+energenie_cal_socket[4] ='amplifier'
 
 
 # list of machines on the housekeeping network
@@ -31,7 +36,6 @@ machines = ['PiGPS',
             'qubicstudio',
             'hwp',
             'platform',
-            'energenie',
             'majortom',
             'horns',
             'modulator',
@@ -113,6 +117,64 @@ def ping(machine,verbosity=1):
     
     return retval
 
+def energenie_cal_get_socket_states():
+    '''
+    get the socket states of the Energenie powerbar powering the calsource (RCPB1)
+    '''
+    states = {}
+    cmd = 'ssh pigps sispmctl -g all'
+    out,err = shellcommand(cmd)
+    find_str = '(Status of outlet [1-4]:\t)(off|on)'
+    match = re.search(find_str,out)
+    errmsg = 'ERROR! Could not get socket states from Energenie powerbar at the calibration source'
+    if match is None:
+        print(errmsg)
+        return None
+   
+   for socket in energenie_cal_socket.keys():
+       find_str = '(Status of outlet %i:\t)(off|on)' % socket
+       match = re.search(find_str,out)
+       if match is None:
+           print('%s for socket %s' % (errmsg,energenie_cal_socket[socket]))
+           status_str = 'UNKNOWN'
+           states[socket] = status_str
+       else:
+           status_str = match.groups()[1]
+           if status_str == 'on':
+               status = True
+           else:
+               status = False
+            
+           states[socket] = status
+
+    if len(states)==0: return None
+    return states
+
+def energenie_cal_set_socket_states(states):
+    '''
+    set the socket states of the calibration source Energenie powerbar (RCPB1)
+    '''
+    retval = {}
+    retval['ok'] = True
+    errmsg_list = []
+    msg_list = []
+    on_cmd = '-o'
+    off_cmd = '-f'
+    for socket in states.keys():
+        if states[socket]:
+            cmd = 'ssh pigps sispmctl %s %i' % (on_cmd,socket)
+        else:
+            cmd = 'ssh pigps sispmctl %s %i' % (off_cmd,socket)
+        out,err = shellcommand(cmd)
+        msg_list.append(out.strip())
+        if err: errmsg_list.append(err.strip())
+
+    retval['message'] = '\n'.join(msg_list)
+    if len(errmsg_list)>0:
+        retval['ok'] = False
+        retval['error_message'] = '\n'.join(errmsg_list)
+        
+    return retval
 
 def check_energenie_cal(verbosity=1,modulator_state=False):
     '''
@@ -128,50 +190,55 @@ def check_energenie_cal(verbosity=1,modulator_state=False):
 
     error_counter = 0
     max_count = 3
-    states_list = None
-    while (states_list is None and error_counter<max_count):
-        try:
-            msg = 'checking for calsource Energenie socket states'
-            if verbosity>0: print(msg)
-            time.sleep(3)
-            states_list = energenie_cal.get_socket_states()
-            for idx,dev in enumerate(energenie_cal_device_list):
-                if states_list[idx]:
+    states = None
+    while (states is None and error_counter<max_count):
+        msg = 'checking for calsource Energenie socket states'
+        if verbosity>0: print(msg)
+        time.sleep(3)
+        states = energenie_cal_get_socket_states()
+        if states is not None:
+            for socket in energenie_cal_socket.keys():
+                dev = energenie_cal_socket[socket]
+                if socket not in states.keys():
+                    msg = '%s is UNKNOWN' % dev
+                elif states[socket]:
                     msg = '%s is ON' % dev
                 else:
                     msg = '%s is OFF' % dev
                     if verbosity>0: print(msg)
                     msg_list.append(msg)
 
-        except:
+        else:
             error_counter += 1
-            states_list = None
+            states = None
             msg = 'Could not get socket states from calsource Energenie powerbar: error count=%i' % error_counter
             if verbosity>0: print(msg)
             msg_list.append(msg)
             errmsg_list.append(msg)
 
-    retval['states_list'] = states_list
-    if states_list is None:
+    retval['states'] = states
+    if states is None:
         retval['ok'] = False
     else:
-        if modulator_state and not states_list[0]: # switch on for a ping
-            states_list_tmp = states_list.copy()
-            states_list_tmp[0] = modulator_state
+        if modulator_state and not states[1]: # switch on for a ping
+            states_tmp = states.copy()
+            states_tmp[1] = modulator_state
             msg = 'switching on modulator for a ping'
             if verbosity>0: print(msg)
             msg_list.append(msg)
-            try:
-                time.sleep(5)
-                energenie_cal.set_socket_states(states_list_tmp)
-                time.sleep(25)
-            except:
+
+            time.sleep(5)
+            info = energenie_cal_set_socket_states(states_tmp)    
+            time.sleep(25)
+            if not info['ok']:
                 msg = 'failed to set Energenie sockets'
                 if verbosity>0: print(msg)
                 msg_list.append(msg)
                 errmsg_list.append(msg)
+                errmsg_list.append(info['error_message'])
                 ok = False
                 retval['ok'] = False
+            msg_list.append(info['message'])
 
             
     if len(errmsg_list)>0: retval['error_message'] += '\n  '.join(errmsg_list)    
@@ -198,25 +265,26 @@ def check_network(verbosity=1,fulltest=False):
         calret = check_energenie_cal(modulator_state=False,verbosity=verbosity)
     if len(calret['message'])>0: msg_list.append(calret['message'])
     if len(calret['error_message'])>0: errmsg_list.append(calret['error_message'])
-    states_list = calret['states_list']
-    if states_list is None: retval['ok'] = False
+    states = calret['states']
+    if states is None: retval['ok'] = False
     
     for machine in machines:
         retval[machine] = ping(machine,verbosity=verbosity)
         msg_list.append(retval[machine]['message'])
         if not retval[machine]['ok']:
             msg = '%s %s' % (machine,retval[machine]['error_message'])
-            if machine=='modulator' and states_list is not None and not states_list[0]:
+            if machine=='modulator' and states is not None and not states[0]:
                 msg += ' OK. Calsource is OFF'
             else:
                 retval['ok'] = False
             errmsg_list.append(msg)
 
-    if fulltest and states_list is not None and not states_list[0]: # switch off the modulator again
+    if fulltest and states is not None and not states[1]: # switch off the modulator again
         msg = 'switching off modulator after the ping'
         if verbosity>0: print(msg)
-        energenie_cal.set_socket_states(states_list)
-        msg_list.append(msg)        
+        info = energenie_cal_set_socket_states(states)
+        msg_list.append(msg)
+        msg_list.append(info['message'])
 
     if len(errmsg_list)>0: retval['error_message'] += '\n  '.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
