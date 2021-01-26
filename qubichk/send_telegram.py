@@ -110,11 +110,13 @@ def send_telegram(msg,rx=None):
     msg_lines = msg.split('\n')
     byte_count = 0
     for line_idx,line in enumerate(msg_lines):
-        line_no = line_idx + 1
         byte_count += len(line)
         if byte_count>=4096: break
-    msg1 = '\n'.join(msg_lines[:line_no])
-    msg2 = '\n'.join(msg_lines[line_no:])
+    msg1 = '\n'.join(msg_lines[:line_idx])
+    msg2 = '\n'.join(msg_lines[line_idx:])
+
+    print('\n\nDEBUG: msg1\n%s' % msg1)
+    print('\n\nDEBUG: msg2\n%s' % msg2)    
     bot.sendMessage(chatid,msg1)
     bot.sendMessage(chatid,msg2)
                      
