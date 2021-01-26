@@ -116,7 +116,6 @@ def send_telegram(msg,rx=None):
         byte_count += len(line)
         if byte_count>=max_msg_len:
             msg_part = '\n'.join(msg_lines[line_start:line_idx])
-            print('\n\nDEBUG: msg_part\n%s' % msg_part)
             bot.sendMessage(chatid,msg_part)
             line_start = line_idx
             byte_count = 0
