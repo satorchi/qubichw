@@ -131,21 +131,21 @@ def energenie_cal_get_socket_states():
         print(errmsg)
         return None
    
-   for socket in energenie_cal_socket.keys():
-       find_str = '(Status of outlet %i:\t)(off|on)' % socket
-       match = re.search(find_str,out)
-       if match is None:
-           print('%s for socket %s' % (errmsg,energenie_cal_socket[socket]))
-           status_str = 'UNKNOWN'
-           states[socket] = status_str
-       else:
-           status_str = match.groups()[1]
-           if status_str == 'on':
-               status = True
-           else:
-               status = False
+    for socket in energenie_cal_socket.keys():
+        find_str = '(Status of outlet %i:\t)(off|on)' % socket
+        match = re.search(find_str,out)
+        if match is None:
+            print('%s for socket %s' % (errmsg,energenie_cal_socket[socket]))
+            status_str = 'UNKNOWN'
+            states[socket] = status_str
+        else:
+            status_str = match.groups()[1]
+            if status_str == 'on':
+                status = True
+            else:
+                status = False
             
-           states[socket] = status
+            states[socket] = status
 
     if len(states)==0: return None
     return states
