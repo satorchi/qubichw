@@ -118,7 +118,7 @@ class calsource_configuration_manager():
         self.powersocket = {}
         self.device_on = {}
         for idx,dev in enumerate(self.device_list):
-            self.powersocket[dev] = idx
+            self.powersocket[dev] = idx + 1
             self.device[dev] = None
             self.device_on[dev] = None
             
