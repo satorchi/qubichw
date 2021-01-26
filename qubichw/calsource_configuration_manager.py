@@ -349,9 +349,9 @@ class calsource_configuration_manager():
             self.log('FAILED to get energenie states',verbosity=2)
             
         if ack.find('FAILED_GET_STATES')<0:
-            for socket_no in states.keys():
+            for socket_no in states_read.keys():
                 socket_idx = socket_no - 1
-                state = states[socket_no]
+                state = states_read[socket_no]
                 dev = self.device_list[socket_idx]
                 self.device_on[dev] = state
 
