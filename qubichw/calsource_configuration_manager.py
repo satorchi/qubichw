@@ -336,6 +336,7 @@ class calsource_configuration_manager():
                 ack = 'OK-'
             else:
                 ack = 'FAILED_SET_STATES-'
+            if 'error_message' in info.keys():
                 self.log('energenie error: %s' % info['error_message'])
             self.log('energenie message: %s' % info['message'])
             

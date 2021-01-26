@@ -190,6 +190,7 @@ def energenie_cal_set_socket_states(states):
             cmd = '%s %s %i' % (sispmctl,on_cmd,socket)
         else:
             cmd = '%s %s %i' % (sispmctl,off_cmd,socket)
+        print('setting energenie socket state with command: %s' % cmd)
         out,err = shellcommand(cmd)
         msg_list.append(out.strip())
         if err: errmsg_list.append(err.strip())
