@@ -14,7 +14,7 @@ HK_DIR=/home/qubic/data/temperature/broadcast
 QS_DIR=pi@cam2:/qs2 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
 ARCHIVE_DIR=/archive
 
-CC_DIR=/sps/hep/qubic/Data/Calib-TD
+CC_DIR=/sps/qubic/Data/Calib-TD
 JUPYTER_DIR=/qubic/Data/Calib-TD
 
 # find the start date of housekeeping data

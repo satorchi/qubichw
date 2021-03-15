@@ -13,7 +13,6 @@ Copy QUBIC data to cc-in2p3 and apcjupyter.  Convert calsource files to fits at 
 This script is run on qubic-central (192.168.2.1) which has access to the QubicStudio files via Samba
 and access to the calsource files via nfs.
 '''
-from __future__ import division, print_function
 import sys,os,time,subprocess
 from glob import glob
 import datetime as dt
@@ -22,7 +21,7 @@ from astropy.io import fits
 
 from satorchipy.datefunctions import tot_seconds
 
-cc_datadir  = '/sps/hep/qubic/Data/Calib-TD'
+cc_datadir  = '/sps/qubic/Data/Calib-TD'
 #qs_datadir  = '/qs/Qubic Studio/backup'
 qs_datadir  = '/qs2' # Fri 05 Apr 2019 16:02:18 CEST
 cs_datadir  = '/calsource/qubic'
