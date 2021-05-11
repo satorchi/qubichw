@@ -1278,8 +1278,17 @@ class qubic_bot :
         '''
         this is the message receiver
         '''
-        self.chat_id = msg['chat']['id']
-        cmd = msg['text']
+
+        if 'chat' in msg.keys():
+            self.chat_id = msg['chat']['id']
+        else:
+            self.chat_id = 0xFFFFFFFF
+
+        if 'text' in msg.keys():
+            cmd = msg['text']
+        else:
+            cmd = 'NONE'
+
         cmd_list = cmd.split()
         if len(cmd_list)>1:
             self._parseargs(cmd_list[1:])
