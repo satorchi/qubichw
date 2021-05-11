@@ -34,10 +34,11 @@ class siglent:
         self.default_settings['offset'] = 2.0
         self.default_settings['duty'] = 50
         self.default_settings['DCoffset'] = 10
-        
-        self.maximum_voltage = 10
+        self.default_settings['maximum voltage'] = 10
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
+
+        self.init()
         return None
     
     def log(self,msg,verbosity=0):
@@ -259,7 +260,6 @@ class siglent:
         cmd = "C%i:BSWV MAX_OUTPUT_AMP,%.2f" % (channel,maximum_voltage)
         ans = self.send_command(cmd)
         self.state['maximum output amplitude'] = maximum_voltage
-        self.maximum_voltage = maximum_voltage
         return ans
         
 
@@ -290,7 +290,7 @@ class siglent:
         self.set_amplitude(self.default_settings['amplitude'],channel)
         self.set_offset(self.default_settings['offset'],channel)
         self.set_duty(self.default_settings['duty'],channel)
-        self.set_max_voltage(self,self.maximum_voltage,channel)
+        self.set_max_voltage(self.default_settings['maximum voltage'],channel)
         self.set_output_on(channel)
         return True
 
