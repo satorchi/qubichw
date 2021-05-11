@@ -255,6 +255,14 @@ class siglent:
         self.state['duty'] = duty
         return ans
 
+    def set_max_voltage(self,maximum_voltage,channel=1):
+        cmd = "C%i:BSWV MAX_OUTPUT_AMP,%.2f" % (channel,maximum_voltage)
+        ans = self.send_command(cmd)
+        self.state['maximum output amplitude'] = maximum_voltage
+        self.maximum_voltage = maximum_voltage
+        return ans
+        
+
     def get_output_state(self,channel=1):
         '''
         get output state
@@ -282,6 +290,8 @@ class siglent:
         self.set_amplitude(self.default_settings['amplitude'],channel)
         self.set_offset(self.default_settings['offset'],channel)
         self.set_duty(self.default_settings['duty'],channel)
+        self.set_max_voltage(self,self.maximum_voltage,channel)
+        self.set_output_on(channel)
         return True
 
     def disconnect(self):
