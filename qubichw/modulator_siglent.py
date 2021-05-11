@@ -228,9 +228,9 @@ class siglent:
 
     def set_frequency(self,frequency,channel=1):
         cmd = "C%i:BSWV FRQ,%.2f" % (channel,frequency)
-        self.send_command(cmd)
+        ans = self.send_command(cmd)
         self.state['frequency'] = frequency
-        return True
+        return ans
 
     def set_shape(self,shape,channel=1):
         cmd = "C%i:BSWV WVTP,%s" % (channel,shape)
