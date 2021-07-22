@@ -125,10 +125,12 @@ class siglent:
 
 
 
-    def read_settings(self,channel=1):
+    def read_settings(self,channel=1,show=True,full_response=False):
         '''
         read the current settings of the Siglent waveform generator
         example return string:  C1:BSWV WVTP,SINE,FRQ,100HZ,PERI,0.01S,AMP,2V,OFST,0V,HLEV,1V,LLEV,-1V,PHSE,0
+
+        show, full_response: for compatibility with modulator_tg5012a
         '''
         if not self.is_connected():  return None
         settings = {}
