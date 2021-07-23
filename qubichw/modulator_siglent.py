@@ -148,9 +148,20 @@ class siglent:
             val = setting_list[2*idx+1]
             settings[key] = val
         settings['output'] = self.get_output_state(channel)
+
+        # translate SIGLENT names to what is expected by the calsource_manager
+        siglent_translation = {'AMP': 'amplitude',
+                               'FRQ': 'frequency',
+                               'OFST': 'offset',
+                               'DUTY': 'duty',
+                               'WVTP': 'shape'}
+        for key in siglent_translation.keys():
+            if key in settings.keys():
+                settings[siglent_translation[key]] = settings[key]
+            else:
+                settings[siglent_translation[key]] = None
             
         self.settings = settings
-
         return settings
    
     def configure(self,frequency=None,shape=None,amplitude=None,offset=None,duty=None,channel=1):
