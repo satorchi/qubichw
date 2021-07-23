@@ -70,10 +70,10 @@ class siglent:
         time.sleep(0.5)
         id = self.ask_id()
         self.log('modulator: first request for ID: %s' % id)
-        time.sleep(0.5)
+        time.sleep(1.0)
         id = self.ask_id()
         if id is None or id=='':
-            self.log('ERROR! unable to communicate!')
+            self.log('modulator ERROR! unable to communicate!')
             return None
         self.log('modulator: The device says: %s\n' % id)
         
