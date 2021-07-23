@@ -298,6 +298,7 @@ class siglent:
             self.log('modulator: asked for default settings but not connected')
             return None
 
+        self.send_command('C%i:OUTP LOAD,50' % channel) # default 50 Ohm load
         self.set_frequency(self.default_settings['frequency'],channel)
         self.set_shape(self.default_settings['shape'],channel)
         self.set_amplitude(self.default_settings['amplitude'],channel)
