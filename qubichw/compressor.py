@@ -135,7 +135,11 @@ class compressor:
         cmdkey = 'id'        
         self.ser.write(self.command[cmdkey])
         ans = self.ser.readline()
-        val = ans.decode().strip().split(',')
+        try:
+            ans_decoded = ans.decode()
+        except:
+            ans_decoded = ans.decode('iso-8859-1')
+        val = ans_decoded.strip().split(',')
         if len(val)!=5:
             retval['status'] = False
             retval['msg'] = 'ERROR! Invalid ID response from device.'
