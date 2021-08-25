@@ -183,7 +183,7 @@ class compressor:
             return retval
 
         try:
-            retval['pressure'] = '%.04fbar' % (float(val[1]) * psi_to_bar)
+            retval['pressure'] = '%.04fbar (relative to ambient)' % (float(val[1]) * psi_to_bar)
         except:
             retval['status'] = False
             retval['msg'] = 'ERROR! Could not read pressure'
