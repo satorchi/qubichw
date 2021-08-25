@@ -13,6 +13,7 @@ a class to read and command the pulse tube compressors
 import serial,subprocess,sys,os,re
 from glob import glob
 
+psi_to_bar = 1.01325 /  14.696
 
 class compressor:
     '''
@@ -182,7 +183,7 @@ class compressor:
             return retval
 
         try:
-            retval['pressure'] = float(val[1])
+            retval['pressure'] = '%.04fbar' % (float(val[1]) * psi_to_bar)
         except:
             retval['status'] = False
             retval['msg'] = 'ERROR! Could not read pressure'
