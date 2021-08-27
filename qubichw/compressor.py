@@ -306,8 +306,7 @@ class compressor:
         self.ser.write(self.command[cmdkey])
         ans = self.ser.readline()
 
-        print(self.status_message())
-        return
+        return ans
         
     
 

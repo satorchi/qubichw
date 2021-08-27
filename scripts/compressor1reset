@@ -1,0 +1,14 @@
+#!/bin/bash
+# $Id: compressor1reset
+# $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
+# $created: Fri 27 Aug 2021 15:30:50 CEST
+# $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
+#           This is free software: you are free to change and
+#           redistribute it.  There is NO WARRANTY, to the extent
+#           permitted by law.
+#
+# 	  reset compressor 1
+
+compressor_commander.py 1 reset
+	  
+	  
