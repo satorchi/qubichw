@@ -78,7 +78,7 @@ def read_hk_file(filename):
     if idx<npts:
         t = t[0:idx]
         v = v[0:idx]
-        print('idx,npts = %i,%i' % (idx,npts))
+        print('%s: idx,npts = %i,%i' % (filename,idx,npts))
     return t,v
 
 
