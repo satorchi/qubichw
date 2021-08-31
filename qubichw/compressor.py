@@ -19,7 +19,7 @@ shortlabel = {}
 shortlabel['Compressor capsule helium discharge temperature'] = 'T_He'
 shortlabel['Water outlet temperature'] = 'Tout'
 shortlabel['Water inlet temperature'] = 'Tin'
-shortlabel['pressure'] = 'Pin'
+shortlabel['pressure (relative to ambient)'] = 'Pin'
 shortlabel['operating hours'] = 'Hours'
 
 class compressor:
@@ -191,7 +191,7 @@ class compressor:
             return retval
 
         try:
-            retval['pressure'] = '%.04fbar (relative to ambient)' % (float(val[1]) * psi_to_bar)
+            retval['pressure (relative to ambient)'] = float(val[1]) * psi_to_bar
         except:
             retval['status'] = False
             retval['msg'] = 'ERROR! Could not read pressure'
@@ -264,7 +264,7 @@ class compressor:
         # status() already checked that everything is okay
         msg_list = ['%s - ' % now_str]
         for key in shortlabel.keys():
-            msg_list.append('%s=%s' % (key,status[key]))
+            msg_list.append('%s=%s' % (shortlabel[key],status[key]))
         msg = ' '.join(msg_list)
         return msg
 
