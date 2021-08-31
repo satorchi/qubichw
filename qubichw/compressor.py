@@ -262,7 +262,7 @@ class compressor:
             return msg
 
         # status() already checked that everything is okay
-        msg = '%s - ' % now_str()
+        msg = '%s - ' % now_str
         for key in status.keys():
             if key!='status' and key!='msg':
                 if key in shortlabel.keys():
