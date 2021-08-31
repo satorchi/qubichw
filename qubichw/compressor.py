@@ -262,14 +262,10 @@ class compressor:
             return msg
 
         # status() already checked that everything is okay
-        msg = '%s - ' % now_str
-        for key in status.keys():
-            if key!='status' and key!='msg':
-                if key in shortlabel.keys():
-                    label = shortlabel[key]
-                else:
-                    label = key
-                msg += '%s=%s' % (label,status[key])
+        msg_list = ['%s - ' % now_str]
+        for key in shortlabel.keys():
+            msg_list.append('%s=%s' % (key,status[key]))
+        msg = ' '.join(msg_list)
         return msg
 
     def on(self):
