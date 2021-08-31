@@ -12,8 +12,15 @@ a class to read and command the pulse tube compressors
 '''
 import serial,subprocess,sys,os,re
 from glob import glob
+import datetime as dt
 
 psi_to_bar = 1.01325 /  14.696
+shortlabel = {}
+shortlabel['Compressor capsule helium discharge temperature'] = 'T_He'
+shortlabel['Water outlet temperature'] = 'Tout'
+shortlabel['Water inlet temperature'] = 'Tin'
+shortlabel['pressure'] = 'Pin'
+shortlabel['operating hours'] = 'Hours'
 
 class compressor:
     '''
@@ -242,6 +249,27 @@ class compressor:
                 if key.find('alarm')>0 or key=='Solonoid' or key=='System ON':
                     msg += ' ... OK'
                     
+        return msg
+
+    def status_log(self):
+        '''
+        format the status info into a text for the log file
+        '''
+        now_str = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S UT')
+        status = self.status()
+        if not status['status']:
+            msg = '%s - compressor OFFLINE' % now_str
+            return msg
+
+        # status() already checked that everything is okay
+        msg = '%s - ' % now_str()
+        for key in status.keys():
+            if key!='status' and key!='msg':
+                if key in shortlabel.keys():
+                    label = shortlabel[key]
+                else:
+                    label = key
+                msg += '%s=%s' % (label,status[key])
         return msg
 
     def on(self):
