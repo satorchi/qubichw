@@ -32,7 +32,7 @@ def parseargs():
     if len(sys.argv)<3:
         return usage()
 
-    valid_cmds = ['status','on','off','reset']
+    valid_cmds = ['status','on','off','reset','log']
     valid_compressors = ['1','2']
     cmd = None
     compressor = None
@@ -78,7 +78,10 @@ if __name__=='__main__':
     if parms['cmd'] == 'reset':
         print('Resetting compressor %s' % parms['compressor'])
         c.reset()
-              
+
+    if parms['cmd'] == 'log':
+        print(c.status_log())
+        quit()      
 
     print(c.status_message())
     print('\n')
