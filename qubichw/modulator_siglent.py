@@ -302,11 +302,12 @@ class siglent:
         if not self.is_connected():
             self.log('modulator: asked for default settings but not connected')
             # try to connect
+            time.sleep(2)
             self.init()
             
             if not self.is_connected():
                 self.log('SIGLENT could not be initiated.  Trying one more time.')
-                time.sleep(1)
+                time.sleep(2)
                 self.init()
 
             if not self.is_connected():
