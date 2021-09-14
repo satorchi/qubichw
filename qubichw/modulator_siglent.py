@@ -22,6 +22,7 @@ class siglent:
     class to send commands to the siglent signal generator using the usbtmc interface
     '''
     def  __init__(self,idVendor=0xF4EC,idProduct=0x1102,verbosity=2):
+        self.log('SIGLENT:  creating new siglent modulator object')
         self.verbosity = verbosity
         self.instrument = None
         self.idVendor = idVendor
@@ -48,7 +49,7 @@ class siglent:
         if verbosity > self.verbosity: return
         
         filename = 'siglent_command.log'
-        h=open(filename,'a')
+        h = open(filename,'a')
         h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)
@@ -64,7 +65,7 @@ class siglent:
         try:
             self.instrument =  usbtmc.Instrument(init_str)
         except:
-            self.log("modulator: Could not connect!")
+            self.log('modulator: Could not connect!\n  %s\n  %s\n  %s' % sys.exc_info())
             return None
 
         time.sleep(0.5)
