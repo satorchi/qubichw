@@ -114,6 +114,18 @@ class calsource_configuration_manager():
                                             'invert']
         self.valid_commands['lamp' ]     = ['on','off']
         self.valid_commands['arduino']   = ['duration']
+
+        # time it takes for a device to register with the operating system
+        # the Siglent signal generator requires 33 seconds !!!
+        # the calsource, only 1 second
+        # the SR560 amplifier requires ??
+        self.wait_after_switch_on = {}
+        self.wait_after_switch_on ['modulator'] = 40
+        self.wait_after_switch_on ['calsource'] = 1
+        self.wait_after_switch_on ['amplifier'] = 1
+                
+        
+        
         
         self.device = {}
         self.powersocket = {}
@@ -463,17 +475,17 @@ class calsource_configuration_manager():
             self.log(msg)
             ack += '%s ' % msg
 
-            # wait before doing other stuff
-            # the Siglent signal generator requires 33 seconds !!!
-            # the calsource, only 1 second
-            # the SR560 amplifier requires ??
-            wait_after_switch_on = 35
-            self.log('waiting %i seconds after switch on/off' % wait_after_switch_on,verbosity=0)
-            time.sleep(wait_after_switch_on)
             # initialize devices that need initializing
+            already_waited = 0
             for dev in ['modulator','calsource','amplifier']:
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
+                    wait_time = wait_after_switch_on[dev] - already_waited
+                    if wait_time > 0:
+                        self.log('waiting %i seconds after switch on/off' % wait_time,verbosity=0)
+                        time.sleep(wait_time)
+                        already_waited += wait_time
+
                     if not self.device[dev].is_connected():
                         self.log('%s is not connected.  re-initializing.' % dev)
                         self.device[dev].init()
