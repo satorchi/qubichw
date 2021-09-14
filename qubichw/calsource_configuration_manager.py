@@ -136,7 +136,7 @@ class calsource_configuration_manager():
             self.device_on[dev] = None
             
         self.energenie_lastcommand_date = dt.datetime.utcnow()
-        self.energenie_timeout = 5
+        self.energenie_timeout = 1
 
         self.known_hosts = {}
         self.known_hosts['qubic-central'] = "192.168.2.1"
@@ -489,7 +489,7 @@ class calsource_configuration_manager():
                     if not self.device[dev].is_connected():
                         self.log('%s is not connected.  re-initializing.' % dev)
                         if dev=='modulator':
-                            self.device[dev].disconnect()
+                            del(self.device[dev])
                             self.device[dev] = modulator()
                             
                     self.log('asking for default settings on %s' % dev)
@@ -719,8 +719,11 @@ class calsource_configuration_manager():
                         self.log('Could not interpret Arduino duration')
                     continue
 
-                if cmd.find('on')>0 or cmd.find('off')>0:
+                if cmd.find('on')>=0 or cmd.find('off')>=0:
                     duration += self.energenie_timeout
+
+                if cmd.find('on')>=0:
+                    duration += max(self.wait_after_switch_on.values())
                     
 
             # add margin to the acknowledgement timeout
