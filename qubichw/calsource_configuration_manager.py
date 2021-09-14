@@ -62,7 +62,7 @@ class calsource_configuration_manager():
         if verbosity > self.verbosity: return
         
         filename = 'calsource_configuration_%s.log' % self.role
-        h=open(filename,'a')
+        h = open(filename,'a')
         h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)

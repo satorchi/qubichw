@@ -66,6 +66,10 @@ class siglent:
             self.instrument =  usbtmc.Instrument(init_str)
         except:
             self.log('modulator: Could not connect!\n  %s\n  %s\n  %s' % sys.exc_info())
+            if os.path.exists('/dev/siglent'):
+                self.log('modulator: path exists: /dev/siglent')
+            else:
+                self.log('modulator: no device /dev/siglent')
             return None
 
         time.sleep(0.5)
