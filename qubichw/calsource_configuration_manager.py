@@ -120,9 +120,9 @@ class calsource_configuration_manager():
         # the calsource, only 1 second
         # the SR560 amplifier requires ??
         self.wait_after_switch_on = {}
-        self.wait_after_switch_on ['modulator'] = 40
-        self.wait_after_switch_on ['calsource'] = 1
-        self.wait_after_switch_on ['amplifier'] = 1
+        self.wait_after_switch_on['modulator'] = 40
+        self.wait_after_switch_on['calsource'] = 1
+        self.wait_after_switch_on['amplifier'] = 1
                 
         
         
@@ -302,7 +302,7 @@ class calsource_configuration_manager():
         listen for an acknowledgement string arriving on socket
         this message is called by the "commander" after sending a command
         '''
-        if timeout is None: timeout = 25
+        if timeout is None: timeout = max(self.wait_after_switch_on.values())
         if timeout < 25: timeout = 25
         
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
@@ -488,7 +488,10 @@ class calsource_configuration_manager():
 
                     if not self.device[dev].is_connected():
                         self.log('%s is not connected.  re-initializing.' % dev)
-                        self.device[dev].init()
+                        if dev=='modulator':
+                            self.device[dev].disconnect()
+                            self.device[dev] = modulator()
+                            
                     self.log('asking for default settings on %s' % dev)
                     self.device[dev].set_default_settings()
                     retval['%s state' % dev] = self.device[dev].state
