@@ -86,19 +86,14 @@ class siglent:
 
         if self.instrument is None:
             self.log('SIGLENT is not initiated')
-
-            # try to initialize
-            time.sleep(0.5)
-            self.init()
-            if self.instrument is None:
-                self.log('SIGLENT could not be initiated')
-                return False
+            return False
 
         id = self.ask_id()
         if id is None or id=='':
             self.log("modulator: did not return it's ID.")
 
             # try again one more time
+            time.sleep(0.5)
             id = self.ask_id()
             if id is None or id=='':
                 self.log("modulator: did not return it's ID after second time.")
@@ -306,7 +301,16 @@ class siglent:
         self.log('modulator: setting default settings')
         if not self.is_connected():
             self.log('modulator: asked for default settings but not connected')
-            return None
+            # try to connect
+            self.init()
+            
+            if not self.is_connected():
+                self.log('SIGLENT could not be initiated.  Trying one more time.')
+                time.sleep(1)
+                self.init()
+
+            if not self.is_connected():
+                return None
 
         self.send_command('C%i:OUTP LOAD,50' % channel) # default 50 Ohm load
         self.set_frequency(self.default_settings['frequency'],channel)
