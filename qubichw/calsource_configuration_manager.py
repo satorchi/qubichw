@@ -463,7 +463,7 @@ class calsource_configuration_manager():
             self.log(msg)
             ack += '%s ' % msg
             # wait before doing other stuff
-            wait_after_switch_on = 15
+            wait_after_switch_on = 2
             self.log('waiting %i seconds after switch on/off' % wait_after_switch_on,verbosity=0)
             time.sleep(wait_after_switch_on)
 

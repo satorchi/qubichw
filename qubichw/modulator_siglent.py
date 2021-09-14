@@ -85,14 +85,23 @@ class siglent:
         '''
 
         if self.instrument is None:
-            msg = 'SIGLENT is not initiated'
-            self.log(msg)
-            return False
+            self.log('SIGLENT is not initiated')
+
+            # try to initialize
+            self.init()
+            if self.instrument is None:
+                self.log('SIGLENT could not be initiated')
+                return False
 
         id = self.ask_id()
         if id is None or id=='':
             self.log("modulator: did not return it's ID.")
-            return False
+
+            # try again one more time
+            id = self.ask_id()
+            if id is None or id=='':
+                self.log("modulator: did not return it's ID after second time.")
+                return False
 
         return True
 
