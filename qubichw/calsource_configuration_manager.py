@@ -471,6 +471,9 @@ class calsource_configuration_manager():
             for dev in ['modulator','calsource','amplifier']:
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
+                    if not self.device[dev].is_connected():
+                        self.log('%s is not connected.  re-initializing.' % dev)
+                        self.device[dev].init()
                     self.log('asking for default settings on %s' % dev)
                     self.device[dev].set_default_settings()
                     retval['%s state' % dev] = self.device[dev].state

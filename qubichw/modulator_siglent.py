@@ -21,7 +21,7 @@ class siglent:
     '''
     class to send commands to the siglent signal generator using the usbtmc interface
     '''
-    def  __init__(self,idVendor=0xF4EC,idProduct=0x1102,verbosity=0):
+    def  __init__(self,idVendor=0xF4EC,idProduct=0x1102,verbosity=2):
         self.verbosity = verbosity
         self.instrument = None
         self.idVendor = idVendor
