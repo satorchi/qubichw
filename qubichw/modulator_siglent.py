@@ -88,6 +88,7 @@ class siglent:
             self.log('SIGLENT is not initiated')
 
             # try to initialize
+            time.sleep(0.5)
             self.init()
             if self.instrument is None:
                 self.log('SIGLENT could not be initiated')
