@@ -462,11 +462,14 @@ class calsource_configuration_manager():
             retval['device_on'] = self.device_on
             self.log(msg)
             ack += '%s ' % msg
+
             # wait before doing other stuff
-            wait_after_switch_on = 2
+            # the Siglent signal generator requires 33 seconds !!!
+            # the calsource, only 1 second
+            # the SR560 amplifier requires ??
+            wait_after_switch_on = 35
             self.log('waiting %i seconds after switch on/off' % wait_after_switch_on,verbosity=0)
             time.sleep(wait_after_switch_on)
-
             # initialize devices that need initializing
             for dev in ['modulator','calsource','amplifier']:
                 powersocket = self.powersocket[dev]
