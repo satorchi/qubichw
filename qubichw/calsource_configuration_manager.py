@@ -480,7 +480,7 @@ class calsource_configuration_manager():
             for dev in ['modulator','calsource','amplifier']:
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
-                    wait_time = wait_after_switch_on[dev] - already_waited
+                    wait_time = self.wait_after_switch_on[dev] - already_waited
                     if wait_time > 0:
                         self.log('waiting %i seconds after switch on/off' % wait_time,verbosity=0)
                         time.sleep(wait_time)
