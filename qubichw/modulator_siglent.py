@@ -22,7 +22,6 @@ class siglent:
     class to send commands to the siglent signal generator using the usbtmc interface
     '''
     def  __init__(self,idVendor=0xF4EC,idProduct=0x1102,verbosity=2):
-        self.log('SIGLENT:  creating new siglent modulator object')
         self.verbosity = verbosity
         self.instrument = None
         self.idVendor = idVendor
@@ -39,6 +38,7 @@ class siglent:
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
+        self.log('SIGLENT:  creating new siglent modulator object')
         self.init()
         return None
     
