@@ -71,7 +71,7 @@ class siglent:
                 cmd = 'udevadm info -a /dev/siglent'
                 proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                 out,err = proc.communicate()
-                self.log(out)
+                self.log(out.decode())
                 
             else:
                 self.log('modulator: no device /dev/siglent')
@@ -83,6 +83,7 @@ class siglent:
             id = self.instrument.ask("*IDN?\r\n")
         except:
             pass
+        self.log('modulator:  making second ID request')
         id = self.instrument.ask("*IDN?\r\n")
         if id is None or id=='':
             self.log('modulator ERROR! unable to communicate!')

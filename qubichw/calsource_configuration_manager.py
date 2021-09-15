@@ -672,7 +672,7 @@ class calsource_configuration_manager():
         buf = ''
         for n in range(len_remain): buf+=' '
         msg = '%s %s%s' % (now_str,ack,buf)
-        self.log('sending acknowledgement: %s' % msg)
+        self.log('sending acknowledgement: %s' % msg.strip())
         try:
             s.sendto(msg.encode(), (addr, self.broadcast_port))
         except:
