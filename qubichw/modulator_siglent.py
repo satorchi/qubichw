@@ -59,7 +59,7 @@ class siglent:
         '''
         establish connection to the Siglent waveform generator
         '''
-        init_str = 'USB::%s::%s::INSTR' % (hex(self.idVendor).upper(),hex(self.idProduct).upper())
+        init_str = 'USB::0x%04X::0x%04X::INSTR' % (self.idVendor,self.idProduct)
         
         self.log('modulator: Establishing communication with the Siglent wave generator: %s' % init_str)
         try:
@@ -122,6 +122,7 @@ class siglent:
             if query: ans = self.instrument.ask('%s\r\n' % cmd)
             else: self.instrument.write('%s\r\n' % cmd)
         except:
+            self.log('modulator: Command unsuccessful!\n  %s\n  %s\n  %s' % sys.exc_info())
             return None
         return ans
 
