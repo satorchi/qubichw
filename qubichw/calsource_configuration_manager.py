@@ -488,9 +488,8 @@ class calsource_configuration_manager():
 
                     if not self.device[dev].is_connected():
                         self.log('%s is not connected.  re-initializing.' % dev)
-                        if dev=='modulator':
-                            del(self.device[dev])
-                            self.device[dev] = modulator()
+                        self.device[dev].init()
+                        
                             
                     self.log('asking for default settings on %s' % dev)
                     self.device[dev].set_default_settings()

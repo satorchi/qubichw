@@ -13,7 +13,7 @@ Documentation in: SDG Programming Guide.pdf
 see also: SDG2000X_V1.0.PDF
 and: USBTMC_1_00.pdf
 '''
-import time,os,sys,socket,struct,string,re
+import time,os,sys,socket,struct,string,re,subprocess
 import usbtmc
 import datetime as dt
 
@@ -68,6 +68,11 @@ class siglent:
             self.log('modulator: Could not connect!\n  %s\n  %s\n  %s' % sys.exc_info())
             if os.path.exists('/dev/siglent'):
                 self.log('modulator: path exists: /dev/siglent')
+                cmd = 'udevadm info -a /dev/siglent'
+                proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                out,err = proc.communicate()
+                self.log(out)
+                
             else:
                 self.log('modulator: no device /dev/siglent')
             return None
