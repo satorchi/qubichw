@@ -59,23 +59,28 @@ class siglent:
         '''
         establish connection to the Siglent waveform generator
         '''
+        self.instrument = None
         init_str = 'USB::0x%04X::0x%04X::INSTR' % (self.idVendor,self.idProduct)
-        
-        self.log('modulator: Establishing communication with the Siglent wave generator: %s' % init_str)
-        try:
-            self.instrument =  usbtmc.Instrument(init_str)
-        except:
-            self.log('modulator: Could not connect!\n  %s\n  %s\n  %s' % sys.exc_info())
-            if os.path.exists('/dev/siglent'):
-                self.log('modulator: path exists: /dev/siglent')
-                cmd = 'udevadm info -a /dev/siglent'
-                proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                out,err = proc.communicate()
-                self.log(out.decode())
+
+        attempt_counter = 0
+        while (self.instrument is None and attempt_counter<5):
+            attempt_counter += 1
+            self.log('modulator: Establishing communication with the Siglent wave generator: %s' % init_str)
+            try:
+                self.instrument =  usbtmc.Instrument(init_str)
+            except:
+                self.log('modulator: Could not connect!\n  %s\n  %s\n  %s' % sys.exc_info())
+                if os.path.exists('/dev/siglent'):
+                    self.log('modulator: path exists: /dev/siglent')
+                    cmd = 'udevadm info -a /dev/siglent'
+                    proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                    out,err = proc.communicate()
+                    self.log(out.decode())
                 
-            else:
-                self.log('modulator: no device /dev/siglent')
-            return None
+                else:
+                    self.log('modulator: no device /dev/siglent')
+
+        if self.instrument is None: return None
 
         # verify ID, first first request always craps out
         try:
