@@ -118,20 +118,6 @@ class siglent:
         send a command to the modulator
         if it's a query, use the "ask" method, otherwise use the "write" method
         '''
-        if not self.is_connected():
-            self.log('modulator: asked to send command but not connected.  Trying to connect.')
-            # try to connect
-            time.sleep(2)
-            self.init()
-            
-            if not self.is_connected():
-                self.log('SIGLENT could not be initiated.  Trying one more time.')
-                time.sleep(2)
-                self.init()
-
-            if not self.is_connected():
-                return None
-
         if cmd.find('?')>0:
             query = True
         else:
