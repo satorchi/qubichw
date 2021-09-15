@@ -77,11 +77,12 @@ class siglent:
                 self.log('modulator: no device /dev/siglent')
             return None
 
-        # wait a bit and then verify ID
-        time.sleep(0.5)
-        id = self.instrument.ask("*IDN?\r\n")
-        self.log('modulator: first request for ID: %s' % id)
-        time.sleep(0.5)
+        # verify ID, first first request always craps out
+        try:
+            self.log('modulator:  making first ID request')
+            id = self.instrument.ask("*IDN?\r\n")
+        except:
+            pass
         id = self.instrument.ask("*IDN?\r\n")
         if id is None or id=='':
             self.log('modulator ERROR! unable to communicate!')
