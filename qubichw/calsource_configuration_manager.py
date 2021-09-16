@@ -12,7 +12,7 @@ A class with methods to send/receive configuration command for the calibration s
 Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
 '''
 import socket,subprocess,time,re,os,multiprocessing,sys
-multiprocessing.set_start_method('fork')
+multiprocessing.set_start_method('spawn')
 import datetime as dt
 
 # the Energenie powerbar
