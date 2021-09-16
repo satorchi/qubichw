@@ -587,7 +587,7 @@ class calsource_configuration_manager():
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
             # interpret the commands in a separate process and continue listening
-            context = multiprocessing.get_context('spawn')
+            context = multiprocessing.get_context('fork')
             manager = context.Manager()
             retval = manager.dict()
             retval['ACK'] = 'no acknowledgement'
