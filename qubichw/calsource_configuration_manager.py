@@ -436,6 +436,7 @@ class calsource_configuration_manager():
         this method is called by the "manager"
         '''
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
+        self.device = retval['device']
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
@@ -485,14 +486,14 @@ class calsource_configuration_manager():
                         time.sleep(wait_time)
                         already_waited += wait_time
 
-                    if not ns.device[dev].is_connected():
+                    if not self.device[dev].is_connected():
                         self.log('%s is not connected.  re-initializing.' % dev)
-                        ns.device[dev].init()
+                        self.device[dev].init()
                         
                             
                     self.log('asking for default settings on %s' % dev)
-                    ns.device[dev].set_default_settings()
-                    retval['%s state' % dev] = ns.device[dev].state
+                    self.device[dev].set_default_settings()
+                    retval['%s state' % dev] = self.device[dev].state
                 else:
                     self.log('not doing anything for %s' % dev)
 
@@ -500,14 +501,14 @@ class calsource_configuration_manager():
         dev = 'calsource'
         parm =  'frequency'
         if dev in command.keys() and parm in command[dev].keys():
-            of = ns.device[dev].set_Frequency(command[dev][parm])
+            of = self.device[dev].set_Frequency(command[dev][parm])
             msg = '%s:%s=%+06fGHz ' % (dev,parm,command[dev][parm])
             if of is None:
                 msg += 'FAILED'
                 retval['%s state' % dev] = None
             else:
                 msg += 'synthesiser:frequency=%+06fGHz' % of
-                retval['%s state' % dev] = ns.device[dev].state
+                retval['%s state' % dev] = self.device[dev].state
             self.log(msg)
             ack += '%s ' % msg
                 
@@ -515,7 +516,7 @@ class calsource_configuration_manager():
         # the modulator configuration
         dev = 'modulator'
         if dev in command.keys() and modulator_configure:
-            ns.device[dev].configure(frequency=command[dev]['frequency'],
+            self.device[dev].configure(frequency=command[dev]['frequency'],
                                        amplitude=command[dev]['amplitude'],
                                        shape=command[dev]['shape'],
                                        offset=command[dev]['offset'],
@@ -523,7 +524,7 @@ class calsource_configuration_manager():
 
             # wait a bit before trying to read the results
             time.sleep(1)
-            settings = ns.device[dev].read_settings(show=False)
+            settings = self.device[dev].read_settings(show=False)
             if settings is None:
                 msg = '%s:FAILED' % dev
             else:
@@ -543,21 +544,21 @@ class calsource_configuration_manager():
         if dev in command.keys():
             for parm in command[dev].keys():
                 if parm!='onoff': # ignore on/off.  This is executed above.
-                    ack += '%s ' % ns.device[dev].set_setting(parm,command[dev][parm])
-                    retval['%s state' % dev] = ns.device[dev].state
+                    ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
+                    retval['%s state' % dev] = self.device[dev].state
         
         # run the Arduino last of all
         dev = 'arduino'
         if dev in command.keys():
             if 'duration' in command[dev].keys():
-                filename = ns.device[dev].acquire(command[dev]['duration'])
+                filename = self.device[dev].acquire(command[dev]['duration'])
                 if filename is None:
                     ack += '%s:acquisition=failed ' % dev
                 else:
                     ack += '%s:file=%s ' % (dev,filename)
 
             if 'save' in command[dev].keys():
-                ns.device[dev].interrupt()
+                self.device[dev].interrupt()
 
         # STATUS
         if command['all']['status']:
@@ -589,10 +590,9 @@ class calsource_configuration_manager():
             # interpret the commands in a separate process and continue listening
             context = multiprocessing.get_context('fork')
             manager = context.Manager()
-            ns = manager.Namespace()
-            ns.device = self.device
             retval = manager.dict()
             retval['ACK'] = 'no acknowledgement'
+            retval['device'] = self.device
             proc = context.Process(target=self.interpret_commands, args=(command,retval))
             proc.start()
             if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
