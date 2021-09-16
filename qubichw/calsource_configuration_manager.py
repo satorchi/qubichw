@@ -590,7 +590,7 @@ class calsource_configuration_manager():
             retval = {}
             retval['ACK'] = 'no acknowledgement'
             retval = self.interpret_commands(command,retval)
-
+            cmdstr = None
             # # interpret the commands in a separate process and continue listening
             # context = multiprocessing.get_context('fork')
             # manager = context.Manager()
