@@ -12,6 +12,7 @@
 
 HK_DIR=/home/qubic/data/temperature/broadcast
 QS_DIR=pi@cam2:/qs2 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
+HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
 ARCHIVE_DIR=/archive
 
 CC_DIR=/sps/qubic/Data/Calib-TD
@@ -28,6 +29,7 @@ echo $ARCHIVE_HKDIR
 # use rsync to copy to archive disk
 rsync -av $HK_DIR/ $ARCHIVE_HKDIR
 rsync -av $QS_DIR/ $ARCHIVE_DIR
+rsync -av $HWP_DIR $ARCHIVE_DIR
 
 # use rsync to copy to CC
 rsync -av $ARCHIVE_DIR/ cc:$CC_DIR
