@@ -11,8 +11,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 A class with methods to send/receive configuration command for the calibration source setup
 Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
 '''
-from __future__ import division, print_function
 import socket,subprocess,time,re,os,multiprocessing,sys
+multiprocessing.set_start_method('fork')
 import datetime as dt
 
 # the Energenie powerbar
@@ -588,7 +588,6 @@ class calsource_configuration_manager():
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
             # interpret the commands in a separate process and continue listening
-            multiprocessing.set_start_method('fork')
             manager = multiprocessing.Manager()
             retval = manager.dict()
             retval['ACK'] = 'no acknowledgement'
