@@ -587,10 +587,11 @@ class calsource_configuration_manager():
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
             # interpret the commands in a separate process and continue listening
-            manager = multiprocessing.Manager()
+            context = multiprocessing.get_context('spawn')
+            manager = context.Manager()
             retval = manager.dict()
             retval['ACK'] = 'no acknowledgement'
-            proc = multiprocessing.Process(target=self.interpret_commands, args=(command,retval))
+            proc = context.Process(target=self.interpret_commands, args=(command,retval))
             proc.start()
             if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
                 delta = dt.timedelta(seconds=command['arduino']['duration'])

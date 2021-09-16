@@ -18,9 +18,7 @@ It has two components:
 by default, this script will run as the "commander"
 invoke with command line argument "manager" to run the "manager"
 '''
-import sys,multiprocessing
-multiprocessing.set_start_method('spawn')
-
+import sys
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 
 role = None
