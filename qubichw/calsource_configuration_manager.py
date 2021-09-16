@@ -436,7 +436,6 @@ class calsource_configuration_manager():
         this method is called by the "manager"
         '''
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
-        self.device = retval['device']
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
@@ -587,37 +586,41 @@ class calsource_configuration_manager():
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
-            # interpret the commands in a separate process and continue listening
-            context = multiprocessing.get_context('fork')
-            manager = context.Manager()
-            retval = manager.dict()
+            # forget about the arduino save stuff... multiprocess buggers up the modulator
+            retval = {}
             retval['ACK'] = 'no acknowledgement'
-            retval['device'] = self.device
-            proc = context.Process(target=self.interpret_commands, args=(command,retval))
-            proc.start()
-            if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
-                delta = dt.timedelta(seconds=command['arduino']['duration'])
-                now = dt.datetime.utcnow()
-                stoptime = now + delta
-                self.send_acknowledgement('Send command "save" to interrupt and save immediately',addr)
-                working = True
-                self.log("going into loop until %s or until 'save' command received" % stoptime.strftime('%Y-%m-%d %H:%M:%S UT'))
-                while working and now<stoptime:
-                    received_tstamp, cmdstr, addr = self.listen_for_command()
-                    now = dt.datetime.utcnow()
-                    command2 = self.parse_command_string(cmdstr)
-                    if 'arduino' in command2.keys() and 'save' in command2['arduino'].keys():
-                        self.device['arduino'].interrupt()
-                        working = False
-                        cmdstr = None
-                    elif now<stoptime:
-                        self.send_acknowledgement("I'm busy and can only respond to the 'save' command",addr)
-                    else:
-                        self.log('command will be carried into main loop: %s' % cmdstr)
-            else:
-                cmdstr = None
+            retval = self.interpret_commands(command,retval)
 
-            proc.join()
+            # # interpret the commands in a separate process and continue listening
+            # context = multiprocessing.get_context('fork')
+            # manager = context.Manager()
+            # retval = manager.dict()
+            # retval['ACK'] = 'no acknowledgement'
+            # proc = context.Process(target=self.interpret_commands, args=(command,retval))
+            # proc.start()
+            # if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
+            #     delta = dt.timedelta(seconds=command['arduino']['duration'])
+            #     now = dt.datetime.utcnow()
+            #     stoptime = now + delta
+            #     self.send_acknowledgement('Send command "save" to interrupt and save immediately',addr)
+            #     working = True
+            #     self.log("going into loop until %s or until 'save' command received" % stoptime.strftime('%Y-%m-%d %H:%M:%S UT'))
+            #     while working and now<stoptime:
+            #         received_tstamp, cmdstr, addr = self.listen_for_command()
+            #         now = dt.datetime.utcnow()
+            #         command2 = self.parse_command_string(cmdstr)
+            #         if 'arduino' in command2.keys() and 'save' in command2['arduino'].keys():
+            #             self.device['arduino'].interrupt()
+            #             working = False
+            #             cmdstr = None
+            #         elif now<stoptime:
+            #             self.send_acknowledgement("I'm busy and can only respond to the 'save' command",addr)
+            #         else:
+            #             self.log('command will be carried into main loop: %s' % cmdstr)
+            # else:
+            #     cmdstr = None
+
+            # proc.join()
             if len(retval)==0:
                 ack = 'no acknowledgement'
             else:
