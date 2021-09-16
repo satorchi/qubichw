@@ -74,10 +74,12 @@ class siglent:
                 if os.path.exists('/dev/siglent'):
                     self.log('modulator: path exists: /dev/siglent')
                     cmd = 'udevadm info -a /dev/siglent'
-                    proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                    proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                     out,err = proc.communicate()
-                    devinfo = []
-                    for line in out.decode().split('looking at')[1].split('\n'):
+                    sections = out.decode().split('looking at ')
+                    dev = sections[1].split('\n')[0].split(' ')[-1][1:-2]
+                    devinfo = [dev]
+                    for line in sections[1].split('\n'):
                         if line.find('serial')>0:
                             devinfo.append(line)
                             continue
