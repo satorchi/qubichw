@@ -220,15 +220,7 @@ class siglent:
             return None
         
         # switch off output while reconfiguring
-        self.set_output_off(channel)
-
-        # Check if DC shape is required for no time modulation.
-        # In this case amplitude, duty and frequency are ignored
-        if shape and shape.upper()=="DC":
-            self.set_modulation_off(offset,channel=channel)
-            self.set_output_on(channel)
-            return True
-        
+        self.set_output_off(channel)        
 
         # do we want default settings?
         if frequency is None\
@@ -265,13 +257,6 @@ class siglent:
 
         return True
 
-    def set_modulation_off(self, offset, channel=1):
-        self.set_output_off(channel)
-        cmd = "C%i:BSWV OFST,%.2f" % (channel,offset)
-        ans = self.send_command(cmd)
-        if ans is None: return None
-        ans = self.set_output_on(channel)
-        return ans
 
     def set_output_off(self,channel=1):
         cmd = 'C%i:OUTP STATE,OFF' % channel
