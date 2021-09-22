@@ -119,7 +119,7 @@ class calsource_configuration_manager():
         # the calsource, only 1 second
         # the SR560 amplifier requires ??
         self.wait_after_switch_on = {}
-        self.wait_after_switch_on['modulator'] = 40
+        self.wait_after_switch_on['modulator'] = 0
         self.wait_after_switch_on['calsource'] = 1
         self.wait_after_switch_on['amplifier'] = 1
                 

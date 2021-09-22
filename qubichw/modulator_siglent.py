@@ -60,7 +60,18 @@ class siglent:
         establish connection to the Siglent waveform generator
         '''
         init_str = 'USB::0x%04X::0x%04X::INSTR' % (self.idVendor,self.idProduct)
+        dev = '/dev/siglent'
+        
+        # wait for device to appear
+        start_time = dt.datetime.utcnow()
+        end_time = start_time + dt.timedelta(seconds=45)
+        self.log('waiting for %s' % dev)
+        while not os.path.exists(dev) and dt.datetime.utcnow()<end_time:
+            time.sleep(1)
+        waited = dt.datetime.utcnow() - start_time
+        self.log('waited %.1f seconds for device %s' % (waited.total_seconds(),dev))
 
+        # now try a few times to connect
         attempt_counter = 0
         while (self.instrument is None and attempt_counter<5):
             attempt_counter += 1
@@ -71,9 +82,9 @@ class siglent:
                 self.instrument =  usbtmc.Instrument(init_str)
             except:
                 self.log('modulator: Could not connect!\n  %s\n  %s\n  %s' % sys.exc_info())
-                if os.path.exists('/dev/siglent'):
-                    self.log('modulator: path exists: /dev/siglent')
-                    cmd = 'udevadm info -a /dev/siglent'
+                if os.path.exists(dev):
+                    self.log('modulator: path exists: %s' % dev)
+                    cmd = 'udevadm info -a %s' % dev
                     proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                     out,err = proc.communicate()
                     sections = out.decode().split('looking at ')
@@ -99,7 +110,7 @@ class siglent:
                     self.log('\n'.join(devinfo))
                 
                 else:
-                    self.log('modulator: no device /dev/siglent')
+                    self.log('modulator: no device %s' % dev)
 
         if self.instrument is None: return None
 
@@ -166,7 +177,7 @@ class siglent:
             str_list = [cmd]
             for info in sys.exc_info():
                 str_list.append(str(info))
-            self.log('modulator: Command unsuccessful!%s' % '  \n'.join(str_list))
+            self.log('modulator: Command unsuccessful!  %s' % '  \n'.join(str_list))
             return None
         return ans
 
@@ -334,6 +345,14 @@ class siglent:
         configure with default settings
         '''
         self.log('modulator: setting default settings')
+
+        if not self.is_connected():
+            self.log('modulator: asked for default settings but not connected.  Trying to connect.')
+            self.init()
+
+        if not self.is_connected():
+            self.log('modulator is not connected.  Cannot set default settings.')
+            return False
 
         self.send_command('C%i:OUTP LOAD,50' % channel) # default 50 Ohm load
         self.set_frequency(self.default_settings['frequency'],channel)
