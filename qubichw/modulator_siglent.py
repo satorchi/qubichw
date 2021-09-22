@@ -161,7 +161,10 @@ class siglent:
             if query: ans = self.instrument.ask('%s\r\n' % cmd)
             else: self.instrument.write('%s\r\n' % cmd)
         except:
-            self.log('modulator: Command unsuccessful!  %s\n  %s\n  %s\n  %s' % (cmd,)+sys.exc_info())
+            str_list = [cmd]
+            for info in sys.exc_info():
+                str_list.append(str(info))
+            self.log('modulator: Command unsuccessful!%s' % '  \n'.join(str_list))
             return None
         return ans
 
