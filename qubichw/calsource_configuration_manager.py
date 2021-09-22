@@ -13,6 +13,7 @@ Commands are sent to switch on/off and configure three components: calsource, am
 '''
 import socket,subprocess,time,re,os,multiprocessing,sys
 import datetime as dt
+from copy import deepcopy
 
 # the Energenie powerbar
 #from PyMS import PMSDevice
@@ -101,8 +102,8 @@ class calsource_configuration_manager():
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
 
         self.valid_commands = {}
-        self.valid_commands['modulator'] = ['on','off','frequency','amplitude','offset','duty','shape']
-        self.valid_commands['calsource'] = ['on','off','frequency']
+        self.valid_commands['modulator'] = ['on','off','frequency','amplitude','offset','duty','shape','default']
+        self.valid_commands['calsource'] = ['on','off','frequency','default']
         self.valid_commands['amplifier'] = ['on','off',
                                             'filter_mode',
                                             'dynamic_range',
@@ -110,7 +111,8 @@ class calsource_configuration_manager():
                                             'filter_low_frequency',
                                             'filter_high_frequency',
                                             'coupling',
-                                            'invert']
+                                            'invert',
+                                            'default']
         self.valid_commands['lamp' ]     = ['on','off']
         self.valid_commands['arduino']   = ['duration']
 
@@ -122,8 +124,9 @@ class calsource_configuration_manager():
         self.wait_after_switch_on['modulator'] = 0
         self.wait_after_switch_on['calsource'] = 1
         self.wait_after_switch_on['amplifier'] = 1
-                
-        
+
+        self.estimated_wait = deepcopy(self.wait_after_switch_on)
+        self.estimated_wait['modulator'] = 33
         
         
         self.device = {}
@@ -219,6 +222,12 @@ class calsource_configuration_manager():
                 for dev in ['calsource','amplifier','modulator']:
                     command[dev]['onoff'] = cmd
                 continue
+            
+            if cmd=='default':
+                command['all']['default'] = True
+                for dev in ['calsource','amplifier','modulator']:
+                    command[dev]['default'] = True
+                continue
 
             if cmd=='save':
                 command['arduino']['save'] = True
@@ -301,7 +310,7 @@ class calsource_configuration_manager():
         listen for an acknowledgement string arriving on socket
         this message is called by the "commander" after sending a command
         '''
-        if timeout is None: timeout = max(self.wait_after_switch_on.values())
+        if timeout is None: timeout = max(self.estimated_wait.values())
         if timeout < 25: timeout = 25
         
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
@@ -442,7 +451,7 @@ class calsource_configuration_manager():
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
-        for parm in ['frequency','amplitude','shape','offset','duty']:
+        for parm in ['frequency','amplitude','shape','offset','duty','default']:
             if parm in command['modulator'].keys():
                 modulator_configure = True
             else:
@@ -502,15 +511,19 @@ class calsource_configuration_manager():
         # do configuration command for calsource
         dev = 'calsource'
         parm =  'frequency'
-        if dev in command.keys() and parm in command[dev].keys():
-            of = self.device[dev].set_Frequency(command[dev][parm])
-            msg = '%s:%s=%+06fGHz ' % (dev,parm,command[dev][parm])
-            if of is None:
-                msg += 'FAILED'
-                retval['%s state' % dev] = None
-            else:
-                msg += 'synthesiser:frequency=%+06fGHz' % of
-                retval['%s state' % dev] = self.device[dev].state
+        if dev in command.keys():
+            if 'default' in command[dev].keys() and command[dev]['default']:
+                of = self.device[dev].set_default_settings()
+                msg += '%s:frequency=%+06fGHz' % (dev,of)
+            elif parm in command[dev].keys():
+                of = self.device[dev].set_Frequency(command[dev][parm])
+                msg = '%s:%s=%+06fGHz ' % (dev,parm,command[dev][parm])
+                if of is None:
+                    msg += 'FAILED'
+                    retval['%s state' % dev] = None
+                else:
+                    msg += 'synthesiser:frequency=%+06fGHz' % of
+                    retval['%s state' % dev] = self.device[dev].state
             self.log(msg)
             ack += '%s ' % msg
                 
@@ -518,11 +531,14 @@ class calsource_configuration_manager():
         # the modulator configuration
         dev = 'modulator'
         if dev in command.keys() and modulator_configure:
-            self.device[dev].configure(frequency=command[dev]['frequency'],
-                                       amplitude=command[dev]['amplitude'],
-                                       shape=command[dev]['shape'],
-                                       offset=command[dev]['offset'],
-                                       duty=command[dev]['duty'])
+            if 'default' in command[dev].keys() and command[dev]['default']:
+                self.device[dev].set_default_settings()
+            else:
+                self.device[dev].configure(frequency=command[dev]['frequency'],
+                                           amplitude=command[dev]['amplitude'],
+                                           shape=command[dev]['shape'],
+                                           offset=command[dev]['offset'],
+                                           duty=command[dev]['duty'])
 
             # wait a bit before trying to read the results
             time.sleep(1)
@@ -544,10 +560,14 @@ class calsource_configuration_manager():
         # the amplifier configuration
         dev = 'amplifier'
         if dev in command.keys():
-            for parm in command[dev].keys():
-                if parm!='onoff': # ignore on/off.  This is executed above.
-                    ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
-                    retval['%s state' % dev] = self.device[dev].state
+            if 'default' in command[dev].keys() and command[dev]['default']:
+                self.device[dev].set_default_settings()
+                ack += '%s:default_settings ' % dev
+            else:
+                for parm in command[dev].keys():
+                    if parm!='onoff': # ignore on/off.  This is executed above.
+                        ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
+                        retval['%s state' % dev] = self.device[dev].state
         
         # run the Arduino last of all
         dev = 'arduino'
@@ -730,7 +750,7 @@ class calsource_configuration_manager():
                     duration += self.energenie_timeout
 
                 if cmd.find('on')>=0:
-                    duration += max(self.wait_after_switch_on.values())
+                    duration += max(self.estimated_wait.values())
                     
 
             # add margin to the acknowledgement timeout
