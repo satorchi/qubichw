@@ -405,6 +405,9 @@ class calsource_configuration_manager():
                 msg += ' synthesiser:frequency=UNKNOWN'
             
         dev = 'modulator'
+        if self.device_on[dev] and not self.device[dev].is_connected():
+            self.log('%s is ON, but not responding.  Trying to reinitialize.' % dev)
+            self.device[dev].init()
         if self.device[dev].is_connected():
             settings = self.device[dev].read_settings(show=False)
             if settings is None:

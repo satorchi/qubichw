@@ -115,6 +115,8 @@ class siglent:
             id = self.instrument.ask("*IDN?\r\n")
         except:
             self.log('modulator ERROR!  did not succeed with second ID request.')
+            del(self.instrument)
+            self.instrument = None
             return None
         
         if id is None or id=='':
