@@ -108,13 +108,19 @@ class siglent:
             self.log('modulator:  making first ID request')
             id = self.instrument.ask("*IDN?\r\n")
         except:
-            pass
-        self.log('modulator:  making second ID request')
-        id = self.instrument.ask("*IDN?\r\n")
-        if id is None or id=='':
-            self.log('modulator ERROR! unable to communicate!')
+            time.sleep(0.3)
+
+        try:
+            self.log('modulator:  making second ID request')
+            id = self.instrument.ask("*IDN?\r\n")
+        except:
+            self.log('modulator ERROR!  did not succeed with second ID request.')
             return None
-        self.log('modulator: The device says: %s\n' % id)
+        
+        if id is None or id=='':
+            self.log('modulator ERROR! did not return a valid ID: %s' % id)
+            return None
+        self.log('modulator: The device says: %s' % id)
         
         return
 
@@ -155,7 +161,7 @@ class siglent:
             if query: ans = self.instrument.ask('%s\r\n' % cmd)
             else: self.instrument.write('%s\r\n' % cmd)
         except:
-            self.log('modulator: Command unsuccessful!\n  %s\n  %s\n  %s' % sys.exc_info())
+            self.log('modulator: Command unsuccessful!  %s\n  %s\n  %s\n  %s' % (cmd,)+sys.exc_info())
             return None
         return ans
 
