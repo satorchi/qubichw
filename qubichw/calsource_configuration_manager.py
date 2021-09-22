@@ -687,7 +687,7 @@ class calsource_configuration_manager():
             self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
 
         sockname = s.getsockname()
-        self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=1)
+        self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=3)
         #s.close()
         return
     
