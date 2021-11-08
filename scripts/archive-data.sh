@@ -27,14 +27,14 @@ ARCHIVE_HKDIR=$ARCHIVE_DIR/hk/data_$START_DATE
 echo $ARCHIVE_HKDIR
 
 # use rsync to copy to archive disk
-rsync -av $HK_DIR/ $ARCHIVE_HKDIR
-rsync -av $QS_DIR/ $ARCHIVE_DIR
-rsync -av $HWP_DIR $ARCHIVE_DIR
+rsync -avt $HK_DIR/ $ARCHIVE_HKDIR
+rsync -avt $QS_DIR/ $ARCHIVE_DIR
+rsync -avt $HWP_DIR $ARCHIVE_DIR
 
 # use rsync to copy to CC
-rsync -av $ARCHIVE_DIR/ cc:$CC_DIR
+rsync -avt $ARCHIVE_DIR/ cc:$CC_DIR
 
 # use rsync to copy to apcjupyter
 ## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
-## rsync -av $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
+## rsync -avt $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
 
