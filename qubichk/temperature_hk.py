@@ -154,7 +154,7 @@ class temperature_hk :
         # check for file existence
         for fname in calibration_files:
             if not os.path.exists(fname):
-                self.log('ERROR! Could not find calibration file: %s' % fname,verbosit=0)
+                self.log('ERROR! Could not find calibration file: %s' % fname,verbosity=0)
                 return False    
         self.calibration_tables = list(map(lambda x: np.loadtxt(x),calibration_files))
 
