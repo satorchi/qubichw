@@ -123,13 +123,19 @@ class entropy_hk :
             self.log("ERROR! Major Tom, there's something wrong.")
             return None
             
-                     
-        self.socket.send(cmd.encode())
+        try:                     
+            self.socket.send(cmd.encode())
+        except:
+            self.log("ERROR! Major Tom refuses message.  Trying to re-initilize socket.")
+            self.socket.close()
+            self.init_socket()
+            return None
+            
         try:
             a = self.socket.recv(self.MAX_MSGLEN)
             return a.decode()
         except:
-            self.log("ERROR!  Major Tom communication error.  Trying to re-initialize socket.")
+            self.log("ERROR!  Not receiving from Major Tom.  Trying to re-initialize socket.")
             self.socket.close()
             self.init_socket()
             return None
