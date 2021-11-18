@@ -126,7 +126,7 @@ class entropy_hk :
         try:                     
             self.socket.send(cmd.encode())
         except:
-            self.log("ERROR! Major Tom refuses message.  Trying to re-initilize socket.")
+            self.log("ERROR! Major Tom refuses message.  Trying to re-initialize socket.")
             self.socket.close()
             self.init_socket()
             return None
