@@ -129,7 +129,7 @@ class entropy_hk :
             a = self.socket.recv(self.MAX_MSGLEN)
             return a.decode()
         except:
-            self.log("ERROR!  Communication error.  Trying to re-initialize socket.")
+            self.log("ERROR!  Major Tom communication error.  Trying to re-initialize socket.")
             self.socket.close()
             self.init_socket()
             return None
