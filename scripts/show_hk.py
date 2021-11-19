@@ -155,7 +155,7 @@ for F in hk_files:
     if units == 'steps':
         val_str = '%10i %s' % (int(val), units)
 
-    line = '%s %20s %20s %s' % (date_str, val_str, label, labelkey)
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
     lines.append(line)
 
 page = '\n'.join(lines)
