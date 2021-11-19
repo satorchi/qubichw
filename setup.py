@@ -122,7 +122,9 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/calsource_on',
            'scripts/calsource_off',
            'scripts/show_hk.py',
-           'scripts/show_hk']
+           'scripts/show_hk',
+           'scripts/start_apctunnel.sh',
+           'scripts/start_cctunnel.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
