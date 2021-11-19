@@ -142,6 +142,9 @@ for F in hk_files:
     else:
         val_str = '%7.3f m%s' % (val*1000,units)
 
+    if units == 'mbar':
+        val_str = '%12.5e %s' % (val,units)
+        
     if units == 'steps':
         val_str = '%i %s' % (int(val), units)
 
