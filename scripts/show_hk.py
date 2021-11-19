@@ -106,11 +106,13 @@ for F in hk_files:
 
     retval = read_lastline(F)
     if retval is None: continue
+    tstamp,val = retval
 
     label = ''
     labelkey = basename.replace('.txt','')
     if labelkey in labels.keys():
         label = labels[labelkey]
+
 
     units = None
     if basename=='AVS47_1_ch0.txt':
@@ -118,7 +120,8 @@ for F in hk_files:
     elif basename.find('TEMPERATURE')==0 or basename.find('AVS')==0:
         units = 'K'
     elif basename.find('PRESSURE')==0:
-        units = 'mbar'
+        units = 'bar'
+        val *= 0.001
     elif basename.find('Volt')>0:
         units = 'V'
     elif basename.find('Amp')>0:
@@ -129,7 +132,6 @@ for F in hk_files:
         units = ''
         
         
-    tstamp,val = retval
 
 
     date = dt.datetime.utcfromtimestamp(tstamp)
@@ -137,19 +139,21 @@ for F in hk_files:
 
     val_str = None
     
-    if abs(val)>1:
+    if abs(val)>=1:
         val_str = '%7.3f %s' % (val,units)
+    elif abs(val)>=1e-3:
+        val_str = '%7.3f m%s' % (val*1e3,units)
+    elif abs(val)>=1e-6:
+        val_str = '%7.3f u%s' % (val*1e6,units)
+    elif abs(val)>=1e-9:
+        val_str = '%7.3f n%s' % (val*1e9,units)
+    elif abs(val)>=1e-12:
+        val_str = '%7.3f p%s' % (val*1e12,units)
     else:
-        val_str = '%7.3f m%s' % (val*1000,units)
-
-    if units == 'mbar':
         val_str = '%12.5e %s' % (val,units)
-        
+
     if units == 'steps':
-        val_str = '%i %s' % (int(val), units)
-
-    if val_str is None:
-        val_str = '%12.5e %s' % (val,units)
+        val_str = '%10i %s' % (int(val), units)
 
     line = '%s %20s %20s %s' % (date_str, val_str, label, labelkey)
     lines.append(line)
