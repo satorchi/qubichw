@@ -10,10 +10,13 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           permitted by law.
 
 show the latest housekeeping values on screen
+
+text highlighting from: https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 '''
 import sys,os
 from glob import glob
 import datetime as dt
+from termcolor import colored
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 if not os.path.isdir(hk_dir):
@@ -99,6 +102,7 @@ labels = read_labels()
 hk_files = glob(hk_dir+os.sep+'*.txt')
 hk_files.sort()
 lines = []
+tstamps = []
 for F in hk_files:
     basename = os.path.basename(F)
     
@@ -107,6 +111,7 @@ for F in hk_files:
     retval = read_lastline(F)
     if retval is None: continue
     tstamp,val = retval
+    tstamps.append(tstamp)
 
     label = ''
     labelkey = basename.replace('.txt','')
@@ -157,6 +162,14 @@ for F in hk_files:
 
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
     lines.append(line)
+
+
+latest = max(tstamps)
+for idx,line in enumerate(lines):
+    delta = latest - tstamps[idx]
+    if delta>5:
+        lines[idx] = colored(line,'red','on_white')
+
 
 page = '\n'.join(lines)
 print(page)

@@ -10,4 +10,4 @@
 
 # wrapper to watch the temperatures with update every second
 
-watch -n1 show_hk.py
+watch -c -n1 show_hk.py
