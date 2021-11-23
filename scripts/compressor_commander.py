@@ -20,7 +20,7 @@ def usage():
     '''
     msg = 'usage: %s <compressor number> <command>' % sys.argv[0]
     msg += '\nvalid compressors are: 1 or 2'
-    msg += '\nvalid commands are: status, on, off\n'
+    msg += '\nvalid commands are: status, on, off, reset, log\n'
     print(msg)
     return None
 
