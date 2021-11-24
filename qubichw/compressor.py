@@ -39,7 +39,7 @@ class compressor:
         self.command['reset'] = '$RS12156\r\n'.encode()
         
         self.statusbits = {}
-        self.statusbits[8] = 'Solonoid'
+        self.statusbits[8] = 'Solenoid'
         self.statusbits[7] = 'Pressure alarm'
         self.statusbits[6] = 'Oil Level alarm'
         self.statusbits[5] = 'Water Flow alarm'
@@ -223,7 +223,7 @@ class compressor:
             if key.find('alarm')>0 and bitstatus:
                 retval['status'] = False
                 errmsg_list.append('ERROR! %s' % key)
-            if (key=='Solonoid' or key=='System ON') and not bitstatus:
+            if (key=='Solenoid' or key=='System ON') and not bitstatus:
                 retval['status'] = False
                 errmsg_list.append('ERROR! %s = %s' % (key,bitstatus))            
                 
@@ -246,7 +246,7 @@ class compressor:
         for key in status.keys():
             if key!='status' and key!='msg':
                 msg += '\n%s: %s' % (key,status[key])
-                if key.find('alarm')>0 or key=='Solonoid' or key=='System ON':
+                if key.find('alarm')>0 or key=='Solenoid' or key=='System ON':
                     msg += ' ... OK'
                     
         return msg
