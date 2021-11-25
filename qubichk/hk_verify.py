@@ -671,6 +671,7 @@ def check_compressors(verbosity=1):
     '''
     retval = {}
     retval['ok'] = True
+    retval['communication error'] = False
     retval['error_message'] = ''
     retval['message'] = ''
     
@@ -682,9 +683,10 @@ def check_compressors(verbosity=1):
         c = compressor(c_num)
         info = c.status()
         msg_list.append('\nCompressor %s' % c_num)
-        msg_list.append(c.status_message())
+        msg_list.append(info['status_message'])
         if not info['status']:
             retval['ok'] = False
+            retval['communication error'] = info['communication error']
             errmsg_list.append('\nCompressor %s' % c_num)
             errmsg_list.append(info['msg'])
             

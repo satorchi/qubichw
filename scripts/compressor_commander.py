@@ -84,6 +84,7 @@ if __name__=='__main__':
         print('Resetting compressor %s' % parms['compressor'])
         c.reset()
 
-    print(c.status_message())
+    info = c.status()
+    print(info['status_message'])
     print('\n')
     

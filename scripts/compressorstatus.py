@@ -10,17 +10,26 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           permitted by law.
 check compressor status, and send a Telegram message if not okay
 '''
-import sys
+import sys,time
 
 from qubichk.hk_verify import check_compressors
 from qubichk.send_telegram import send_telegram
 
 ans = check_compressors(verbosity=0)
 
-if not ans['ok']:
-    msg = ans['error_message'] + '\n***********\n' + ans['message']
+# try one more time if there was a communication error
+if ans['communication error']:
+    time.sleep(0.5)
+    ans = check_compressors(verbosity=0)
+
+msg = ans['error_message'] + '\n***********\n' + ans['message']
+if not ans['ok'] and not ans['communication error']:
     send_telegram(msg,'Jean-Christophe')
     send_telegram(msg,'Steve')
+if ans['communication error']:
+    send_telegram('The following message was not sent to JC','Steve')
+    send_telegram(msg,'Steve')
+    
 
 ### testing send telegram to JC
 if len(sys.argv)>1 and sys.argv[1]=="--test":

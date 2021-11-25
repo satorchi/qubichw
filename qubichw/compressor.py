@@ -134,11 +134,14 @@ class compressor:
         '''
         retval = {}
         retval['status'] = True
+        retval['communication error'] = False
         retval['msg'] = 'ok'
+        retval['status_message'] = 'no message'
 
         if not self.ok():
             retval['status'] = False
             retval['msg'] = 'ERROR!  Device not configured.'
+            retval['status_message'] = self.status_message(retval)
             return retval
         
         cmdkey = 'id'        
@@ -151,7 +154,9 @@ class compressor:
         val = ans_decoded.strip().split(',')
         if len(val)!=5:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Invalid ID response from device.'
+            retval['status_message'] = self.status_message(retval)
             return retval
 
         try:
@@ -159,7 +164,9 @@ class compressor:
             retval['operating hours'] = op_hours
         except:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Could not read operating hours'
+            retval['status_message'] = self.status_message(retval)
             return retval
 
         cmdkey = 'temperature'
@@ -168,7 +175,9 @@ class compressor:
         val = ans.decode().strip().split(',')
         if len(val)!=6:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Invalid temperature response from device.'
+            retval['status_message'] = self.status_message(retval)
             return retval
 
         try:
@@ -177,7 +186,9 @@ class compressor:
             retval['Water inlet temperature'] = float(val[3])
         except:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Could not read temperatures'
+            retval['status_message'] = self.status_message(retval)
             return retval
         
         cmdkey = 'pressure'
@@ -187,14 +198,18 @@ class compressor:
         
         if len(val)!=4:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Invalid pressure response from device.'
+            retval['status_message'] = self.status_message(retval)
             return retval
 
         try:
             retval['pressure (relative to ambient)'] = float(val[1]) * psi_to_bar
         except:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Could not read pressure'
+            retval['status_message'] = self.status_message(retval)
             return retval
 
         cmdkey = 'status'
@@ -204,14 +219,18 @@ class compressor:
 
         if len(val)!=3:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Invalid status response from device'
+            retval['status_message'] = self.status_message(retval)
             return retval
 
         try:
             statbits = int(val[1],16)
         except:
             retval['status'] = False
+            retval['communication error'] = True
             retval['msg'] = 'ERROR! Could not read status bits'
+            retval['status_message'] = self.status_message(retval)
             return retval
         
 
@@ -229,13 +248,13 @@ class compressor:
                 
         if len(errmsg_list)>0:
             retval['msg'] = '\n'.join(errmsg_list)
+        retval['status_message'] = self.status_message(retval)
         return retval
 
-    def status_message(self):
+    def status_message(self,status):
         '''
         format the status info into a text
         '''
-        status = self.status()
         if not status['status']:
             msg = 'PT Compressor is NOT okay!\n'
             msg += status['msg']
