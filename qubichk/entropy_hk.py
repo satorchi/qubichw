@@ -107,7 +107,7 @@ class entropy_hk :
             self.debugmsg(a.decode())
             self.connected=True
         except:
-            self.debugmsg('Unable to connect to Major Tom!')
+            self.log('Unable to connect to Major Tom!')
             self.connected=False
         return None
 
