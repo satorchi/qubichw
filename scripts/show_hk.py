@@ -132,6 +132,7 @@ for F in hk_files:
         units = 'V'
     elif basename.find('Amp')>0:
         units = 'A'
+        val *= 0.001
     elif basename.find('MHS')==0:
         units = 'steps'
     else:
