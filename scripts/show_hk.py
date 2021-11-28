@@ -60,9 +60,10 @@ def read_labels():
     for line in lines:
         col = line.split(':')
         if len(col)<2: continue
-        key = col[0].strip()
-        val = col[1].strip()
-        labels[key] = val
+        for ext in ['','_Volt','_Amp']:
+            key = col[0].strip()+ext
+            val = col[1].strip()
+            labels[key] = val
     h.close()
     return labels
     
