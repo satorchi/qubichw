@@ -997,18 +997,10 @@ class qubic_bot :
             if 'HELP' in self.args.keys():
                 return self.plothelp()                
         else:
+            # nothing selected, return the help.  Plot all takes a lot of  time, so avoid it.
             print("I didn't find any arguments")
-
-        # if nothing was selected, the default is to plot all temperatures
-        plotalltemps = True
-        for key in self.hktypes:
-            if self.args[key]:
-                plotalltemps = False
-                break
-        if plotalltemps:
-            print('plotting all temperatures')
-            for key in self.allTemperatures:
-                self.args[key] = self.allTemperatures[key]
+            return self.plothelp()
+            
 
         something2plot = False
         plt.ioff()
