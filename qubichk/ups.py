@@ -68,8 +68,8 @@ def get_ups_info():
         if parm not in info.keys(): continue
         log_msg_list.append('%s=%s' % (parm,info[parm]))
             
-     info['log message'] = ' '.join(log_msg_list)
-     return info
+    info['log message'] = ' '.join(log_msg_list)
+    return info
 
  
     
