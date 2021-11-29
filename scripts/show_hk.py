@@ -96,7 +96,10 @@ def read_lastline(filename):
 
     tstamp = float(col[0])
     val = float(col[1])
-    return tstamp, val
+    onoff = None
+    if len(col)>2:
+        onoff = col[2]
+    return tstamp, val, onoff
 
 
 labels = read_labels()
@@ -112,7 +115,7 @@ for F in hk_files:
 
     retval = read_lastline(F)
     if retval is None: continue
-    tstamp,val = retval
+    tstamp,val,onoff = retval
     tstamps.append(tstamp)
 
     label = ''
@@ -122,6 +125,7 @@ for F in hk_files:
 
 
     units = None
+    val_str = None
     if basename=='AVS47_1_ch0.txt':
         units = 'Ohm'
     elif basename.find('TEMPERATURE')==0 or basename.find('AVS')==0:
@@ -132,36 +136,36 @@ for F in hk_files:
     elif basename.find('Volt')>0:
         units = 'V'
     elif basename.find('Amp')>0:
-        units = 'A'
-        val *= 0.001
+        if onoff is not None and onoff=='OFF':
+            units = ''
+            val_str = 'OFF'
+        else:
+            units = 'A'
+            val *= 0.001
     elif basename.find('MHS')==0:
         units = 'steps'
     else:
         units = ''
         
-        
-
-
     date = dt.datetime.utcfromtimestamp(tstamp)
     date_str = date.strftime('%Y-%m-%d %H:%M:%S')
 
-    val_str = None
-    
-    if abs(val)>=1:
-        val_str = '%7.3f %s' % (val,units)
-    elif abs(val)>=1e-3:
-        val_str = '%7.3f m%s' % (val*1e3,units)
-    elif abs(val)>=1e-6:
-        val_str = '%7.3f u%s' % (val*1e6,units)
-    elif abs(val)>=1e-9:
-        val_str = '%7.3f n%s' % (val*1e9,units)
-    elif abs(val)>=1e-12:
-        val_str = '%7.3f p%s' % (val*1e12,units)
-    else:
-        val_str = '%12.5e %s' % (val,units)
-
     if units == 'steps':
         val_str = '%10i %s' % (int(val), units)
+    if val_str is None:
+        if abs(val)>=1:
+            val_str = '%7.3f %s' % (val,units)
+        elif abs(val)>=1e-3:
+            val_str = '%7.3f m%s' % (val*1e3,units)
+        elif abs(val)>=1e-6:
+            val_str = '%7.3f u%s' % (val*1e6,units)
+        elif abs(val)>=1e-9:
+            val_str = '%7.3f n%s' % (val*1e9,units)
+        elif abs(val)>=1e-12:
+            val_str = '%7.3f p%s' % (val*1e12,units)
+        else:
+            val_str = '%12.5e %s' % (val,units)
+
 
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
     lines.append(line)
