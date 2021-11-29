@@ -12,6 +12,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 a few methods to access info from the UPS
 '''
 import sys,os,time,subprocess
+import datetime as dt
 
 def get_ups_info():
     '''
