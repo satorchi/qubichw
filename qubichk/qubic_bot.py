@@ -29,7 +29,7 @@ from qubichw.calsource_configuration_manager import calsource_configuration_mana
 from qubichk.hk_verify import check_compressors,check_diskspace
 
 from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses
-
+from qubichk.ups import get_ups_info
 
 class dummy_bot:
     '''
@@ -100,7 +100,8 @@ class qubic_bot :
                          '/plot1k': self.entropy_plot1K,
                          '/ip': self.ip,
                          '/pt': self.pt,
-                         '/diskspace': self.diskspace
+                         '/diskspace': self.diskspace,
+                         '/ups': self.ups
                          }
 
         self.known_users = get_TelegramAddresses()
@@ -1217,6 +1218,14 @@ class qubic_bot :
         self._send_message(ret['message'])
         return
 
+    def ups(self):
+        '''
+        send the UPS info
+        '''
+        info = get_ups_info()
+        self._send_message(info['full message'])
+        return
+        
 
     def _default_answer(self):
         '''
