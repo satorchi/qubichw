@@ -1077,7 +1077,8 @@ class qubic_bot :
 
         if not something2plot:
             msg = 'Sorry, your argument list resulted in no plot.  Are you sure about the channel numbers?'
-            return self._send_message(msg)
+            self._send_message(msg)
+            return self.plothelp()
 
         Tmin=min(tmin_list)
         Tmax=max(tmax_list)
