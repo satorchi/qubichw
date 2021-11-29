@@ -30,7 +30,8 @@ exclude_files = ['TEMPERATURE_RAW.txt',
                  'TEMPERATURE_VOLT.txt',
                  'LABELS.txt',
                  'compressor1_log.txt',
-                 'compressor2_log.txt']
+                 'compressor2_log.txt',
+                 'ups_log.txt']
 
 def read_labels():
     '''
