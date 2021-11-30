@@ -407,13 +407,14 @@ def check_mounts(verbosity=1):
     errmsg_list = []
 
     if verbosity>0: print('\n============ checking for remote disk shares ============')
-    smbmounts = ['qs2','entropy']
+    smbmounts = ['qs','entropy']
     cmd = 'mount'
-    out1,err = shellcommand(cmd)
-    # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
-    cmd = 'ssh pitemps mount'
-    out2,err = shellcommand(cmd)
-    out = out1+'\n'+out2
+    out,err = shellcommand(cmd)
+    ### 2021-11-30 09:58:50 new config.  qs is mounted directly on qubic-central again
+    # # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
+    # cmd = 'ssh pitemps mount'
+    # out2,err = shellcommand(cmd)
+    # out = out1+'\n'+out2
     find_str = '(%s) type cifs' % '|'.join(smbmounts)
     match = re.findall(find_str,out)
     for smbshare in match:
@@ -449,16 +450,17 @@ def check_diskspace(verbosity=1):
     
     space_warning = 10*1024**2 # 10GB minimum disk space (df gives results in 1k blocks)
     if verbosity>0: print('\n============ checking for disk space ============')
-    parts = ['home','archive','entropy','qs2']
+    parts = ['home','archive','entropy','qs']
         
     find_str = '/'+'|/'.join(parts)
     
     cmd = 'df'
-    out1,err = shellcommand(cmd)
-    # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
-    cmd = 'ssh pitemps df'
-    out2,err = shellcommand(cmd)
-    out = out1+'\n'+out2
+    out,err = shellcommand(cmd)
+    # 2021-11-30 10:00:02 qs is mounted directly on qubic-central again
+    # # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
+    # cmd = 'ssh pitemps df'
+    # out2,err = shellcommand(cmd)
+    # out = out1+'\n'+out2
     for line in out.split('\n'):
         cols = line.split()
         if len(cols)==0: continue
