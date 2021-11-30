@@ -25,5 +25,5 @@ h.close()
 Rx_list = ['Steve','Jean-Christophe','Christian']
 if info['alarm']:
     for rx in Rx_list:
-    send_telegram(info['full message'],rx)
+        send_telegram(info['full message'],rx)
 
