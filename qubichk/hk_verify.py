@@ -556,7 +556,15 @@ def check_temps(verbosity=1):
     retval['ok'] = True
     retval['error_message'] = ''
     msg_list = []
-    nfiles = 47 # total number expected
+    # 2021-11-30 10:32:42 where did this number come from?  
+    # nfiles = 47 # total number expected.
+    # 8 channels on AVS47_1
+    # 5 channels on AVS47_2
+    # 2 MHS
+    # 12 for 6 heaters (voltage and current) There used to be 7 heaters
+    # 18 temperature sensors
+    # 1 pressure sensor
+    nfiles = 46    
     delta_max = 6 # seconds. if latest HK is earlier than this, we have a problem
     if verbosity>0: print('\n============ checking recent housekeeping values...',end='',flush=True)
     hk_dir = '/home/qubic/data/temperature/broadcast'
