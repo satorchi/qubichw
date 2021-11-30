@@ -30,8 +30,8 @@ machines = ['PiGPS',
             'mgc',
             'mmr',
             'pitemps',
-            'cam26',
-            'cam27']
+            'cam26']
+#            'cam27'] # 2021-11-30 10:02:07 cam27 was never re-installed in Salta
 
 # the Energenie powerbar.
 # Mon 25 Jan 2021 13:25:27 CET: The network Energenie is replaced by a USB Energenie
