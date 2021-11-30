@@ -28,6 +28,9 @@ ARCHIVE_HKDIR=$ARCHIVE_DIR/hk/data_$START_DATE
 
 echo $ARCHIVE_HKDIR
 
+# make a tar file of the qubic-central configuration
+sudo /usr/local/bin/configfile_backup.sh
+
 # make a tar file of the fridge cycling scripts
 tar -cvf $ARCHIVE_DIR/fridgescripts.tar $FRIDGESCRIPTS_DIR/*.*
 gzip -9 -f $ARCHIVE_DIR/fridgescripts.tar
