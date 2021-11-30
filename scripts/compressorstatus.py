@@ -25,9 +25,10 @@ if ans['communication error']:
 msg = ans['error_message'] + '\n***********\n' + ans['message']
 if not ans['ok'] and not ans['communication error']:
     send_telegram(msg,'Jean-Christophe')
+    send_telegram(msg,'Christian')
     send_telegram(msg,'Steve')
 if ans['communication error']:
-    send_telegram('The following message was not sent to JC','Steve')
+    msg = 'The following message was not sent to JC nor to Christian\n- - - - - -\n'+msg
     send_telegram(msg,'Steve')
     
 
