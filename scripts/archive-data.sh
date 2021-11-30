@@ -11,6 +11,7 @@
 # archive data for QUBIC.  This should be run by cron once a day
 
 HK_DIR=/home/qubic/data/temperature/broadcast
+FRIDGESCRIPTS_DIR=/home/qubic/data/temperature
 #QS_DIR=pi@cam2:/qs2 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
 QS_DIR=/qs # 2021-11-30 11:52:06 back to samba mount on qubic-central
 HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
@@ -26,6 +27,10 @@ START_DATE=`date --date="@$START_TSTAMP" +"%Y%m%d"`
 ARCHIVE_HKDIR=$ARCHIVE_DIR/hk/data_$START_DATE
 
 echo $ARCHIVE_HKDIR
+
+# make a tar file of the fridge cycling scripts
+tar -cvf $ARCHIVE_DIR/fridgescripts.tar $FRIDGESCRIPTS_DIR/*.*
+gzip -9 -f $ARCHIVE_DIR/fridgescripts.tar
 
 # use rsync to copy to archive disk
 rsync -avt $HK_DIR/ $ARCHIVE_HKDIR
