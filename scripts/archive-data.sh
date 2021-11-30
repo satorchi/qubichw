@@ -11,7 +11,8 @@
 # archive data for QUBIC.  This should be run by cron once a day
 
 HK_DIR=/home/qubic/data/temperature/broadcast
-QS_DIR=pi@cam2:/qs2 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
+#QS_DIR=pi@cam2:/qs2 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
+QS_DIR=/qs # 2021-11-30 11:52:06 back to samba mount on qubic-central
 HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
 ARCHIVE_DIR=/archive
 
