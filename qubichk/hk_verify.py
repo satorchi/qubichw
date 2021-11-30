@@ -29,8 +29,8 @@ machines = ['PiGPS',
             'horns',
             'mgc',
             'mmr',
-            'pitemps',
-            'cam26']
+            'pitemps']
+#            'cam26'] # 2021-11-30 19:30:48 no cam26
 #            'cam27'] # 2021-11-30 10:02:07 cam27 was never re-installed in Salta
 
 # the Energenie powerbar.
