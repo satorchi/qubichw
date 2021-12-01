@@ -37,7 +37,9 @@ gzip -9 -f $ARCHIVE_DIR/fridgescripts.tar
 
 # use rsync to copy to archive disk
 rsync -avt $HK_DIR/ $ARCHIVE_HKDIR
-rsync -avt $QS_DIR/ $ARCHIVE_DIR
+rsync -avt $QS_DIR/QubicStudio $ARCHIVE_DIR
+rsync -avt $QS_DIR/Script $ARCHIVE_DIR
+rsync -avt $QS_DIR/Data/ $ARCHIVE_DIR
 rsync -avt $HWP_DIR $ARCHIVE_DIR
 
 # use rsync to copy to CC
