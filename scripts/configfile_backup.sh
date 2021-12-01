@@ -20,11 +20,11 @@ FILES="/etc/lilo.conf\
  /home/qubic/.local/share/qubic/*\
  /usr/local/ups/etc/*.conf\
  /home/qubic/qubic.crontab\
- $HOME/satorchi.crontab"
+ /home/satorchi/satorchi.crontab"
 
 # extract latest crontab
 sudo su qubic -c "crontab -l > /home/qubic/qubic.crontab"
-crontab -l > $HOME/satorchi.crontab
+sudo su satorchi -c "crontab -l > /home/satorchi/satorchi.crontab"
 
 ARCHIVE_DIR=/archive
 tar -cvf ${ARCHIVE_DIR}/qc_etc.tar $FILES
