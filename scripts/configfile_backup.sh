@@ -18,7 +18,13 @@ FILES="/etc/lilo.conf\
  /etc/udev/rules.d/*.rules\
  /usr/local/sbin/firewall.sh\
  /home/qubic/.local/share/qubic/*\
- /usr/local/ups/etc/*.conf"
+ /usr/local/ups/etc/*.conf\
+ /home/qubic/qubic.crontab\
+ $HOME/satorchi.crontab"
+
+# extract latest crontab
+sudo su qubic -c "crontab -l > /home/qubic/qubic.crontab"
+crontab -l > $HOME/satorchi.crontab
 
 ARCHIVE_DIR=/archive
 tar -cvf ${ARCHIVE_DIR}/qc_etc.tar $FILES
