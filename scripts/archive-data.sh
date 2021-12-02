@@ -40,7 +40,10 @@ rsync -avt $HK_DIR/ $ARCHIVE_HKDIR
 rsync -avt $QS_DIR/QubicStudio $ARCHIVE_DIR
 rsync -avt $QS_DIR/Script $ARCHIVE_DIR
 rsync -avt $QS_DIR/Data/ $ARCHIVE_DIR
-rsync -avt $HWP_DIR $ARCHIVE_DIR
+
+# for some reason, the Raspberry Pi does not accept keys from qubic-central
+# but it does from elsewhere!
+sshpass -p hwp2021 rsync -avt $HWP_DIR $ARCHIVE_DIR
 
 # use rsync to copy to CC
 rsync -avt $ARCHIVE_DIR/ cc:$CC_DIR
