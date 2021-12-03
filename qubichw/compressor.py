@@ -91,7 +91,7 @@ class compressor:
                     return tty
 
         if not gotit:
-            print('ERROR! Did not find a valid device.  find_port argument: %s' % port)
+            #print('ERROR! Did not find a valid device.  find_port argument: %s' % port)
             return None
 
         print('Unreachable code')
