@@ -25,7 +25,7 @@ msg += "\nQUBIC"
 for rx in alarm_recipients:
     fullmsg = 'Hi %s!' % rx
     fullmsg += '\n'+msg
-    send_telegram(msg,rx)
-    send_telegram(msg,'Steve')
+    send_telegram(fullmsg,rx)
+    send_telegram(fullmsg,'Steve')
 
     
