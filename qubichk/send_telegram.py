@@ -72,6 +72,24 @@ def get_TelegramAddresses():
 
     return known_users
 
+def get_alarm_recipients():
+    '''
+    read the list of alarm recipients
+    '''
+    rx_file = telegram_datafile('telegram-alarm-recipients')
+    if rx_file is None: return ['Steve']
+
+    h = open(rx_file,'r')
+    lines = h.read().split('\n')
+    h.close()
+    del(lines[-1])
+    alarm_recipients = []
+    for line in lines:
+        alarm_recipients.append(line.strip())
+
+    return alarm_recipients
+    
+
 def send_telegram(msg,rx=None):
     '''
     send a message on the Telegram messaging service from the QUBIC bot

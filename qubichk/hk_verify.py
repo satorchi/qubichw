@@ -17,9 +17,9 @@ from glob import glob
 import datetime as dt
 
 from qubichw.compressor import compressor
-from qubichk.send_telegram import send_telegram
+from qubichk.send_telegram import send_telegram, get_alarm_recipients
 
-alarm_recipients = ['Steve','Jean-Christophe','Christian','Emiliano','Cristian']
+alarm_recipients = get_alarm_recipients()
 
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts

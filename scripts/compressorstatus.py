@@ -13,8 +13,7 @@ check compressor status, and send a Telegram message if not okay
 import sys,time
 
 from qubichk.hk_verify import check_compressors
-from qubichk.send_telegram import send_telegram
-from qubichk.hk_verify import alarm_recipients
+from qubichk.send_telegram import send_telegram, get_alarm_recipients
 
 ans = check_compressors(verbosity=0)
 
@@ -25,6 +24,7 @@ if ans['communication error']:
     ans = check_compressors(verbosity=0)
 
 msg = ans['error_message'] + '\n***********\n' + ans['message']
+alarm_recipients = get_alarm_recipients()
 if not ans['ok'] and not ans['communication error']:
     for rx in alarm_recipients:
         send_telegram(msg,rx)
@@ -35,7 +35,6 @@ if ans['communication error']:
 
 ### testing send telegram to JC
 if len(sys.argv)>1 and sys.argv[1]=="--test":
-    msg = 'Hi Jean-Christophe!'
     msg += "\nThis is QUBIC.  I hope you are well.  I'm fine."
     msg += "\nI'm just testing the script to check the compressor status."
     msg += "\nI will check the status every five minutes, and if there's a problem, I'll send you a telegram."
@@ -43,7 +42,10 @@ if len(sys.argv)>1 and sys.argv[1]=="--test":
     msg += "\nQUBIC"
     msg += "\n\nP.S.  Here's the compressor status:\n\n"
     msg += ans['error_message'] + '\n***********\n' + ans['message']
-    send_telegram(msg,'Jean-Christophe')
-    send_telegram(msg,'Steve')
+    for rx in alarm_recipients:
+        fullmsg = 'Hi %s!' % rx
+        fullmsg += '\n'+msg
+        send_telegram(msg,rx)
+        send_telegram(msg,'Steve')
 
     

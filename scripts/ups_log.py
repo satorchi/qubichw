@@ -12,8 +12,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 output logging information from the UPS, save to the housekeeping directory
 '''
 from qubichk.ups import get_ups_info
-from qubichk.send_telegram import send_telegram
-from qubichk.hk_verify import alarm_recipients
+from qubichk.send_telegram import send_telegram, get_alarm_recipients
 
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
@@ -24,6 +23,7 @@ logline = info['log message']+'\n'
 h.write(logline)
 h.close()
 
+alarm_recipients = get_alarm_recipients()
 if info['alarm']:
     for rx in alarm_recipients:
         send_telegram(info['full message'],rx)

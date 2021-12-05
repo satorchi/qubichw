@@ -1232,6 +1232,7 @@ class qubic_bot :
         the default reply to unknown commands
         '''
         ans="I don't understand."
+        self.known_users = get_TelegramAddresses()
         if self.chat_id in self.known_users.keys():
             ans='Sorry %s, %s' % (self.known_users[self.chat_id],ans)
         self._send_message(ans)
@@ -1297,6 +1298,7 @@ class qubic_bot :
 
         now=dt.datetime.utcnow()
         user='unknown'
+        self.known_users = get_TelegramAddresses()
         if self.chat_id in self.known_users.keys():user=self.known_users[self.chat_id]
         msg="%s %i %16s %s" % (now.strftime(self.time_fmt),self.chat_id, user, cmd)
     
