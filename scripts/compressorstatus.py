@@ -31,21 +31,3 @@ if not ans['ok'] and not ans['communication error']:
 if ans['communication error']:
     msg = 'The following message is only sent to Steve\n- - - - - -\n'+msg
     send_telegram(msg,'Steve')
-    
-
-### testing send telegram to JC
-if len(sys.argv)>1 and sys.argv[1]=="--test":
-    msg += "\nThis is QUBIC.  I hope you are well.  I'm fine."
-    msg += "\nI'm just testing the script to check the compressor status."
-    msg += "\nI will check the status every five minutes, and if there's a problem, I'll send you a telegram."
-    msg += "\nBest regards from your friend,"
-    msg += "\nQUBIC"
-    msg += "\n\nP.S.  Here's the compressor status:\n\n"
-    msg += ans['error_message'] + '\n***********\n' + ans['message']
-    for rx in alarm_recipients:
-        fullmsg = 'Hi %s!' % rx
-        fullmsg += '\n'+msg
-        send_telegram(msg,rx)
-        send_telegram(msg,'Steve')
-
-    
