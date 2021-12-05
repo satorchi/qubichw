@@ -14,8 +14,10 @@ import sys,time
 
 from qubichk.hk_verify import check_compressors
 from qubichk.send_telegram import send_telegram
+from qubichk.hk_verify import alarm_recipients
 
 ans = check_compressors(verbosity=0)
+
 
 # try one more time if there was a communication error
 if ans['communication error']:
@@ -24,11 +26,10 @@ if ans['communication error']:
 
 msg = ans['error_message'] + '\n***********\n' + ans['message']
 if not ans['ok'] and not ans['communication error']:
-    send_telegram(msg,'Jean-Christophe')
-    send_telegram(msg,'Christian')
-    send_telegram(msg,'Steve')
+    for rx in alarm_recipients:
+        send_telegram(msg,rx)
 if ans['communication error']:
-    msg = 'The following message was not sent to JC nor to Christian\n- - - - - -\n'+msg
+    msg = 'The following message is only sent to Steve\n- - - - - -\n'+msg
     send_telegram(msg,'Steve')
     
 

@@ -19,6 +19,8 @@ import datetime as dt
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram
 
+alarm_recipients = ['Steve','Jean-Christophe','Christian','Emiliano','Cristian']
+
 # list of machines on the housekeeping network
 # the IP addresses are listed in /etc/hosts
 machines = ['PiGPS',

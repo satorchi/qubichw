@@ -13,6 +13,8 @@ output logging information from the UPS, save to the housekeeping directory
 '''
 from qubichk.ups import get_ups_info
 from qubichk.send_telegram import send_telegram
+from qubichk.hk_verify import alarm_recipients
+
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 
@@ -22,8 +24,7 @@ logline = info['log message']+'\n'
 h.write(logline)
 h.close()
 
-Rx_list = ['Steve','Jean-Christophe','Christian']
 if info['alarm']:
-    for rx in Rx_list:
+    for rx in alarm_recipients:
         send_telegram(info['full message'],rx)
 
