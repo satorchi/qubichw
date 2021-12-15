@@ -20,7 +20,7 @@ ans = check_compressors(verbosity=0)
 
 # try one more time if there was a communication error
 if ans['communication error']:
-    time.sleep(0.5)
+    time.sleep(1.0)
     ans = check_compressors(verbosity=0)
 
 msg = ans['error_message'] + '\n***********\n' + ans['message']
