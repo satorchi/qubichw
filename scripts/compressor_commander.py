@@ -64,14 +64,6 @@ if __name__=='__main__':
 
     c = compressor(int(parms['compressor']))
 
-
-
-    if parms['cmd'] == 'log':
-        print(c.status_log())
-        quit()      
-
-    print('\nCompressor %s' % parms['compressor'])
-
     if parms['cmd'] == 'on':
         print('Switching on compressor %s' % parms['compressor'])
         c.on()
@@ -85,6 +77,11 @@ if __name__=='__main__':
         c.reset()
 
     info = c.status()
+    if parms['cmd'] == 'log':
+        print(info['log_message'])
+        quit()      
+
+    print('\nCompressor %s' % parms['compressor'])
     print(info['status_message'])
     print('\n')
     
