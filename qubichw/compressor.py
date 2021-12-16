@@ -249,6 +249,7 @@ class compressor:
         if len(errmsg_list)>0:
             retval['msg'] = '\n'.join(errmsg_list)
         retval['status_message'] = self.status_message(retval)
+        retval['log_message'] = self.status_log(retval)
         return retval
 
     def status_message(self,status):
@@ -263,19 +264,18 @@ class compressor:
         # status() already checked that everything is okay
         msg = ''
         for key in status.keys():
-            if key!='status' and key!='msg':
+            if key not in ['status','msg','status_message','log_message']:
                 msg += '\n%s: %s' % (key,status[key])
                 if key.find('alarm')>0 or key=='Solenoid' or key=='System ON':
                     msg += ' ... OK'
                     
         return msg
 
-    def status_log(self):
+    def status_log(self,status):
         '''
         format the status info into a text for the log file
         '''
         now_str = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S UT')
-        status = self.status()
         if not status['status']:
             msg = '%s - compressor OFFLINE' % now_str
             return msg
