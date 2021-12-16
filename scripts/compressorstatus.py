@@ -15,13 +15,14 @@ import sys,time
 from qubichk.hk_verify import check_compressors
 from qubichk.send_telegram import send_telegram, get_alarm_recipients
 
+try_counter = 0
 ans = check_compressors(verbosity=0)
 
-
-# try one more time if there was a communication error
-if ans['communication error']:
-    time.sleep(1.0)
+# try a few times in case of communication error
+while ans['communication error'] and try_counter<4:
+    time.sleep(0.5)
     ans = check_compressors(verbosity=0)
+    try_counter += 1
 
 msg = ans['error_message'] + '\n***********\n' + ans['message']
 alarm_recipients = get_alarm_recipients()
