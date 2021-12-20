@@ -127,24 +127,20 @@ class compressor:
         if not self.initialized: return False
         if self.port is None: return False
         return True
-    
-    def status(self):
+
+    def send_command(self,cmdkey):
         '''
-        return the status of the compressors
+        send a command to the compressor
         '''
         retval = {}
-        retval['status'] = True
-        retval['communication error'] = False
-        retval['msg'] = 'ok'
-        retval['status_message'] = 'no message'
 
         if not self.ok():
             retval['status'] = False
             retval['msg'] = 'ERROR!  Device not configured.'
             retval['status_message'] = self.status_message(retval)
+            retval['value'] = None
             return retval
         
-        cmdkey = 'id'        
         self.ser.write(self.command[cmdkey])
         ans = self.ser.readline()
         try:
@@ -152,10 +148,34 @@ class compressor:
         except:
             ans_decoded = ans.decode('iso-8859-1')
         val = ans_decoded.strip().split(',')
+
+        retval['value'] = val
+        return retval
+
+    def get_info(self,cmdkey):
+        '''
+        get the information for a given command
+        '''
+        retval = send_command(cmdkey)
+        if retval['value'] is None: return retval
+
+        if cmdkey=='id': return get_id(retval)
+        if cmdkey=='temperature': return get_temperature(retval)
+        if cmdkey=='pressure': return get_pressure(retval)
+        return retval
+
+    def get_id(self):
+        '''
+        get the device ID and number of operating hours
+        '''
+        retval = get_info('id')
+        if retval['value'] is None: return retval
+        val = retval['value']
+        
         if len(val)!=5:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Invalid ID response from device.'
+            retval['msg'] = 'ERROR! Invalid ID response from device. %s' % val
             retval['status_message'] = self.status_message(retval)
             return retval
 
@@ -165,14 +185,20 @@ class compressor:
         except:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Could not read operating hours'
+            retval['msg'] = 'ERROR! Could not read operating hours: %s' % val[2]
             retval['status_message'] = self.status_message(retval)
             return retval
+        
+        return retval
 
-        cmdkey = 'temperature'
-        self.ser.write(self.command[cmdkey])
-        ans = self.ser.readline()
-        val = ans.decode().strip().split(',')
+    def get_temperature(self):
+        '''
+        get the temperatures
+        '''
+        retval = get_info('temperature')
+        if retval['value'] is None: return retval
+        val = retval['value']
+        
         if len(val)!=6:
             retval['status'] = False
             retval['communication error'] = True
@@ -191,11 +217,16 @@ class compressor:
             retval['status_message'] = self.status_message(retval)
             return retval
         
-        cmdkey = 'pressure'
-        self.ser.write(self.command[cmdkey])
-        ans = self.ser.readline()
-        val = ans.decode().strip().split(',')
-        
+        return retval
+
+    def get_pressure(self):
+        '''
+        get pressure information
+        '''
+        retval = get_info('pressure')
+        if retval['value'] is None: return retval
+        val = retval['value']
+                    
         if len(val)!=4:
             retval['status'] = False
             retval['communication error'] = True
@@ -211,11 +242,16 @@ class compressor:
             retval['msg'] = 'ERROR! Could not read pressure'
             retval['status_message'] = self.status_message(retval)
             return retval
+        return retval
 
-        cmdkey = 'status'
-        self.ser.write(self.command[cmdkey])
-        ans = self.ser.readline()
-        val = ans.decode().strip().split(',')
+    def get_status(self):
+        '''
+        get the status info
+        '''
+        
+        retval = get_info('status')
+        if retval['value'] is None: return retval
+        val = retval['value']
 
         if len(val)!=3:
             retval['status'] = False
@@ -233,7 +269,6 @@ class compressor:
             retval['status_message'] = self.status_message(retval)
             return retval
         
-
         errmsg_list = []
         for bit in self.statusbits.keys():
             bitstatus = (statbits & 2**bit) > 0
@@ -248,6 +283,36 @@ class compressor:
                 
         if len(errmsg_list)>0:
             retval['msg'] = '\n'.join(errmsg_list)
+        return retval
+
+    def status(self):
+        '''
+        return the status of the compressors
+        '''
+        retval = {}
+        retval['status'] = True
+        retval['communication error'] = False
+        comm_error = False
+        retval['msg'] = ''
+        msg = []
+        
+        retval['status_message'] = ''
+
+        if not self.ok():
+            retval['status'] = False
+            retval['msg'] = 'ERROR!  Device not configured.'
+            retval['status_message'] = self.status_message(retval)
+            return retval
+
+        for cmdkey in ['id','temperature','pressure','status']:
+            info = self.get_info(cmdkey)
+            for key in info.keys():
+                retval[key] = info[key]
+            comm_error = comm_error or info['communication error']
+            msg.append(info['msg'])        
+
+        retval['msg'] = '\n'.join(msg)
+        retval['communication error'] = comm_error
         retval['status_message'] = self.status_message(retval)
         retval['log_message'] = self.status_log(retval)
         return retval

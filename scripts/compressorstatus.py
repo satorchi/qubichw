@@ -23,12 +23,16 @@ while ans['communication error'] and try_counter<4:
     time.sleep(0.5)
     ans = check_compressors(verbosity=0)
     try_counter += 1
-
+ans['communication attempts'] = try_counter+1
+ 
 msg = ans['error_message'] + '\n***********\n' + ans['message']
 alarm_recipients = get_alarm_recipients()
 if not ans['ok'] and not ans['communication error']:
     for rx in alarm_recipients:
         send_telegram(msg,rx)
+
 if ans['communication error']:
-    msg = 'The following message is only sent to Steve\n- - - - - -\n'+msg
-    send_telegram(msg,'Steve')
+    fullmsg = 'The following message is only sent to Steve'
+    fullmsg += '\ncommunication attempts: %i' % try_counter
+    fullmsg += '\n- - - - - -\n' + msg
+    send_telegram(fullmsg,'Steve')
