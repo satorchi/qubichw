@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 a class to read and command the pulse tube compressors
 '''
-import serial,subprocess,sys,os,re
+import serial,subprocess,sys,os,re,time
 from glob import glob
 import datetime as dt
 
@@ -303,6 +303,7 @@ class compressor:
             return retval
 
         for cmdkey in ['id','temperature','pressure','status']:
+            time.sleep(0.2)
             info = self.get_info(cmdkey)
             for key in info.keys():
                 retval[key] = info[key]
