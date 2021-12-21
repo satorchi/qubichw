@@ -155,20 +155,22 @@ class compressor:
     def get_info(self,cmdkey):
         '''
         get the information for a given command
+
+        after getting the information from the serial socket, send it for appropriate formatting
         '''
         retval = send_command(cmdkey)
         if retval['value'] is None: return retval
 
-        if cmdkey=='id': return get_id(retval)
-        if cmdkey=='temperature': return get_temperature(retval)
-        if cmdkey=='pressure': return get_pressure(retval)
+        if cmdkey=='id': return self.get_id(retval)
+        if cmdkey=='temperature': return self.get_temperature(retval)
+        if cmdkey=='pressure': return self.get_pressure(retval)
+        if cmdkey=='status': return self.get_status(retval)
         return retval
 
-    def get_id(self):
+    def get_id(self,retval):
         '''
-        get the device ID and number of operating hours
+        extract the device ID and number of operating hours
         '''
-        retval = get_info('id')
         if retval['value'] is None: return retval
         val = retval['value']
         
@@ -191,11 +193,10 @@ class compressor:
         
         return retval
 
-    def get_temperature(self):
+    def get_temperature(self,retval):
         '''
-        get the temperatures
+        extract the temperatures
         '''
-        retval = get_info('temperature')
         if retval['value'] is None: return retval
         val = retval['value']
         
@@ -219,11 +220,10 @@ class compressor:
         
         return retval
 
-    def get_pressure(self):
+    def get_pressure(self,retval):
         '''
-        get pressure information
+        extract pressure information
         '''
-        retval = get_info('pressure')
         if retval['value'] is None: return retval
         val = retval['value']
                     
@@ -244,12 +244,10 @@ class compressor:
             return retval
         return retval
 
-    def get_status(self):
+    def get_status(self,retval):
         '''
-        get the status info
+        extract the status info
         '''
-        
-        retval = get_info('status')
         if retval['value'] is None: return retval
         val = retval['value']
 
