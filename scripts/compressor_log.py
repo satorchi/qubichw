@@ -12,11 +12,11 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 log compressor status and send a Telegram if there's a problem
 this script should be run from crontab every minute
 '''
-import sys,time
+import os,sys,time
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram, get_alarm_recipients
 
-hk_dir = '/home/qubic/data/temperature/broadcast'
+hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 
 c = []
 info = []
