@@ -74,6 +74,7 @@ for exec_dir in exec_dir_list:
         continue
     else:
         exec_dir_ok = True
+        os.remove('%s/%s' % (exec_dir,tmp_file))
         break
     
 scripts = ['scripts/calsource_commander.py',
