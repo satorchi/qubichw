@@ -190,7 +190,8 @@ class compressor:
             retval['msg'] = 'ERROR! Could not read operating hours: %s' % val[2]
             retval['status_message'] = self.status_message(retval)
             return retval
-        
+
+        retval['communication error'] = False
         return retval
 
     def get_temperature(self,retval):
@@ -218,6 +219,7 @@ class compressor:
             retval['status_message'] = self.status_message(retval)
             return retval
         
+        retval['communication error'] = False
         return retval
 
     def get_pressure(self,retval):
@@ -242,6 +244,8 @@ class compressor:
             retval['msg'] = 'ERROR! Could not read pressure'
             retval['status_message'] = self.status_message(retval)
             return retval
+
+        retval['communication error'] = False
         return retval
 
     def get_status(self,retval):
@@ -281,6 +285,8 @@ class compressor:
                 
         if len(errmsg_list)>0:
             retval['msg'] = '\n'.join(errmsg_list)
+
+        retval['communication error'] = False            
         return retval
 
     def status(self):
