@@ -9,6 +9,9 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           redistribute it.  There is NO WARRANTY, to the extent
           permitted by law.
 check compressor status, and send a Telegram message if not okay
+run this from crontab at regular intervals
+
+Fri 24 Dec 2021 16:46:12 CET: This script is DEPRECATED.  Use compressor_log.py instead. 
 '''
 import sys,time
 
