@@ -158,7 +158,7 @@ class compressor:
 
         after getting the information from the serial socket, send it for appropriate formatting
         '''
-        retval = send_command(cmdkey)
+        retval = self.send_command(cmdkey)
         if retval['value'] is None: return retval
 
         if cmdkey=='id': return self.get_id(retval)
