@@ -337,7 +337,7 @@ class compressor:
         for key in status.keys():
             if key not in ['status','msg','status_message','log_message','value']:
                 msg += '\n%s: %s' % (key,status[key])
-                if key.find('alarm')>0 or key=='Solenoid' or key=='System ON':
+                if key.find('alarm')>0 or key=='Solenoid' or key=='System ON' or key=='communication error':
                     msg += ' ... OK'
                     
         return msg
