@@ -238,7 +238,7 @@ class compressor:
             return retval
 
         try:
-            retval['pressure (relative to ambient)'] = float(val[1]) * psi_to_bar
+            retval['pressure (relative to ambient)'] = '%.4f' % (float(val[1]) * psi_to_bar)
         except:
             retval['status'] = False
             retval['communication error'] = True
@@ -335,7 +335,7 @@ class compressor:
         # status() already checked that everything is okay
         msg = ''
         for key in status.keys():
-            if key not in ['status','msg','status_message','log_message']:
+            if key not in ['status','msg','status_message','log_message','value']:
                 msg += '\n%s: %s' % (key,status[key])
                 if key.find('alarm')>0 or key=='Solenoid' or key=='System ON':
                     msg += ' ... OK'
