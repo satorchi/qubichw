@@ -133,6 +133,7 @@ class compressor:
         send a command to the compressor
         '''
         retval = {}
+        retval['msg'] = ''
 
         if not self.ok():
             retval['status'] = False
