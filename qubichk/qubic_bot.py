@@ -1293,7 +1293,7 @@ class qubic_bot :
             msg = 'Hi %s,\n' % user
         
         msg +='You are %s subscribed to the list of alarm recipients.' % notmsg
-        msg += '\nYou will not receive a messages in case of problems with the pulse tubes, or with the UPS (220V power supply)'
+        msg += '\nYou will not receive messages in case of problems with the pulse tubes, or with the UPS (220V power supply)'
         self._send_message(msg)
         return
         
