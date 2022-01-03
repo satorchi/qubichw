@@ -89,7 +89,12 @@ def get_alarm_recipients():
     del(lines[-1])
     alarm_recipients = []
     for line in lines:
-        alarm_recipients.append(int(line.split()[0].strip()))
+        chat_id_str = line.split()[0].strip(':')
+        try:
+            chat_id = int(chat_id_str)
+        except:
+            chat_id = 0
+        alarm_recipients.append(chat_id)
 
     return alarm_recipients
     
