@@ -28,7 +28,7 @@ from satorchipy.datefunctions import str2dt
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 from qubichk.hk_verify import check_compressors,check_diskspace
 
-from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses
+from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses, get_alarm_recipients
 from qubichk.ups import get_ups_info
 
 class dummy_bot:
@@ -101,10 +101,11 @@ class qubic_bot :
                          '/ip': self.ip,
                          '/pt': self.pt,
                          '/diskspace': self.diskspace,
-                         '/ups': self.ups
+                         '/ups': self.ups,
+                         '/subscribe': self.subscribe,
+                         '/unsubscribe':self.unsubscribe
                          }
 
-        self.known_users = get_TelegramAddresses()
 
         self.temperature_headings = ['40K filters',
                                      '40K sd',
@@ -1225,6 +1226,76 @@ class qubic_bot :
         info = get_ups_info()
         self._send_message(info['full message'])
         return
+
+    def subscribe(self):
+        '''
+        subscribe to the list of recipients for alarms
+        '''
+        known_users = get_TelegramAddresses()
+        alarm_recipients = get_alarm_recipients()
+
+        msg = ''
+        user = ''
+        if self.chat_id in known_users.keys():
+            user = known_users[self.chat_id]
+            msg = 'Hi %s,\n' % user
+            
+        if self.chat_id not in alarm_recipients:
+            alarm_recipients_file = telegram_datafile('telegram-alarm-recipients')
+            if alarm_recipients_file is None:
+                msg = 'ERROR! Could not find the alarm recipients list.'
+                self._send_message(msg)
+                return
+            h = open(alarm_recipients_file,'a')
+            newline = '%s %s\n' % (self.chat_id, user)
+            h.write(newline)
+            h.close()
+            
+        
+        msg +='You are subscribed to the list of alarm recipients.'
+        msg += '\nYou will receive a message in case of problems with the pulse tubes, or with the UPS (220V power supply)'
+        self._send_message(msg)
+        return
+
+    def unsubscribe(self):
+        '''
+        remove user from the list of alarm recipients
+        '''
+
+        known_users = get_TelegramAddresses()
+        alarm_recipients = get_alarm_recipients()
+
+        msg = ''
+        user = ''
+
+        if self.chat_id in alarm_recipients:
+            alarm_recipients_file = telegram_datafile('telegram-alarm-recipients')
+            if alarm_recipients_file is None:
+                msg = 'ERROR! Could not find the alarm recipients list.'
+                self._send_message(msg)
+                return
+            h = open(alarm_recipients_file,'w')
+            if alarm_recipients is None: alarm_recipients = [self.chat_id]
+            for chat_id in alarm_recipients:
+                if chat_id==self.chat_id: continue
+                if chat_id in known_users.keys():
+                    newline = '%s %s\n' % (chat_id, known_users[chat_id])
+                else:
+                    newline = '%s\n' % chat_id
+                h.write(newline)
+            h.close()
+            notmsg = 'no longer'
+        else:
+            notmsg = 'not'
+            
+        if self.chat_id in known_users.keys():
+            user = known_users[self.chat_id]
+            msg = 'Hi %s,\n' % user
+        
+        msg +='You are %s subscribed to the list of alarm recipients.' % notmsg
+        msg += '\nYou will not receive a messages in case of problems with the pulse tubes, or with the UPS (220V power supply)'
+        self._send_message(msg)
+        return
         
 
     def _default_answer(self):
@@ -1232,9 +1303,9 @@ class qubic_bot :
         the default reply to unknown commands
         '''
         ans="I don't understand."
-        self.known_users = get_TelegramAddresses()
-        if self.chat_id in self.known_users.keys():
-            ans='Sorry %s, %s' % (self.known_users[self.chat_id],ans)
+        known_users = get_TelegramAddresses()
+        if self.chat_id in known_users.keys():
+            ans='Sorry %s, %s' % (known_users[self.chat_id],ans)
         self._send_message(ans)
         return
 
@@ -1298,8 +1369,8 @@ class qubic_bot :
 
         now=dt.datetime.utcnow()
         user='unknown'
-        self.known_users = get_TelegramAddresses()
-        if self.chat_id in self.known_users.keys():user=self.known_users[self.chat_id]
+        known_users = get_TelegramAddresses()
+        if self.chat_id in known_users.keys():user=known_users[self.chat_id]
         msg="%s %i %16s %s" % (now.strftime(self.time_fmt),self.chat_id, user, cmd)
     
         print(msg)

@@ -76,8 +76,12 @@ def get_alarm_recipients():
     '''
     read the list of alarm recipients
     '''
+    chatid_dict = get_TelegramAddresses()
     rx_file = telegram_datafile('telegram-alarm-recipients')
-    if rx_file is None: return ['Steve']
+    if rx_file is None:
+        if chatid_dict is None: return None
+        if 'Steve' not in chatid_dict.keys(): return None
+        return chatid_dict['Steve']
 
     h = open(rx_file,'r')
     lines = h.read().split('\n')
@@ -85,7 +89,7 @@ def get_alarm_recipients():
     del(lines[-1])
     alarm_recipients = []
     for line in lines:
-        alarm_recipients.append(line.strip())
+        alarm_recipients.append(int(line.split()[0].strip()))
 
     return alarm_recipients
     
