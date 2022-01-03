@@ -11,8 +11,9 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 test the Telegram alarm 
 '''
-from qubichk.send_telegram import send_telegram, get_alarm_recipients
+from qubichk.send_telegram import send_telegram, get_alarm_recipients, get_TelegramAddresses
 
+known_users = get_TelegramAddresses()
 alarm_recipients = get_alarm_recipients()
 
 msg = "\nThis is QUBIC.  I hope you are well.  I'm fine."
@@ -25,7 +26,10 @@ msg += "\nor until you unsubscribe from the list."
 msg += "\n\nBest regards from your friend,"
 msg += "\nQUBIC"
 for chatid in alarm_recipients:
-    fullmsg = 'Hi %s!' % rx
+    if chatid in known_users.keys():
+        fullmsg = 'Hi %s!' % known_users[chatid]
+    else:
+        fullmsg = 'Hi!'
     fullmsg += '\n'+msg
     send_telegram(fullmsg,chatid=chatid)
     send_telegram(fullmsg,'Steve')
