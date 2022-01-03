@@ -17,9 +17,11 @@ alarm_recipients = get_alarm_recipients()
 
 msg = "\nThis is QUBIC.  I hope you are well.  I'm fine."
 msg += "\nI'm just testing the alarm system."
-msg += "\nI will check the compressor status every minute, and the UPS status every minute."
-msg += "\nIf there's a problem, I'll send you a telegram."
-msg += "\n\nPlease tell Steve that you received this message from me."
+msg += "\n\nYou can now subscribe or unsubscribe yourself from the list of recipients for alarms"
+msg += "\nby using the commands 'subscribe' and 'unsubscribe'.  You are currently subscribed."
+msg += "\n\nI will check the compressor status every minute, and the UPS status every minute."
+msg += "\nIf there's a problem, I'll send you a telegram every minute until the problem is resolved,"
+msg += "\nor until you unsubscribe from the list."
 msg += "\n\nBest regards from your friend,"
 msg += "\nQUBIC"
 for chatid in alarm_recipients:
