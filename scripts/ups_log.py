@@ -25,6 +25,6 @@ h.close()
 
 alarm_recipients = get_alarm_recipients()
 if info['alarm']:
-    for rx in alarm_recipients:
-        send_telegram(info['full message'],rx)
+    for chatid in alarm_recipients:
+        send_telegram(info['full message'],chatid=chatid)
 

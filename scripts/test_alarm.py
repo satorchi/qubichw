@@ -17,15 +17,15 @@ alarm_recipients = get_alarm_recipients()
 
 msg = "\nThis is QUBIC.  I hope you are well.  I'm fine."
 msg += "\nI'm just testing the alarm system."
-msg += "\nI will check the compressor status every five minutes, and the UPS status every minute."
+msg += "\nI will check the compressor status every minute, and the UPS status every minute."
 msg += "\nIf there's a problem, I'll send you a telegram."
 msg += "\n\nPlease tell Steve that you received this message from me."
 msg += "\n\nBest regards from your friend,"
 msg += "\nQUBIC"
-for rx in alarm_recipients:
+for chatid in alarm_recipients:
     fullmsg = 'Hi %s!' % rx
     fullmsg += '\n'+msg
-    send_telegram(fullmsg,rx)
+    send_telegram(fullmsg,chatid=chatid)
     send_telegram(fullmsg,'Steve')
 
     

@@ -31,8 +31,8 @@ ans['communication attempts'] = try_counter+1
 msg = ans['error_message'] + '\n***********\n' + ans['message']
 alarm_recipients = get_alarm_recipients()
 if not ans['ok'] and not ans['communication error']:
-    for rx in alarm_recipients:
-        send_telegram(msg,rx)
+    for chatid in alarm_recipients:
+        send_telegram(msg,chatid=chatid)
 
 if ans['communication error']:
     fullmsg = 'The following message is only sent to Steve'
