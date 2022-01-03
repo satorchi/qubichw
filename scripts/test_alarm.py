@@ -16,7 +16,7 @@ from qubichk.send_telegram import send_telegram, get_alarm_recipients, get_Teleg
 known_users = get_TelegramAddresses()
 alarm_recipients = get_alarm_recipients()
 
-msg += "\n\nYou can now subscribe or unsubscribe yourself from the list of recipients for alarms"
+msg  = "\n\nYou can now subscribe or unsubscribe yourself from the list of recipients for alarms"
 msg += " by using the commands 'subscribe' and 'unsubscribe'.  You are currently subscribed."
 msg += "\n\nI will check the compressor status every minute, and the UPS status every minute."
 msg += "  If there's a problem, I'll send you a telegram every minute until the problem is resolved,"
