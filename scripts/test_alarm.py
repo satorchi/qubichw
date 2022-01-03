@@ -16,13 +16,11 @@ from qubichk.send_telegram import send_telegram, get_alarm_recipients, get_Teleg
 known_users = get_TelegramAddresses()
 alarm_recipients = get_alarm_recipients()
 
-msg = "\nThis is QUBIC.  I hope you are well.  I'm fine."
-msg += "\nI'm just testing the alarm system."
 msg += "\n\nYou can now subscribe or unsubscribe yourself from the list of recipients for alarms"
-msg += "\nby using the commands 'subscribe' and 'unsubscribe'.  You are currently subscribed."
+msg += " by using the commands 'subscribe' and 'unsubscribe'.  You are currently subscribed."
 msg += "\n\nI will check the compressor status every minute, and the UPS status every minute."
-msg += "\nIf there's a problem, I'll send you a telegram every minute until the problem is resolved,"
-msg += "\nor until you unsubscribe from the list."
+msg += "  If there's a problem, I'll send you a telegram every minute until the problem is resolved,"
+msg += "  or until you unsubscribe from the list."
 msg += "\n\nBest regards from your friend,"
 msg += "\nQUBIC"
 for chatid in alarm_recipients:
