@@ -99,7 +99,7 @@ def get_alarm_recipients():
     return alarm_recipients
     
 
-def send_telegram(msg,rx=None,id=None):
+def send_telegram(msg,rx=None,chatid=None):
     '''
     send a message on the Telegram messaging service from the QUBIC bot
     '''
@@ -110,14 +110,13 @@ def send_telegram(msg,rx=None,id=None):
 
     # make reverse lookup
     users_dict = {}
-    for chatid in chatid_dict.keys():
-        users_dict[chatid_dict[chatid]] = chatid
+    for idnum in chatid_dict.keys():
+        users_dict[chatid_dict[idnum]] = idnum
         
     
     bot = telepot.Bot(botId)
     
-    if rx is None and id is None: rx = 'Steve'
-    if rx is None: chatid=id
+    if rx is None and chatid is None: rx = 'Steve'
     
     if rx is not None and rx not in users_dict.keys():
         print('ERROR! Telegram not sent.  Could not find id for user: %s' % rx)
@@ -129,7 +128,7 @@ def send_telegram(msg,rx=None,id=None):
         bot.sendMessage(users_dict['Steve'],'Trying to send message to unknown user: %s' % rx)
         return False
         
-    if id is None: chatid = users_dict[rx]
+    if chatid is None: chatid = users_dict[rx]
 
     # check for message size.  There is a Telegram limit of 4096 bytes
     if len(msg)<=4096:
