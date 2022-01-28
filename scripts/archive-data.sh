@@ -24,6 +24,9 @@ JUPYTER_DIR=/qubic/Data/Calib-TD
 HK_FILES=`ls $HK_DIR/*.txt|grep -v -e LABEL -e RAW -e VOLT -e botId`
 START_TSTAMP=`for F in $HK_FILES;do head -1 $F;done|sort|head -1|gawk '{print $1}'`
 START_DATE=`date --date="@$START_TSTAMP" +"%Y%m%d"`
+if [ -z "$START_DATE" ];then
+    START_DATE=`date --date="$START_TSTAMP" +"%Y%m%d"`
+fi
 ARCHIVE_HKDIR=$ARCHIVE_DIR/hk/data_$START_DATE
 
 echo $ARCHIVE_HKDIR
