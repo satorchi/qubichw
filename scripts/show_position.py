@@ -14,7 +14,7 @@ show the position of the platform
 import datetime as dt
 from qubichk.platform import get_position
 
-header = '%s   %s   %s' % ('time'.center(20),'az'.center(5),'el'.center(5))
+header = '%s   %s   %s' % ('time'.center(20),'az'.center(7),'el'.center(7))
 print(header,end='\n')
 
 while True:
