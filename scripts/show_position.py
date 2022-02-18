@@ -21,13 +21,13 @@ while True:
     az,el = get_position()
     date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     if type(az)==str:
-        az_str = 'ERROR'.center(5)
+        az_str = 'ERROR'.center(7)
     else:
-        az_str = '%.2f' % az
+        az_str = '%7.2f' % az
     if type(el)==str:
-        el_str = 'ERROR'.center(5)
+        el_str = 'ERROR'.center(7)
     else:
-        el_str = '%.2f' % el
+        el_str = '%7.2f' % el
     
     line = '%s   %s   %s' % (date_str,az_str,el_str)
     print(line,end='\r')
