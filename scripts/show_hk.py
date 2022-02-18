@@ -18,6 +18,8 @@ from glob import glob
 import datetime as dt
 from termcolor import colored
 
+from qubichk.platform import get_position
+
 hk_dir = '/home/qubic/data/temperature/broadcast'
 if not os.path.isdir(hk_dir):
     hk_dir = '/home/steve/data/2021/hk'
@@ -102,12 +104,25 @@ def read_lastline(filename):
     return tstamp, val, onoff
 
 
+# initialize output variable
+lines = []
+
+# first of all, read the platform position directly from socket
+labels = ['azimuth','elevation']
+vals = get_position()
+date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+for idx,val in enumerate(vals):
+    val_str = '%.2f degrees' % val
+    label = labels[idx]
+    line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
+    lines.append(line)
+
+# read latest values saved to HK files
+tstamps = []
 labels = read_labels()
 
 hk_files = glob(hk_dir+os.sep+'*.txt')
 hk_files.sort()
-lines = []
-tstamps = []
 for F in hk_files:
     basename = os.path.basename(F)
     
