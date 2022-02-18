@@ -104,8 +104,9 @@ def read_lastline(filename):
     return tstamp, val, onoff
 
 
-# initialize output variable
+# initialize output variables
 lines = []
+tstamps = []
 
 # first of all, read the platform position directly from socket
 labels = ['azimuth','elevation']
@@ -118,7 +119,6 @@ for idx,val in enumerate(vals):
     lines.append(line)
 
 # read latest values saved to HK files
-tstamps = []
 labels = read_labels()
 
 hk_files = glob(hk_dir+os.sep+'*.txt')
