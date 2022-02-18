@@ -1304,7 +1304,7 @@ class qubic_bot :
         get the azimuth and elevation pointing of the platform
         '''
         az,el = get_position()
-        answer = "azimuth = %s degrees\nelevation = %s degrees" % (az,el)
+        answer = "azimuth = %.2f degrees\nelevation = %.2f degrees" % (az,el)
         self._send_message(answer)
         return
 
