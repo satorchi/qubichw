@@ -14,7 +14,6 @@ This is the QUBIC Telegram bot
 https://web.telegram.org/#/im?p=@QUBIC_bot
 
 '''
-from __future__ import division, print_function
 import sys,os,re,time,subprocess,inspect,urllib
 import datetime as dt
 from glob import glob
@@ -30,6 +29,7 @@ from qubichk.hk_verify import check_compressors,check_diskspace
 
 from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses, get_alarm_recipients
 from qubichk.ups import get_ups_info
+from qubichk.platform import get_position
 
 class dummy_bot:
     '''
@@ -103,7 +103,8 @@ class qubic_bot :
                          '/diskspace': self.diskspace,
                          '/ups': self.ups,
                          '/subscribe': self.subscribe,
-                         '/unsubscribe':self.unsubscribe
+                         '/unsubscribe':self.unsubscribe,
+                         '/position': self.position
                          }
 
 
@@ -1296,7 +1297,16 @@ class qubic_bot :
         msg += '\nYou will not receive messages in case of problems with the pulse tubes, or with the UPS (220V power supply)'
         self._send_message(msg)
         return
-        
+
+
+    def position(self):
+        '''
+        get the azimuth and elevation pointing of the platform
+        '''
+        az,el = get_position()
+        answer = "azimuth = %s degrees\nelevation = %s degrees" % (az,el)
+        self._send_message(answer)
+        return
 
     def _default_answer(self):
         '''
