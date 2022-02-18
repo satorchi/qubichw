@@ -111,12 +111,14 @@ tstamps = []
 # first of all, read the platform position directly from socket
 labels = ['azimuth','elevation']
 vals = get_position()
-date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+tstamp = float(dt.datetime.utcnow().strftime('%s.%f'))
+date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
 for idx,val in enumerate(vals):
     val_str = '%.2f degrees' % val
     label = labels[idx]
     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
     lines.append(line)
+    tstamps.append(tstamp)
 
 # read latest values saved to HK files
 labels = read_labels()
