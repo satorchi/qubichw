@@ -24,8 +24,14 @@ platform_outfile = 'platform.dat'
 def send_command(cmd):
     
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)
-    sock.connect((platform_ip,broadcast_port))
+    sock.settimeout(1)
+    try:
+        sock.connect((platform_ip,broadcast_port))
+    except socket.timeout:
+        return 'TIMEOUT'
+    except:
+        return 'SOCKET ERROR'
+    
     encoded_cmd = (cmd+'\r\n').encode()
     sock.send(encoded_cmd)
 
