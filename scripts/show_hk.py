@@ -194,8 +194,9 @@ for F in hk_files:
 latest = max(tstamps)
 for idx,line in enumerate(lines):
     delta = latest - tstamps[idx]
-    if delta>5:
+    if delta>5 or line.find('bad answer')>=0:
         lines[idx] = colored(line,'red','on_white')
+    
 
 
 page = '\n'.join(lines)
