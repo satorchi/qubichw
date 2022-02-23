@@ -41,7 +41,7 @@ def send_command(cmd):
     return reply_decoded
 
 
-def get_encoder_position():
+def get_encoder_position(debug=False):
     reply = send_command('BASE(0)')
     reply = send_command('PRINT MPOS')
     lines =  reply.split('\n')
@@ -49,7 +49,8 @@ def get_encoder_position():
         az = lines[1].strip()
     else:
         az = 'bad answer'
-
+    if debug:print(reply)
+        
     reply = send_command('BASE(1)')
     reply = send_command('PRINT MPOS')
     lines = reply.split('\n')
@@ -57,6 +58,7 @@ def get_encoder_position():
         el = lines[1].strip()
     else:
         el = 'bad answer'
+    if debug:print(reply)
     return az,el
 
 def get_position():
