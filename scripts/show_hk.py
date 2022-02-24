@@ -111,13 +111,17 @@ tstamps = []
 # first of all, read the platform position directly from socket
 labels = ['azimuth','elevation']
 vals = get_position()
+azel = vals[:2]
+warn = vals[2:]
 tstamp = float(dt.datetime.utcnow().strftime('%s.%f'))
 date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
-for idx,val in enumerate(vals):
+for idx,val in enumerate(azel):
     if type(val)==str:
         val_str = val.center(7)
     else:
         val_str = '%7.2f degrees' % val
+    if warn[idx]:
+        val_str += ' ?'
     label = labels[idx]
     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
     lines.append(line)

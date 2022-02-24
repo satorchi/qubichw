@@ -1303,8 +1303,21 @@ class qubic_bot :
         '''
         get the azimuth and elevation pointing of the platform
         '''
-        az,el = get_position()
-        answer = "azimuth = %.2f degrees\nelevation = %.2f degrees" % (az,el)
+        az,el,azwarn,elwarn = get_position()
+        date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        if type(az)==str:
+            az_str = 'ERROR'
+        else:
+            if azwarn:
+                az_str = '%7.2f degrees (possible encoder readout error)' % az
+            else:
+                az_str = '%7.2f degrees' % az
+                
+        if type(el)==str:
+            el_str = 'ERROR'
+        else:
+            el_str = '%7.2f degrees' % el
+        answer = "\nazimuth = %s\nelevation = %s" % (az_str,el_str)
         self._send_message(answer)
         return
 

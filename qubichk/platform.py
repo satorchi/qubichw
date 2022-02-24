@@ -62,17 +62,22 @@ def get_encoder_position(debug=False):
     return az,el
 
 def get_position():
-    enc_az,enc_el = get_encoder_position()    
+    azwarn = False
+    elwarn = False
+    enc_az,enc_el = get_encoder_position()
+    if enc_az==enc_el: azwarn = True
     try:
         az = (float(enc_az)-32768) * (360/65536)
     except:
         az = 'bad answer'
+        azwarn = True
 
     try:
         el = (float(enc_el)-32768) * (360/65536) + 124.35
     except:
-        el = 'bad answer'    
-    return az,el
+        el = 'bad answer'
+        elwarn = True
+    return az,el,azwarn,elwarn
 
 def get_mac():
     reply = send_command('PRINT IP_MAC')
