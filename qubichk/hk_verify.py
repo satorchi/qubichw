@@ -457,7 +457,7 @@ def check_diskspace(verbosity=1):
     find_str = '/'+'|/'.join(parts)
     
     cmd = 'df'
-    out,err = shellcommand(cmd)
+    out1,err = shellcommand(cmd)
     # 2021-11-30 10:00:02 qs is mounted directly on qubic-central again
     # 2022-02-23 16:38:02 qs is back to pitemps... same bug
     # qs2 is mounted on pitemps because of a bug with Windows mounts on qubic-central
