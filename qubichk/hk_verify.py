@@ -409,7 +409,8 @@ def check_mounts(verbosity=1):
     errmsg_list = []
 
     if verbosity>0: print('\n============ checking for remote disk shares ============')
-    smbmounts = ['qs2','entropy']
+    smbmounts = ['qs','entropy']
+    smbmounts = ['entropy'] # qs is mounted on pitemps
     cmd = 'mount'
     out,err = shellcommand(cmd)
     ### 2021-11-30 09:58:50 new config.  qs is mounted directly on qubic-central again
@@ -452,7 +453,7 @@ def check_diskspace(verbosity=1):
     
     space_warning = 10*1024**2 # 10GB minimum disk space (df gives results in 1k blocks)
     if verbosity>0: print('\n============ checking for disk space ============')
-    parts = ['home','archive','entropy','qs']
+    parts = ['home','archive','entropy','qs2']
         
     find_str = '/'+'|/'.join(parts)
     
