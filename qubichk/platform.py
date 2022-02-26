@@ -10,6 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 help: https://docs.python.org/2/howto/sockets.html
 
+list of commands in the manuel:  TrioBASIC Commands (Chapter 2).pdf
+
 get info from the QUBIC lab platform (the red LAL platform)
 
 '''
