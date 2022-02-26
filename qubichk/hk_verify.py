@@ -409,7 +409,7 @@ def check_mounts(verbosity=1):
     errmsg_list = []
 
     if verbosity>0: print('\n============ checking for remote disk shares ============')
-    smbmounts = ['qs','entropy']
+    smbmounts = ['qs2','entropy']
     cmd = 'mount'
     out,err = shellcommand(cmd)
     ### 2021-11-30 09:58:50 new config.  qs is mounted directly on qubic-central again
