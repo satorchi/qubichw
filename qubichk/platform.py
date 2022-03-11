@@ -76,6 +76,7 @@ def get_position():
 
     try:
         el = (float(enc_el)-32768) * (360/65536) + 124.35
+        if el>360: el -= 360
     except:
         el = 'bad answer'
         elwarn = True
