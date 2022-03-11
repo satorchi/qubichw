@@ -369,7 +369,8 @@ class PowerSupply :
             StatusLeft=self.OutputStatus('left')
             print(subttl_left)
             try:
-                print('   Voltage: %f V\n   Current: %f mA\n   Output: %s\n' % (Vleft,Ileft,StatusLeft))
+                Rleft = Vleft/Ileft
+                print('   Voltage: %f V\n   Current: %f mA\nResistance: %f Ohm\n   Output: %s\n' % (Vleft,Ileft,Rleft,StatusLeft))
             except:
                 print('   Voltage: %s V\n   Current: %s mA\n   Output: %s\n' % (Vleft,Ileft,StatusLeft))
                 
@@ -378,7 +379,8 @@ class PowerSupply :
         Iright=self.get_CurrentOutput('right')
         StatusRight=self.OutputStatus('right')
         try:
-            print('   Voltage: %f V\n   Current: %f mA\n   Output: %s\n' % (Vright,Iright,StatusRight))
+            Rright = Vright/Iright
+            print('   Voltage: %f V\n   Current: %f mA\Resistance: %f Ohm\n   Output: %s\n' % (Vright,Iright,Rright,StatusRight))
         except:
             print('   Voltage: %s V\n   Current: %s mA\n   Output: %s\n' % (Vright,Iright,StatusRight))
             
