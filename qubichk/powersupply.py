@@ -353,6 +353,7 @@ class PowerSupply :
     def Status(self):
         '''print out all the parameters of both power supplies
         '''
+        msg_list = []
 
         ttl='\nPower Supply: '+self.supplyname
         subttl_left  = self.info['label_left']
@@ -362,34 +363,42 @@ class PowerSupply :
         if 'userlabel_right' in self.info.keys():
             subttl_right += ': %s' % self.info['userlabel_right']
 
-        print(ttl)
+        msg_list.append(ttl)
         if self.nsupplies==2:
             Vleft=self.get_VoltageSetting('left')
             Ileft=self.get_CurrentOutput('left')
             StatusLeft=self.OutputStatus('left')
-            print(subttl_left)
+            msg_list.append(subttl_left)
             try:
-                print('   Voltage: %f V\n   Current: %f mA' % (Vleft,Ileft))
+                msg_list.append('   Voltage: %f V' % Vleft)
                 if StatusLeft=="ON":
+                    msg_list.append('   Current: %f mA' % Ileft)
                     Rleft = Vleft/Ileft
-                    print('\n   Resistance: %f kOhm' % Rleft)
-                print('\n   Output: %s\n' % StatusLeft)
+                    msg_list.append('   Resistance: %f kOhm' % Rleft)
+                msg_list.append('   Output: %s' % StatusLeft)
             except:
-                print('   Voltage: %s V\n   Current: %s mA\n   Output: %s\n' % (Vleft,Ileft,StatusLeft))
-                
-        print(subttl_right+'\n')
+                msg_list.append('   Voltage: %s V' % Vleft)
+                msg_list.append('   Current: %s mA' % Ileft)
+                msg_list.append('   Output: %s' % StatusLeft)
+
+        msg_list.append('\n'+subttl_right)
         Vright=self.get_VoltageSetting('right')
         Iright=self.get_CurrentOutput('right')
         StatusRight=self.OutputStatus('right')
         try:
-            print('   Voltage: %f V\n   Current: %f mA' % (Vright,Iright))
+            msg_list.append('   Voltage: %f V' % Vright)
             if StatusRight=="ON":
+                msg_list.append('   Current: %f mA' % Iright)
                 Rright = Vright/Iright
-                print('\n   Resistance: %f kOhm' % Rright)
-            print('\n   Output: %s\n' % StatusRight)
+                msg_list.append('   Resistance: %f kOhm' % Rright)
+            msg_list.append('   Output: %s' % StatusRight)
         except:
-            print('   Voltage: %s V\n   Current: %s mA\n   Output: %s\n' % (Vright,Iright,StatusRight))
-            
+            msg_list.append('   Voltage: %s V' % Vright)
+            msg_list.append('   Current: %s mA' % Iright)
+            msg_list.append('   Output: %s' % StatusRight)
+
+        msg = '\n'.join(msg_list)
+        print(msg)
         return
 
 
