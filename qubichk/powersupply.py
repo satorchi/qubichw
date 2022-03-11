@@ -381,7 +381,7 @@ class PowerSupply :
                 msg_list.append('   Current: %s mA' % Ileft)
                 msg_list.append('   Output: %s' % StatusLeft)
 
-        msg_list.append('\n'+subttl_right)
+        msg_list.append(subttl_right)
         Vright=self.get_VoltageSetting('right')
         Iright=self.get_CurrentOutput('right')
         StatusRight=self.OutputStatus('right')
