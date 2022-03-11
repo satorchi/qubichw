@@ -20,6 +20,7 @@ QS_DIR=pi@cam2:/qs2
 
 HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
 ARCHIVE_DIR=/archive
+echo "`date +%Y-%m-%dT%H:%M:%S` starting archiving" >> $ARCHIVE_DIR/archive_log.txt
 
 CC_DIR=/sps/qubic/Data/Calib-TD
 JUPYTER_DIR=/qubic/Data/Calib-TD
@@ -56,3 +57,4 @@ rsync -avt $ARCHIVE_DIR/ cc:$CC_DIR
 ## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
 ## rsync -avt $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
 
+echo "`date +%Y-%m-%dT%H:%M:%S` finished archiving" >> $ARCHIVE_DIR/archive_log.txt
