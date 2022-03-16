@@ -34,6 +34,7 @@ exclude_files = ['TEMPERATURE_RAW.txt',
                  'compressor1_log.txt',
                  'compressor2_log.txt',
                  'ups_log.txt']
+touchname = 'AVS47_1_ch0.txt'
 
 def read_labels():
     '''
@@ -104,6 +105,23 @@ def read_lastline(filename):
     return tstamp, val, onoff
 
 
+def assign_val_string(val,units):
+    if abs(val)>=1:
+        val_str = '%7.3f %s' % (val,units)
+    elif abs(val)>=1e-3:
+        val_str = '%7.3f m%s' % (val*1e3,units)
+    elif abs(val)>=1e-6:
+        val_str = '%7.3f u%s' % (val*1e6,units)
+    elif abs(val)>=1e-9:
+        val_str = '%7.3f n%s' % (val*1e9,units)
+    elif abs(val)>=1e-12:
+        val_str = '%7.3f p%s' % (val*1e12,units)
+    else:
+        val_str = '%12.5e %s' % (val,units)
+    return val_str
+    
+
+
 # initialize output variables
 lines = []
 tstamps = []
@@ -130,12 +148,65 @@ for idx,val in enumerate(azel):
 # read latest values saved to HK files
 labels = read_labels()
 
+# find all the existing HK files
 hk_files = glob(hk_dir+os.sep+'*.txt')
 hk_files.sort()
+
+
+# treat the heaters first
+heaterfiletypes = ['Amp','Volt']
+heaterunits = {'Volt':'V', 'Amp': 'A'}
+for idx in range(7):
+    counter = idx + 1
+    heatervals = {}
+
+    for filetype in heaterfiletypes:
+        basename = 'HEATER%i_%s.txt' % (counter,filetype)
+        F = '%s%s%s' % (hk_dir,os.sep,basename)
+        if not os.path.isfile(F): continue
+    
+        retval = read_lastline(F)
+        if retval is None: continue
+        tstamp,val,onoff = retval
+        tstamps.append(tstamp)
+        date = dt.datetime.utcfromtimestamp(tstamp)
+        date_str = date.strftime('%Y-%m-%d %H:%M:%S')
+    
+        label = ''
+        labelkey = basename.replace('.txt','')
+        if labelkey in labels.keys():
+            label = labels[labelkey]
+
+        units = heaterunits[filetype]
+        if filetype=='Amp':
+            if onoff is not None and onoff=='OFF': continue # don't print the current if the powersupply is off
+            units = 'A'
+            val *= 0.001
+        else:
+            units = 'V'
+        heatervals[filetype] = val
+
+        R_str = None
+        if onoff is not None and onoff=='OFF':
+            units += ' OFF'
+        else:
+            R = heatervals['Volt']/heatervals['Amp']
+            R_str = assign_val_string(R,'Ohm')
+            
+
+        val_str = assign_val_string(val,units)
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        lines.append(line)
+        if R_str is not None:
+            line = '%s %s %s %s' % (date_str, R_str.rjust(20), label.center(20), labelkey)
+            lines.append(line)
+            
+    
+# do the rest of the HK files
 for F in hk_files:
     basename = os.path.basename(F)
-    
     if basename in exclude_files: continue
+    if basename.find('HEATER')==0: continue # already done, above
 
     retval = read_lastline(F)
     if retval is None: continue
@@ -150,7 +221,7 @@ for F in hk_files:
 
     units = None
     val_str = None
-    if basename=='AVS47_1_ch0.txt':
+    if basename==touchname:
         units = 'Ohm'
     elif basename.find('TEMPERATURE')==0 or basename.find('AVS')==0:
         units = 'K'
@@ -176,19 +247,9 @@ for F in hk_files:
 
     if units == 'steps':
         val_str = '%10i %s' % (int(val), units)
+        
     if val_str is None:
-        if abs(val)>=1:
-            val_str = '%7.3f %s' % (val,units)
-        elif abs(val)>=1e-3:
-            val_str = '%7.3f m%s' % (val*1e3,units)
-        elif abs(val)>=1e-6:
-            val_str = '%7.3f u%s' % (val*1e6,units)
-        elif abs(val)>=1e-9:
-            val_str = '%7.3f n%s' % (val*1e9,units)
-        elif abs(val)>=1e-12:
-            val_str = '%7.3f p%s' % (val*1e12,units)
-        else:
-            val_str = '%12.5e %s' % (val,units)
+        val_str = assign_val_string(val,units)
 
 
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
