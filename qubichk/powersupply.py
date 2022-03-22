@@ -166,7 +166,13 @@ class PowerSupply :
             match = re.match('^(HEATER.*): (.*)',line)
             if match:
                 label = match.groups()[0]
-                userlabel = match.groups()[1]
+                userinfo = match.groups()[1].split(';')
+                userlabel = userinfo[0].strip()
+                if len(userinfo)>1:
+                    resistor = float(userinfo[1].strip())
+                else:
+                    resistor = None
+                
                 self.log('found user label %s = %s' % (label,userlabel),verbosity=3)
                 self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']),verbosity=4)
                 if label==self.info['label_left']:
