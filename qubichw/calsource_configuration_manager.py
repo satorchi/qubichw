@@ -332,7 +332,7 @@ class calsource_configuration_manager():
         # clean up the acknowledgement
         ack_cleaned = []
         for line in ack.decode().strip().split():
-            ack_cleaned.append('%s\n' % line.strip())
+            ack_cleaned.append(line.strip())
         self.log('\n'.join(ack_cleaned))
         return received_tstamp, ack
     
