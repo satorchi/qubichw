@@ -118,7 +118,7 @@ class amplifier:
         self.send_command('CPLG 1\n')  # coupling: DC
         self.send_command('DYNR 0\n')  # dynamic range: low noise
         self.send_command('GAIN 10\n') # gain: 2000
-        self.send_command('INVT 0\n')  # not inverted
+        self.send_command('INVT 1\n')  # inverted
         self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 10.0
         self.state['filter high frequency'] = 0.3
