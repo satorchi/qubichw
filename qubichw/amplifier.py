@@ -10,8 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 configure the amplifier in the Calibration Source setup
 '''
-from __future__ import division, print_function
-import os,serial
+import os,serial,time
 import numpy as np
 import datetime as dt
 
@@ -159,7 +158,9 @@ class amplifier:
         '''
         tell device to listen
         '''
+        time.sleep(0.5)
         self.send_command('LALL')
+        time.sleep(0.5)
         return
 
     def set_invert_mode(self,invert_mode):
