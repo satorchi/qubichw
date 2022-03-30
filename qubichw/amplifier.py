@@ -79,6 +79,7 @@ class amplifier:
                               stopbits=2,
                               timeout=0.5)
             self.s = s
+            self.set_listen_mode()
             return True
 
         except:
@@ -153,6 +154,12 @@ class amplifier:
         # self.state['invert'] = 'off'
         return
 
+    def set_listen_mode(self):
+        '''
+        tell device to listen
+        '''
+        self.send_command('LALL')
+        return
 
     def set_invert_mode(self,invert_mode):
         '''
