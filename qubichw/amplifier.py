@@ -128,21 +128,29 @@ class amplifier:
         '''
         if not self.is_connected():return False
         self.log('AMPLIFIER: set default settings',verbosity=2)
-        self.send_command('LALL')    # tell device to listen
-        self.send_command('FLTM 2')  # filter mode: 12dB low pass
-        self.send_command('LFRQ 5')  # low pass freq: 10Hz
-        self.send_command('HFRQ 2')  # high pass freq: 0.3Hz
-        self.send_command('CPLG 1')  # coupling: DC
-        self.send_command('DYNR 0')  # dynamic range: low noise
-        self.send_command('GAIN 10') # gain: 2000
-        self.send_command('INVT 1')  # inverted
-        self.state['filter mode'] = '12db_low_pass'
-        self.state['filter low frequency'] = 10.0
-        self.state['filter high frequency'] = 0.3
-        self.state['coupling'] = 'DC'
-        self.state['dynamic range'] = 'low_noise'
-        self.state['gain'] = 10000
-        self.state['invert'] = 'off'
+        self.set_filter_mode('12db_low_pass')
+        self.set_filter_frequency(10,lowhigh='low')
+        self.set_filter_frequency(0.3,lowhigh='high')
+        self.set_coupling('DC')
+        self.set_dynamic('low_noise')
+        self.set_gain(2000)
+        self.set_invert_mode('ON')
+        
+        # self.send_command('LALL')    # tell device to listen
+        # self.send_command('FLTM 2')  # filter mode: 12dB low pass
+        # self.send_command('LFRQ 5')  # low pass freq: 10Hz
+        # self.send_command('HFRQ 2')  # high pass freq: 0.3Hz
+        # self.send_command('CPLG 1')  # coupling: DC
+        # self.send_command('DYNR 0')  # dynamic range: low noise
+        # self.send_command('GAIN 10') # gain: 2000
+        # self.send_command('INVT 1')  # inverted
+        # self.state['filter mode'] = '12db_low_pass'
+        # self.state['filter low frequency'] = 10.0
+        # self.state['filter high frequency'] = 0.3
+        # self.state['coupling'] = 'DC'
+        # self.state['dynamic range'] = 'low_noise'
+        # self.state['gain'] = 10000
+        # self.state['invert'] = 'off'
         return
 
 
