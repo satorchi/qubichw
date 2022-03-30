@@ -24,6 +24,7 @@ class amplifier:
         '''
         initialization of the amplifier object
         '''
+        self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         self.verbosity = verbosity
         self.creation = dt.datetime.utcnow()
         self.creation_str = self.creation.strftime('%Y-%m-%d %H:%M:%S')
