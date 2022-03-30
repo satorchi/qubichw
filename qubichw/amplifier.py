@@ -129,6 +129,7 @@ class amplifier:
         '''
         if not self.is_connected():return False
         self.log('AMPLIFIER: set default settings',verbosity=2)
+        self.set_listen_mode()
         self.set_filter_mode('12db_low_pass')
         self.set_filter_frequency(10,lowhigh='low')
         self.set_filter_frequency(0.3,lowhigh='high')
