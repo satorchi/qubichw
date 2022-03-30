@@ -113,10 +113,13 @@ class amplifier:
         '''
         if not self.is_connected(): return False
 
+        cmd_encoded = ('%s\n' % cmd).encode()
         try:
-            self.s.write(cmd.encode())
+            self.s.write(cmd_encoded)
         except:
+            self.log('AMPLIFIER: send_command failed: %s' % cmd)
             return False
+    
         return True
     
     def set_default_settings(self):
@@ -125,14 +128,14 @@ class amplifier:
         '''
         if not self.is_connected():return False
         self.log('AMPLIFIER: set default settings',verbosity=2)
-        self.send_command('LALL\n')    # tell device to listen
-        self.send_command('FLTM 2\n')  # filter mode: 12dB low pass
-        self.send_command('LFRQ 5\n')  # low pass freq: 10Hz
-        self.send_command('HFRQ 2\n')  # high pass freq: 0.3Hz
-        self.send_command('CPLG 1\n')  # coupling: DC
-        self.send_command('DYNR 0\n')  # dynamic range: low noise
-        self.send_command('GAIN 10\n') # gain: 2000
-        self.send_command('INVT 1\n')  # inverted
+        self.send_command('LALL')    # tell device to listen
+        self.send_command('FLTM 2')  # filter mode: 12dB low pass
+        self.send_command('LFRQ 5')  # low pass freq: 10Hz
+        self.send_command('HFRQ 2')  # high pass freq: 0.3Hz
+        self.send_command('CPLG 1')  # coupling: DC
+        self.send_command('DYNR 0')  # dynamic range: low noise
+        self.send_command('GAIN 10') # gain: 2000
+        self.send_command('INVT 1')  # inverted
         self.state['filter mode'] = '12db_low_pass'
         self.state['filter low frequency'] = 10.0
         self.state['filter high frequency'] = 0.3
@@ -149,11 +152,11 @@ class amplifier:
         '''
         if not self.is_connected():return False
         if invert_mode.upper()=='ON':
-            self.send_command('INVT 1\n')
+            self.send_command('INVT 1')
             self.state['invert'] = invert_mode.upper()
             return True
 
-        self.send_command('INVT 0\n')
+        self.send_command('INVT 0')
         self.state['invert'] = 'OFF'
         return True
                 
@@ -188,7 +191,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.send_command('FLTM %i\n' % mode_idx)
+        self.send_command('FLTM %i' % mode_idx)
         self.state['filter mode'] = valid_args[mode_idx]
         return True
         
@@ -241,7 +244,7 @@ class amplifier:
         else:
             return False # should never get here.
             
-        self.send_command('%s %i\n' % (cmd,mode_idx))
+        self.send_command('%s %i' % (cmd,mode_idx))
         self.state['filter %s frequency' % lowhigh] = valid_args[mode_idx]
         return True
 
@@ -276,7 +279,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.send_command('GAIN %i\n' % mode_idx)
+        self.send_command('GAIN %i' % mode_idx)
         self.state['gain'] = valid_args[mode_idx]
         self.log('AMPLIFIER gain set to %i' % self.state['gain'],verbosity=2)
         self.log('AMPLIFIER instantiated %s' % self.creation_str,verbosity=2)
@@ -300,7 +303,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.send_command('CPLG %i\n' % mode_idx)
+        self.send_command('CPLG %i' % mode_idx)
         self.state['coupling'] = valid_args[mode_idx]
         return True
 
@@ -324,7 +327,7 @@ class amplifier:
                 mode_idx = idx
                 break
 
-        self.send_command('DYNR %i\n' % mode_idx)
+        self.send_command('DYNR %i' % mode_idx)
         self.state['dynamic range'] = valid_args[mode_idx]
         return True
 
