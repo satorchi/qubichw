@@ -20,11 +20,11 @@ class amplifier:
     a class to communicate with the Stanford Research Systems SR560 low noise amplifier
     '''
 
-    def __init__(self,port=None):
+    def __init__(self,port=None,verbosity=2):
         '''
         initialization of the amplifier object
         '''
-        #print('DEBUG:AMPLIFIER instantiating new amplifier object')
+        self.verbosity = verbosity
         self.creation = dt.datetime.utcnow()
         self.creation_str = self.creation.strftime('%Y-%m-%d %H:%M:%S')
         self.s = None
@@ -42,12 +42,24 @@ class amplifier:
         self.set_default_settings()
         return None
 
+    def log(self,msg,verbosity=0):
+        '''
+        log message to screen and to a file
+        '''
+        if verbosity > self.verbosity: return
+        
+        filename = 'amplifier_command.log'
+        h = open(filename,'a')
+        h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
+        h.close()
+        print(msg)
+        return
 
     def init(self,port=None):
         '''
         initialize the amplifier
         '''
-        print('DEBUG:AMPLIFIER initializing')
+        self.log('AMPLIFIER initializing',verbosity=2)
         if port is None: port = self.port
         if port is None: port = '/dev/rs232_1'
 
@@ -80,16 +92,16 @@ class amplifier:
         check if the amplifier is connected
         '''
         if self.port is None:
-            print('DEBUG:AMPLIFIER is_connected:self.port is None')
+            self.log('AMPLIFIER is_connected:self.port is None',verbosity=2)
             return False
 
         if not os.path.exists(self.port):
-            print('DEBUG:AMPLIFIER port does not exist: %s' % self.port)
+            self.log('AMPLIFIER port does not exist: %s' % self.port,verbosity=2)
             self.s = None
             return False
 
         if self.s is None:
-            print('DEBUG:AMPLIFIER is_connected:self.s is None')
+            self.log('AMPLIFIER is_connected:self.s is None',verbosity=2)
             return False
         
         return True
@@ -111,6 +123,7 @@ class amplifier:
         default settings for the amplifier
         '''
         if not self.is_connected():return False
+        self.log('AMPLIFIER: set default settings',verbosity=2)
         self.send_command('LALL\n')    # tell device to listen
         self.send_command('FLTM 2\n')  # filter mode: 12dB low pass
         self.send_command('LFRQ 5\n')  # low pass freq: 10Hz
@@ -264,8 +277,8 @@ class amplifier:
 
         self.send_command('GAIN %i\n' % mode_idx)
         self.state['gain'] = valid_args[mode_idx]
-        #print('DEBUG:AMPLIFIER gain set to %i' % self.state['gain'])
-        #print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
+        self.log('AMPLIFIER gain set to %i' % self.state['gain'],verbosity=2)
+        self.log('AMPLIFIER instantiated %s' % self.creation_str,verbosity=2)
         return True
 
     def set_coupling(self,coupling):
@@ -391,6 +404,6 @@ class amplifier:
             msg += ' amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
         msg += ' amplifier:invert=%s' % self.state['invert']
-        #print('DEBUG:AMPLIFIER returning status message: %s' % msg)
-        #print('DEBUG:AMPLIFIER instantiated %s' % self.creation_str)
+        self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
+        self.log('AMPLIFIER instantiated %s' % self.creation_str,verbosity=2)
         return msg
