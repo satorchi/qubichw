@@ -259,7 +259,9 @@ for F in hk_files:
 
 
 latest = max(tstamps)
+n_tstamps = len(tstamps)
 for idx,line in enumerate(lines):
+    if idx>=n_tstamps: break
     delta = latest - tstamps[idx]
     if delta>5 or line.find('bad answer')>=0 or line.find('?')>=0:
         lines[idx] = colored(line,'red','on_white')
