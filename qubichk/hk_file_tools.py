@@ -56,9 +56,10 @@ def read_hk_file(filename):
     lines = h.read().split('\n')
     h.close()
     del(lines[-1])
-    npts=len(lines)
-    t=np.zeros(npts)
-    v=np.zeros(npts)
+    npts = len(lines)
+    t = np.zeros(npts)
+    v = np.zeros(npts)
+    onoff = np.zeros(npts,dtype=bool)
     idx=0
     for line_idx,line in enumerate(lines):
         cols = line.strip().replace('\x00','').split()
@@ -73,13 +74,18 @@ def read_hk_file(filename):
             idx+=1
         except:
             print("ERROR! Couldn't read line: %i) %s" % (line_idx+1,line))
-            pass
+            continue
+
+        if len(cols)<3: continue
+        if cols[2]=='ON': onoff[idx] = True
+        
 
     if idx<npts:
         t = t[0:idx]
         v = v[0:idx]
+        onoff = onoff[0:idx]
         print('%s: idx,npts = %i,%i' % (filename,idx,npts))
-    return t,v
+    return t,v,onoff
 
 
 def read_entropy_label(filename):
