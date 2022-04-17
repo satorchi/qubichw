@@ -10,7 +10,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 tools for reading QUBIC raw housekeeping files
 '''
-from __future__ import division, print_function
 import sys,os,re,time
 import datetime as dt
 from glob import glob
