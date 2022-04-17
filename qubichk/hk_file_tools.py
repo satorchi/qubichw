@@ -60,13 +60,14 @@ def read_hk_file(filename):
     v = np.zeros(npts)
     onoff = np.zeros(npts,dtype=bool)
     idx=0
+    badpattern = re.compile('[a-z][A-Z]')
     for line_idx,line in enumerate(lines):
         cols = line.strip().replace('\x00','').split()
+        if len(cols)<2: continue
+        if badpattern.match(cols[0]): continue
+        if badpattern.match(cols[1]): continue
         try:
             tstamp = float(cols[0])
-            if cols[1]=='inf':
-                continue
-            
             reading = eval(cols[1])
             v[idx] = reading
             t[idx] = tstamp
