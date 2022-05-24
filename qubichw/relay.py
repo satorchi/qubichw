@@ -26,7 +26,6 @@ class relay:
         self.port = port # full path to port device, for example /dev/ttyACM0
         self.s = None # serial port
         
-        self.default_settings = {}
         if isinstance(devices,dict):
             self.device_address = devices
         else:
@@ -35,12 +34,15 @@ class relay:
             self.device_address['modulator'] = 14
             self.device_address['fan']       = 13
             self.device_address['heater']    = 12
-            self.device_address['source 150'] = 11
-            self.device_address['source 220'] = 10
+            self.device_address['calsource 150'] = 11
+            self.device_address['calsource 220'] = 10
             
 
+        self.default_setting = {}
+        self.current_setting = {}
         for dev in self.device_address.keys():
-            self.default_settings[dev] = 0
+            self.default_setting[dev] = 0
+            self.current_setting[dev] = 0
         
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
@@ -147,12 +149,24 @@ class relay:
         try:
             hexstr = '0x'+lines[-2].strip()
             bits = int(hexstr,16)
+            self.assign_status(bits)
             return bits
         except:
             self.log('inappropriate answer to get_state: %s' % ans,verbosity=1)
             
         return ans
 
+    def assign_status(self,bitmask):
+        '''
+        after a successful get_state command, assign the status to the current_state dictionary
+        '''
+        for dev in self.device_address.keys():
+            addr = self.device_address[dev]
+            bit = 2**addr
+            onoff = (bit & bitmask) >> adr
+            self.current_state[dev] = onoff
+        return        
+        
     def print_state(self):
         '''
         print the on/off state of each relay
@@ -160,10 +174,8 @@ class relay:
         bits = self.get_state()
         if isinstance(bits,str): return None
         
-        for dev in self.device_address.keys():
-            addr = self.device_address[dev]
-            bit = 2**addr
-            if bit & bits == bit:
+        for dev in self.current_state.keys():
+            if self.current_state[dev]==1
                 onoff = 'on'
             else:
                 onoff = 'off'
