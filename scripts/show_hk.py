@@ -189,7 +189,7 @@ for idx in range(7):
         R_str = None
         if onoff is not None and onoff=='OFF':
             units += ' OFF'
-        elif 'Volt' in heatervals.keys() and 'Amp' in heatervals.keys():
+        elif 'Volt' in heatervals.keys() and 'Amp' in heatervals.keys() and heatervals['Amp']!=0:
             R = heatervals['Volt']/heatervals['Amp']
             R_str = assign_val_string(R,'Ohm')
         else:
