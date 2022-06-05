@@ -44,7 +44,7 @@ HK_FILES="`/bin/ls -1 TEMP*.txt\
 for F in $HK_FILES; do
     chk=`diff $HK_DIR/$F $ARCHIVE_HKDIR/$F 2> /dev/null`
     if [ -n "$chk" ];then
-	echo "ERROR:  file not copied: $F"
+	echo "ERROR:  file differs: $F"
 	exit
     fi
 done
