@@ -175,7 +175,7 @@ class relay:
         if isinstance(bits,str): return None
         
         for dev in self.current_state.keys():
-            if self.current_state[dev]==1
+            if self.current_state[dev]==1:
                 onoff = 'on'
             else:
                 onoff = 'off'
