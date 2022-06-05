@@ -23,7 +23,8 @@ fi
 ARCHIVE_HKDIR=$ARCHIVE_DIR/hk/data_$START_DATE
 
 # stop the housekeeping server
-killall -9 run_hkserver.py
+pid=`ps axw|grep 'python.*run_hkserver.py'|grep -v grep|gawk '{print $1}'`
+kill -9 $pid
 
 # archive the data
 archive-data.sh
