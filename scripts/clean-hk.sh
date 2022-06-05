@@ -35,7 +35,8 @@ HK_FILES="`/bin/ls -1 TEMP*.txt\
   HEATER*.txt\
   compressor?_log.txt\
   MHS?.txt\
-  PRESSURE?.txt`"
+  PRESSURE?.txt\
+  *.log`"
 
 
 # check that everything was copied
