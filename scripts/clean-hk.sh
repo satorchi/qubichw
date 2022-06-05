@@ -50,7 +50,7 @@ for F in $HK_FILES; do
 done
       
 # clean up the housekeeping directory
-rm -f $HK_FILES
+rm -fv $HK_FILES
 
 # restart the housekeeping server
 start_hkserver.sh
