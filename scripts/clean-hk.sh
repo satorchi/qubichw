@@ -36,6 +36,7 @@ HK_FILES="`/bin/ls -1 TEMP*.txt\
   compressor?_log.txt\
   MHS?.txt\
   PRESSURE?.txt\
+  ups_log.txt\
   *.log`"
 
 
