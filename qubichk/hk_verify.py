@@ -661,7 +661,10 @@ def check_calsource(verbosity=1):
     for daemon in start_command.keys():
         msg = '%s ...' % daemon
         if verbosity>0: print(msg,end='',flush=True)
-        find_str = 'python.*%s' % daemon
+        if daemon.find('.py')>0:
+            find_str = 'python.*%s' % daemon
+        else:
+            find_str = daemon
         match = re.search(find_str,out)
         if match is None:
             retval['ok'] = False
@@ -716,7 +719,7 @@ def check_ups(verbosity=1):
     '''
     check the UPS
     '''
-
+    if verbosity>0: print('\n============ checking UPS ============')
     retval = {}
     info = get_ups_info()
     retval['ok'] =  not info['alarm']
