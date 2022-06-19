@@ -60,6 +60,7 @@ def get_ups_info():
         txtmsg = 'UPS status\n'
 
     txtmsg +=  '\n'.join(brief_msg_list)
+    info['brief message'] = txtmsg
     txtmsg += '\n**************\n\nFull output from UPS:\n%s' % full_output
 
     info['alarm'] = alarm

@@ -18,6 +18,7 @@ import datetime as dt
 
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram, get_alarm_recipients
+from qubichk.ups import get_ups_info
 
 alarm_recipients = get_alarm_recipients()
 
@@ -639,6 +640,8 @@ def check_calsource(verbosity=1):
     start_command = {}
     start_command['calsource_commander.py'] = 'start_calsource_manager.sh'
     start_command['read_calsource.py'] = 'start_calsource_acq.sh'
+    start_command['gpsd'] = 'gpsd'
+    start_command['ntpd'] = 'ntpd'
 
     if verbosity>0: print('\n============ checking calsource daemons ============')
     cmd = 'ssh pigps ps axwu'
@@ -709,6 +712,18 @@ def check_compressors(verbosity=1):
     if verbosity>0: print(retval['message'])
     return retval
 
+def check_ups(verbosity=1):
+    '''
+    check the UPS
+    '''
+
+    retval = {}
+    info = get_ups_info()
+    retval['ok'] =  not info['alarm']
+    retval['message'] = info['brief message']
+    if verbosity>0: print(retval['message'])
+    return retval
+
 def hk_ok(verbosity=1,fulltest=False):
     '''
     check that housekeeping is okay
@@ -717,6 +732,7 @@ def hk_ok(verbosity=1,fulltest=False):
     ok = True
     message = ''
 
+    retval['ups'] = check_ups(verbosity=verbosity)
     retval['power'] = check_power(verbosity=verbosity)
     retval['network'] = check_network(verbosity=verbosity,fulltest=fulltest)
     retval['mounts'] = check_mounts(verbosity=verbosity)
