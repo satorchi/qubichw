@@ -133,7 +133,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/configfile_backup.sh',
            'scripts/test_alarm.py',
            'scripts/copydata',
-           'scripts/clean-hk.sh']
+           'scripts/clean-hk.sh',
+           'scripts/mount_entropy.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
