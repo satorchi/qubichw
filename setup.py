@@ -134,7 +134,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/test_alarm.py',
            'scripts/copydata',
            'scripts/clean-hk.sh',
-           'scripts/mount_entropy.sh']
+           'scripts/mount_entropy.sh',
+           'scripts/start_gpsd-ntpd.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
