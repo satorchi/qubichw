@@ -161,13 +161,13 @@ class relay:
 
     def assign_status(self,bitmask):
         '''
-        after a successful get_state command, assign the status to the current_state dictionary
+        after a successful get_state command, assign the status to the current_setting dictionary
         '''
         for dev in self.device_address.keys():
             addr = self.device_address[dev]
             bit = 2**addr
             onoff = (bit & bitmask) >> addr
-            self.current_state[dev] = onoff
+            self.current_setting[dev] = onoff
         return        
         
     def print_state(self):
@@ -177,8 +177,8 @@ class relay:
         bits = self.get_state()
         if isinstance(bits,str): return None
         
-        for dev in self.current_state.keys():
-            if self.current_state[dev]==1:
+        for dev in self.current_setting.keys():
+            if self.current_setting[dev]==1:
                 onoff = 'on'
             else:
                 onoff = 'off'
