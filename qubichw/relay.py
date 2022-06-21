@@ -13,6 +13,7 @@ ref: Numato-16-Channel-USB Relay-Module.pdf
 https://numato.com/docs/16-channel-usb-relay-module/
 '''
 import serial,subprocess,sys,os
+from glob import glob
 
 class relay:
     '''
