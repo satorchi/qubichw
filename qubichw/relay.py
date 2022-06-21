@@ -12,7 +12,7 @@ control the Numato relay for power supply
 ref: Numato-16-Channel-USB Relay-Module.pdf
 https://numato.com/docs/16-channel-usb-relay-module/
 '''
-import serial,subprocess,sys,os
+import serial,subprocess,sys,os,re
 from glob import glob
 
 class relay:
