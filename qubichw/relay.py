@@ -38,6 +38,7 @@ class relay:
             self.device_address['heater']    = 12
             self.device_address['calsource 150'] = 11
             self.device_address['calsource 220'] = 10
+            self.device_address['laser'] = 9
             
 
         self.default_setting = {}
@@ -165,7 +166,7 @@ class relay:
         for dev in self.device_address.keys():
             addr = self.device_address[dev]
             bit = 2**addr
-            onoff = (bit & bitmask) >> adr
+            onoff = (bit & bitmask) >> addr
             self.current_state[dev] = onoff
         return        
         
