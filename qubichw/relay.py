@@ -14,6 +14,7 @@ https://numato.com/docs/16-channel-usb-relay-module/
 '''
 import serial,subprocess,sys,os,re
 from glob import glob
+import datetime as dt
 
 class relay:
     '''
