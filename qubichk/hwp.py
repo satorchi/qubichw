@@ -28,7 +28,9 @@ def get_hwp_info():
     msg_ack = "cmd received"
     msg_bytes = msg_ack.encode()
     msg_rcv, addr = s.recvfrom(1024)
-    msg = pos_rcv.decode()
+    s.close()
+    
+    msg = msg_rcv.decode()
     pos_str = msg.split('direction')[0].split()[1]
     dir_str = msg.split('direction:')[1].split(',')[0].strip()
     motor_str = msg.split(',')[-1].strip()
