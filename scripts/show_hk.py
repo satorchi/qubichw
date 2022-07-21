@@ -19,6 +19,7 @@ import datetime as dt
 from termcolor import colored
 
 from qubichk.platform import get_position
+from qubichk.hwp import get_hwp_info
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 if not os.path.isdir(hk_dir):
@@ -131,7 +132,7 @@ labels = ['azimuth','elevation']
 vals = get_position()
 azel = vals[:2]
 warn = vals[2:]
-tstamp = float(dt.datetime.utcnow().strftime('%s.%f'))
+tstamp = dt.datetime.utcnow().timestamp()
 date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
 for idx,val in enumerate(azel):
     if type(val)==str:
@@ -144,6 +145,16 @@ for idx,val in enumerate(azel):
     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
     lines.append(line)
     tstamps.append(tstamp)
+
+# next read the HWP position
+hwpinfo = get_hwp_info()
+tstamp = dt.datetime.utcnow().timestamp()
+date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
+label = 'HWP Position'
+line = '%s %s %s' % (date_str, hwpinfo['pos'].rjust(20), label.center(20))
+lines.append(line)
+tstamps.append(tstamp)
+
 
 # read latest values saved to HK files
 labels = read_labels()

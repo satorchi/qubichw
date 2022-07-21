@@ -19,6 +19,7 @@ import datetime as dt
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram, get_alarm_recipients
 from qubichk.ups import get_ups_info
+from qubichk.hwp import get_hwp_info
 
 alarm_recipients = get_alarm_recipients()
 
@@ -727,6 +728,13 @@ def check_ups(verbosity=1):
     if verbosity>0: print(retval['message'])
     return retval
 
+def check_hwp(verbosity=1):
+    '''
+    get the HWP position
+    '''
+    retval = get_hwp_info()
+    return retval
+
 def hk_ok(verbosity=1,fulltest=False):
     '''
     check that housekeeping is okay
@@ -741,6 +749,7 @@ def hk_ok(verbosity=1,fulltest=False):
     retval['mounts'] = check_mounts(verbosity=verbosity)
     retval['diskspace'] = check_diskspace(verbosity=verbosity)
     retval['calsource'] = check_calsource(verbosity=verbosity)
+    retval['hwp'] = check_hwp(verbosity=verbosity)
     retval['servers'] = check_servers(verbosity=verbosity)
     retval['temps'] = check_temps(verbosity=verbosity)
     retval['compressor'] = check_compressors(verbosity=verbosity)
