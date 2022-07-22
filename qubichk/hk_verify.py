@@ -732,7 +732,10 @@ def check_hwp(verbosity=1):
     '''
     get the HWP position
     '''
+    if verbosity>0: print('\n============ checking HWP ============')
     retval = get_hwp_info()
+    if verbosity>0: print(retval['message'])
+        
     return retval
 
 def hk_ok(verbosity=1,fulltest=False):
