@@ -36,6 +36,9 @@ def get_hwp_info():
         retval['ok'] = False
         retval['message'] = 'HWP info unavailable: socket in use.  Try again.'
         retval['brief message'] = retval['message']
+        retval['pos'] = None
+        retval['dir'] = None
+        retval['motor'] = None
         return retval
     
     msg = msg_rcv.decode()
