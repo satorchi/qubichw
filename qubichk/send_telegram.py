@@ -65,8 +65,14 @@ def get_TelegramAddresses():
     del(lines[-1])
     known_users = {}
     for line in lines:
-        id_str,user_str = line.split(':')
-        chatid = int(id_str.strip())
+        col = line.split(':')
+        if len(col)<2:continue
+        id_str = col[0]
+        user_str = col[1]
+        try:
+            chatid = int(id_str.strip())
+        except:
+            continue
         user = user_str.strip()
         known_users[chatid] = user
 
