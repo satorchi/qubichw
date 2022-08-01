@@ -1381,7 +1381,7 @@ class qubic_bot :
             msg['msg'] = _msg
             msg['chat'] = {}
             msg['chat']['id'] = _msg
-            msg['text'] = 'error message'
+            msg['text'] = 'error message: %s' % _msg
         else:
             msg = _msg
 
