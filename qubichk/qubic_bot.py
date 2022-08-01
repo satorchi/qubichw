@@ -1371,10 +1371,19 @@ class qubic_bot :
             
         return
 
-    def _respuesta(self,msg):
+    def _respuesta(self,_msg):
         '''
         this is the message receiver
         '''
+
+        if type(msg)!=dict:
+            msg = {}
+            msg['msg'] = _msg
+            msg['chat'] = {}
+            msg['chat']['id'] = _msg
+            msg['text'] = 'error message'
+        else:
+            msg = _msg
 
         if 'chat' in msg.keys():
             self.chat_id = msg['chat']['id']
