@@ -179,7 +179,6 @@ for idx in range(7):
         retval = read_lastline(F)
         if retval is None: continue
         tstamp,val,onoff = retval
-        tstamps.append(tstamp)
         date = dt.datetime.utcfromtimestamp(tstamp)
         date_str = date.strftime('%Y-%m-%d %H:%M:%S')
     
@@ -209,9 +208,11 @@ for idx in range(7):
 
         val_str = assign_val_string(val,units)
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        tstamps.append(tstamp)
         lines.append(line)
         if R_str is not None:
             line = '%s %s %s %s' % (date_str, R_str.rjust(20), label.center(20), labelkey)
+            tstamps.append(tstamp)
             lines.append(line)
             
     
@@ -275,8 +276,7 @@ for idx,line in enumerate(lines):
     if idx>=n_tstamps: break
     delta = latest - tstamps[idx]
     if delta>5 or line.find('bad answer')>=0 or line.find('?')>=0:
-        line = colored(line,'red','on_white')
-    
+        lines[idx] = colored(line,'red','on_white')
 
 
 page = '\n'.join(lines)
