@@ -197,6 +197,7 @@ class PowerSupply :
         '''
 
         errmsg=None
+        if port is None: port = self.port
         if port is None:
             errmsg='ERROR! No Device specified.'
         elif not os.path.exists(port):
@@ -359,6 +360,10 @@ class PowerSupply :
     def Status(self):
         '''print out all the parameters of both power supplies
         '''
+        if not self.device_ok:
+            self.log('powersupply offline.  Trying to reinitialize.',verbosity=1)
+            self.init_TTiPowerSupply()
+        
         msg_list = []
 
         ttl='\nPower Supply: '+self.supplyname
