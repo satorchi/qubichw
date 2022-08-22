@@ -151,7 +151,11 @@ hwpinfo = get_hwp_info()
 tstamp = dt.datetime.utcnow().timestamp()
 date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
 label = 'HWP Position'
-line = '%s %s %s' % (date_str, hwpinfo['pos'].rjust(20), label.center(20))
+if hwpinfo['pos'] is None:
+    hwppos_str = 'UNKNOWN'
+else:
+    hwppos_str = hwpinfo['pos']
+line = '%s %s %s' % (date_str, hwppos_str.rjust(20), label.center(20))
 lines.append(line)
 tstamps.append(tstamp)
 
