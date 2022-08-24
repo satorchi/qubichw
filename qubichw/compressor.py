@@ -126,11 +126,13 @@ class compressor:
         '''
         if not self.initialized: return False
         if self.port is None: return False
+        if not os.path.exists(self.port): return False
         return True
 
     def send_command(self,cmdkey):
         '''
         send a command to the compressor
+        with lots of error checking
         '''
         retval = {}
         retval['msg'] = ''
@@ -141,9 +143,25 @@ class compressor:
             retval['status_message'] = self.status_message(retval)
             retval['value'] = None
             return retval
-        
-        self.ser.write(self.command[cmdkey])
-        ans = self.ser.readline()
+
+        try:
+            self.ser.write(self.command[cmdkey])
+        except:
+            retval['status'] = False
+            retval['msg'] = 'ERROR!  Could not send command to device.'
+            retval['status_message'] = self.status_message(retval)
+            retval['value'] = None
+            return retval
+
+        try:
+            ans = self.ser.readline()
+        except:
+            retval['status'] = False
+            retval['msg'] = 'ERROR!  Could not get reply from device.'
+            retval['status_message'] = self.status_message(retval)
+            retval['value'] = None
+            return retval
+            
         try:
             ans_decoded = ans.decode()
         except:
