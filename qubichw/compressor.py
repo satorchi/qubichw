@@ -165,7 +165,18 @@ class compressor:
         try:
             ans_decoded = ans.decode()
         except:
-            ans_decoded = ans.decode('iso-8859-1')
+            ans_decoded = None
+
+        if ans_decoded is None:
+            try:
+                ans_decoded = ans.decode('iso-8859-1')
+            except:
+                retval['status'] = False
+                retval['msg'] = 'ERROR!  Could not decode reply from device.'
+                retval['status_message'] = self.status_message(retval)
+                retval['value'] = None
+                return retval
+                
         val = ans_decoded.strip().split(',')
 
         retval['value'] = val
