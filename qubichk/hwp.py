@@ -35,6 +35,7 @@ def get_hwp_info():
     except:
         retval['ok'] = False
         retval['message'] = 'HWP info unavailable: socket in use.  Try again.'
+        retval['error_message'] = 'HWP info unavailable: socket in use.'
         retval['brief message'] = retval['message']
         retval['pos'] = None
         retval['dir'] = None
@@ -53,6 +54,7 @@ def get_hwp_info():
         retval['ok'] = True
     else:
         retval['ok'] = False
+        retval['error_message'] = 'motor not running'
         
 
     msg = 'HWP POS=%s, direction=%s, motor state=%s' % (pos_str,dir_str,motor_str)
