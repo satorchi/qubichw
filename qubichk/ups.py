@@ -18,14 +18,15 @@ def get_ups_info():
     '''
     get the UPS information
     '''
-    log_parms = ['input.voltage',
-                 'battery.charge',
+    battery_key = 'battery.charge'
+    voltage_key = 'input.voltage'
+
+    log_parms = [voltage_key,
+                 battery_key,
                  'battery.voltage',
                  'battery.runtime',
                  'ups.load']
 
-    brief_parms = ['battery.charge',
-                   'intput.voltage']
     
     info = {}
     alarm = False
@@ -46,12 +47,12 @@ def get_ups_info():
         val = col[1].strip()
         info[parm] = val
         
-    if 'battery.charge' in info.keys():
-        brief_msg_list.append('Battery level: %s' % info['battery.charge'])
+    if battery_key in info.keys():
+        brief_msg_list.append('Battery level: %s' % info[battery_key])
 
-    if 'input.voltage' in info.keys():
-        brief_msg_list.append('Input voltage: %s' % info['input.voltage'])
-        input_voltage = float(info['input.voltage'])
+    if voltage_key in info.keys():
+        brief_msg_list.append('Input voltage: %s' % info[voltage_key])
+        input_voltage = float(info[voltage_key])
         if input_voltage < 200: alarm = True
 
     if alarm:
