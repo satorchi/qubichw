@@ -1376,7 +1376,7 @@ class qubic_bot :
         this is the message receiver
         '''
 
-        if type(msg)!=dict:
+        if type(_msg)!=dict:
             msg = {}
             msg['msg'] = _msg
             msg['chat'] = {}
