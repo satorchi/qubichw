@@ -11,15 +11,12 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 use the Arduino Uno as an ADC to monitor the signal generator
 
 '''
-from __future__ import division, print_function
 import socket,serial,time,multiprocessing,os,pathlib
 from glob import glob
 import numpy as np
 #from scipy.optimize import curve_fit
 import datetime as dt
 import struct
-
-from satorchipy.datefunctions import tot_seconds
 
 class arduino:
     '''
@@ -295,7 +292,7 @@ class arduino:
         self.log('started data acquisition at %s' %  start_time.strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
         self.log('  ended data acquisition at %s' % end_time.strftime('%Y-%m-%d %H:%M:%S.%f UTC'))
         delta=end_time - start_time
-        self.log('total acquisition time: %.3f seconds' % tot_seconds(delta))
+        self.log('total acquisition time: %.3f seconds' % (delta.total_seconds()))
 
         self.clear_interrupt_flag()
         return outfile
