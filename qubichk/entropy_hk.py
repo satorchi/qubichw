@@ -12,7 +12,6 @@ class to read data from Entropy controlled devices
 AVS47 temperatures
 Mechanical heat switches
 '''
-from __future__ import division, print_function
 import time,socket,re
 
 from satorchipy.datefunctions import *
@@ -29,7 +28,7 @@ class entropy_hk :
         self.verbosity=0
         
         if hostname is None:
-            self.hostname='apcbrain2'
+            self.hostname='majortom'
         else:
             self.hostname=hostname
 
@@ -152,7 +151,7 @@ class entropy_hk :
         self.startTime=str2dt(a) 
 
         # assume the Windows computer is on the same time as qubic-central (this computer)
-        tzone = int('%.0f' % tot_seconds( dt.datetime.utcnow() - dt.datetime.now() ))
+        tzone = int(( dt.datetime.utcnow() - dt.datetime.now() ).total_seconds())
         self.startTime += dt.timedelta(seconds = tzone) # convert to UT
         self.log('Logging start time: %s' % self.startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT'))
         return self.startTime
