@@ -34,8 +34,6 @@ from qubichw.modulator_siglent import siglent as modulator
 # the Arduino Uno
 from qubichw.arduino import arduino
 
-from satorchipy.datefunctions import tot_seconds
-
 class calsource_configuration_manager():
 
     def __init__(self,role=None, verbosity=0):
@@ -344,7 +342,7 @@ class calsource_configuration_manager():
         '''
         reset_delta = self.energenie_timeout # minimum time to wait
         now = dt.datetime.utcnow()
-        delta = tot_seconds(now - self.energenie_lastcommand_date)
+        delta = (now - self.energenie_lastcommand_date).total_seconds()
 
         if delta < reset_delta:
             extra_wait = reset_delta - delta
