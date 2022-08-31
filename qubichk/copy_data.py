@@ -19,8 +19,6 @@ import datetime as dt
 import numpy as np
 from astropy.io import fits
 
-from satorchipy.datefunctions import tot_seconds
-
 cc_datadir  = '/sps/qubic/Data/Calib-TD'
 #qs_datadir  = '/qs/Qubic Studio/backup'
 qs_datadir  = '/qs2' # Fri 05 Apr 2019 16:02:18 CEST
@@ -295,7 +293,7 @@ def calsource2fits(filename):
     t,v = read_calsource_dat(filename)
     if t is None: return
     endtime = dt.datetime.utcnow()
-    delta = tot_seconds(endtime-starttime)
+    delta = (endtime-starttime).total_seconds()
     sys.stdout.write(' read file in %.1f seconds' % delta)
     sys.stdout.flush()
     
@@ -303,7 +301,7 @@ def calsource2fits(filename):
     fitsname = write_calsource_fits(t,v)
     if fitsname is None: return
     endtime = dt.datetime.utcnow()
-    delta = tot_seconds(endtime-starttime)
+    delta = (endtime-starttime).total_seconds()
     sys.stdout.write(' saved file in %.1f seconds\n' % delta)
     sys.stdout.flush()
 
