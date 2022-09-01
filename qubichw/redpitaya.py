@@ -423,9 +423,6 @@ class redpitaya:
         ans = self.get_acquisition_units()
         ans = self.get_decimation()
         ans = self.get_sample_period()
-        for key in self.current_settings.keys():
-            if key==1 or key==2: continue
-            print(key,' = ',self.current_settings[key])
 
         # for frequency, use the last commanded value,
         # not the value returned by RedPitaya because it drops the fractional Hz
@@ -438,11 +435,6 @@ class redpitaya:
             ans = self.get_output_state(ch)
             if 'frequency' not in self.current_settings[ch].keys():
                 self.current_settings[ch]['frequency'] = self.get_frequency(ch)
-
-            print('\n')
-            for key in self.current_settings[ch].keys():
-                line = 'ch%i: %s = %s' % (ch,key,self.current_settings[ch][key])
-                print(line)
 
         return self.current_settings
 
