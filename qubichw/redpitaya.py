@@ -23,7 +23,6 @@ class redpitaya:
     # sample period table
     # https://redpitaya.readthedocs.io/en/latest/appsFeatures/examples/acqRF-samp-and-dec.html
     max_sample_rate = 250e6 # with decimation=1
-    is_connected = False
     buffer_size = None
 
     state = {}
@@ -58,7 +57,8 @@ class redpitaya:
         t = dt.datetime.utcnow()
         self.utcoffset = t.timestamp() - dt.datetime.utcfromtimestamp(t.timestamp()).timestamp()
         
-        self.init_redpitaya(ip)
+        self.connection_status = False
+        self.init(ip)
 
         return None
     
@@ -76,7 +76,19 @@ class redpitaya:
         print(fullmsg)
         return
 
-    def init_redpitaya(self,ip=None):
+    def is_connected(self):
+        '''
+        check if RedPitaya is currently accessible
+        '''
+        if not self.connection_status: return False
+        id = self.get_id()
+        if not self.connection_status: return False
+        if id.upper().find('REDPITAYA')<0:
+            self.log('ERROR! This is not the expected device: %s' % id)
+            return False
+        return True        
+
+    def init(self,ip=None):
         '''
         connect to the RedPitaya
         '''
@@ -84,17 +96,17 @@ class redpitaya:
         self.ip = ip
         port    = 5000
         timeout = 0.1
-        self.is_connected = False
+        self.connection_status = False
 
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.settimeout(timeout)
             self.sock.connect((ip, port))
-            self.is_connected = True
+            self.connection_status = True
 
         except self.sock.error:
             print('ERROR! Failed to connect to RedPitaya: %s' % self.sock.error)
-            self.is_connected = False
+            self.connection_status = False
             return False        
 
         self.set_decimation(self.default_settings['decimation'])
@@ -112,7 +124,7 @@ class redpitaya:
             ans = self.sock.send(cmd_encode)
         except:
             if self.verbosity>0: print('ERROR!  Could not send to RedPitaya')
-            self.is_connected = False
+            self.connection_status = False
             return None
         
         return ans
@@ -130,7 +142,7 @@ class redpitaya:
             return None
         except:
             self.log('ERROR!  Could not get reply from RedPitaya: %s' % self.sock.error,verbosity=1)
-            self.is_connected = False
+            self.connection_status = False
             return None
 
         
@@ -380,7 +392,7 @@ class redpitaya:
         '''
         set the default settings for a given output channel
         '''
-        if not self.is_connected:
+        if not self.connection_status:
             self.log('ERROR! default settings: Device not connected')
             return False
         
@@ -394,7 +406,7 @@ class redpitaya:
         self.set_decimation(self.default_settings['decimation'])
         self.set_output_on(ch)
 
-        if not self.is_connected:
+        if not self.connection_status:
             self.log('ERROR! default settings: Problem setting parameters')
             return False
         
