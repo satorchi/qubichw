@@ -169,7 +169,16 @@ class relay:
             onoff = (bit & bitmask) >> addr
             self.current_setting[dev] = onoff
         return        
-        
+
+    def state(self):
+        '''
+        return the dictionary of the current state (on/off) of each device 
+        connected to the relay
+        The dictionary is updated with every call to get_state() (see above)
+        '''
+        statebits = self.get_state()
+        return self.current_setting
+    
     def print_state(self):
         '''
         print the on/off state of each relay
