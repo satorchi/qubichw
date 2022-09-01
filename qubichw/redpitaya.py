@@ -25,9 +25,9 @@ class redpitaya:
     max_sample_rate = 250e6 # with decimation=1
     buffer_size = None
 
-    state = {}
-    state[1] = {}
-    state[2] = {}
+    current_settings = {}
+    current_settings[1] = {}
+    current_settings[2] = {}
     default_settings = {}
     default_settings['frequency'] = 0.7
     default_settings['shape'] = 'SINE'
@@ -171,7 +171,7 @@ class redpitaya:
         get the identity string
         '''
         id = self.get_info('*IDN?',string=True)
-        self.state['id'] = id
+        self.current_settings['id'] = id
         return id
     
     def set_decimation(self,decimnum):
@@ -187,7 +187,7 @@ class redpitaya:
         get the decimation value:  max is 65536
         '''
         decnum = self.get_info('ACQ:DEC?',string=False)
-        self.state['decimation'] = decnum
+        self.current_settings['decimation'] = decnum
         return decnum
     
     def get_buffer_size(self):
@@ -195,7 +195,7 @@ class redpitaya:
         get the buffer size.  This is 16384.  but in case you want the Red Pitaya to tell you...
         '''
         self.buffer_size = self.get_info('ACQ:BUF:SIZE?',string=False)
-        self.state['buffer size'] = self.buffer_size
+        self.current_settings['buffer size'] = self.buffer_size
         return self.buffer_size
 
     def get_sample_rate(self):
@@ -208,7 +208,7 @@ class redpitaya:
         if decnum is None: return None
 
         sample_rate = self.max_sample_rate/decnum
-        self.state['sample rate'] = sample_rate
+        self.current_settings['sample rate'] = sample_rate
         return sample_rate
 
     def get_sample_period(self):
@@ -217,7 +217,7 @@ class redpitaya:
         '''
         sample_rate = self.get_sample_rate()
         sample_period = self.buffer_size/sample_rate
-        self.state['sample period'] = sample_period
+        self.current_settings['sample period'] = sample_period
         return sample_period
         
 
@@ -227,7 +227,7 @@ class redpitaya:
         '''
         cmd = 'OUTPUT%1i:STATE?' % ch
         onoff = self.get_info(cmd,string=False)
-        self.state[ch]['output state'] = onoff
+        self.current_settings[ch]['output state'] = onoff
         return onoff
 
     def set_output_on(self,ch=1):
@@ -253,7 +253,7 @@ class redpitaya:
 
         # we store the frequency commanded because the RedPitaya only returns a whole number for the frequency
         # even though the setting might have a fractional Hz
-        self.state[ch]['frequency'] = freq
+        self.current_settings[ch]['frequency'] = freq
         return self.send_command(cmd)
 
     def get_frequency(self,ch=1):
@@ -285,7 +285,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:FUNC?' % ch
         shape = self.get_info(cmd,string=True)
-        self.state[ch]['shape'] = shape
+        self.current_settings[ch]['shape'] = shape
 
     def set_duty(self,duty,ch=1):
         '''
@@ -300,7 +300,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:DCYC?' % ch
         duty = self.get_info(cmd,string=False)
-        self.state[ch]['duty'] = duty
+        self.current_settings[ch]['duty'] = duty
         return duty
 
     def set_offset(self,offset,ch=1):
@@ -316,7 +316,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:VOLT:OFFS?' % (ch)
         offset = self.get_info(cmd,string=False)
-        self.state[ch]['offset'] = offset
+        self.current_settings[ch]['offset'] = offset
         return offset
 
     def set_amplitude(self,amplitude,ch=1):
@@ -332,7 +332,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:VOLT?' % ch
         a = self.get_info(cmd,string=False)
-        self.state[ch]['amplitude'] = a
+        self.current_settings[ch]['amplitude'] = a
         return a
         
 
@@ -357,7 +357,7 @@ class redpitaya:
         '''
         cmd = 'ACQ:DATA:UNITS?'
         acqunits = self.get_info(cmd,string=True)
-        self.state['units'] = acqunits
+        self.current_settings['units'] = acqunits
         return acqunits
 
     def set_acquisition_units(self,units=None):
@@ -385,7 +385,7 @@ class redpitaya:
         '''
         cmd = 'ACQ:SOUR%1i:GAIN?' % ch
         gain = self.get_info(cmd,string=True)
-        self.state[ch]['gain'] = gain
+        self.current_settings[ch]['gain'] = gain
         return gain
         
     def set_default_settings(self,ch=1):
@@ -412,9 +412,9 @@ class redpitaya:
         
         return True
 
-    def show_settings(self):
+    def state(self):
         '''
-        print the current settings for a given channel
+        update the current settings and return the dictionary of current settings
         '''
        
         # first, the global parameters
@@ -423,9 +423,9 @@ class redpitaya:
         ans = self.get_acquisition_units()
         ans = self.get_decimation()
         ans = self.get_sample_period()
-        for key in self.state.keys():
+        for key in self.current_settings.keys():
             if key==1 or key==2: continue
-            print(key,' = ',self.state[key])
+            print(key,' = ',self.current_settings[key])
 
         # for frequency, use the last commanded value,
         # not the value returned by RedPitaya because it drops the fractional Hz
@@ -436,15 +436,37 @@ class redpitaya:
             ans = self.get_duty(ch)
             ans = self.get_input_gain(ch)
             ans = self.get_output_state(ch)
-            if 'frequency' not in self.state[ch].keys():
-                self.state[ch]['frequency'] = self.get_frequency(ch)
+            if 'frequency' not in self.current_settings[ch].keys():
+                self.current_settings[ch]['frequency'] = self.get_frequency(ch)
 
             print('\n')
-            for key in self.state[ch].keys():
-                line = 'ch%i: %s = %s' % (ch,key,self.state[ch][key])
+            for key in self.current_settings[ch].keys():
+                line = 'ch%i: %s = %s' % (ch,key,self.current_settings[ch][key])
                 print(line)
 
+        return self.current_settings
+
+    def show_settings(self):
+        '''
+        print the current settings
+        '''
+        # update the dictionary settings
+        ans = self.state()
+        
+        # print first, the global parameters
+        for key in self.current_settings.keys():
+            if key==1 or key==2: continue
+            print(key,' = ',self.current_settings[key])
+
+        # print the parameters for each channel
+        for ch in [1,2]:
+            print('-----------------')
+            for key in self.current_settings[ch].keys():
+                line = 'ch%i: %s = %s' % (ch,key,self.current_settings[ch][key])
+                print(line)
         return
+
+        
                
     def acquire(self,ch=1):
         '''
