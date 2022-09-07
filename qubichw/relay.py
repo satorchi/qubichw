@@ -188,13 +188,9 @@ class relay:
         bits = self.get_state()
         if isinstance(bits,str): return None
         
+        onoff_str = ['OFF','ON']
         for dev in self.current_setting.keys():
-            if self.current_setting[dev]==1:
-                onoff = 'on'
-            else:
-                onoff = 'off'
-            print('%s is %s' % (dev,onoff))
-            
+            print('%s is %s' % (dev,onoff_str[self.current_setting[key]]))            
         return None
 
     def status(self):
@@ -203,8 +199,9 @@ class relay:
         '''
         bits = self.get_state()
         msg_list = []
+        onoff_str = ['OFF','ON']
         for dev in self.current_setting.keys():
-            msg_list.append(' relay:%s=%s' % (dev,self.current_setting[dev]))
+            msg_list.append(' relay:%s=%s' % (dev,onoff_str[self.current_setting[dev]]))
         msg = ' '.join(msg_list)
         self.log('returning status message: %s' % msg,verbosity=2)
         return msg
