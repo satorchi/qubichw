@@ -190,7 +190,7 @@ class relay:
         
         onoff_str = ['OFF','ON']
         for dev in self.current_setting.keys():
-            print('%s is %s' % (dev,onoff_str[self.current_setting[key]]))            
+            print('%s is %s' % (dev,onoff_str[self.current_setting[dev]]))
         return None
 
     def status(self):
