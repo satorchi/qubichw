@@ -163,9 +163,9 @@ class amplifier:
         mode_idx = valid_args.index(bw)
         
         if bw==100:
-            gpio.output(14,gpio.HIGH)
+            gpio.output(18,gpio.HIGH)
         else:
-            gpio.output(14,gpio.LOW)
+            gpio.output(18,gpio.LOW)
         
 
         self.state['bandwidth'] = valid_args[mode_idx]
