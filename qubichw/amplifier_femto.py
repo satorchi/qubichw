@@ -222,9 +222,11 @@ class amplifier:
         show the current configuration compatible with calsource_configuration_manager
         '''
         overload = self.get_overload()
-        msg = 'amplifier:gain=%i' % self.state['gain']
-        msg += 'amplifier:coupling=%s' % self.state['coupling']
-        msg += 'amplifier:bandwidth=%i' % self.state['bandwidth']
-        msg += 'amplifier:overload=%i' % self.state['overload']
+        msg_list = []
+        msg_list.append('amplifier:gain=%i' % self.state['gain'])
+        msg_list.append('amplifier:coupling=%s' % self.state['coupling'])
+        msg_list.append('amplifier:bandwidth=%i' % self.state['bandwidth'])
+        msg_list.append('amplifier:overload=%i' % self.state['overload'])
+        msg = ' '.join(msg_list)
         self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
         return msg
