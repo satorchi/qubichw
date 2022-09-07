@@ -1,0 +1,245 @@
+'''
+$Id: amplifier_femto.py
+$auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
+$created: Mon 05 Sep 2022 17:45:31 CEST
+$license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
+
+          This is free software: you are free to change and
+          redistribute it.  There is NO WARRANTY, to the extent
+          permitted by law.
+
+control/command of the FEMTO amplifier on the GPIO of the RaspberryPi
+'''
+
+import os,time
+import RPi.GPIO as gpio
+import numpy as np
+import datetime as dt
+
+class amplifier:
+    '''
+    a class to communicate with the FEMTO amplifier connected on the RaspberryPi GPIO
+    '''
+
+    def __init__(self,port=None,verbosity=2):
+        '''
+        initialization of the amplifier object
+        '''
+        self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
+        self.verbosity = verbosity
+        self.creation = dt.datetime.utcnow()
+        self.creation_str = self.creation.strftime('%Y-%m-%d %H:%M:%S')
+        self.state = {}
+        self.state['bandwidth'] = None
+        self.state['coupling'] = None
+        self.state['gain'] = None
+
+        self.default_setting = {}
+        self.default_setting['gain'] = 20
+        self.default_setting['bandwidth'] = 100
+        self.default_setting['coupling'] = 'DC'
+        
+        self.init()
+        self.set_default_settings()
+        return None
+
+    def log(self,msg,verbosity=0):
+        '''
+        log message to screen and to a file
+        '''
+        if verbosity > self.verbosity: return
+        
+        filename = 'amplifier_command.log'
+        h = open(filename,'a')
+        fullmsg = '%s: FEMTO - %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg) 
+        h.write(fullmsg+'\n')
+        h.close()
+        print(fullmsg)
+        return
+
+    def init(self,port=None):
+        '''
+        initialize the amplifier
+        '''
+        self.log('initializing',verbosity=2)
+
+        gpio.setmode(gpio.BCM)
+        gpio.setup(17, gpio.IN) # overload
+        gpio.setup(27,gpio.OUT) # offset input
+        gpio.setup(22,gpio.OUT) # GAIN LSB
+        gpio.setup(14,gpio.OUT) # GAIN MSB
+        gpio.setup(15,gpio.OUT) # AC/DC
+        gpio.setup(18,gpio.OUT) # bandwidth 100kHz/1kHz
+        
+        return True
+
+
+    def is_connected(self):
+        '''
+        check if the amplifier is connected
+        '''
+
+        try:
+            overload = gpio.input(17)
+            return True
+        except:
+            return False
+        
+        return False
+    
+    def set_default_settings(self):
+        '''
+        default settings for the amplifier
+        '''
+        if not self.is_connected():return False
+        self.log('AMPLIFIER: set default settings',verbosity=2)
+        self.set_coupling('DC')
+        self.set_gain(20)
+        return
+
+    def set_gain(self,gain):
+        '''
+        set the gain
+        '''
+        if not self.is_connected():return False
+        valid_args = [20,
+                      40,
+                      60,
+                      80]
+        if gain not in valid_args:
+            print('ERROR! Invalid gain requested: %i' % gain)
+            return False
+
+        mode_idx = valid_args.index(gain)
+        pinstate = [(gpio.LOW,gpio.LOW),
+                    (gpio.LOW,gpio.HIGH),
+                    (gpio.HIGH,gpio.LOW),
+                    (gpio.HIGH,gpio.HIGH)]
+        gpio.output(14,pinstate[mode_idx][0])
+        gpio.output(22,pinstate[mode_idx][1])        
+        
+        self.state['gain'] = valid_args[mode_idx]
+        self.log('AMPLIFIER gain set to %i' % self.state['gain'],verbosity=2)
+        return True
+
+    def set_coupling(self,coupling):
+        '''
+        set the coupling mode: ground, DC, AC
+        '''
+        if not self.is_connected():return False
+        valid_args = ['GROUND','DC','AC']
+        coupling = coupling.upper()
+        
+        if coupling not in valid_args:
+            print('ERROR! Invalid coupling requested: %s' % coupling)
+            return False
+        mode_idx = valid_args.index(coupling)        
+
+        self.send_command('CPLG %i' % mode_idx)
+        self.state['coupling'] = valid_args[mode_idx]
+        return True
+
+    
+    def set_dynamic(self,dynamic):
+        '''
+        set the dynamic range: low noise, high, calibration
+        '''
+    
+        if not self.is_connected():return False
+        valid_args = ['low_noise','high','calibration']
+        dynamic = dynamic.lower()
+        
+        if dynamic not in valid_args:
+            print('ERROR! Invalid dynamic range requested: %s' % dynamic)
+            return False
+
+        mode_idx = -1
+        for idx,val in enumerate(valid_args):
+            if val==dynamic:
+                mode_idx = idx
+                break
+
+        self.send_command('DYNR %i' % mode_idx)
+        self.state['dynamic range'] = valid_args[mode_idx]
+        return True
+
+
+    def set_setting(self,setting,value):
+        '''
+        a generic wrapper to set a setting (called by calsource_configuration_manager)
+        '''
+        if not self.is_connected():
+            return 'amplifier:disconnected'
+
+        valid_settings = ['filter_mode',
+                          'dynamic_range',
+                          'gain',
+                          'filter_low_frequency',
+                          'filter_high_frequency',
+                          'coupling',
+                          'invert']
+        setting = setting.lower()
+        if setting not in valid_settings:
+            return 'amplifier:INVALID_REQUEST__%s=%s' % (setting,value)
+
+        if setting=='filter_mode':
+            chk = self.set_filter_mode(value)
+            if chk:
+                return 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
+            return 'amplifier:filter_mode=FAILED'
+
+        if setting=='dynamic_range':
+            chk = self.set_dynamic(value)
+            if chk:
+                return 'amplifier:dynamic_range=%s' % self.state['dynamic range'].replace(' ','_')
+            return 'amplifier:dynamic_range=FAILED'
+
+        if setting=='gain':
+            chk = self.set_gain(value)
+            if chk:
+                return 'amplifier:gain=%i' % self.state['gain']
+            return 'amplifier:gain=FAILED'
+
+        if setting=='filter_low_frequency':
+            chk = self.set_filter_frequency(value,lowhigh='low')
+            if chk:
+                return 'amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
+            return 'amplifier:filter_low_frequency:FAILED'
+
+        if setting=='filter_high_frequency':
+            chk = self.set_filter_frequency(value,lowhigh='high')
+            if chk:
+                return 'amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
+            return 'amplifier:filter_high_frequency:FAILED'
+
+        if setting=='coupling':
+            chk = self.set_coupling(value)
+            if chk:
+                return 'amplifier:coupling=%s' % self.state['coupling']
+            return 'amplifier:coupling:FAILED'
+
+        if setting=='invert':
+            chk = self.set_invert_mode(value)
+            if chk:
+                return 'amplifier:invert:%s' % self.state['invert']
+            return 'amplifier:invert:FAILED'
+        
+        return 'amplifier:%s=NOTFOUND' % setting
+    
+    
+    def status(self):
+        '''
+        show the current configuration
+        '''
+        msg  = 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
+        msg += ' amplifier:dynamic_range=%s' % self.state['dynamic range'].replace(' ','_')
+        msg += ' amplifier:gain=%i' % self.state['gain']
+        if self.state['filter low frequency'] is not None:
+            msg += ' amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
+        if self.state['filter high frequency'] is not None:
+            msg += ' amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
+        msg += ' amplifier:coupling=%s' % self.state['coupling']
+        msg += ' amplifier:invert=%s' % self.state['invert']
+        self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
+        self.log('AMPLIFIER instantiated %s' % self.creation_str,verbosity=2)
+        return msg
