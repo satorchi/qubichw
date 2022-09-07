@@ -104,8 +104,8 @@ class redpitaya:
             self.sock.connect((ip, port))
             self.connection_status = True
 
-        except self.sock.error:
-            print('ERROR! Failed to connect to RedPitaya: %s' % self.sock.error)
+        except:
+            print('ERROR! Failed to connect to RedPitaya')
             self.connection_status = False
             return False        
 
