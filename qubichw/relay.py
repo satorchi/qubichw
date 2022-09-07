@@ -139,7 +139,8 @@ class relay:
         # read back the command to avoid filling the buffer.
         # This will be the response required for a query.  No separate read command is required.
         ans = self.s.read(1024)
-        return ans.decode()
+        ans_str = ans.decode().replace('\n\r>','').strip()
+        return ans_str
         
     
     def get_state(self):
