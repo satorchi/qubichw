@@ -201,7 +201,8 @@ class relay:
         msg_list = []
         onoff_str = ['OFF','ON']
         for dev in self.current_setting.keys():
-            msg_list.append(' relay:%s=%s' % (dev,onoff_str[self.current_setting[dev]]))
+            dev_str = dev.replace(' ','_')
+            msg_list.append('relay:%s=%s' % (dev_str,onoff_str[self.current_setting[dev]]))
         msg = ' '.join(msg_list)
         self.log('returning status message: %s' % msg,verbosity=2)
         return msg
