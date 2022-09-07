@@ -95,6 +95,7 @@ class amplifier:
         get the overload state
         '''
         overload = gpio.input(17)
+        self.state['overload'] = overload
         return overload
     
     def set_default_settings(self):
@@ -106,6 +107,7 @@ class amplifier:
         self.set_coupling(self.default_setting['coupling'])
         self.set_gain(self.default_setting['gain'])
         self.set_bandwidth(self.default_setting['bandwidth'])
+        overload = self.get_overload()
         return
 
     def set_gain(self,gain):
