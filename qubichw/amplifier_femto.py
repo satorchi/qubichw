@@ -108,7 +108,7 @@ class amplifier:
                       60,
                       80]
         if gain not in valid_args:
-            print('ERROR! Invalid gain requested: %i' % gain)
+            self.log('ERROR! Invalid gain requested: %i' % gain)
             return False
 
         mode_idx = valid_args.index(gain)
@@ -142,6 +142,7 @@ class amplifier:
         
 
         self.state['coupling'] = valid_args[mode_idx]
+        self.log('AMPLIFIER coupling set to %s' % self.state['coupling'],verbosity=2)
         return True
 
     def set_bandwidth(self,bw):
@@ -168,6 +169,7 @@ class amplifier:
         
 
         self.state['bandwidth'] = valid_args[mode_idx]
+        self.log('AMPLIFIER coupling set to %i' % self.state['bandwidth'],verbosity=2)
         return True
         
     
@@ -207,11 +209,10 @@ class amplifier:
     
     def status(self):
         '''
-        show the current configuration
+        show the current configuration compatible with calsource_configuration_manager
         '''
         msg = ' amplifier:gain=%i' % self.state['gain']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
         msg += ' amplifier:bandwidth=%i' % self.state['bandwidth']
         self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
-        self.log('AMPLIFIER instantiated %s' % self.creation_str,verbosity=2)
         return msg

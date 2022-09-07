@@ -197,6 +197,19 @@ class relay:
             
         return None
 
+    def status(self):
+        '''
+        return status string compatible with calsource_configuration_manager
+        '''
+        bits = self.get_state()
+        msg_list = []
+        for dev in self.current_setting.keys():
+            msg_list.append(' relay:%s=%s' % (dev,self.current_setting[dev]))
+        msg = ' '.join(msg_list)
+        self.log('returning status message: %s' % msg,verbosity=2)
+        return msg
+        
+
     def switchon(self,devlist):
         '''
         switch on one or more devices
