@@ -93,8 +93,9 @@ class amplifier:
         '''
         if not self.is_connected():return False
         self.log('AMPLIFIER: set default settings',verbosity=2)
-        self.set_coupling('DC')
-        self.set_gain(20)
+        self.set_coupling(self.default_setting['coupling'])
+        self.set_gain(self.default_setting['gain'])
+        self.set_bandwidth(self.default_setting['bandwidth'])
         return
 
     def set_gain(self,gain):
@@ -127,42 +128,49 @@ class amplifier:
         set the coupling mode: ground, DC, AC
         '''
         if not self.is_connected():return False
-        valid_args = ['GROUND','DC','AC']
+        valid_args = ['DC','AC']
         coupling = coupling.upper()
         
         if coupling not in valid_args:
-            print('ERROR! Invalid coupling requested: %s' % coupling)
+            self.log('ERROR! Invalid coupling requested: %s' % coupling)
             return False
-        mode_idx = valid_args.index(coupling)        
+        mode_idx = valid_args.index(coupling)
+        if coupling=='AC':
+            gpio.output(15,gpio.HIGH)
+        else:
+            gpio.output(15,gpio.LOW)
+        
 
-        self.send_command('CPLG %i' % mode_idx)
         self.state['coupling'] = valid_args[mode_idx]
         return True
 
-    
-    def set_dynamic(self,dynamic):
+    def set_bandwidth(self,bw):
         '''
-        set the dynamic range: low noise, high, calibration
+        set the bandwidth of the FEMTO amplifier:  100kHz or 1kHz
         '''
-    
         if not self.is_connected():return False
-        valid_args = ['low_noise','high','calibration']
-        dynamic = dynamic.lower()
-        
-        if dynamic not in valid_args:
-            print('ERROR! Invalid dynamic range requested: %s' % dynamic)
+        try:
+            bw = int(bw)
+        except:
+            self.log('ERROR! Invalid bandwidth requested: %.2f' % bw)
             return False
+        
+        valid_args = [1,100]
+        if bw not in valid_args:
+            self.log('ERROR! Invalid bandwidth requested: %i' % bw)
+            return False
+        mode_idx = valid_args.index(bw)
+        
+        if bw==100:
+            gpio.output(14,gpio.HIGH)
+        else:
+            gpio.output(14,gpio.LOW)
+        
 
-        mode_idx = -1
-        for idx,val in enumerate(valid_args):
-            if val==dynamic:
-                mode_idx = idx
-                break
-
-        self.send_command('DYNR %i' % mode_idx)
-        self.state['dynamic range'] = valid_args[mode_idx]
+        self.state['bandwidth'] = valid_args[mode_idx]
         return True
-
+        
+    
 
     def set_setting(self,setting,value):
         '''
@@ -171,28 +179,10 @@ class amplifier:
         if not self.is_connected():
             return 'amplifier:disconnected'
 
-        valid_settings = ['filter_mode',
-                          'dynamic_range',
-                          'gain',
-                          'filter_low_frequency',
-                          'filter_high_frequency',
-                          'coupling',
-                          'invert']
+        valid_settings = self.default_setting.keys()
         setting = setting.lower()
         if setting not in valid_settings:
             return 'amplifier:INVALID_REQUEST__%s=%s' % (setting,value)
-
-        if setting=='filter_mode':
-            chk = self.set_filter_mode(value)
-            if chk:
-                return 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
-            return 'amplifier:filter_mode=FAILED'
-
-        if setting=='dynamic_range':
-            chk = self.set_dynamic(value)
-            if chk:
-                return 'amplifier:dynamic_range=%s' % self.state['dynamic range'].replace(' ','_')
-            return 'amplifier:dynamic_range=FAILED'
 
         if setting=='gain':
             chk = self.set_gain(value)
@@ -200,29 +190,17 @@ class amplifier:
                 return 'amplifier:gain=%i' % self.state['gain']
             return 'amplifier:gain=FAILED'
 
-        if setting=='filter_low_frequency':
-            chk = self.set_filter_frequency(value,lowhigh='low')
-            if chk:
-                return 'amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
-            return 'amplifier:filter_low_frequency:FAILED'
-
-        if setting=='filter_high_frequency':
-            chk = self.set_filter_frequency(value,lowhigh='high')
-            if chk:
-                return 'amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
-            return 'amplifier:filter_high_frequency:FAILED'
-
         if setting=='coupling':
             chk = self.set_coupling(value)
             if chk:
                 return 'amplifier:coupling=%s' % self.state['coupling']
             return 'amplifier:coupling:FAILED'
 
-        if setting=='invert':
-            chk = self.set_invert_mode(value)
+        if setting=='bandwidth':
+            chk = self.set_bandwidth(value)
             if chk:
-                return 'amplifier:invert:%s' % self.state['invert']
-            return 'amplifier:invert:FAILED'
+                return 'amplifier:bandwidth:%s' % self.state['bandwidth']
+            return 'amplifier:bandwidth:FAILED'
         
         return 'amplifier:%s=NOTFOUND' % setting
     
@@ -231,15 +209,9 @@ class amplifier:
         '''
         show the current configuration
         '''
-        msg  = 'amplifier:filter_mode=%s' % self.state['filter mode'].replace(' ','_')
-        msg += ' amplifier:dynamic_range=%s' % self.state['dynamic range'].replace(' ','_')
-        msg += ' amplifier:gain=%i' % self.state['gain']
-        if self.state['filter low frequency'] is not None:
-            msg += ' amplifier:filter_low_frequency=%.2fHz' % self.state['filter low frequency']
-        if self.state['filter high frequency'] is not None:
-            msg += ' amplifier:filter_high_frequency=%.2fHz' % self.state['filter high frequency']
+        msg = ' amplifier:gain=%i' % self.state['gain']
         msg += ' amplifier:coupling=%s' % self.state['coupling']
-        msg += ' amplifier:invert=%s' % self.state['invert']
+        msg += ' amplifier:bandwidth=%i' % self.state['bandwidth']
         self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
         self.log('AMPLIFIER instantiated %s' % self.creation_str,verbosity=2)
         return msg
