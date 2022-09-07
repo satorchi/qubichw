@@ -458,6 +458,27 @@ class redpitaya:
                 print(line)
         return
 
+    def status(self):
+        '''
+        return status string compatible with calsource_configuration_manager
+        '''
+        # update the dictionary settings
+        ans = self.state()
+        msg_list = []
+        # first, the global parameters
+        for key in self.current_settings.keys():
+            if key==1 or key==2: continue
+            key_str = key.replace(' ','_')
+            msg_list.append('modulator:',key,'=',self.current_settings[key])
+
+        # the parameters for each channel
+        for ch in [1,2]:
+            for key in self.current_settings[ch].keys():
+                key_str = key.replace(' ','_')
+                msg_list.append('modulator%i:%s=%s' % (ch,key,self.current_settings[ch][key]))
+                
+        msg = ' '.join(msg_list)
+        return msg
         
                
     def acquire(self,ch=1):
