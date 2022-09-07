@@ -152,7 +152,7 @@ class relay:
         
         lines = ans.split('\n')
         try:
-            hexstr = '0x'+lines[-2].strip()
+            hexstr = '0x'+lines[-1].strip()
             bits = int(hexstr,16)
             self.assign_status(bits)
             return bits
