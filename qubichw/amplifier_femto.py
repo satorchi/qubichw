@@ -33,6 +33,7 @@ class amplifier:
         self.state['bandwidth'] = None
         self.state['coupling'] = None
         self.state['gain'] = None
+        self.state['overload'] = None
 
         self.default_setting = {}
         self.default_setting['gain'] = 20
@@ -63,6 +64,8 @@ class amplifier:
         '''
         self.log('initializing',verbosity=2)
 
+        gpio.setwarnings(False)
+        
         gpio.setmode(gpio.BCM)
         gpio.setup(17, gpio.IN) # overload
         gpio.setup(27,gpio.OUT) # offset input
@@ -86,6 +89,13 @@ class amplifier:
             return False
         
         return False
+
+    def get_overload(self):
+        '''
+        get the overload state
+        '''
+        overload = gpio.input(17)
+        return overload
     
     def set_default_settings(self):
         '''
@@ -211,8 +221,10 @@ class amplifier:
         '''
         show the current configuration compatible with calsource_configuration_manager
         '''
-        msg = ' amplifier:gain=%i' % self.state['gain']
-        msg += ' amplifier:coupling=%s' % self.state['coupling']
-        msg += ' amplifier:bandwidth=%i' % self.state['bandwidth']
+        overload = self.get_overload()
+        msg = 'amplifier:gain=%i' % self.state['gain']
+        msg += 'amplifier:coupling=%s' % self.state['coupling']
+        msg += 'amplifier:bandwidth=%i' % self.state['bandwidth']
+        msg += 'amplifier:overload=%i' % self.state['overload']
         self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
         return msg
