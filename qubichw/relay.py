@@ -20,8 +20,10 @@ class relay:
     '''
     class to turn on/off power supplies using the Numato relay
     '''
-    def  __init__(self,port=None,idVendor=0x2a19,idProduct=0x0c03,devices=None,verbosity=2):
-        self.verbosity = verbosity
+    verbosity = 2
+    
+    def  __init__(self,port=None,idVendor=0x2a19,idProduct=0x0c03,devices=None,verbosity=None):
+        if verbosity is not None: self.verbosity = verbosity
         self.instrument = None
         self.idVendor = idVendor
         self.idProduct = idProduct

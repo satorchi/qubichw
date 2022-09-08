@@ -20,13 +20,14 @@ class amplifier:
     '''
     a class to communicate with the FEMTO amplifier connected on the RaspberryPi GPIO
     '''
+    verbosity = 2
 
-    def __init__(self,port=None,verbosity=2):
+    def __init__(self,port=None,verbosity=None):
         '''
         initialization of the amplifier object
         '''
+        if verbosity is not None: self.verbosity = verbosity
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
-        self.verbosity = verbosity
         self.creation = dt.datetime.utcnow()
         self.creation_str = self.creation.strftime('%Y-%m-%d %H:%M:%S')
         self.state = {}
@@ -67,7 +68,7 @@ class amplifier:
         gpio.setwarnings(False)
         
         gpio.setmode(gpio.BCM)
-        gpio.setup(17, gpio.IN) # overload
+        gpio.setup(17,gpio.IN)  # overload
         gpio.setup(27,gpio.OUT) # offset input
         gpio.setup(22,gpio.OUT) # GAIN LSB
         gpio.setup(14,gpio.OUT) # GAIN MSB
