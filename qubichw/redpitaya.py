@@ -426,6 +426,7 @@ class redpitaya:
         self.set_input_gain(self.default_settings['input gain'],ch)
         self.set_acquisition_units(self.default_settings['acquisition units'])
         self.set_decimation(self.default_settings['decimation'])
+        self.set_input_coupling(self.default_settings['coupling'],ch)
         self.set_output_on(ch)
 
         if not self.connection_status:
