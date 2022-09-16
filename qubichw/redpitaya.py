@@ -37,7 +37,8 @@ class redpitaya:
     default_settings['input gain'] = 'HV'
     default_settings['acquisition units'] = 'RAW'
     default_settings['decimation'] = 65536
-
+    default_settings['coupling'] = 'DC'
+    
     # number of bytes to receive by default (but not for acquisition)
     default_settings['chunksize'] = 4096 
 
@@ -387,6 +388,27 @@ class redpitaya:
         gain = self.get_info(cmd,string=True)
         self.current_settings[ch]['gain'] = gain
         return gain
+
+    def set_input_coupling(self,coupling='DC',ch=1):
+        '''
+        set the input coupling:  AC or DC
+        '''
+        if coupling.upper()=='AC':
+            coupling = 'AC'
+        else:
+            coupling = 'DC'
+        cmd = 'ACQ:SOUR%1i:COUP %s' % (ch,coupling)
+        return self.send_command(cmd)
+
+    def get_input_coupling(self,ch=1):
+        '''
+        get the input coupling (AC or DC)
+        '''
+        cmd = 'ACQ:SOUR%1i:COUP?' % ch
+        coupling = self.get_info(cmd,string=True)
+        self.current_settings[ch]['coupling'] = coupling
+        return coupling
+        
         
     def set_default_settings(self,ch=1):
         '''
