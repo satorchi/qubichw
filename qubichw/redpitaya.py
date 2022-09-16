@@ -492,7 +492,8 @@ class redpitaya:
         for key in self.current_settings.keys():
             if key==1 or key==2: continue
             key_str = key.replace(' ','_')
-            msg_list.append('modulator:',key,'=',self.current_settings[key])
+            msg = 'modulator:%s=%s' % (key,self.current_settings[key])
+            msg_list.append(msg)
 
         # the parameters for each channel
         for ch in [1,2]:
