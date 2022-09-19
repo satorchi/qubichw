@@ -183,7 +183,7 @@ class relay:
         statebits = self.get_state()
         return self.current_setting
     
-    def print_state(self):
+    def show_status(self):
         '''
         print the on/off state of each relay
         '''

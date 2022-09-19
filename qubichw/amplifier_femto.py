@@ -233,3 +233,16 @@ class amplifier:
         msg = ' '.join(msg_list)
         self.log('AMPLIFIER returning status message: %s' % msg,verbosity=2)
         return msg
+
+    def show_status(self):
+        '''
+        printout the status in a nice human readable list
+        '''
+        overload = self.get_overload()
+        print('FEMTO Amplifier')
+        print('coupling = %s' % self.state['coupling'])
+        print('bandwidth = %ikHz' % self.state['bandwidth'])
+        print('gain = %i ' % self.state['gain'])
+        print('overload = %i' % self.state['overload'])
+        return
+    

@@ -446,7 +446,6 @@ class redpitaya:
         ans = self.get_acquisition_units()
         ans = self.get_decimation()
         ans = self.get_sample_period()
-
         # for frequency, use the last commanded value,
         # not the value returned by RedPitaya because it drops the fractional Hz
         for ch in [1,2]:
@@ -456,12 +455,14 @@ class redpitaya:
             ans = self.get_duty(ch)
             ans = self.get_input_gain(ch)
             ans = self.get_output_state(ch)
+            ans = self.get_input_coupling(ch)
+
             if 'frequency' not in self.current_settings[ch].keys():
                 self.current_settings[ch]['frequency'] = self.get_frequency(ch)
 
         return self.current_settings
 
-    def show_settings(self):
+    def show_status(self):
         '''
         print the current settings
         '''
