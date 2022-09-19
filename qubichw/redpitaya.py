@@ -43,7 +43,7 @@ class redpitaya:
     default_settings['chunksize'] = 4096 
 
     # wait time after sending a command and before requesting a response
-    default_settings['response delay'] = 0.05
+    default_settings['response delay'] = 0.1
 
     date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
