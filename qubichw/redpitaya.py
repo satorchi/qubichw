@@ -33,7 +33,7 @@ class redpitaya:
     default_settings['shape'] = 'SINE'
     default_settings['amplitude'] = 1.0
     default_settings['offset'] = 2.0
-    default_settings['duty'] = 33
+    default_settings['duty cycle'] = 33
     default_settings['input gain'] = 'HV'
     default_settings['acquisition units'] = 'RAW'
     default_settings['decimation'] = 65536
@@ -301,7 +301,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:DCYC?' % ch
         duty = self.get_info(cmd,string=False)
-        self.current_settings[ch]['duty'] = duty
+        self.current_settings[ch]['duty cycle'] = duty
         return duty
 
     def set_offset(self,offset,ch=1):
@@ -422,7 +422,7 @@ class redpitaya:
         self.set_shape(self.default_settings['shape'],ch)
         self.set_amplitude(self.default_settings['amplitude'],ch)
         self.set_offset(self.default_settings['offset'],ch)
-        self.set_duty(self.default_settings['duty'],ch)
+        self.set_duty(self.default_settings['duty cycle'],ch)
         self.set_input_gain(self.default_settings['input gain'],ch)
         self.set_acquisition_units(self.default_settings['acquisition units'])
         self.set_decimation(self.default_settings['decimation'])
@@ -492,14 +492,14 @@ class redpitaya:
         for key in self.current_settings.keys():
             if key==1 or key==2: continue
             key_str = key.replace(' ','_')
-            msg = 'modulator:%s=%s' % (key,self.current_settings[key])
+            msg = 'modulator:%s=%s' % (key_str,self.current_settings[key])
             msg_list.append(msg)
 
         # the parameters for each channel
         for ch in [1,2]:
             for key in self.current_settings[ch].keys():
                 key_str = key.replace(' ','_')
-                msg_list.append('modulator%i:%s=%s' % (ch,key,self.current_settings[ch][key]))
+                msg_list.append('modulator%i:%s=%s' % (ch,key_str,self.current_settings[ch][key]))
                 
         msg = ' '.join(msg_list)
         return msg
