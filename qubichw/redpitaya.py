@@ -93,7 +93,7 @@ class redpitaya:
         '''
         connect to the RedPitaya
         '''
-        if ip is None: ip = '192.168.1.21'
+        if ip is None: ip = '192.168.3.21'
         self.ip = ip
         port    = 5000
         timeout = 0.1
@@ -354,7 +354,7 @@ class redpitaya:
 
     def get_acquisition_units(self):
         '''
-        get the data acquisition units, either RAW or VOLT
+        get the data acquisition units, either RAW or VOLTS
         '''
         cmd = 'ACQ:DATA:UNITS?'
         acqunits = self.get_info(cmd,string=True)
@@ -363,7 +363,7 @@ class redpitaya:
 
     def set_acquisition_units(self,units=None):
         '''
-        set the data acquisition units, either RAW or VOLT
+        set the data acquisition units, either RAW or VOLTS
         '''
         if units is None: units = self.default_settings['acquisition units']
         cmd = 'ACQ:DATA:UNITS %s' % units.upper()
