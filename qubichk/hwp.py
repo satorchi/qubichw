@@ -26,6 +26,7 @@ def get_hwp_info():
     retval['ok'] = False
     
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(1)
     try:
         s.bind((QC_IP, LISTEN_PORT))
         msg_ack = "cmd received"
