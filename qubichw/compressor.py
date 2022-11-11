@@ -336,6 +336,7 @@ class compressor:
             retval['status'] = False
             retval['msg'] = 'ERROR!  Device not configured.'
             retval['status_message'] = self.status_message(retval)
+            retval['log_message'] = self.status_log(retval)
             return retval
 
         for cmdkey in ['id','temperature','pressure','status']:
