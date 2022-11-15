@@ -65,7 +65,7 @@ def energenie_cal_get_socket_states():
     for socket in energenie_cal_socket.keys():
         find_str = '(Status of outlet %i:\t)(off|on)' % socket
         match = re.search(find_str,out)
-         if match is None:
+        if match is None:
             print('%s for socket %s' % (errmsg,energenie_cal_socket[socket]))
             status_str = 'UNKNOWN'
             states[socket] = status_str
