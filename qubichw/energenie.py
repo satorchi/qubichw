@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 control of the Energenie USB power bar.  Code originally was in hk_verify.py
 '''
-import time,subprocess
+import time,subprocess,re
 
 
 # this is temporary and should be moved to it's own package
