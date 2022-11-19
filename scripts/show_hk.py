@@ -101,9 +101,19 @@ def read_lastline(filename):
     tstamp = float(col[0])
     val = float(col[1])
     onoff = None
-    if len(col)>2:
-        onoff = col[2]
-    return tstamp, val, onoff
+    if len(col)<3:
+        return tstamp, val, None
+
+    onoff = col[2]
+    if onoff.upper()=='ON' or onoff.upper()=='OFF':
+        return tstamp, val, onoff
+
+    try:
+        val2 = eval(onoff)
+    except:
+        val2 = onoff
+    
+    return tstamp, val, val2
 
 
 def assign_val_string(val,units):
