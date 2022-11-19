@@ -12,7 +12,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 functions to check if QUBIC housekeeping is running
 '''
 
-import subprocess,re,os,sys,time
+import re,os,sys,time
 from glob import glob
 import datetime as dt
 
@@ -20,7 +20,8 @@ from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram, get_alarm_recipients
 from qubichk.ups import get_ups_info
 from qubichk.hwp import get_hwp_info
-from qubichw.energenie import *
+from qubichw.energenie import energenie
+from qubichw.utilities import shellcommand, ping
 
 alarm_recipients = get_alarm_recipients()
 
@@ -29,82 +30,21 @@ alarm_recipients = get_alarm_recipients()
 machines = ['PiGPS',
             'qubicstudio',
             'hwp',
-            'platform',
+            'motor1',
+            'motor2',
             'majortom',
             'horns',
             'mgc',
             'mmr',
-            'pitemps']
+            'qsbridge']
 #            'cam26'] # 2021-11-30 19:30:48 no cam26
 #            'cam27'] # 2021-11-30 10:02:07 cam27 was never re-installed in Salta
 
 
-def shellcommand(cmd):
-    '''
-    run a shell command
-    '''
-    
-    proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    out,err = proc.communicate()
-    return out.decode(),err.decode()
 
-
-def ping(machine,verbosity=1):
-    '''
-    ping a machine to make sure it's online
-    '''
-    retval = {}
-    retval['machine'] = machine
-    retval['ok'] = True
-    retval['error_message'] = ''
-    retval['message'] = ''
-
-    msg = 'checking connection to %s...' % machine
-    retval['message'] = msg
-    if verbosity>0: print(msg, end='', flush=True)
-    
-    cmd = 'ping -c1 %s' % machine
-    out,err = shellcommand(cmd)
-
-    match = re.search('([0-9]*%) packet loss',out)
-    if match is None:
-        retval['ok'] = False
-        msg = 'Could not determine network packet loss to %s' % machine
-        retval['error_message'] = msg
-        if verbosity>0: print('UNREACHABLE!\n--> %s' % msg)
-        return retval
-
-    packet_loss_str = match.groups()[0].replace('%','')
-    packet_loss = float(packet_loss_str)
-
-    if packet_loss > 99.0:
-        retval['ok'] = False
-        retval['error_message'] = 'unreachable'
-        retval['message'] += 'UNREACHABLE'
-        msg = 'UNREACHABLE!\n--> %s is unreachable.' % machine
-        if machine=='modulator':
-            msg += ' This is okay if Calsource is off.'
-        else:
-            msg += ' Please make sure it is switched on and connected to the housekeeping network'
-        if verbosity>0: print(msg)
-        return retval
-    
-    if packet_loss > 0.0:
-        retval['ok'] = False
-        retval['error_message'] = 'Unstable network'
-        retval['message'] += 'UNREACHABLE'
-        msg = 'ERROR!\n--> Unstable network to %s.' % machine
-        msg += '  Please make sure the ethernet cable is well connected'
-        if verbosity>0: print(msg)
-        return retval
-
-    retval['message'] += 'OK'
-    if verbosity>0: print('OK')
-    
-    return retval
     
 
-def check_network(verbosity=1,fulltest=False):
+def check_network(verbosity=1):
     '''
     ping the machines on the network
     '''
@@ -116,33 +56,25 @@ def check_network(verbosity=1,fulltest=False):
     msg_list = []
     if verbosity>0: print('\n============ checking network access ============')
 
-    # before pinging all the machines, make sure the modulator is switched on
-    if fulltest: # full test: switch on modulator
-        calret = check_energenie_cal(modulator_state=True,verbosity=verbosity)
-    else: # partial test: don't switch on modulator.  assume it's ok if Energenie is accessible
-        calret = check_energenie_cal(modulator_state=False,verbosity=verbosity)
-    if len(calret['message'])>0: msg_list.append(calret['message'])
-    if len(calret['error_message'])>0: errmsg_list.append(calret['error_message'])
-    states = calret['states']
-    if states is None: retval['ok'] = False
-    
     for machine in machines:
         retval[machine] = ping(machine,verbosity=verbosity)
         msg_list.append(retval[machine]['message'])
         if not retval[machine]['ok']:
             msg = '%s %s' % (machine,retval[machine]['error_message'])
-            if machine=='modulator' and states is not None and not states[energenie_socket_number['modulator']]:
-                msg += ' OK. Calsource is OFF'
+            if machine=='modulator':
+                powerbar = energenie('calsource')
+                if not powerbar.ok:
+                    msg += ' Calsource power bar is unreachable'
+                    retval['ok'] = False
+                else:
+                    states = powerbar.get_socket_states()                
+                    if states is not None:
+                        modulator_state = states[powerbar.devicesocket['modulator']]
+                        if not modulator_state:
+                            msg += ' OK. Calsource is OFF'
             else:
                 retval['ok'] = False
             errmsg_list.append(msg)
-
-    if fulltest and states is not None and not states[energenie_socket_number['modulator']]: # switch off the modulator again
-        msg = 'switching off modulator after the ping'
-        if verbosity>0: print(msg)
-        info = energenie_cal_set_socket_states(states)
-        msg_list.append(msg)
-        msg_list.append(info['message'])
 
     if len(errmsg_list)>0: retval['error_message'] += '\n  '.join(errmsg_list)
     retval['message'] = '\n'.join(msg_list)
@@ -160,67 +92,31 @@ def check_power(verbosity=1):
     msg_list = []
     if verbosity>0: print('\n============ checking for power connections ============')
 
-    energenie_manager = 'sispmctl'
-    
-    # check that the Energenie manager application is installed
-    cmd = 'which %s' % energenie_manager
-    out,err = shellcommand(cmd)
-    if out=='':
+    powerbar = energenie('electronics rack')
+    if not powerbar.ok:
         retval['ok'] = False
-        retval['error_message'] = '%s application not found.' % energenie_manager
-        msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % retval['error_message']
-        retval['message'] = msg
-        if verbosity>0: print(msg)
-        return retval
-
-
-    # try a few times to connect to the Energenie USB powerbar
-    error_counter = 0
-    max_count = 3
-    match = None
-    find_str = '(Status of outlet [1-4]:\t)(off|on)'
-    cmd = 'sispmctl -g all'
-    while match is None and error_counter<max_count:
-        out,err = shellcommand(cmd)
-        match = re.search(find_str,out)
-        if match is None:
-            error_counter += 1
-            retval['error_message'] = 'USB Energenie powerbar not detected: error count=%i' % error_counter
-            if err: retval['error_message'] += '\n'+err
-            if out: retval['error_message'] += '\n'+out
-            msg =  retval['error_message']
-            retval['message'] = msg
-            if verbosity>0: print(msg)
-            if error_counter<max_count: time.sleep(3)
-
-    if match is None:
-        retval['ok'] = False
-        msg = 'ERROR! %s\n-->Please check USB connection' % retval['error_message']
-        if verbosity>0: print(msg)    
-        return retval
+    else:
+        states = powerbar.get_states()
+        retval['ok'] = states['ok']
+        
             
-    for socket in energenie_socket.keys():
-        find_str = '(Status of outlet %i:\t)(off|on)' % socket
-        match = re.search(find_str,out)
-        if match is None:
+    for socknum in powerbar.socket.keys():
+        subsys = powerbar.socket[socknum]
+        state = states[socknum]
+        if state:
+            retval[subsys] = 'ON'
+        else:
+            retval[subsys] = 'OFF'
             retval['ok'] = False
-            msg = 'Could not find Energenie power status for %s' % energenie_socket[socket]
-            retval['error_message'] = msg
-            retval['message'] = msg
-            if verbosity>0: print('\nERROR! %s' % msg)
-            return retval
-
-        subsys = energenie_socket[socket]
-        state = match.groups()[1]
-        retval[subsys] = state
         msg = '%s is %s' % (subsys,state)
         msg_list.append(msg)
-        if state=='off':
-            retval['ok'] = False
+
+        if not state:
             errmsg_list.append(msg)
             msg += '\n--> Please switch on %s with the command "qubic_poweron" (no quotes)' % subsys
         else:
             msg += '... OK'
+
         if verbosity>0: print(msg)
 
     if len(errmsg_list)>0:
@@ -425,18 +321,10 @@ def check_temps(verbosity=1):
         h = open(F,'rb')
         h.seek(0,os.SEEK_END)
         fsize = h.tell()
-        if fsize<29:
-            info['ok'] = False
-            retval['ok'] = False
-            info['error_message'] = 'file too small: %s' % info['name']
-            msg = 'unable to read timestamp. File too smalle %s' % info['name']
-            if verbosity>0: print('\nERROR! %s' % msg,end='')
-            retval['error_message'] += msg
-            retval[F] = info
-            continue
-
-            
-        h.seek(-29,os.SEEK_END)
+        if fsize<40:
+            h.seek(0,os.SEEK_SET)
+        else:
+            h.seek(-40,os.SEEK_END)
         x = h.read()
         h.close()
         lines = x.decode().split('\n')

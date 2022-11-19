@@ -18,16 +18,12 @@ from qubichk.send_telegram import send_telegram
 
 if __name__=='__main__':
     verbosity = 1
-    fulltest = False
     for arg in sys.argv:
         if arg=='--silent':
             verbosity = 0
             continue
-
-        if arg=='--full':
-            fulltest=True
         
-    ret = hk_ok(verbosity=verbosity,fulltest=fulltest)
+    ret = hk_ok(verbosity=verbosity)
 
     if verbosity>0: send_telegram(ret['full_message'])
 
