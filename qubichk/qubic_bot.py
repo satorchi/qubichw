@@ -14,7 +14,7 @@ This is the QUBIC Telegram bot
 https://web.telegram.org/#/im?p=@QUBIC_bot
 
 '''
-import sys,os,re,time,subprocess,inspect,urllib
+import sys,os,re,time,inspect,urllib
 import datetime as dt
 from glob import glob
 import numpy as np
@@ -30,6 +30,7 @@ from qubichk.hk_verify import check_compressors,check_diskspace
 from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses, get_alarm_recipients
 from qubichk.ups import get_ups_info
 from qubichk.platform import get_position
+from qubichw.utilities import shellcommand
 
 class dummy_bot:
     '''
@@ -1186,20 +1187,16 @@ class qubic_bot :
         '''
         send the IP address
         '''
-        cmd='hostname'
-        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
-        hostname=out.decode().strip()
+        cmd = 'hostname'
+        hostname,err = shellcommand(cmd)
 
-        cmd='/sbin/ifconfig -a'
-        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
-        msg = out.decode()
+        cmd = '/sbin/ifconfig -a'
+        msg,err = shellcommand(cmd)
 
-        cmd='/usr/bin/uptime'
-        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
-        answer = 'IP Address from %s\n\n%s\n\n%s' % (hostname,msg,out.decode())
+        cmd = '/usr/bin/uptime'
+        uptime,err = shellcommand(cmd)
+        
+        answer = 'IP Address from %s\n\n%s\n\n%s' % (hostname,msg,uptime)
 
         self._send_message(answer)
         return

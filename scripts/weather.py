@@ -11,9 +11,10 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 read the weather stuff from the weather station online
 '''
-import sys,re,subprocess,time
+import sys,re,time
 import datetime as dt
 from urllib.request import urlopen
+from qubichw.utilities import shellcommand
 
 def parseargs(argv):
     '''
@@ -60,9 +61,8 @@ def choose_server():
     
     ip = None
     cmd = '/sbin/ip address show dev eth0'
-    proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    out,err = proc.communicate()
-    for line in out.decode().split('\n'):
+    out,err = shellcommand(cmd)
+    for line in out.split('\n'):
         col = line.strip().split()
         if col[0]=='inet':
             ip = col[1].split('/')[0]

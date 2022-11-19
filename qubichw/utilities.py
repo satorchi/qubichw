@@ -18,7 +18,7 @@ def shellcommand(cmd):
     '''    
     proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out,err = proc.communicate()
-    return out.decode(),err.decode()
+    return out.decode().strip(),err.decode().strip()
 
 
 def ping(machine,verbosity=1):

@@ -12,10 +12,10 @@ control the Numato relay for power supply
 ref: Numato-16-Channel-USB Relay-Module.pdf
 https://numato.com/docs/16-channel-usb-relay-module/
 '''
-import serial,subprocess,sys,os,re
+import serial,sys,os,re
 from glob import glob
 import datetime as dt
-
+from qubichw.utilities import shellcommand
 class relay:
     '''
     class to turn on/off power supplies using the Numato relay
@@ -110,9 +110,8 @@ class relay:
         for tty in ttys:
             self.log('Checking device: %s' % tty,verbosity=3)
             cmd = '/sbin/udevadm info -a %s' % tty
-            proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            out,err = proc.communicate()
-            lines = out.decode().split('\n')
+            out,err = shellcommand(cmd)
+            lines = out.split('\n')
             find_str = 'ATTRS{idProduct}=="%04x"' % self.idProduct
             self.log('searching for: %s' % find_str,verbosity=3)
             for line in lines:
