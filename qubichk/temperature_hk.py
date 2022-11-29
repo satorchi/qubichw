@@ -14,7 +14,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 get temperatures from the temperature diodes
 '''
-import os,sys,serial,subprocess
+import os,sys,serial
 from glob import glob
 import time
 import datetime as dt
