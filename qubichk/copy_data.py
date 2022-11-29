@@ -12,12 +12,15 @@ Copy QUBIC data to cc-in2p3 and apcjupyter.  Convert calsource files to fits at 
 
 This script is run on qubic-central (192.168.2.1) which has access to the QubicStudio files via Samba
 and access to the calsource files via nfs.
+
+This script was replaced by archive-data.sh Wed 15 Jul 2020 10:40:46 CEST
 '''
-import sys,os,time,subprocess
+import sys,os,time
 from glob import glob
 import datetime as dt
 import numpy as np
 from astropy.io import fits
+from qubichw.utilities import shellcommand
 
 cc_datadir  = '/sps/qubic/Data/Calib-TD'
 #qs_datadir  = '/qs/Qubic Studio/backup'
@@ -25,16 +28,6 @@ qs_datadir  = '/qs2' # Fri 05 Apr 2019 16:02:18 CEST
 cs_datadir  = '/calsource/qubic'
 jup_datadir = '/qubic/Data/Calib-TD'
 central_datadir = '/archive'
-
-def shell_command(cmd):
-    '''
-    run a shell command and retrieve the output
-    '''
-    print('command shell:\n   %s' % cmd)
-    proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    out,err = proc.communicate()
-    return out,err
-
 
 def archive_command(server,archive_cmd):
     '''
@@ -44,7 +37,7 @@ def archive_command(server,archive_cmd):
         cmd = archive_cmd
     else:
         cmd = 'ssh %s "%s"' % (server,archive_cmd)
-    return shell_command(cmd)
+    return shellcommand(cmd)
     
 
 def make_relative_filelist(datadir,filelist):
@@ -182,7 +175,7 @@ def copy2archive(server):
         src_file = srcfiles2copy[idx]
         cmd = 'scp -p "%s" %s:"%s"' % (src_file,server,escaped_destination)
         #print('copy command:\n   %s' % cmd)
-        out,err = shell_command(cmd)
+        out,err = shellcommand(cmd)
         if err:
             print(err)
             return
@@ -197,11 +190,11 @@ def copy2central():
 
     # QubicStudio fits files
     cmd = 'cd "%s";find . -type f -name "*.fits" -exec cp -puv --parents {} %s \;' % (qs_datadir,central_datadir)
-    shell_command(cmd)
+    shellcommand(cmd)
 
     # calsource dat and fits files
     cmd = 'cd %s;find . -type f \( -name "*.fits" -o -name "*.dat" \) -exec cp -puv --parents {} %s/calsource \;' % (cs_datadir,central_datadir)
-    shell_command(cmd)
+    shellcommand(cmd)
     return
 
 def copy2cc():
