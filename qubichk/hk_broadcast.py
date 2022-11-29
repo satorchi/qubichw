@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 class for broadcasting/receiving QUBIC Housekeeping data
 '''
 from __future__ import division, print_function
-import sys,os,subprocess,time,socket,struct
+import sys,os,time,socket,struct
 import numpy as np
 import datetime as dt
 import re
@@ -20,6 +20,7 @@ from qubichk.powersupply import PowerSupply, PowerSupplies, known_supplies
 from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
+from qubichw.utilities import shellcommand
 
 class hk_broadcast :
     '''a class for broadcasting  and receiving QUBIC housekeeping data
@@ -348,8 +349,7 @@ class hk_broadcast :
 
         if eth is None:
             cmd = '/sbin/ifconfig -a'
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            out,err = proc.communicate()
+            out,err = shellcommand(cmd)
             devs = []
             for line in out.decode().split('\n'):
                 match = re.match('^(eth[0-9])',line)
@@ -362,8 +362,7 @@ class hk_broadcast :
 
             
         cmd = '/sbin/ifconfig %s' % eth
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err = proc.communicate()
+        out,err = shellcommand(cmd)
         for line in out.decode().split('\n'):
             if line.find('inet ')>0: break
         hostname = line.split()[1]
