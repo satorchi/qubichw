@@ -16,7 +16,7 @@ The TTi PL303QMD-P power supply has two supplies
   2) on the left hand side
 
 '''
-import os,sys,serial,subprocess
+import os,sys,serial
 from glob import glob
 import numpy as np
 import datetime as dt
@@ -24,7 +24,7 @@ import re
 import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
-
+from qubichw.utilities import shellcommand
 
 class PowerSupply :
 
@@ -80,8 +80,7 @@ class PowerSupply :
         
         # find out which power supply it is, and whether it has one or two supplies
         cmd='/sbin/udevadm info -a %s|grep serial|head -1' % self.port
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
+        out,err = shellcommand(cmd)
         serialno=out.decode().split('==')[1].replace('"','').strip()
         self.log('found powersupply with serialno %s' % serialno,verbosity=3)
 
