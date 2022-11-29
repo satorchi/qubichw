@@ -564,9 +564,9 @@ class qubic_bot :
         with the webcam near the calibration source
         '''
         cmd='ssh pigps ./snapshot.sh'
-        subprocess.call(cmd.split())
+        out,err = shellcommand(cmd)
         cmd='scp -p pigps:webcamshot.jpg .'
-        subprocess.call(cmd.split())
+        out,err = shellcommand(cmd)
         with open('webcamshot.jpg','rb') as photo:
             if photo is not None: self._send_photo(photo)
         return
@@ -577,9 +577,9 @@ class qubic_bot :
         with the webcam on the electronics rack
         '''
         cmd='ssh pitemps ./snapshot.sh'
-        subprocess.call(cmd.split())
+        out,err = shellcommand(cmd)
         cmd='scp -p pitemps:webcamshot.jpg .'
-        subprocess.call(cmd.split())
+        out,err = shellcommand(cmd)
         with open('webcamshot.jpg','rb') as photo:
             if photo is not None: self._send_photo(photo)
         return
