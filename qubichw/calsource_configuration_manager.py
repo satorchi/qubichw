@@ -17,8 +17,7 @@ from copy import deepcopy
 
 # the Energenie powerbar
 #from PyMS import PMSDevice
-from qubichk.hk_verify import energenie_cal_set_socket_states as energenie_set_socket_states
-from qubichk.hk_verify import energenie_cal_get_socket_states as energenie_get_socket_states
+from qubichw.energenie import energenie
 from qubichk.utilities import shellcommand
 # the calibration source
 from qubichw.calibration_source import calibration_source
@@ -148,7 +147,6 @@ class calsource_configuration_manager():
         self.nbytes = 1024
         self.receiver = self.known_hosts['pigps']
 
-        self.energenie = None
         self.hostname = None
         if self.hostname is None and 'HOST' in os.environ.keys():
             self.hostname = os.environ['HOST']
@@ -342,6 +340,7 @@ class calsource_configuration_manager():
         reset_delta = self.energenie_timeout # minimum time to wait
         now = dt.datetime.utcnow()
         delta = (now - self.energenie_lastcommand_date).total_seconds()
+        powerbar = energenie('calsource')
 
         if delta < reset_delta:
             extra_wait = reset_delta - delta
@@ -349,7 +348,7 @@ class calsource_configuration_manager():
 
         ack = ''
         if states is not None:
-            info = energenie_set_socket_states(states)
+            info = powerbar.set_socket_states(states)
             if info['ok']:
                 ack = 'OK-'
             else:
@@ -361,7 +360,7 @@ class calsource_configuration_manager():
                 
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
-        states_read = energenie_get_socket_states()
+        states_read = powerbar.get_socket_states()
         if states_read is not None:
             ack += 'OK'
             self.log('retrieved energenie states: %s' % states_read,verbosity=2)
