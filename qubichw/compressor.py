@@ -10,9 +10,10 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 a class to read and command the pulse tube compressors
 '''
-import serial,subprocess,sys,os,re,time
+import serial,sys,os,re,time
 from glob import glob
 import datetime as dt
+from qubichk.utilities import shellcommand
 
 psi_to_bar = 1.01325 /  14.696
 shortlabel = {}
@@ -78,9 +79,8 @@ class compressor:
         gotit = False
         for tty in ttys:
             cmd = '/sbin/udevadm info -a %s' % tty
-            proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            out,err = proc.communicate()
-            lines = out.decode().split('\n')
+            out,err = shellcommand(cmd)
+            lines = out.split('\n')
             for line in lines:
                 if id is not None:
                     find_str = 'ATTRS{serial}=="%s"' % id

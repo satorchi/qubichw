@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 A class with methods to send/receive configuration command for the calibration source setup
 Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
 '''
-import socket,subprocess,time,re,os,multiprocessing,sys
+import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
@@ -19,7 +19,7 @@ from copy import deepcopy
 #from PyMS import PMSDevice
 from qubichk.hk_verify import energenie_cal_set_socket_states as energenie_set_socket_states
 from qubichk.hk_verify import energenie_cal_get_socket_states as energenie_get_socket_states
-
+from qubichk.utilities import shellcommand
 # the calibration source
 from qubichw.calibration_source import calibration_source
 
@@ -155,9 +155,8 @@ class calsource_configuration_manager():
             
         # try to get hostname from the ethernet device
         cmd = '/sbin/ifconfig -a'
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = proc.communicate()
-        match = re.match('.* inet (192\.168\.2\..*?) ',out.decode().replace('\n',' '))
+        out, err = shellcommand(cmd)
+        match = re.match('.* inet (192\.168\.2\..*?) ',out.replace('\n',' '))
         if match:
             ip_addr = match.groups()[0]
             if ip_addr in self.known_hosts.values():

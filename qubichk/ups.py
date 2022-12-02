@@ -11,8 +11,9 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 a few methods to access info from the UPS
 '''
-import sys,os,time,subprocess
+import sys,os,time
 import datetime as dt
+from qubichk.utilities import shellcommand
 
 def get_ups_info():
     '''
@@ -32,9 +33,7 @@ def get_ups_info():
     alarm = False
     
     cmd = 'upsc cyberpower'
-    proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    out,err = proc.communicate()
-    full_output = out.decode()
+    full_output,err = shellcommand(cmd)
 
     brief_msg_list = []
     log_msg_list = [dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')]
