@@ -13,10 +13,10 @@ Documentation in: SDG Programming Guide.pdf
 see also: SDG2000X_V1.0.PDF
 and: USBTMC_1_00.pdf
 '''
-import time,os,sys,socket,struct,string,re,subprocess
+import time,os,sys,socket,struct,string,re
 import usbtmc
 import datetime as dt
-
+from qubichk.utilities import shellcommand
 class siglent:
     '''
     class to send commands to the siglent signal generator using the usbtmc interface
@@ -85,9 +85,8 @@ class siglent:
                 if os.path.exists(dev):
                     self.log('modulator: path exists: %s' % dev)
                     cmd = 'udevadm info -a %s' % dev
-                    proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                    out,err = proc.communicate()
-                    sections = out.decode().split('looking at ')
+                    out,err = shellcommand(cmd)
+                    sections = out.split('looking at ')
                     dev = sections[1].split('\n')[0].split(' ')[-1][1:-2]
                     devinfo = [dev]
                     for line in sections[1].split('\n'):
