@@ -15,7 +15,7 @@ https://numato.com/docs/16-channel-usb-relay-module/
 import serial,sys,os,re
 from glob import glob
 import datetime as dt
-from qubichw.utilities import shellcommand
+from qubichk.utilities import shellcommand
 class relay:
     '''
     class to turn on/off power supplies using the Numato relay

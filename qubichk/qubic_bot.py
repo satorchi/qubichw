@@ -30,7 +30,7 @@ from qubichk.hk_verify import check_compressors,check_diskspace
 from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses, get_alarm_recipients
 from qubichk.ups import get_ups_info
 from qubichk.platform import get_position
-from qubichw.utilities import shellcommand
+from qubichk.utilities import shellcommand
 
 class dummy_bot:
     '''

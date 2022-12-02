@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 control of the Energenie USB power bar.  Code originally was in hk_verify.py
 '''
 import time,re
-from qubichw.utilities import shellcommand, ping
+from qubichk.utilities import shellcommand, ping
 
 class energenie:
     '''

@@ -20,7 +20,7 @@ from glob import glob
 import datetime as dt
 import numpy as np
 from astropy.io import fits
-from qubichw.utilities import shellcommand
+from qubichk.utilities import shellcommand
 
 cc_datadir  = '/sps/qubic/Data/Calib-TD'
 #qs_datadir  = '/qs/Qubic Studio/backup'

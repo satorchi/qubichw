@@ -14,7 +14,7 @@ read the weather stuff from the weather station online
 import sys,re,time
 import datetime as dt
 from urllib.request import urlopen
-from qubichw.utilities import shellcommand
+from qubichk.utilities import shellcommand
 
 def parseargs(argv):
     '''

@@ -24,7 +24,7 @@ import re
 import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
-from qubichw.utilities import shellcommand
+from qubichk.utilities import shellcommand
 
 class PowerSupply :
 

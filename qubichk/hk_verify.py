@@ -21,7 +21,7 @@ from qubichk.send_telegram import send_telegram, get_alarm_recipients
 from qubichk.ups import get_ups_info
 from qubichk.hwp import get_hwp_info
 from qubichw.energenie import energenie
-from qubichw.utilities import shellcommand, ping
+from qubichk.utilities import shellcommand, ping
 
 alarm_recipients = get_alarm_recipients()
 
