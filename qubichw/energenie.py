@@ -11,6 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 control of the Energenie USB power bar.  Code originally was in hk_verify.py
 '''
 import time,re
+import datetime as dt
 from qubichk.utilities import shellcommand, ping
 
 class energenie:
@@ -67,7 +68,7 @@ class energenie:
             self.devicesocket[self.socket[socknum]] = socknum
     
         # check that the Energenie manager application is installed
-        out,err = shellcommand(cmd)
+        out,err = shellcommand(verify_cmd)
         if out=='':
             error_message = '%s application not found.' % self.manager
             msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % error_message
@@ -85,7 +86,7 @@ class energenie:
         
         filename = 'energenie.log'
         h = open(filename,'a')
-        h.write('%s|ENERGENIE| %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
+        h.write('%s|ENERGENIE| %s\n' % (dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'),msg))
         h.close()
         print(msg)
         return
