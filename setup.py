@@ -15,6 +15,15 @@ import os,sys,subprocess
 import datetime as dt
 from setuptools import setup
 
+def shellcommand(cmd):
+    '''
+    run a shell command
+    '''    
+    proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    out,err = proc.communicate()
+    return out.decode().strip(),err.decode().strip()
+
+
 DISTNAME         = 'qubichw'
 DESCRIPTION      = 'Utilities for QUBIC hardware control and monitoring'
 AUTHOR           = 'Steve Torchinsky'
@@ -64,12 +73,10 @@ exec_dir_ok = False
 for exec_dir in exec_dir_list:
     if not os.path.isdir(exec_dir):
         cmd = 'mkdir --parents %s' % exec_dir
-        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
+        out,err = shellcommand(cmd)
     tmp_file = 'qubicpack_installation_temporary_file_%s.txt' % dt.datetime.now().strftime('%Y%m%dT%H%M%S')
     cmd = 'touch %s/%s' % (exec_dir,tmp_file)
-    proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    out,err=proc.communicate()
+    out,err = shellcommand(cmd)
     if err:
         continue
     else:
@@ -142,8 +149,7 @@ if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     for F in scripts:
         basename = os.path.basename(F)
         cmd = 'rm -f %s/%s; cp -puv %s %s;chmod +x %s/%s' % (exec_dir,basename,F,exec_dir,exec_dir,basename)
-        proc=subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out,err=proc.communicate()
-        if out:print(out.decode().strip())
-        if err:print(err.decode().strip())
+        out,err = shellcommand(cmd)
+        if out:print(out.strip())
+        if err:print(err.strip())
 
