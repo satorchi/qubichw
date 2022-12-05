@@ -19,7 +19,7 @@ class energenie:
     '''
     verbosity = 2
 
-    def __init__(name='electronics rack'):
+    def __init__(self,name='electronics rack'):
         valid_names = ['electronics rack','calsource','rack 1','rack 2']
         self.socket = {}
         self.ok = False
@@ -91,7 +91,7 @@ class energenie:
         return
 
 
-    def get_socket_states():
+    def get_socket_states(self):
         '''
         get the socket states of the Energenie powerbar
         '''
@@ -146,7 +146,7 @@ class energenie:
         return states
 
 
-    def set_socket_states(states):
+    def set_socket_states(self,states):
         '''
         set the socket states of the calibration source Energenie powerbar (RCPB1)
         '''
@@ -175,7 +175,7 @@ class energenie:
         return retval
 
     
-    def get_status(verbosity=1,modulator_state=False):
+    def get_status(self,verbosity=1,modulator_state=False):
         '''
         check for the status of the calsource Energenie sockets
         '''
