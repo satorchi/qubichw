@@ -96,7 +96,7 @@ def check_power(verbosity=1):
     if not powerbar.ok:
         retval['ok'] = False
     else:
-        states = powerbar.get_states()
+        states = powerbar.get_socket_states()
         retval['ok'] = states['ok']
         
             
