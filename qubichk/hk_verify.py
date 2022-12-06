@@ -468,7 +468,7 @@ def check_hwp(verbosity=1):
         
     return retval
 
-def hk_ok(verbosity=1,fulltest=False):
+def hk_ok(verbosity=1):
     '''
     check that housekeeping is okay
     '''
@@ -478,7 +478,7 @@ def hk_ok(verbosity=1,fulltest=False):
 
     retval['ups'] = check_ups(verbosity=verbosity)
     retval['power'] = check_power(verbosity=verbosity)
-    retval['network'] = check_network(verbosity=verbosity,fulltest=fulltest)
+    retval['network'] = check_network(verbosity=verbosity)
     retval['mounts'] = check_mounts(verbosity=verbosity)
     retval['diskspace'] = check_diskspace(verbosity=verbosity)
     retval['calsource'] = check_calsource(verbosity=verbosity)
