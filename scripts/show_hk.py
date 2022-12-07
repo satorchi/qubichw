@@ -365,7 +365,10 @@ n_tstamps = len(tstamps)
 for idx,line in enumerate(lines):
     if idx>=n_tstamps: break
     delta = latest - tstamps[idx]
-    if delta>7 or line.find('bad answer')>=0 or line.find('?')>=0 or line.find('LOW!')>=0 or line.find('NO UPS')>=0:
+    limit_delta = 7
+    if line.find('ups')>0:
+        limit_delta=67
+    if delta>limit_delta or line.find('bad answer')>=0 or line.find('?')>=0 or line.find('LOW!')>=0 or line.find('NO UPS')>=0:
         lines[idx] = colored(line,'red','on_white')
 
 
