@@ -134,6 +134,7 @@ def read_weather():
     return a list timestamps, and a list of strings with the weather data
     '''
     basename = 'weather.txt'
+    rootname = basename.replace('.txt','')
     weather_file = '%s%s%s' % (hk_dir,os.sep,basename)
     vals = read_lastline(weather_file)
     if vals is None: return None
@@ -146,13 +147,13 @@ def read_weather():
     date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
     val_str = '%.1f C' % vals[1]
     label = 'outside temperature'
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename)
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
     lines.append(line)
 
     tstamps.append(tstamp)
     val_str = '%.1f %%' % vals[2]
     label = 'relative humidity'
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
     lines.append(line)
     
     return tstamps,lines
