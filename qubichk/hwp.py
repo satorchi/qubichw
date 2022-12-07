@@ -12,9 +12,11 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 Half Wave Plate methods for housekeeping acquisition
 HWP control software by Carlos Reyes
 '''
-import socket
+import socket,re
+from qubichk.utilities import ping,shellcommand
 
 QC_IP = "192.168.2.1"
+HWP_IP = "192.168.2.100"
 LISTEN_PORT = 5455
 
 
@@ -24,7 +26,35 @@ def get_hwp_info():
     '''
     retval = {}
     retval['ok'] = False
-    
+
+    # check if hwp is responding
+    ping_result = ping(HWP_IP)
+    if not ping_result['ok']:
+        retval['ok'] = False
+        retval['message'] = 'HWP is not responding on the network'
+        retval['error_message'] = retval['message']
+        retval['brief message'] = 'HWP unavailable'
+        retval['pos'] = None
+        retval['dir'] = None
+        retval['motor'] = None
+        return retval
+
+    # check if HWP server is running
+    cmd = 'ssh hwp ps axwu'
+    out,err = shellcommand(cmd)
+    daemon = 'hwpctl.py'
+    find_str = 'python.*%s' % daemon
+    match = re.search(find_str,out)
+    if match is None:
+        retval['ok'] = False
+        retval['message'] = 'HWP server not running'
+        retval['error_message'] = '%s not running on HWP' % daemon
+        retval['brief message'] = '%s not running' % daemon
+        retval['pos'] = None
+        retval['dir'] = None
+        retval['motor'] = None
+        return retval
+        
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(1)
     try:
@@ -35,7 +65,7 @@ def get_hwp_info():
         s.close()
     except:
         retval['ok'] = False
-        retval['message'] = 'HWP info unavailable: socket in use or HWP server not running.  Try again.'
+        retval['message'] = 'HWP info unavailable: socket in use.  Try again.'
         retval['error_message'] = 'HWP info unavailable: socket in use.'
         retval['brief message'] = retval['message']
         retval['pos'] = None
