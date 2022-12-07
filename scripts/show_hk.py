@@ -210,14 +210,18 @@ def read_compressor(compressor_num):
     vals = read_lastline(compressor_file)
     if vals is None: return None
 
-    if len(vals)<8: return None
-
     lines = []
     tstamps = []
 
     date = str2dt(vals[0])
     tstamp = date.timestamp()
     date_str = date.strftime(date_fmt)
+
+    if vals.find('OFFLINE')>0 or len(vals)<6:
+        val_str = 'OFFLINE'
+        label_human = 'compressor %i' % compressor_num
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
+        return [tstamp],[line]
 
     label_human = 'output water'
     label = 'Tout'
