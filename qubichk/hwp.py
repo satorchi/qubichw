@@ -35,7 +35,7 @@ def get_hwp_info():
         s.close()
     except:
         retval['ok'] = False
-        retval['message'] = 'HWP info unavailable: socket in use.  Try again.'
+        retval['message'] = 'HWP info unavailable: socket in use or HWP server not running.  Try again.'
         retval['error_message'] = 'HWP info unavailable: socket in use.'
         retval['brief message'] = retval['message']
         retval['pos'] = None
