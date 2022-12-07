@@ -163,6 +163,7 @@ def read_ups():
     return a list of timestamps and a list of strings with the UPS status
     '''
     basename = 'ups_log.txt'
+    rootname = basename.replace('.txt','')
     ups_file = '%s%s%s' % (hk_dir,os.sep,basename)
     vals = read_lastline(ups_file)
     if vals is None: return None
@@ -182,7 +183,7 @@ def read_ups():
         val = eval(vals[1].split('=')[-1])
         val_str = '%.1f VAC' % val
         if val<210: label+=' LOW!'
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
     lines.append(line)
 
     
@@ -194,10 +195,58 @@ def read_ups():
         val = eval(vals[2].split('=')[-1])
         val_str = '%.1f %%' % val
         if val<50: label+=' LOW!'
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
     lines.append(line)
     
     return tstamps,lines
+
+def read_compressor(compressor_num):
+    '''
+    get the compressor status from the log file
+    '''
+    basename = 'compressor%i_log.txt' % compressor_num
+    rootname = basename.replace('.txt','')
+    compressor_file = '%s%s%s' % (hk_dir,os.sep,basename)
+    vals = read_lastline(compressor_file)
+    if vals is None: return None
+
+    if len(vals)<8: return None
+
+    lines = []
+    tstamps = []
+
+    date = str2dt(vals[0])
+    tstamp = date.timestamp()
+    date_str = date.strftime(date_fmt)
+
+    label_human = 'output water'
+    label = 'Tout'
+    col = vals[4]
+    tstamps.append(tstamp)
+    if col.find(label)<0:
+        val_str = 'NO COMPRESSOR INFO'
+    else:
+        val = eval(col.split('=')[-1])
+        val_str = '%.1f C' % val
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
+    lines.append(line)
+
+    
+    label_human = 'intake water'
+    label = 'Tin'
+    col = vals[5]
+    tstamps.append(tstamp)
+    if col.find(label)<0:
+        val_str = 'NO COMPRESSOR INFO'
+    else:
+        val = eval(col.split('=')[-1])
+        val_str = '%.1f C' % val
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
+    lines.append(line)
+    
+    return tstamps,lines
+    
+    
 
 # first look at the weather
 retval = read_weather()
@@ -209,6 +258,16 @@ else:
 
 # read the UPS status
 retval = read_ups()
+if retval is not None:
+    tstamps += retval[0]
+    lines += retval[1]
+
+# read the compressor status    
+retval = read_compressor(1)
+if retval is not None:
+    tstamps += retval[0]
+    lines += retval[1]
+retval = read_compressor(2)
 if retval is not None:
     tstamps += retval[0]
     lines += retval[1]
@@ -316,6 +375,7 @@ for F in hk_files:
     retval = read_lastline(F)
     if retval is None: continue
     tstamp,val,onoff = retval
+    if val=='inf': val=1e6
     tstamps.append(tstamp)
 
     label = ''
