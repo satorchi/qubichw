@@ -156,7 +156,7 @@ def read_weather():
     tstamps.append(tstamp)
     val_str = '%.1f %%' % vals[2]
     label = 'relative humidity'
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename)
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
     lines.append(line)
     
     return tstamps,lines
@@ -322,7 +322,7 @@ n_tstamps = len(tstamps)
 for idx,line in enumerate(lines):
     if idx>=n_tstamps: break
     delta = latest - tstamps[idx]
-    if delta>5 or line.find('bad answer')>=0 or line.find('?')>=0:
+    if delta>7 or line.find('bad answer')>=0 or line.find('?')>=0:
         lines[idx] = colored(line,'red','on_white')
 
 
