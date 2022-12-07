@@ -28,7 +28,7 @@ def get_hwp_info():
     retval['ok'] = False
 
     # check if hwp is responding
-    ping_result = ping(HWP_IP)
+    ping_result = ping(HWP_IP,verbosity=0)
     if not ping_result['ok']:
         retval['ok'] = False
         retval['message'] = 'HWP is not responding on the network'
