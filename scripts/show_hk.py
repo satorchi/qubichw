@@ -217,7 +217,8 @@ def read_compressor(compressor_num):
     tstamp = date.timestamp()
     date_str = date.strftime(date_fmt)
 
-    if vals.find('OFFLINE')>0 or len(vals)<6:
+    lastline = ' '.join(vals)
+    if lastline.find('OFFLINE')>0 or len(vals)<6:
         val_str = 'OFFLINE'
         label_human = 'compressor %i' % compressor_num
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
