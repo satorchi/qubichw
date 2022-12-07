@@ -185,7 +185,7 @@ def read_ups():
     
     label = 'battery charge'
     tstamps.append(tstamp)
-    if vals[2].find(label.replace(' '.'.'))<0:
+    if vals[2].find(label.replace(' ','.'))<0:
         val_str = 'NO UPS INFO'
     else:
         val = eval(vals[1].split('=')[-1])
