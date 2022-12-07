@@ -180,7 +180,7 @@ def read_ups():
     else:
         val = eval(vals[1].split('=')[-1])
         val_str = '%.1f VAC' % val
-        if val<220: label+=' LOW!'
+        if val<210: label+=' LOW!'
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
     lines.append(line)
 
