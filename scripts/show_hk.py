@@ -17,7 +17,7 @@ import sys,os
 from glob import glob
 import datetime as dt
 from termcolor import colored
-
+from satorchipy.datefunctions import str2dt
 from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
 
@@ -100,22 +100,18 @@ def read_lastline(filename):
         print('Unexpected string: %s' % lastline)
         return None
 
-    tstamp = float(col[0])
-    val = float(col[1])
-    onoff = None
+    val_list = []
+    for val_str in col:
+        try:
+            val = eval(val_str)
+        except:
+            val = val_str
+        val_list.append(val)
+            
     if len(col)<3:
-        return tstamp, val, None
+        return val_list + [None]
 
-    onoff = col[2]
-    if onoff.upper()=='ON' or onoff.upper()=='OFF':
-        return tstamp, val, onoff
-
-    try:
-        val2 = eval(onoff)
-    except:
-        val2 = onoff
-    
-    return tstamp, val, val2
+    return val_list
 
 
 def assign_val_string(val,units):
@@ -161,6 +157,43 @@ def read_weather():
     
     return tstamps,lines
 
+def read_ups():
+    '''
+    return a list of timestamps and a list of strings with the UPS status
+    '''
+    basename = 'ups_log.txt'
+    ups_file = '%s%s%s' % (hk_dir,os.sep,basename)
+    vals = read_lastline(ups_file)
+    if vals is None: return None
+
+    lines = []
+    tstamps = []
+
+    tstamp = str2dt(vals[0])
+    date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+
+    label = 'input voltage'
+    tstamps.append(tstamp)
+    if vals[1].find(label.replace(' '.'.'))<0:
+        val_str = 'NO UPS INFO'
+    else:
+        val = eval(vals[1].split('=')[-1])
+        val_str = '%.1f VAC' % val
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
+    lines.append(line)
+
+    
+    label = 'battery charge'
+    tstamps.append(tstamp)
+    if vals[2].find(label.replace(' '.'.'))<0:
+        val_str = 'NO UPS INFO'
+    else:
+        val = eval(vals[1].split('=')[-1])
+        val_str = '%.1f %%' % val
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
+    lines.append(line)
+    
+    return tstamps,lines
 
 # first look at the weather
 retval = read_weather()
@@ -170,6 +203,13 @@ if retval is None:
 else:
     tstamps,lines = retval
 
+# read the UPS status
+retval = read_ups()
+if retval is not None:
+    tstamps += retval[0]
+    lines += retval[1]
+
+    
 # read the platform position directly from socket
 labels = ['azimuth','elevation']
 vals = get_position()
