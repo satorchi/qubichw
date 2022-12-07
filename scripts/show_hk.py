@@ -169,7 +169,7 @@ def read_ups():
     lines = []
     tstamps = []
 
-    tstamp = str2dt(vals[0])
+    tstamp = str2dt(vals[0]).timestamp()
     date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
 
     label = 'input voltage'
