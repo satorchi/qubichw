@@ -23,18 +23,20 @@ from qubichk.hwp import get_hwp_info
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 if not os.path.isdir(hk_dir):
-    hk_dir = '/home/steve/data/2021/hk'
+    hk_dir = '/home/steve/data/2022/hk'
 
 if not os.path.isdir(hk_dir):
     print('could not find Housekeeping data directory')
     quit()
-    
+
+date_fmt = '%Y-%m-%d %H:%M:%S'    
 exclude_files = ['TEMPERATURE_RAW.txt',
                  'TEMPERATURE_VOLT.txt',
                  'LABELS.txt',
                  'compressor1_log.txt',
                  'compressor2_log.txt',
-                 'ups_log.txt']
+                 'ups_log.txt',
+                 'weather.txt']
 touchname = 'AVS47_1_ch0.txt'
 
 def read_labels():
@@ -131,19 +133,50 @@ def assign_val_string(val,units):
         val_str = '%12.5e %s' % (val,units)
     return val_str
     
+def read_weather():
+    '''
+    return a list timestamps, and a list of strings with the weather data
+    '''
+    basename = 'weather.txt'
+    weather_file = '%s%s%s' % (hk_dir,os.sep,basename)
+    vals = read_lastline(weather_file)
+    if vals is None: return None
+
+    lines = []
+    tstamps = []
+
+    tstamp = vals[0]
+    tstamps.append(tstamp)
+    date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+    val_str = '%.1f C' % vals[1]
+    label = 'outside temperature'
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename)
+    lines.append(line)
+
+    tstamps.append(tstamp)
+    val_str = '%.1f %%' % vals[2]
+    label = 'relative humidity'
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename)
+    lines.append(line)
+    
+    return tstamps,lines
 
 
-# initialize output variables
-lines = []
-tstamps = []
+# first look at the weather
+retval = read_weather()
+if retval is None:
+    lines = []
+    tstamps = []
+else:
+    tstamps,lines = retval
 
-# first of all, read the platform position directly from socket
+# read the platform position directly from socket
 labels = ['azimuth','elevation']
 vals = get_position()
 azel = vals[:2]
 warn = vals[2:]
 tstamp = dt.datetime.utcnow().timestamp()
-date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
+date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
 for idx,val in enumerate(azel):
     if type(val)==str:
         val_str = val.center(7)
@@ -159,7 +192,7 @@ for idx,val in enumerate(azel):
 # next read the HWP position
 hwpinfo = get_hwp_info()
 tstamp = dt.datetime.utcnow().timestamp()
-date_str = dt.datetime.utcfromtimestamp(tstamp).strftime('%Y-%m-%d %H:%M:%S')
+date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
 label = 'HWP Position'
 if hwpinfo['pos'] is None:
     hwppos_str = 'UNKNOWN'
@@ -194,7 +227,7 @@ for idx in range(7):
         if retval is None: continue
         tstamp,val,onoff = retval
         date = dt.datetime.utcfromtimestamp(tstamp)
-        date_str = date.strftime('%Y-%m-%d %H:%M:%S')
+        date_str = date.strftime(date_fmt)
     
         label = ''
         labelkey = basename.replace('.txt','')
@@ -271,7 +304,7 @@ for F in hk_files:
         units = ''
         
     date = dt.datetime.utcfromtimestamp(tstamp)
-    date_str = date.strftime('%Y-%m-%d %H:%M:%S')
+    date_str = date.strftime(date_fmt)
 
     if units == 'steps':
         val_str = '%10i %s' % (int(val), units)
