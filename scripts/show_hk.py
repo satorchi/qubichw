@@ -180,6 +180,7 @@ def read_ups():
     else:
         val = eval(vals[1].split('=')[-1])
         val_str = '%.1f VAC' % val
+        if val<220: label+=' LOW!'
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
     lines.append(line)
 
@@ -189,8 +190,9 @@ def read_ups():
     if vals[2].find(label.replace(' ','.'))<0:
         val_str = 'NO UPS INFO'
     else:
-        val = eval(vals[1].split('=')[-1])
+        val = eval(vals[2].split('=')[-1])
         val_str = '%.1f %%' % val
+        if val<50: label+=' LOW!'
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), basename.replace('.txt',''))
     lines.append(line)
     
@@ -363,7 +365,7 @@ n_tstamps = len(tstamps)
 for idx,line in enumerate(lines):
     if idx>=n_tstamps: break
     delta = latest - tstamps[idx]
-    if delta>7 or line.find('bad answer')>=0 or line.find('?')>=0:
+    if delta>7 or line.find('bad answer')>=0 or line.find('?')>=0 or line.find('LOW!')>=0 or line.find('NO UPS')>=0:
         lines[idx] = colored(line,'red','on_white')
 
 
