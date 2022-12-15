@@ -24,19 +24,23 @@ fi
 # if not, start the gps daemon, and wait for it to connect
 chk=`ps axw|grep gpsd|grep -v grep`
 if [ -z "$chk" ]; then
+    echo "starting gpsd"
     /usr/sbin/gpsd $GPS_DEV
     sleep 15
 fi
 
 # check if the ntp daemon is running
-chk=`ps axw|grep ntpd|grep -v grep`
+chk=`ps axw|grep ntpd|grep -v -e "start_gpsd" -e grep`
 if [ -n "$chk" ]; then
+    echo "ntpd is already running"
+    echo $chk
     exit
 fi
 
 # if not, start the ntp daemon and allow for a big initial correction (flag: -g)
-/usr/sbin/ntpd -g
+/usr/sbin/ntpd -q -g
 
+/usr/sbin/ntpd
 # start_gpsd-ntpd.sh
 
 	  
