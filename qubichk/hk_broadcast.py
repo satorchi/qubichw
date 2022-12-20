@@ -351,7 +351,7 @@ class hk_broadcast :
             cmd = '/sbin/ifconfig -a'
             out,err = shellcommand(cmd)
             devs = []
-            for line in out.decode().split('\n'):
+            for line in out.split('\n'):
                 match = re.match('^(eth[0-9])',line)
                 if match:
                    devs.append(match.groups()[0])
@@ -363,7 +363,7 @@ class hk_broadcast :
             
         cmd = '/sbin/ifconfig %s' % eth
         out,err = shellcommand(cmd)
-        for line in out.decode().split('\n'):
+        for line in out.split('\n'):
             if line.find('inet ')>0: break
         hostname = line.split()[1]
         self.log('server: hostname=%s' % hostname)
