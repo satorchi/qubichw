@@ -138,6 +138,8 @@ class compressor:
         '''
         retval = {}
         retval['msg'] = ''
+        retval['value'] = None
+        retval['online'] = False
 
         if not self.ok():
             retval['status'] = False
@@ -180,8 +182,16 @@ class compressor:
                 return retval
                 
         val = ans_decoded.strip().split(',')
-
         retval['value'] = val
+        retval['online'] = True
+
+        if len(val)==1 and val[0]=='':
+            retval['online'] = False
+            retval['status'] = False
+            retval['communication error'] = True
+            retval['msg'] = 'compressor %s is offline' % self.compressor_num
+            retval['status_message'] = self.status_message(retval)
+
         return retval
 
     def get_info(self,cmdkey):
@@ -206,14 +216,8 @@ class compressor:
         if retval['value'] is None: return retval
         val = retval['value']
 
-        if len(val)==1 and val[0]=='':
-            retval['status'] = False
-            retval['communication error'] = True
-            retval['msg'] = 'compressor %s is offline' % self.compressor_num
-            retval['status_message'] = self.status_message(retval)
-            return retval
-            
-        
+        if not retval['online']: return retval
+
         if len(val)!=5:
             retval['status'] = False
             retval['communication error'] = True
