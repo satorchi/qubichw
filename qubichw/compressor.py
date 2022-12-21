@@ -29,6 +29,8 @@ class compressor:
     '''
 
     def __init__(self,port=1):
+
+        self.compressor_num = port
         
         self.command = {}
         self.command['on']   = '$ON177CF\r\n'.encode()
@@ -203,6 +205,14 @@ class compressor:
         '''
         if retval['value'] is None: return retval
         val = retval['value']
+
+        if len(val)==1 and val[0]=='':
+            retval['status'] = False
+            retval['communication error'] = True
+            retval['msg'] = 'compressor %s is offline' % self.compressor_num
+            retval['status_message'] = self.status_message(retval)
+            return retval
+            
         
         if len(val)!=5:
             retval['status'] = False
@@ -358,7 +368,7 @@ class compressor:
         format the status info into a text
         '''
         if not status['status']:
-            msg = 'PT Compressor is NOT okay!\n'
+            msg = 'PT Compressor %s is NOT okay!\n' % self.compressor_num
             msg += status['msg']
             return msg
 
