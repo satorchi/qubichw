@@ -23,6 +23,7 @@ info = []
 msg = []
 status_msg = []
 comm_error = False
+online = True
 ok = True
 for compressor_num in [1,2]:
     logfile = '%s/compressor%i_log.txt' % (hk_dir,compressor_num)
@@ -37,6 +38,7 @@ for compressor_num in [1,2]:
     msg.append(info[-1]['msg'])
     comm_error = comm_error or info[-1]['communication error']
     ok = ok and info[-1]['status']
+    online = online and info[-1]['online']
 
 
 if not ok:
@@ -47,5 +49,9 @@ if not ok:
         for chatid in alarm_recipients: send_telegram(error_msg,chatid=chatid)
     else:
         fullmsg = 'The following message is only sent to Steve'
-        fullmsg += '\n- - - - - -\n' + error_msg
+        fullmsg += '\n- - - - - -\n'
+        if online:
+            fullmsg += error_msg
+        else:
+            fullmsg += '\n'.join(status_msg)
         send_telegram(fullmsg,'Steve')

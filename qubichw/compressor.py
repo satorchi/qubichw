@@ -216,8 +216,6 @@ class compressor:
         if retval['value'] is None: return retval
         val = retval['value']
 
-        if not retval['online']: return retval
-
         if len(val)!=5:
             retval['status'] = False
             retval['communication error'] = True
@@ -341,6 +339,7 @@ class compressor:
         retval['status'] = True
         retval['communication error'] = False
         comm_error = False
+        online = True
         retval['msg'] = ''
         msg = []
         
@@ -359,8 +358,10 @@ class compressor:
             for key in info.keys():
                 retval[key] = info[key]
             comm_error = comm_error or info['communication error']
+            online = online and info['online']
             msg.append(info['msg'])        
 
+        retval['online'] = online
         retval['msg'] = '\n'.join(msg)
         retval['communication error'] = comm_error
         retval['status_message'] = self.status_message(retval)
@@ -371,6 +372,10 @@ class compressor:
         '''
         format the status info into a text
         '''
+        if not status['online']:
+            msg = 'PT Compressor %s is offline' % self.compressor_num
+            return msg
+        
         if not status['status']:
             msg = 'PT Compressor %s is NOT okay!\n' % self.compressor_num
             msg += status['msg']
