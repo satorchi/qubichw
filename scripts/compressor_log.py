@@ -48,5 +48,4 @@ if not ok:
     else:
         fullmsg = 'The following message is only sent to Steve'
         fullmsg += '\n- - - - - -\n' + error_msg
-        fullmsg += '\n- - - - - -\n' + '\n'.join(status_msg)        
         send_telegram(fullmsg,'Steve')
