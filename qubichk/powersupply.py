@@ -79,9 +79,9 @@ class PowerSupply :
             return  None
         
         # find out which power supply it is, and whether it has one or two supplies
-        cmd='/sbin/udevadm info -a %s|grep serial|head -1' % self.port
+        cmd = '/sbin/udevadm info -a %s|grep serial|head -1' % self.port
         out,err = shellcommand(cmd)
-        serialno=out.decode().split('==')[1].replace('"','').strip()
+        serialno = out.split('==')[1].replace('"','').strip()
         self.log('found powersupply with serialno %s' % serialno,verbosity=3)
 
         try:
@@ -94,7 +94,7 @@ class PowerSupply :
             return None
 
             
-        a_list=a.decode().strip().split(',')
+        a_list = a.decode().strip().split(',')
         if len(a_list)<2:
             self.log('ERROR! This does not appear to be a TTi Power Supply: %s' % serialno,verbosity=0)
             self.device_ok=False
