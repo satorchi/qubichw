@@ -80,8 +80,8 @@ class obsmount:
         else:
             port_num = self.listen_port
         
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(1)
         try:
             self.sock.connect((self.mount_ip,port))
             time.sleep(1)
@@ -90,12 +90,12 @@ class obsmount:
         except socket.timeout:
             self.subscribed = False
             self.error = 'TIMEOUT'
-            print('ERROR: could communicate because of %s to %s:%s') % (self.error,self.mount_ip,port_num)
+            print('ERROR: could communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num))
             return None
         except:
             self.subscribed = False
             self.error = 'SOCKET ERROR'
-            print('ERROR: could communicate because of %s to %s:%s') % (self.error,self.mount_ip,port_num)
+            print('ERROR: could communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num))
             return None
 
         return True
@@ -117,7 +117,7 @@ class obsmount:
         # subscribe
         encoded_cmd = ('OK\r\n').encode()
         try:
-            sock.send(encoded_cmd)
+            self.sock.send(encoded_cmd)
             time.sleep(1)
         except socket.timeout:
             self.subscribed = False
