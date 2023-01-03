@@ -54,4 +54,9 @@ if not ok:
             fullmsg += error_msg
         else:
             fullmsg += '\n'.join(status_msg)
-        send_telegram(fullmsg,'Steve')
+            if os.path.isfile('/tmp/DONT_SEND_OFFLINE_MESSAGE'):
+                fullmsg = None
+
+        if fullmsg is not None:
+            send_telegram(fullmsg,'Steve')
+
