@@ -83,7 +83,7 @@ class obsmount:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(1)
         try:
-            self.sock.connect((self.mount_ip,port))
+            self.sock.connect((self.mount_ip,port_num))
             time.sleep(1)
             self.subscribed = True
             self.error = None
