@@ -143,7 +143,7 @@ class compressor:
 
         if not self.ok():
             retval['status'] = False
-            retval['msg'] = 'ERROR!  Device not configured.'
+            retval['msg'] = 'ERROR!  compressor %i: Device not configured.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             retval['value'] = None
             return retval
@@ -152,7 +152,7 @@ class compressor:
             self.ser.write(self.command[cmdkey])
         except:
             retval['status'] = False
-            retval['msg'] = 'ERROR!  Could not send command to device.'
+            retval['msg'] = 'ERROR!  compressor %i: Could not send command to device.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             retval['value'] = None
             return retval
@@ -161,7 +161,7 @@ class compressor:
             ans = self.ser.readline()
         except:
             retval['status'] = False
-            retval['msg'] = 'ERROR!  Could not get reply from device.'
+            retval['msg'] = 'ERROR!  compressor %i: Could not get reply from device.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             retval['value'] = None
             return retval
@@ -176,7 +176,7 @@ class compressor:
                 ans_decoded = ans.decode('iso-8859-1')
             except:
                 retval['status'] = False
-                retval['msg'] = 'ERROR!  Could not decode reply from device.'
+                retval['msg'] = 'ERROR!  compressor %i: Could not decode reply from device.' % self.compressor_num
                 retval['status_message'] = self.status_message(retval)
                 retval['value'] = None
                 return retval
@@ -219,7 +219,7 @@ class compressor:
         if len(val)!=5:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Invalid ID response from device. %s' % val
+            retval['msg'] = 'ERROR! compressor %i: Invalid ID response from device. %s' % (self.compressor_num,val)
             retval['status_message'] = self.status_message(retval)
             return retval
 
@@ -229,7 +229,7 @@ class compressor:
         except:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Could not read operating hours: %s' % val[2]
+            retval['msg'] = 'ERROR! compressor %i: Could not read operating hours: %s' % (self.compressor_num,val[2])
             retval['status_message'] = self.status_message(retval)
             return retval
 
@@ -246,7 +246,7 @@ class compressor:
         if len(val)!=6:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Invalid temperature response from device.'
+            retval['msg'] = 'ERROR! compressor %i: Invalid temperature response from device.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             return retval
 
@@ -257,7 +257,7 @@ class compressor:
         except:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Could not read temperatures'
+            retval['msg'] = 'ERROR! compressor %i: Could not read temperatures' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             return retval
         
@@ -274,7 +274,7 @@ class compressor:
         if len(val)!=4:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Invalid pressure response from device.'
+            retval['msg'] = 'ERROR! compressor %i: Invalid pressure response from device.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             return retval
 
@@ -300,7 +300,7 @@ class compressor:
         if len(val)!=3:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Invalid status response from device'
+            retval['msg'] = 'ERROR! compressor %i: Invalid status response from device' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             return retval
 
@@ -309,7 +309,7 @@ class compressor:
         except:
             retval['status'] = False
             retval['communication error'] = True
-            retval['msg'] = 'ERROR! Could not read status bits'
+            retval['msg'] = 'ERROR! compressor %i: Could not read status bits' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             return retval
         
@@ -323,7 +323,7 @@ class compressor:
                 errmsg_list.append('ERROR! %s' % key)
             if (key=='Solenoid' or key=='System ON') and not bitstatus:
                 retval['status'] = False
-                errmsg_list.append('ERROR! %s = %s' % (key,bitstatus))            
+                errmsg_list.append('ERROR! compressor %i: %s = %s' % (self.compressor_num,key,bitstatus))            
                 
         if len(errmsg_list)>0:
             retval['msg'] = '\n'.join(errmsg_list)
