@@ -432,8 +432,8 @@ for idx,line in enumerate(lines):
     if idx>=n_tstamps: break
     delta = latest - tstamps[idx]
     limit_delta = 15
-    if line.find('ups')>0 or line.find('weather')>0:
-        limit_delta=90
+    if line.find('ups')>0 or line.find('weather')>0 or line.find('compressor')>0:
+        limit_delta = 90
     if delta>limit_delta\
        or line.find('bad answer')>=0\
        or line.find('?')>=0\
