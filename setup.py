@@ -144,7 +144,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/mount_entropy.sh',
            'scripts/start_gpsd-ntpd.sh',
            'scripts/weather.py',
-           'scripts/start_weather.sh']
+           'scripts/start_weather.sh',
+           'scripts/mech_openclose.py']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
