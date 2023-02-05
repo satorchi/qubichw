@@ -64,11 +64,17 @@ def read_hk_file(filename):
     for line_idx,line in enumerate(lines):
         cols = line.strip().replace('\x00','').split()
         if len(cols)<2: continue
-        if badpattern.match(cols[0]): continue
-        if badpattern.match(cols[1]): continue
+        tstamp_str = cols[0]
+        val_str = cols[1]
+        if badpattern.match(tstamp_str): continue
+        if badpattern.match(val_str):
+            if val_str=='inf':
+                val_str = '64218' # infinity = 0xfada
+            else:
+                continue
         try:
-            tstamp = float(cols[0])
-            reading = eval(cols[1])
+            tstamp = float(tstamp_str)
+            reading = eval(val_str)
             v[idx] = reading
             t[idx] = tstamp
             idx+=1
