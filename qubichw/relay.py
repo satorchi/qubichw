@@ -34,14 +34,15 @@ class relay:
             self.device_address = devices
         else:
             self.device_address = {}
-            self.device_address['amplifier']     = 15
-            self.device_address['auxilliary']    = 14
-            self.device_address['fan']           = 13
-            self.device_address['calsource 150'] = 12
+            self.device_address['heater']        = 15
+            self.device_address['fan']           =  7
+            self.device_address['amplifier']     = 14
+            self.device_address['modulator']     = 10
+
+            # to be verified
             self.device_address['laser']         = 11
-            self.device_address['calsource 220'] = 10
-            self.device_address['modulator']     =  9
-            self.device_address['heater']        =  8
+            self.device_address['calsource 150'] = 12
+            self.device_address['calsource 220'] = 13
             
 
         self.default_setting = {}
