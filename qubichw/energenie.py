@@ -21,7 +21,7 @@ class energenie:
     verbosity = 2
 
     def __init__(self,name='electronics rack'):
-        valid_names = ['electronics rack','calsource','rack 1','rack 2']
+        valid_names = ['electronics rack','calsource','cryostat','rack 1','rack 2']
         self.socket = {}
         self.ok = False
 
@@ -39,7 +39,7 @@ class energenie:
             self.socket[3] = 'hwp'
             self.socket[4] = 'thermos'
 
-        if name=='cryostat':
+        if name=='cryostat' or name=='rack 2':
             verify_cmd = 'which sispmctl' 
             self.manager = 'sispmctl -d 1'
             self.socket[1] = 'network switch'
