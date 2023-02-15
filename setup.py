@@ -145,7 +145,11 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/start_gpsd-ntpd.sh',
            'scripts/weather.py',
            'scripts/start_weather.sh',
-           'scripts/mech_openclose.py']
+           'scripts/mech_openclose.py',
+           'scripts/kellypi_on',
+           'scripts/kellypi_off',
+           'scripts/fpga_on',
+           'scripts/fpga_off']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
