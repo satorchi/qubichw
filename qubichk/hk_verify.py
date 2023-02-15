@@ -112,7 +112,7 @@ def check_power(verbosity=1):
                 retval[subsys] = 'OFF'
             msg = '%s is %s' % (subsys,state)
             msg_list.append(msg)
-
+            
             # under normal operation, the RaspberryPi bridge for Opal Kelly should be OFF
             if subsys.find('Kelly')>=0:                
                 if not state:
@@ -120,7 +120,7 @@ def check_power(verbosity=1):
                 else:
                     msg += '\n--> %s should be OFF during normal operation.  Switch OFF with command "kellypi_off" (no quotes)' % subsys
                     retval['ok'] = False
-            else:
+            elif subsys!='unused':
                 if state:
                     msg += '... OK'
                 else:
