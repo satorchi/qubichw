@@ -39,13 +39,13 @@ class energenie:
             self.socket[3] = 'hwp'
             self.socket[4] = 'thermos'
 
-        if name=='rack 2':
+        if name=='cryostat':
             verify_cmd = 'which sispmctl' 
             self.manager = 'sispmctl -d 1'
-            self.socket[1] = 'fpga'
-            self.socket[2] = 'imacrt'
-            self.socket[3] = 'socket3'
-            self.socket[4] = 'socket4'
+            self.socket[1] = 'network switch'
+            self.socket[2] = 'unused'
+            self.socket[3] = 'Opal Kelly RaspberryPi'
+            self.socket[4] = 'FPGA'
             
         if name=='calsource':
             pingresult = ping('pigps',verbosity=self.verbosity)

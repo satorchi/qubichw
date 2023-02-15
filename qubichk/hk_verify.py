@@ -92,32 +92,44 @@ def check_power(verbosity=1):
     msg_list = []
     if verbosity>0: print('\n============ checking for power connections ============')
 
-    powerbar = energenie('electronics rack')
-    if not powerbar.ok:
-        retval['ok'] = False
-    else:
-        states = powerbar.get_socket_states()
-        retval['ok'] = states['ok']
+    powerbar_names = ['electronics rack','cryostat']
+    for pb_id in powerbar_names:
+        powerbar = energenie(pb_id)
+        
+        if not powerbar.ok:
+            retval['ok'] = False
+        else:
+            states = powerbar.get_socket_states()
+            retval['ok'] = retval['ok'] and states['ok']
         
             
-    for socknum in powerbar.socket.keys():
-        subsys = powerbar.socket[socknum]
-        state = states[socknum]
-        if state:
-            retval[subsys] = 'ON'
-        else:
-            retval[subsys] = 'OFF'
-            retval['ok'] = False
-        msg = '%s is %s' % (subsys,state)
-        msg_list.append(msg)
+        for socknum in powerbar.socket.keys():
+            subsys = powerbar.socket[socknum]
+            state = states[socknum]
+            if state:
+                retval[subsys] = 'ON'
+            else:
+                retval[subsys] = 'OFF'
+            msg = '%s is %s' % (subsys,state)
+            msg_list.append(msg)
 
-        if not state:
+            # under normal operation, the RaspberryPi bridge for Opal Kelly should be OFF
+            if subsys.find('Kelly')>=0:                
+                if not state:
+                    msg += '...OK'
+                else:
+                    msg += '\n--> %s should be OFF during normal operation.  Switch OFF with command "kellypi_off" (no quotes)' % subsys
+                    retval['ok'] = False
+            else:
+                if state:
+                    msg += '... OK'
+                else:
+                    msg += '\n--> Please switch on %s with the command "qubic_poweron" (no quotes)' % subsys
+                    retval['ok'] = False
+                    
+        
             errmsg_list.append(msg)
-            msg += '\n--> Please switch on %s with the command "qubic_poweron" (no quotes)' % subsys
-        else:
-            msg += '... OK'
-
-        if verbosity>0: print(msg)
+            if verbosity>0: print(msg)
 
     if len(errmsg_list)>0:
         retval['error_message'] = '\n  '.join(errmsg_list)
