@@ -1,8 +1,16 @@
+#!/bin/bash
 let d=0
-while [ $d -le 1 ]; do
+while [ $d -le 1 ]
+do
     let n=1
-    while [ $n -le 4 ]; do
-	sispmctl -d $d -o $n
+    while [ $n -le 4 ]
+    do
+    	if [ $d -eq 1 -a $n -eq 3 ]
+	then # Opal Kelly bridge should be off for normal operation
+	    sispmctl -d $d -f $n
+	else
+	    sispmctl -d $d -o $n
+	fi
 	sleep 1
 	let n+=1
     done
