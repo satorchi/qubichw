@@ -44,17 +44,17 @@ tar -cvf $ARCHIVE_DIR/fridgescripts.tar $FRIDGESCRIPTS_DIR/*.*
 gzip -9 -f $ARCHIVE_DIR/fridgescripts.tar
 
 # use rsync to copy to archive disk
-rsync -avt $HK_DIR/ $ARCHIVE_HKDIR
-rsync -avt $QS_DIR/QubicStudio $ARCHIVE_DIR
-rsync -avt $QS_DIR/Script $ARCHIVE_DIR
-rsync -avt $QS_DIR/Data/ $ARCHIVE_DIR
-rsync -avt $HWP_DIR $ARCHIVE_DIR
+rsync -avztP $HK_DIR/ $ARCHIVE_HKDIR
+rsync -avztP $QS_DIR/QubicStudio $ARCHIVE_DIR
+rsync -avztP $QS_DIR/Script $ARCHIVE_DIR
+rsync -avztP $QS_DIR/Data/ $ARCHIVE_DIR
+rsync -avztP $HWP_DIR $ARCHIVE_DIR
 
 # use rsync to copy to CC
-rsync -avt $ARCHIVE_DIR/ cc:$CC_DIR
+rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
 
 # use rsync to copy to apcjupyter
 ## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
-## rsync -avt $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
+## rsync -avztP $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
 
 echo "`date +%Y-%m-%dT%H:%M:%S` finished archiving" >> $ARCHIVE_DIR/archive_log.txt
