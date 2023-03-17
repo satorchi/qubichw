@@ -38,6 +38,7 @@ class relay:
             self.device_address['fan']           =  7
             self.device_address['amplifier']     = 14
             self.device_address['modulator']     = 10
+            self.device_address['bnc']           = 8
 
             # to be verified
             self.device_address['laser']         = 11
@@ -191,8 +192,12 @@ class relay:
         if isinstance(bits,str): return None
         
         onoff_str = ['OFF','ON']
+        bnc_str = ['150GHz','220GHz']
         for dev in self.current_setting.keys():
-            print('%s is %s' % (dev,onoff_str[self.current_setting[dev]]))
+            if dev=='bnc':
+                print('%s is %s' % (dev,bnc_str[self.current_setting[dev]]))
+            else:
+                print('%s is %s' % (dev,onoff_str[self.current_setting[dev]]))
         return None
 
     def status(self):
@@ -266,4 +271,23 @@ class relay:
         ans = self.send_command(cmd)
         return ans
             
- 
+    def select_bnc(src=None):
+        '''
+        select which calsource power monitor goes to the amplifier
+        '''
+        if src is None: src = 150
+        if isinstance(src,str):
+            if src.find('2')==0:
+                src = 220
+            elif src.find('1')==0:
+                src = 150
+            else:
+                print('selecting default source: 150GHz')
+                src = 150
+
+        if src>170:
+            src = 220
+            return self.switchoff('bnc')
+
+        return self.switchon('bnc')
+        
