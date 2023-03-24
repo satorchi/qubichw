@@ -36,6 +36,9 @@ ARCHIVE_HKDIR=$ARCHIVE_DIR/hk/data_$START_DATE
 
 echo $ARCHIVE_HKDIR
 
+# make sure the correct permissions are on archive_hkdir
+sudo chmod -R 1775 $ARCHIVE_HKDIR
+
 # make a tar file of the qubic-central configuration
 sudo /usr/local/bin/configfile_backup.sh
 
@@ -56,5 +59,8 @@ rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
 # use rsync to copy to apcjupyter
 ## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
 ## rsync -avztP $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
+
+# make sure the correct permissions are on archive_hkdir
+sudo chmod -R 1775 $ARCHIVE_HKDIR
 
 echo "`date +%Y-%m-%dT%H:%M:%S` finished archiving" >> $ARCHIVE_DIR/archive_log.txt
