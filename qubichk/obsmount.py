@@ -92,7 +92,7 @@ class obsmount:
             self.error = 'TIMEOUT'
             print('ERROR: could communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num))
             return None
-        except: socket.ConnectionRefusedError:
+        except socket.ConnectionRefusedError:
             self.subscribed = False
             self.error = 'SOCKET CONNECTION REFUSED'
             print('ERROR: could communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num))
