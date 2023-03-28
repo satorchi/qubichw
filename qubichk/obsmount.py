@@ -94,7 +94,7 @@ class obsmount:
             return None        
         except:
             self.subscribed = False
-            self.error = sock.error
+            self.error = self.sock.error
             print('ERROR: could communicate because %s to %s:%s' % (self.error,self.mount_ip,port_num))
             return None
 
