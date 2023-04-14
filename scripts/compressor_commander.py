@@ -20,7 +20,7 @@ def usage():
     '''
     msg = 'usage: %s <compressor number> <command>' % sys.argv[0]
     msg += '\nvalid compressors are: 1 or 2'
-    msg += '\nvalid commands are: status, on, off, reset, log\n'
+    msg += '\nvalid commands are: status, on, off, reset, log, pause, restart\n'
     print(msg)
     return None
 
@@ -32,7 +32,7 @@ def parseargs():
     if len(sys.argv)<3:
         return usage()
 
-    valid_cmds = ['status','on','off','reset','log']
+    valid_cmds = ['status','on','off','reset','log','pause','restart']
     valid_compressors = ['1','2']
     cmd = None
     compressor = None
@@ -76,6 +76,14 @@ if __name__=='__main__':
         print('Resetting compressor %s' % parms['compressor'])
         c.reset()
 
+    if parms['cmd'] == 'pause':
+        print('Pausing rotary valve %s' % parms['compressor'])
+        c.pause()
+
+    if parms['cmd'] == 'restart':
+        print('Restarting rotary valve %s' % parms['compressor'])
+        c.restart()
+        
     info = c.status()
     if parms['cmd'] == 'log':
         print(info['log_message'])
