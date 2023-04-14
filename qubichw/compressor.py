@@ -40,6 +40,8 @@ class compressor:
         self.command['id'] = '$ID1D629\r\n'.encode()
         self.command['status'] = '$STA3504\r\n'.encode()
         self.command['reset'] = '$RS12156\r\n'.encode()
+        self.command['chpause'] = '$CHP3CCD\r\n'.encode()
+        self.command['chrestart'] = '$POF07BF\r\n'.encode()
         
         self.statusbits = {}
         self.statusbits[8] = 'Solenoid'
@@ -471,6 +473,32 @@ class compressor:
 
         return ans
         
-    
+    def pause(self):
+        '''
+        stop the rotary valve
+        '''
+        if not self.ok():
+            print('ERROR!  Device not configured.')
+            return False
+
+        cmdkey = 'chpause'
+        self.ser.write(self.command[cmdkey])
+        ans = self.ser.readline()
+
+        return ans
+        
+    def restart(self):
+        '''
+        restart the rotary valve
+        '''
+        if not self.ok():
+            print('ERROR!  Device not configured.')
+            return False
+
+        cmdkey = 'chrestart'
+        self.ser.write(self.command[cmdkey])
+        ans = self.ser.readline()
+
+        return ans
 
     
