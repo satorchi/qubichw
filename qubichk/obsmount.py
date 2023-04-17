@@ -104,7 +104,7 @@ class obsmount:
         '''
         print a message to screen
         '''
-        date_str = dt.datetime.utcnow().strftime(datefmt)
+        date_str = dt.datetime.utcnow().strftime(self.datefmt)
         print('%s obsmount: %s' % (date_str,msg))
         return
 
