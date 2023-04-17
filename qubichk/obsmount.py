@@ -133,18 +133,18 @@ class obsmount:
         
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
         self.sock[port].settimeout(1)
-        try:
-            self.sock[port].connect((self.mount_ip,port_num))
-            self.sock[port].send('OK\r\n'.encode())
-            time.sleep(1)
-            self.subscribed[port] = True
-            self.error = None
-        except socket.timeout:
-            self.subscribed[port] = False
-            self.error = 'TIMEOUT'
-        except:
-            self.subscribed[port] = False
-            self.error = 'SOCKET ERROR'
+        # try:
+        self.sock[port].connect((self.mount_ip,port_num))
+        time.sleep(0.5)
+        self.sock[port].send('OK\r\n'.encode())
+        self.subscribed[port] = True
+        self.error = None
+        # except socket.timeout:
+        #     self.subscribed[port] = False
+        #     self.error = 'TIMEOUT'
+        # except:
+        #     self.subscribed[port] = False
+        #     self.error = 'SOCKET ERROR'
 
         if self.error is None: return True
         
