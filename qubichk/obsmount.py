@@ -86,7 +86,7 @@ class obsmount:
     datefmt = '%Y%m%d-%H%M%S'
     data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
-    wait = 1 # seconds to wait before next socket command
+    wait = 0.1 # seconds to wait before next socket command
     
     def __init__(self):
         '''
@@ -135,21 +135,21 @@ class obsmount:
         self.printmsg('creating socket with type: %s' % socktype)
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
         self.sock[port].settimeout(1)
-        # try:
-        self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
-        self.sock[port].connect((self.mount_ip,port_num))
-        time.sleep(self.wait)
-        self.printmsg('sending OK')
-        ans = self.sock[port].send('OK'.encode())
-        self.printmsg('return from socket.send: %s' % ans)
-        self.subscribed[port] = True
-        self.error = None
-        # except socket.timeout:
-        #     self.subscribed[port] = False
-        #     self.error = 'TIMEOUT'
-        # except:
-        #     self.subscribed[port] = False
-        #     self.error = 'SOCKET ERROR'
+        try:
+            self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
+            self.sock[port].connect((self.mount_ip,port_num))
+            time.sleep(self.wait)
+            self.printmsg('sending OK')
+            ans = self.sock[port].send('OK'.encode())
+            self.printmsg('return from socket.send: %s' % ans)
+            self.subscribed[port] = True
+            self.error = None
+        except socket.timeout:
+            self.subscribed[port] = False
+            self.error = 'TIMEOUT'
+        except:
+            self.subscribed[port] = False
+            self.error = 'SOCKET ERROR'
 
         if self.error is None: return True
         
@@ -192,24 +192,24 @@ class obsmount:
             return self.return_with_error(retval)
 
         lines = []
-        # try:
-        for idx in range(2):
-            time.sleep(self.wait)
-            dat = self.sock[port].recv(128)
-            lines.append(dat.decode())
-            print('[%i] %s' % (idx,lines[-1]))
-        # except:
-        #     retval['error'] = 'could not get az,el data'
-        #     self.subscribed[port] = False
-        #     self.return_with_error(retval)
+        try:
+            for idx in range(2):
+                time.sleep(self.wait)
+                dat = self.sock[port].recv(128)
+                lines.append(dat.decode())
+                self.printmsg('[%i] %s' % (idx,lines[-1]))
+        except:
+            retval['error'] = 'could not get az,el data'
+            self.subscribed[port] = False
+            self.return_with_error(retval)
 
         for line in lines:
             col = line.split(':')
-            if len(col)!=len(data_keys):
+            if len(col)!=len(self.data_keys):
                 retval['error'] = 'inappropriate data length'
                 return return_with_error(retval)
                             
-            for idx,key in enumerate(data_keys):
+            for idx,key in enumerate(self.data_keys):
                 if idx>1:
                     try:
                         data[key] = eval(col[idx])
