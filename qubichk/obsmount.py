@@ -187,13 +187,13 @@ class obsmount:
             return self.return_with_error(retval)
 
         lines = []
-        try:
-            for idx in range(2):
-                lines.append(self.sock[port].recv(128).decode())
-        except:
-            retval['error'] = 'could not get az,el data'
-            self.subscribed[port] = False
-            self.return_with_error(retval)
+        # try:
+        for idx in range(2):
+            lines.append(self.sock[port].recv(128).decode())
+        # except:
+        #     retval['error'] = 'could not get az,el data'
+        #     self.subscribed[port] = False
+        #     self.return_with_error(retval)
 
         for line in lines:
             col = line.split(':')
