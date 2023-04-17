@@ -140,7 +140,8 @@ class obsmount:
         self.sock[port].connect((self.mount_ip,port_num))
         time.sleep(self.wait)
         self.printmsg('sending OK')
-        self.sock[port].send('OK\r\n'.encode())
+        ans = self.sock[port].send('OK\r\n'.encode())
+        self.printmsg('return from socket.send: %s' % ans)
         self.subscribed[port] = True
         self.error = None
         # except socket.timeout:
