@@ -86,6 +86,7 @@ class obsmount:
     datefmt = '%Y%m%d-%H%M%S'
     data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
+    wait = 1 # seconds to wait before next socket command
     
     def __init__(self):
         '''
@@ -135,7 +136,7 @@ class obsmount:
         self.sock[port].settimeout(1)
         # try:
         self.sock[port].connect((self.mount_ip,port_num))
-        time.sleep(0.5)
+        time.sleep(self.wait)
         self.sock[port].send('OK\r\n'.encode())
         self.subscribed[port] = True
         self.error = None
@@ -189,8 +190,9 @@ class obsmount:
         lines = []
         # try:
         for idx in range(2):
-            time.sleep(0.5)
-            lines.append(self.sock[port].recv(128).decode())
+            time.sleep(self.wait)
+            dat = self.sock[port].recv(128)
+            lines.append(dat.decode())
             print('[%i] %s' % (idx,lines[-1]))
         # except:
         #     retval['error'] = 'could not get az,el data'
