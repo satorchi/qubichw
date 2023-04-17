@@ -139,6 +139,7 @@ class obsmount:
         self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
         self.sock[port].connect((self.mount_ip,port_num))
         time.sleep(self.wait)
+        self.printmsg('sending OK')
         self.sock[port].send('OK\r\n'.encode())
         self.subscribed[port] = True
         self.error = None
