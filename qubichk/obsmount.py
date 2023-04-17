@@ -146,7 +146,7 @@ class obsmount:
             self.subscribed[port] = False
             self.error = 'SOCKET ERROR'
 
-        if sock.error is None: return True
+        if self.sock[port].error is None: return True
         
         retval['error'] = 'could not communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num)
         return self.return_with_error(retval)
