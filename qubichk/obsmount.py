@@ -140,7 +140,7 @@ class obsmount:
         self.sock[port].connect((self.mount_ip,port_num))
         time.sleep(self.wait)
         self.printmsg('sending OK')
-        ans = self.sock[port].send('OK\r\n'.encode())
+        ans = self.sock[port].send('OK'.encode())
         self.printmsg('return from socket.send: %s' % ans)
         self.subscribed[port] = True
         self.error = None
@@ -251,7 +251,7 @@ class obsmount:
             return self.return_with_error(retval)
 
         try:
-            full_cmd_str = '%s\r\n' % cmd_str.upper()
+            full_cmd_str = '%s' % cmd_str.upper()
             self.sock[port].send(full_cmd_str.encode())
         except:
             retval['error'] = 'command unsuccessful'
