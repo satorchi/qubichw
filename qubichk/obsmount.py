@@ -189,6 +189,7 @@ class obsmount:
         lines = []
         # try:
         for idx in range(2):
+            time.sleep(0.5)
             lines.append(self.sock[port].recv(128).decode())
             print('[%i] %s' % (idx,lines[-1]))
         # except:
