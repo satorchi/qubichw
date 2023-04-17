@@ -15,11 +15,14 @@ email from Carlos, 2022-12-07 17:25:40
 
 The data obtained after the subscribe method will be:
 
-DATA : AXES : ACT_VELOCITY : TARGET_VELOCITY : ACT_POSITION : TARGET_POSITION : ACT_TORQUE : IS_READY : IS_HOMED
+DATA : AXIS : ACT_VELOCITY : TARGET_VELOCITY : ACT_POSITION : TARGET_POSITION : ACT_TORQUE : IS_READY : IS_HOMED
+
+example:
+DATA:AZ:0:0:31.998101199445816:0.0:0:1:1
 
 DATA: constant string
 
-AXES: AZ or EL
+AXIS: AZ or EL
 
 ACT_VELOCITY: actual velocity (this is the actual value that KEB
               driver calculates)
@@ -52,8 +55,24 @@ above structure every 100ms.
 The IP for the rpi running the server is 192.168.2.103.  4545 is
 listening for commands but 4546 is listening for incoming subscribers.
 
+
+------------------ available commands --------------------------
+'AZ <n>' send to absolute azimuth position (see zero offset below)
+'EL <n>' send to absolute elevation position (see zero offset below)
+'DOHOMING' go home (absolute az 0, el 41.6 see below)
+'STOP' stop moving now 
+'ABORT' abort current command (and reset?)
+
+
+------------------ zero measurements --------------------------
+2023-04-14 17:20:29
+elevation commanded to 8.5 degrees is 50.1 degrees elevation
+
+
+
 '''
 import socket,time
+import datetime as dt
 
 class obsmount:
     '''
@@ -61,100 +80,178 @@ class obsmount:
     '''
     
     mount_ip = '192.168.2.103'
-    subscribe_port = 4546
-    listen_port = 4545
+    listen_port = 4546
+    command_port = 4545
+    el_zero_offset = 8.4
+    datefmt = '%Y%m%d-%H%M%S'
+    data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
+    available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     
     def __init__(self):
         '''
-        so far, initialization is done manually
+        instantiate the class with some default values
         '''
-        self.subscribed = False
+        self.sock = {}
+        self.sock['data'] = None
+        self.sock['command'] = None
+        self.subscribed = {}
+        self.subscribed['data'] = False
+        self.subscribed['command'] = False
+        
         return
 
-    def init_socket(self,port='subscribe'):
+    def printmsg(self,msg):
+        '''
+        print a message to screen
+        '''
+        date_str = dt.datetime.utcnow().strftime(datefmt)
+        print('%s obsmount: %s' % (date_str,msg))
+        return
+
+    def return_with_error(self,retval):
+        '''
+        print a message and return the error code and stuff in a dictionary
+        '''
+        retval['ok'] = False
+        self.printmsg('ERROR! %s' % retval['error'])
+        return retval
+                      
+
+    def init_socket(self,port='data'):
         '''
         initialize the communication socket
+        the port is either 'data' or 'command'
         '''
-        if port=='subscribe':
-            port_num = self.subscribe_port
-        else:
+        retval = {}
+        retval['ok'] = True
+        if port=='data':
             port_num = self.listen_port
+            socktype = socket.SOCK_DGRAM
+        else:
+            port_num = self.command_port
+            socktype = socket.SOCK_STREAM
         
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(1)
+        self.sock[port] = socket.socket(socket.AF_INET, socktype)
+        self.sock[port].settimeout(1)
         try:
-            self.sock.connect((self.mount_ip,port_num))
+            self.sock[port].connect((self.mount_ip,port_num))
+            self.sock[port].send('OK\r\n'.encode())
             time.sleep(1)
-            self.subscribed = True
+            self.subscribed[port] = True
             self.error = None
         except socket.timeout:
-            self.subscribed = False
+            self.subscribed[port] = False
             self.error = 'TIMEOUT'
-            print('ERROR: could communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num))
-            return None        
         except:
-            self.subscribed = False
+            self.subscribed[port] = False
             self.error = 'SOCKET ERROR'
-            print('ERROR: could communicate because %s to %s:%s' % (self.error,self.mount_ip,port_num))
-            return None
 
-        return True
+        if sock.error is None: return True
+        
+        retval['error'] = 'could not communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num)
+        return self.return_with_error(retval)
 
     
-    def subscribe(self):
+    def subscribe(self,port='data'):
         '''
         subscribe to the observation mount server
+        the port is 'data' or 'command'
         '''
 
-        if not self.subscribed:
-            self.init_socket(port='subscribe')
+        retval = {}
+        if not self.subscribed[port]:
+            self.init_socket(port=port)
         
         # check that the socket is valid
-        if not self.subscribed:
-            print('ERROR: could not subscribe')
-            return None
+        if not self.subscribed[port]:
+            retval['error'] = 'could not subscribe for %s' % port
+            return self.return_with_error(retval)
 
-        # subscribe
-        encoded_cmd = ('OK\r\n').encode()
-        try:
-            self.sock.send(encoded_cmd)
-            time.sleep(1)
-        except socket.timeout:
-            self.subscribed = False
-            self.error = 'TIMEOUT'
-            return None
-        except:
-            self.subscribed = False
-            self.error = 'SOCKET ERROR'
-            return None
-            
-        return self.subscribed
+        return self.subscribed[port]
 
     def read_data(self):
         '''
-        once we're subscribed, we can just listen for the data
+        once we're subscribed, we can listen for the data
         '''
+        port = 'data'
+        retval = {}
+        retval['ok'] = True
+        retval['error'] = 'NONE'
 
         # check that we are subscribed
-        if not self.subscribed:
-            self.subscribe()
+        if not self.subscribed[port]:
+            self.subscribe(port='data')
 
-        if not self.subscribed:
-            print('ERROR: could not subscribe')
-            return None
+        if not self.subscribed[port]:
+            retval['error'] = 'could not subscribe'
+            return self.return_with_error(retval)
 
-        port = self.listen_port
+        lines = []
+        try:
+            for idx in range(2):
+                lines.append(self.sock[port].recv(128).decode())
+        except:
+            retval['error'] = 'could not get az,el data'
+            self.subscribed[port] = False
+            self.return_with_error(retval)
 
-        # check that the socket is valid
-        if not self.init_socket(port='listen'):
-            print('ERROR: could not establish connection to data server')
-            return None
+        for line in lines:
+            col = line.split(':')
+            if len(col)!=len(data_keys):
+                retval['error'] = 'inappropriate data length'
+                return return_with_error(retval)
+                            
+            for idx,key in enumerate(data_keys):
+                if idx>1:
+                    try:
+                        data[key] = eval(col[idx])
+                    except:
+                        retval['error'] = 'could not interpret data: %s' % col[idx]
+                        return self.return_with_error(retval)
+                else:
+                    data[key] = col[idx]
+                
+            if data['DATA']!='DATA':
+                retval['error'] = 'unrecognized data'
+                return return_with_error(retval)
 
-        ans = self.sock.recv(8192)
-        lines = ans.decode().split()
+            retval[data['AXIS']] = data
+            
+        return retval
 
-        # temporary
-        print('\n'.join(lines))
-        return lines
+    def send_command(self,cmd_str):
+        '''
+        send a command to the observation mount
+        '''
+        port = 'command'
+        retval = {}
+        retval['ok'] = True
+        retval['error'] = 'NONE'
+        retval['command'] = cmd_str
 
+        # check that we are subscribed
+        if not self.subscribed[port]:
+            self.subscribe(port='data')
+
+        if not self.subscribed[port]:
+            retval['error'] = 'could not subscribe'
+            return self.return_with_error(retval)
+
+        cmd = cmd_str.split()[0].upper()
+        if cmd not in self.available_commands:
+            retval['error'] = 'Invalid command: %s' % cmd
+            return self.return_with_error(retval)
+
+        try:
+            full_cmd_str = '%s\r\n' % cmd_str.upper()
+            self.sock[port].send(full_cmd_str.encode())
+        except:
+            retval['error'] = 'command unsuccessful'
+            self.return_with_error(retval)
+
+        return retval
     
+
+        
+
+        
