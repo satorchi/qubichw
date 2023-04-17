@@ -209,6 +209,7 @@ class obsmount:
                 retval['error'] = 'inappropriate data length'
                 return return_with_error(retval)
                             
+            data = {}
             for idx,key in enumerate(self.data_keys):
                 if idx>1:
                     try:
