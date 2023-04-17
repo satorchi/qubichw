@@ -190,6 +190,7 @@ class obsmount:
         # try:
         for idx in range(2):
             lines.append(self.sock[port].recv(128).decode())
+            print('[%i] %s' % (idx,lines[-1]))
         # except:
         #     retval['error'] = 'could not get az,el data'
         #     self.subscribed[port] = False
