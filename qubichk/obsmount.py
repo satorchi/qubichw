@@ -291,7 +291,7 @@ class obsmount:
             print('AZ,EL = ERROR: %s' % ans['error'])
             return
 
-        print('AZ,EL = %.3f %.3f' % (ans['az'],ans['el']))
+        print('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']))
         return
 
     def is_connected(self,port='data'):
