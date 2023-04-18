@@ -18,7 +18,7 @@ from glob import glob
 import datetime as dt
 from termcolor import colored
 from satorchipy.datefunctions import str2dt
-from qubichk.platform import get_position
+#from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
@@ -278,24 +278,24 @@ if retval is not None:
     lines += retval[1]
 
     
-# read the platform position directly from socket
-labels = ['azimuth','elevation']
-vals = get_position()
-azel = vals[:2]
-warn = vals[2:]
-tstamp = dt.datetime.utcnow().timestamp()
-date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
-for idx,val in enumerate(azel):
-    if type(val)==str:
-        val_str = val.center(7)
-    else:
-        val_str = '%7.2f degrees' % val
-    if warn[idx]:
-        val_str += ' ?'
-    label = labels[idx]
-    line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
-    lines.append(line)
-    tstamps.append(tstamp)
+# # read the platform position directly from socket
+# labels = ['azimuth','elevation']
+# vals = get_position()
+# azel = vals[:2]
+# warn = vals[2:]
+# tstamp = dt.datetime.utcnow().timestamp()
+# date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+# for idx,val in enumerate(azel):
+#     if type(val)==str:
+#         val_str = val.center(7)
+#     else:
+#         val_str = '%7.2f degrees' % val
+#     if warn[idx]:
+#         val_str += ' ?'
+#     label = labels[idx]
+#     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
+#     lines.append(line)
+#     tstamps.append(tstamp)
 
 # next read the HWP position
 hwpinfo = get_hwp_info()
