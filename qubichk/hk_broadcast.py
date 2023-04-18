@@ -135,7 +135,7 @@ class hk_broadcast :
             names.append(name)
             fmts.append('f8')
             record_zero.append(dummy_val)
-            dummy_val += 1
+            dummy_val -= 1
 
         # the temperature diodes
         for idx in range(21): # THIS MUST CHANGE TO 21 AFTER WILFRIED CHANGES QUBICSTUDIO
