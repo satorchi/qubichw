@@ -83,10 +83,11 @@ class obsmount:
     listen_port = 4546
     command_port = 4545
     el_zero_offset = 41.6
-    datefmt = '%Y%m%d-%H%M%S'
+    datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.1 # seconds to wait before next socket command
+    verbosity = 0
     
     def __init__(self):
         '''
@@ -105,8 +106,10 @@ class obsmount:
         '''
         print a message to screen
         '''
+        if self.verbosity<1: return
+        
         date_str = dt.datetime.utcnow().strftime(self.datefmt)
-        print('%s obsmount: %s' % (date_str,msg))
+        print('%s | obsmount: %s' % (date_str,msg))
         return
 
     def return_with_error(self,retval):
