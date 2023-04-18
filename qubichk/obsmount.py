@@ -277,8 +277,8 @@ class obsmount:
         el = ans['EL']['ACT_POSITION']
         tstamp = dt.datetime.utcnow().timestamp()
 
-        retval['az'] = az
-        retval['el'] = el + self.el_zero_offset
+        retval['AZ'] = az
+        retval['EL'] = el + self.el_zero_offset
         retval['tstamp'] = tstamp
         return retval
 
