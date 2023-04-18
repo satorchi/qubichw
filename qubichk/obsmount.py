@@ -271,7 +271,7 @@ class obsmount:
 
         ans = self.read_data()
         if not ans['ok']:
-            self.return_with_error(ans)
+            return self.return_with_error(ans)
 
         az = ans['AZ']['ACT_POSITION']
         el = ans['EL']['ACT_POSITION']
