@@ -69,7 +69,7 @@ class hk_broadcast :
     def define_hk_record(self):
         '''define a housekeeping data record
         '''
-        dummy_val=1000
+        dummy_val = -1000
         
         # packet identifiers
         STX=0xAA
@@ -103,7 +103,7 @@ class hk_broadcast :
                 names.append(recname)
                 fmts.append('f8')
                 record_zero.append(dummy_val)
-                dummy_val+=1
+                dummy_val -= 1
 
         # the Mechanical Heat Switch positions
         for idx in range(self.nMECH):
@@ -111,16 +111,16 @@ class hk_broadcast :
             names.append(mhs)
             fmts.append('i4')
             record_zero.append(dummy_val)
-            dummy_val+=1
+            dummy_val -= 1
 
         # the power supplies (heaters)
-        for meastype in ['Volt','Amp']:
-            for idx in range(self.nHEATER):
+        for idx in range(self.nHEATER):
+            for meastype in ['Volt','Amp']:
                 heater='HEATER%i' % (idx+1)
                 names.append('%s_%s' % (heater,meastype))
                 fmts.append('f8')
                 record_zero.append(dummy_val)
-                dummy_val+=1
+                dummy_val -= 1
 
         # the pressure sensor
         for idx in range(self.nPRESSURE):
@@ -128,7 +128,7 @@ class hk_broadcast :
             names.append('%s' % pressure_sensor)
             fmts.append('f8')
             record_zero.append(dummy_val)
-            dummy_val+=1
+            dummy_val -= 1
 
         # azimuth and elevation
         for name in ['AZIMUTH','ELEVATION']:
@@ -143,7 +143,7 @@ class hk_broadcast :
             names.append('%s' % Tname)
             fmts.append('f8')
             record_zero.append(dummy_val)
-            dummy_val+=1
+            dummy_val -= 1
 
         ########### we don't send the labels themselves ###########
         # names=['LABELS']+names
