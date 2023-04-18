@@ -10,7 +10,6 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 class for broadcasting/receiving QUBIC Housekeeping data
 '''
-from __future__ import division, print_function
 import sys,os,time,socket,struct
 import numpy as np
 import datetime as dt
@@ -21,6 +20,7 @@ from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
 from qubichk.utilities import shellcommand
+from qubichk.obsmount import obsmount
 
 class hk_broadcast :
     '''a class for broadcasting  and receiving QUBIC housekeeping data
@@ -38,14 +38,16 @@ class hk_broadcast :
         self.sampling_period = 2.0
         self.nENTROPY_TEMPERATURE = 8
         self.nMECH = 2
-        self.nHEATER = 7
-        self.nPRESSURE = 1
+        self.nHEATER = 8 # QubicStudio is expecting 8 heaters (there are only 6)
+        self.nPRESSURE = 6 # QubicStudio is expecting 8 pressure gauges (there is only 1)
+        # two of the spots reserved for pressure are used for azimuth and elevation
         self.record = self.define_hk_record()
         self.hk_entropy = None
         self.powersupply = None
         self.hk_temperature = None
         self.dump_diode_rawData = True
         self.hk_pressure = None
+        self.hk_azel = None
         self.verbosity_threshold = verbosity
         return None
 
@@ -127,6 +129,13 @@ class hk_broadcast :
             fmts.append('f8')
             record_zero.append(dummy_val)
             dummy_val+=1
+
+        # azimuth and elevation
+        for name in ['AZIMUTH','ELEVATION']:
+            names.append(name)
+            fmts.append('f8')
+            record_zero.append(dummy_val)
+            dummy_val += 1
 
         # the temperature diodes
         for idx in range(21): # THIS MUST CHANGE TO 21 AFTER WILFRIED CHANGES QUBICSTUDIO
@@ -286,6 +295,28 @@ class hk_broadcast :
             self.log_hk(recname,tstamp,dat)                    
 
         return self.record
+
+    def get_azel_hk(self):
+        '''get the azimuth and elevation
+        '''
+        if self.hk_azel is None:
+            self.hk_azel = obsmount()
+
+        ans = self.hk_azel.get_azel()
+        
+        if not ans['ok']:
+            self.log('ERROR! obsmount: %s' % ans['error'])
+            return None
+
+        recname_lookup = {'AZ':'AZIMUTH','EL':'ELEVATION'}
+        tstamp = ans['tstamp']
+        for key in recname_lookup.keys():
+            recname = recname_lookup[key]
+            val = ans[key]
+            self.record[recname][0] = val
+            self.log_hk(recname,tstamp,val)
+
+        return self.record        
     
     def get_all_hk(self):
         '''sample all the housekeeping from the various sensors

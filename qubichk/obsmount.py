@@ -82,7 +82,7 @@ class obsmount:
     mount_ip = '192.168.2.103'
     listen_port = 4546
     command_port = 4545
-    el_zero_offset = 8.4
+    el_zero_offset = 41.6
     datefmt = '%Y%m%d-%H%M%S'
     data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
@@ -259,7 +259,48 @@ class obsmount:
             self.return_with_error(retval)
 
         return retval
+
+
+    def get_azel(self):
+        '''
+        get the azimuth and elevation and return it with a timestamp
+        '''
+        retval = {}
+        retval['ok'] = True
+        retval['error'] = 'NONE'
+
+        ans = self.read_data()
+        if not ans['ok']:
+            self.return_with_error(ans)
+
+        az = ans['AZ']['ACT_POSITION']
+        el = ans['EL']['ACT_POSITION']
+        tstamp = dt.datetime.utcnow().timestamp()
+
+        retval['az'] = az
+        retval['el'] = el + self.el_zero_offset
+        retval['tstamp'] = tstamp
+        return retval
+
+    def show_azel(self):
+        '''
+        print the azimuth and elevation to screen
+        '''
+        ans = self.get_azel()
+        if not ans['ok']:
+            print('AZ,EL = ERROR: %s' % ans['error'])
+            return
+
+        print('AZ,EL = %.3f %.3f' % (ans['az'],ans['el']))
+        return
+
+    def is_connected(self,port='data'):
+        '''
+        return status of connection
+        '''
+        return self.subscribed[port]
     
+            
 
         
 
