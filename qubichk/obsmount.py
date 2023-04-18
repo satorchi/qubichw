@@ -32,7 +32,7 @@ TARGET_VELOCITY: target velocity that will be using while motor is
 
 ACT_POSITION: actual position. This value is already converted via a
               calibration constant and should be a float. 0 means that
-              the axis is near the lower limit switch and will be
+              the axis is near the lower limit switch and will be
               touching the homing switch (not yet activating it).
 
 TARGET_POSITION: the last target position that was written into the
@@ -45,11 +45,11 @@ IS_READY: this is a bit from the StatusWord of the KEB driver and
 IS_HOMED: this is a boolean variable from the program and not from the
           StatusWord. The server app has no memory and the
           HomingRoutine should be executed every time the system is
-          restarted. This decision was committed thinking about system
+          restarted. This decision was committed thinking about system
           security.
 
 In order to subscribe to the update service you should send the "OK" message to
-the RPi to the 4546 port. After that you will start receiving messages with the
+the RPi to the 4546 port. After that you will start receiving messages with the
 above structure every 100ms.
 
 The IP for the rpi running the server is 192.168.2.103.  4545 is
