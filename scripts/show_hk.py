@@ -409,6 +409,8 @@ for F in hk_files:
             val *= 0.001
     elif basename.find('MHS')==0:
         units = 'steps'
+    elif basename.find('AZ')==0 or basename.find('EL')==0:
+        units = 'degrees'
     else:
         units = ''
         
