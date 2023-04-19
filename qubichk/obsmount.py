@@ -89,6 +89,7 @@ class obsmount:
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.1 # seconds to wait before next socket command
     verbosity = 0
+    testmode = False
     
     def __init__(self):
         '''
@@ -257,6 +258,10 @@ class obsmount:
 
         full_cmd_str = '%s' % cmd_str.upper()
         self.printmsg('sending command: %s' % full_cmd_str)
+        if self.testmode:
+            print("TESTMODE:  I didn't really send the command")
+            return retval
+        
         try:
             self.sock[port].send(full_cmd_str.encode())
         except:
