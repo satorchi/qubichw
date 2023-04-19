@@ -325,7 +325,7 @@ class hk_broadcast :
         self.get_powersupply_hk()
         self.get_temperature_hk()
         self.get_pressure_hk()
-        # self.get_azel_hk() no az,el while debugging the motors
+        self.get_azel_hk() # comment out for no az,el while debugging the motors
         self.record[0].DATE = self.current_timestamp()
         return self.record
 
