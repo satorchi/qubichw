@@ -87,7 +87,7 @@ class obsmount:
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
-    wait = 0.1 # seconds to wait before next socket command
+    wait = 0.0 # seconds to wait before next socket command
     verbosity = 0
     testmode = False
     
@@ -266,6 +266,7 @@ class obsmount:
             self.sock[port].send(full_cmd_str.encode())
         except:
             retval['error'] = 'command unsuccessful'
+            self.subscribed[port] = False
             self.return_with_error(retval)
 
         return retval
