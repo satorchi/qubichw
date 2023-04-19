@@ -68,7 +68,8 @@ listening for commands but 4546 is listening for incoming subscribers.
 2023-04-14 17:20:29
 elevation commanded to 8.5 degrees is 50.1 degrees elevation
 
-
+2023-04-19 08:18:57
+raw elevation: 17.952062612098484 is 50 degrees elevation
 
 '''
 import socket,time
@@ -82,7 +83,7 @@ class obsmount:
     mount_ip = '192.168.2.103'
     listen_port = 4546
     command_port = 4545
-    el_zero_offset = 41.6
+    el_zero_offset = 50 - 17.952062612098484
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
@@ -243,7 +244,7 @@ class obsmount:
 
         # check that we are subscribed
         if not self.subscribed[port]:
-            self.subscribe(port='data')
+            self.subscribe(port)
 
         if not self.subscribed[port]:
             retval['error'] = 'could not subscribe'
@@ -254,8 +255,9 @@ class obsmount:
             retval['error'] = 'Invalid command: %s' % cmd
             return self.return_with_error(retval)
 
+        full_cmd_str = '%s' % cmd_str.upper()
+        self.printmsg('sending command: %s' % full_cmd_str)
         try:
-            full_cmd_str = '%s' % cmd_str.upper()
             self.sock[port].send(full_cmd_str.encode())
         except:
             retval['error'] = 'command unsuccessful'
@@ -302,7 +304,20 @@ class obsmount:
         return status of connection
         '''
         return self.subscribed[port]
-    
+
+    def goto_az(self,az):
+        '''
+        send command to move to the given azimuth
+        '''
+        return self.send_command('AZ %f' % az)
+
+    def goto_el(self,el):
+        '''
+        send command to move to the given elevation
+        we correct for the elevation offset
+        '''
+        cmd_el = el - self.el_zero_offset
+        return self.send_command('EL %f' % cmd_el)
             
 
         
