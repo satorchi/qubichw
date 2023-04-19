@@ -29,7 +29,7 @@ from qubichk.hk_verify import check_compressors,check_diskspace
 
 from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses, get_alarm_recipients
 from qubichk.ups import get_ups_info
-from qubichk.platform import get_position
+#from qubichk.platform import get_position
 from qubichk.utilities import shellcommand
 
 class dummy_bot:
@@ -1296,27 +1296,56 @@ class qubic_bot :
         return
 
 
+    # def position(self):
+    #     '''
+    #     get the azimuth and elevation pointing of the platform
+    #     '''
+    #     az,el,azwarn,elwarn = get_position()
+    #     date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    #     if type(az)==str:
+    #         az_str = 'ERROR'
+    #     else:
+    #         if azwarn:
+    #             az_str = '%7.2f degrees (possible encoder readout error)' % az
+    #         else:
+    #             az_str = '%7.2f degrees' % az
+                
+    #     if type(el)==str:
+    #         el_str = 'ERROR'
+    #     else:
+    #         el_str = '%7.2f degrees' % el
+    #     answer = "\nazimuth = %s\nelevation = %s" % (az_str,el_str)
+    #     self._send_message(answer)
+    #     return
+
     def position(self):
         '''
-        get the azimuth and elevation pointing of the platform
+        read the mount positions
         '''
-        az,el,azwarn,elwarn = get_position()
-        date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        if type(az)==str:
-            az_str = 'ERROR'
-        else:
-            if azwarn:
-                az_str = '%7.2f degrees (possible encoder readout error)' % az
-            else:
-                az_str = '%7.2f degrees' % az
-                
-        if type(el)==str:
-            el_str = 'ERROR'
-        else:
-            el_str = '%7.2f degrees' % el
-        answer = "\nazimuth = %s\nelevation = %s" % (az_str,el_str)
+        latest_date = dt.datetime.utcfromtimestamp(0)
+        fmt_str = '\n%9s:  %.3f degrees'
+        answer = 'Pointing:\n'
+        for basename in ['AZIMUTH','ELEVATION']:
+            fullname = '%s/%s.txt' % (self.hk_dir,basename)
+            if not os.path.isfile(fullname):
+                continue
+        
+            h = open(fullname,'r')
+            lines = h.read().split('\n')
+            h.close()
+            lastline = lines[-2]
+            cols = lastline.split()
+            tstamp = self.timestamp_factor*float(cols[0])
+            reading_date = dt.datetime.utcfromtimestamp(tstamp)
+            if reading_date > latest_date:
+                latest_date = reading_date
+            reading = eval(cols[1])
+            answer += fmt_str % (basename,reading)
+
+        answer += '\n\nTime: %s' % latest_date.strftime(self.time_fmt)    
         self._send_message(answer)
         return
+    
 
     def _default_answer(self):
         '''

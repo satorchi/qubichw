@@ -299,6 +299,26 @@ class obsmount:
         print('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']))
         return
 
+
+    def get_position():
+        '''
+        for compatibility with platform.py for the red mount
+        '''
+        azel = self.get_azel()
+        if not azel['ok']:
+            az = 'bad answer'
+            el = 'bad answer'
+            azwarn = True
+            elwarn = True
+            return az,el,azwarn,elwarn
+
+        az = azel['AZ']
+        el = azel['EL']
+        azwarn = False
+        elwarn = False
+        return az,el,azwarn,elwarn
+
+
     def is_connected(self,port='data'):
         '''
         return status of connection
