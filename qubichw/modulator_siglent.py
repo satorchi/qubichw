@@ -254,7 +254,7 @@ class siglent:
             return None
         
         # switch off output while reconfiguring
-        output_state = self.get_output_state(channel=1)
+        output_state = self.get_output_state(channel)
         self.set_output_off(channel)        
 
         # do we want default settings?
