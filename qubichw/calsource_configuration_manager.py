@@ -534,18 +534,18 @@ class calsource_configuration_manager():
         for dev in ['modulator','cf']:
             if dev in command.keys() and modulator_configure:
                 if 'default' in command[dev].keys() and command[dev]['default']:
-                    self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
+                    self.device['modulator'].set_default_settings(channel=self.modulator_channel[dev])
                 else:
-                    self.device[dev].configure(frequency=command[dev]['frequency'],
-                                               amplitude=command[dev]['amplitude'],
-                                               shape=command[dev]['shape'],
-                                               offset=command[dev]['offset'],
-                                               duty=command[dev]['duty'],
-                                               channel=self.modulator_channel[dev])
+                    self.device['modulator'].configure(frequency=command[dev]['frequency'],
+                                                       amplitude=command[dev]['amplitude'],
+                                                       shape=command[dev]['shape'],
+                                                       offset=command[dev]['offset'],
+                                                       duty=command[dev]['duty'],
+                                                       channel=self.modulator_channel[dev])
 
             # wait a bit before trying to read the results
             time.sleep(1)
-            settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[dev])
+            settings = self.device['modulator'].read_settings(show=False,channel=self.modulator_channel[dev])
             if settings is None:
                 msg = '%s:FAILED' % dev
             else:
