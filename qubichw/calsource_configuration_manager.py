@@ -381,6 +381,7 @@ class calsource_configuration_manager():
             
         if ack.find('FAILED_GET_STATES')<0:
             for socket_no in states_read.keys():
+                if isinstance(socket_no,str): continue # states also has 'ok' and 'error_message'
                 socket_idx = socket_no - 1
                 state = states_read[socket_no]
                 dev = self.device_list[socket_idx]
