@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 control of the Energenie USB power bar.  Code originally was in hk_verify.py
 '''
-import time,re
+import time,re,os
 import datetime as dt
 from qubichk.utilities import shellcommand, ping
 
@@ -21,6 +21,11 @@ class energenie:
     verbosity = 2
 
     def __init__(self,name='electronics rack'):
+        if 'HOSTNAME' in os.environ.keys():
+            hostname = os.environ['HOSTNAME']
+        else:
+            hostname,err = shellcommand('hostname')
+
         valid_names = ['electronics rack','calsource','cryostat','rack 1','rack 2']
         self.socket = {}
         self.ok = False
@@ -48,14 +53,19 @@ class energenie:
             self.socket[4] = 'FPGA'
             
         if name=='calsource':
-            pingresult = ping('pigps',verbosity=self.verbosity)
-            if not pingresult['ok']:
-                msg = 'ERROR: PiGPS is UNREACHABLE'
-                self.log(msg,verbosity=1)
-                return
-            
-            verify_cmd = 'ssh pigps which sispmctl' 
-            self.manager = 'ssh pigps sispmctl'
+            if hostname.find('pigps')>=0:
+                verify_cmd = 'which sispmctl'
+                self.manager = 'sispmctl -d 0'
+            else:
+                pingresult = ping('pigps',verbosity=self.verbosity)
+                if not pingresult['ok']:
+                    msg = 'ERROR: PiGPS is UNREACHABLE'
+                    self.log(msg,verbosity=1)
+                    return
+                verify_cmd = 'ssh pigps which sispmctl' 
+                self.manager = 'ssh pigps sispmctl'
+
+                
             self.socket[1] ='modulator'
             self.socket[2] ='calsource'
             self.socket[3] ='lamp'
