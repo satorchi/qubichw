@@ -428,7 +428,7 @@ class calsource_configuration_manager():
         if self.device[dev].is_connected():
             for dev_name in self.modulator_channel.keys():
                 
-                settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[output])
+                settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[dev_name])
                 if settings is None:
                     msg += ' %s:UNKNOWN' % dev
                 else:
