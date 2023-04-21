@@ -96,7 +96,7 @@ class calsource_configuration_manager():
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         # the device list is in the order that they are plugged into the Energenie powerbar
-        self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
+        self.device_list = ['modulator','cf','calsource','lamp','amplifier','arduino']
 
         self.modulator_channel = {}
         self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
