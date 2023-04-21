@@ -432,7 +432,7 @@ class calsource_configuration_manager():
                 
                 settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[dev_name])
                 if settings is None:
-                    msg += ' %s:UNKNOWN' % dev
+                    msg += ' %s:UNKNOWN' % dev_name
                 else:
                     msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s %s:OUTPUT=%s' % \
                         (dev_name,settings['shape'],

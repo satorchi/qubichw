@@ -257,16 +257,16 @@ class siglent:
         output_state = self.get_output_state(channel)
         self.set_output_off(channel)        
 
-        # do we want default settings?
-        if frequency is None\
-           and shape is None\
-           and amplitude is None\
-           and offset is None\
-           and duty is None\
-           and output is None:
-            self.set_default_settings(channel)
-            self.set_output_on(channel)
-            return True
+        # # do we want default settings?
+        # if frequency is None\
+        #    and shape is None\
+        #    and amplitude is None\
+        #    and offset is None\
+        #    and duty is None\
+        #    and output is None:
+        #     self.set_default_settings(channel)
+        #     self.set_output_on(channel)
+        #     return True
 
         # otherwise, set each parameter requested
         if frequency:
