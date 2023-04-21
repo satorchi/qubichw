@@ -111,6 +111,8 @@ class calsource_configuration_manager():
                                             'duty',
                                             'shape',
                                             'default']
+        self.valid_commands['cf'] = self.valid_commands['modulator']
+        
         self.valid_commands['calsource'] = ['on','off','frequency','default']
         self.valid_commands['amplifier'] = ['on','off',
                                             'filter_mode',
