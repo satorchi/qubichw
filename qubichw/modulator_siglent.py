@@ -242,7 +242,7 @@ class siglent:
         self.settings = settings
         return settings
    
-    def configure(self,frequency=None,shape=None,amplitude=None,offset=None,duty=None,output='ON',channel=1):
+    def configure(self,frequency=None,shape=None,amplitude=None,offset=None,duty=None,output=None,channel=1):
         '''
         configure the Siglent waveform generator
         
@@ -254,6 +254,7 @@ class siglent:
             return None
         
         # switch off output while reconfiguring
+        output_state = self.get_output_state(channel=1)
         self.set_output_off(channel)        
 
         # do we want default settings?
@@ -261,7 +262,8 @@ class siglent:
            and shape is None\
            and amplitude is None\
            and offset is None\
-           and duty is None:
+           and duty is None\
+           and output is None:
             self.set_default_settings(channel)
             self.set_output_on(channel)
             return True
@@ -287,8 +289,8 @@ class siglent:
             self.set_duty(duty)
             time.sleep(0.5)
 
-        
-        if output=='ON':
+        # restore output state or reset output state as required
+        if (output is None and output_state=='ON') or output=='ON':
             self.set_output_on(channel)
 
         return True
