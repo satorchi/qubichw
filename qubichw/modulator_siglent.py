@@ -269,24 +269,24 @@ class siglent:
         #     return True
 
         # otherwise, set each parameter requested
-        if frequency:
-            self.set_frequency(frequency)
+        if frequency is not None:
+            self.set_frequency(frequency,channel)
             time.sleep(0.5)
-        if shape:
+        if shape is not None:
             # matching the old commands to the new ones
             if shape.upper().find('SQ') >= 0: shape='SQUARE'
             if shape.upper().find('SI') >= 0: shape='SINE'
             if shape.upper().find('TRI') >= 0: shape='RAMP'
-            self.set_shape(shape)
+            self.set_shape(shape,channel)
             time.sleep(0.5)
-        if amplitude:
-            self.set_amplitude(amplitude)
+        if amplitude is not None:
+            self.set_amplitude(amplitude,channel)
             time.sleep(0.5)
-        if offset:
-            self.set_offset(offset)
+        if offset is not None:
+            self.set_offset(offset,channel)
             time.sleep(0.5)
-        if duty:
-            self.set_duty(duty)
+        if duty is not None:
+            self.set_duty(duty,channel)
             time.sleep(0.5)
 
         # restore output state or reset output state as required
