@@ -27,14 +27,27 @@ class siglent:
         self.idVendor = idVendor
         self.idProduct = idProduct
         self.state = {}
+        self.state[1] = {}
+        self.state[2] = {}
         self.default_settings = {}
-        self.default_settings['frequency'] = 1
-        self.default_settings['shape'] = 'SINE'
-        self.default_settings['amplitude'] = 1.0
-        self.default_settings['offset'] = 2.0
-        self.default_settings['duty'] = 50
-        self.default_settings['DCoffset'] = 10
-        self.default_settings['maximum voltage'] = 10
+        self.default_settings[1] = {}
+        self.default_settings[1]['frequency'] = 1
+        self.default_settings[1]['shape'] = 'SINE'
+        self.default_settings[1]['amplitude'] = 1.0
+        self.default_settings[1]['offset'] = 2.0
+        self.default_settings[1]['duty'] = 50
+        self.default_settings[1]['DCoffset'] = 10
+        self.default_settings[1]['maximum voltage'] = 10
+
+        # for the carbon fibre
+        self.default_settings[2] = {}
+        self.default_settings[2]['frequency'] = 0.3
+        self.default_settings[2]['shape'] = 'SINE'
+        self.default_settings[2]['amplitude'] = 2.0
+        self.default_settings[2]['offset'] = 1.0
+        self.default_settings[2]['duty'] = 50
+        self.default_settings[2]['DCoffset'] = 10
+        self.default_settings[2]['maximum voltage'] = 10
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
@@ -229,7 +242,7 @@ class siglent:
         self.settings = settings
         return settings
    
-    def configure(self,frequency=None,shape=None,amplitude=None,offset=None,duty=None,channel=1):
+    def configure(self,frequency=None,shape=None,amplitude=None,offset=None,duty=None,output=True,channel=1):
         '''
         configure the Siglent waveform generator
         
@@ -274,7 +287,8 @@ class siglent:
             self.set_duty(duty)
             time.sleep(0.5)
 
-        self.set_output_on(channel)
+        
+        if output: self.set_output_on(channel)
 
         return True
 
@@ -292,37 +306,37 @@ class siglent:
     def set_frequency(self,frequency,channel=1):
         cmd = "C%i:BSWV FRQ,%.2f" % (channel,frequency)
         ans = self.send_command(cmd)
-        self.state['frequency'] = frequency
+        self.state[channel]['frequency'] = frequency
         return ans
 
     def set_shape(self,shape,channel=1):
         cmd = "C%i:BSWV WVTP,%s" % (channel,shape)
         ans = self.send_command(cmd)
-        self.state['shape'] = shape
+        self.state[channel]['shape'] = shape
         return ans
 
     def set_amplitude(self,amplitude,channel=1):
         cmd = "C%i:BSWV AMP,%.2f" % (channel,amplitude)
         ans = self.send_command(cmd)
-        self.state['amplitude'] = amplitude
+        self.state[channel]['amplitude'] = amplitude
         return ans
 
     def set_offset(self,offset,channel=1):
         cmd = "C%i:BSWV OFST,%.2f" % (channel,offset)
         ans = self.send_command(cmd)
-        self.state['offset'] = offset
+        self.state[channel]['offset'] = offset
         return ans
     
     def set_duty(self,duty,channel=1):
         cmd = "C%i:BSWV DUTY,%.2f" % (channel,duty)
         ans = self.send_command(cmd)
-        self.state['duty'] = duty
+        self.state[channel]['duty'] = duty
         return ans
 
     def set_max_voltage(self,maximum_voltage,channel=1):
         cmd = "C%i:BSWV MAX_OUTPUT_AMP,%.2f" % (channel,maximum_voltage)
         ans = self.send_command(cmd)
-        self.state['maximum output amplitude'] = maximum_voltage
+        self.state[channel]['maximum output amplitude'] = maximum_voltage
         return ans
         
 
@@ -335,7 +349,7 @@ class siglent:
         ans = self.send_command(cmd)
         if ans is None: return None
         output_state = ans.split(' ')[1].split(',')[0]
-        self.state['output'] = output_state
+        self.state[channel]['output'] = output_state
         return output_state
         
 
@@ -354,12 +368,12 @@ class siglent:
             return False
 
         self.send_command('C%i:OUTP LOAD,50' % channel) # default 50 Ohm load
-        self.set_frequency(self.default_settings['frequency'],channel)
-        self.set_shape(self.default_settings['shape'],channel)
-        self.set_amplitude(self.default_settings['amplitude'],channel)
-        self.set_offset(self.default_settings['offset'],channel)
-        self.set_duty(self.default_settings['duty'],channel)
-        self.set_max_voltage(self.default_settings['maximum voltage'],channel)
+        self.set_frequency(self.default_settings[channel]['frequency'],channel)
+        self.set_shape(self.default_settings[channel]['shape'],channel)
+        self.set_amplitude(self.default_settings[channel]['amplitude'],channel)
+        self.set_offset(self.default_settings[channel]['offset'],channel)
+        self.set_duty(self.default_settings[channel]['duty'],channel)
+        self.set_max_voltage(self.default_settings[channel]['maximum voltage'],channel)
         self.set_output_on(channel)
         return True
 

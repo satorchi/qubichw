@@ -98,8 +98,19 @@ class calsource_configuration_manager():
         # the device list is in the order that they are plugged into the Energenie powerbar
         self.device_list = ['modulator','calsource','lamp','amplifier','arduino']
 
+        self.modulator_channel = {}
+        self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
+        self.modulator_channel['cf'] = 2
+        
         self.valid_commands = {}
-        self.valid_commands['modulator'] = ['on','off','frequency','amplitude','offset','duty','shape','default']
+        self.valid_commands['modulator'] = ['on','off',
+                                            'output',
+                                            'frequency',
+                                            'amplitude',
+                                            'offset',
+                                            'duty',
+                                            'shape',
+                                            'default']
         self.valid_commands['calsource'] = ['on','off','frequency','default']
         self.valid_commands['amplifier'] = ['on','off',
                                             'filter_mode',
@@ -414,26 +425,19 @@ class calsource_configuration_manager():
             self.log('%s is ON, but not responding.  Trying to reinitialize.' % dev)
             self.device[dev].init()
         if self.device[dev].is_connected():
-            settings = self.device[dev].read_settings(show=False)
-            if settings is None:
-                msg += ' %s:UNKNOWN' % dev
-            else:
-                '''
-                # for the HP3312A
-                msg += '| %s: SHAPE=%s FREQUENCY=%.6f Hz AMPLITUDE=%.6f V OFFSET=%.6f V DUTY CYCLE=%.1f%%' % \
-                    (dev,
-                     settings['shape'],
-                     settings['frequency'],
-                     settings['amplitude'],
-                     settings['offset'],
-                     settings['duty'])
-                '''
-                msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
-                    (dev,settings['shape'],
-                     dev,settings['frequency'],
-                     dev,settings['amplitude'],
-                     dev,settings['offset'],
-                     dev,settings['duty'])
+            for dev_name in self.modulator_channel.keys():
+                
+                settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[output])
+                if settings is None:
+                    msg += ' %s:UNKNOWN' % dev
+                else:
+                    msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
+                        (dev_name,settings['shape'],
+                         dev_name,settings['frequency'],
+                         dev_name,settings['amplitude'],
+                         dev_name,settings['offset'],
+                         dev_name,settings['duty'],
+                         dev_name,settings['output'])
 
             
         return msg
@@ -447,11 +451,12 @@ class calsource_configuration_manager():
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
-        for parm in ['frequency','amplitude','shape','offset','duty','default']:
-            if parm in command['modulator'].keys():
-                modulator_configure = True
-            else:
-                command['modulator'][parm] = None
+        for dev in ['modulator','cf']:
+            for parm in ['frequency','amplitude','shape','offset','duty','default']:
+                if parm in command[dev].keys():
+                    modulator_configure = True
+                else:
+                    command[dev][parm] = None
                 
         # get current on/off status from Energenie powerbar
         onoff_ack = self.onoff()
@@ -524,30 +529,32 @@ class calsource_configuration_manager():
             ack += '%s ' % msg
                 
 
-        # the modulator configuration
-        dev = 'modulator'
-        if dev in command.keys() and modulator_configure:
-            if 'default' in command[dev].keys() and command[dev]['default']:
-                self.device[dev].set_default_settings()
-            else:
-                self.device[dev].configure(frequency=command[dev]['frequency'],
-                                           amplitude=command[dev]['amplitude'],
-                                           shape=command[dev]['shape'],
-                                           offset=command[dev]['offset'],
-                                           duty=command[dev]['duty'])
+        # the modulator configuration also for the carbon fibre
+        for dev in ['modulator','cf']:
+            if dev in command.keys() and modulator_configure:
+                if 'default' in command[dev].keys() and command[dev]['default']:
+                    self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
+                else:
+                    self.device[dev].configure(frequency=command[dev]['frequency'],
+                                               amplitude=command[dev]['amplitude'],
+                                               shape=command[dev]['shape'],
+                                               offset=command[dev]['offset'],
+                                               duty=command[dev]['duty'],
+                                               channel=self.modulator_channel[dev])
 
             # wait a bit before trying to read the results
             time.sleep(1)
-            settings = self.device[dev].read_settings(show=False)
+            settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[dev])
             if settings is None:
                 msg = '%s:FAILED' % dev
             else:
-                msg = '%s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
+                msg = '%s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s %s:OUTPUT=%s' % \
                     (dev,settings['shape'],
                      dev,settings['frequency'],
                      dev,settings['amplitude'],
                      dev,settings['offset'],
-                     dev,settings['duty'])
+                     dev,settings['duty'],
+                     dev,settings['output'])
                     
             self.log(msg)
             ack += '%s ' % msg
