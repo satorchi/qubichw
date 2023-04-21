@@ -227,13 +227,13 @@ class calsource_configuration_manager():
 
             if cmd=='on' or cmd=='off':
                 command['all']['onoff'] = cmd
-                for dev in ['calsource','amplifier','modulator']:
+                for dev in ['calsource','amplifier','modulator','cf']:
                     command[dev]['onoff'] = cmd
                 continue
             
             if cmd=='default':
                 command['all']['default'] = True
-                for dev in ['calsource','amplifier','modulator']:
+                for dev in ['calsource','amplifier','modulator','cf']:
                     command[dev]['default'] = True
                 continue
 
@@ -455,7 +455,7 @@ class calsource_configuration_manager():
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
         for dev in ['modulator','cf']:
-            for parm in ['frequency','amplitude','shape','offset','duty','default']:
+            for parm in ['frequency','amplitude','shape','offset','duty','output','default']:
                 if parm in command[dev].keys():
                     modulator_configure = True
                 else:
@@ -543,6 +543,7 @@ class calsource_configuration_manager():
                                                        shape=command[dev]['shape'],
                                                        offset=command[dev]['offset'],
                                                        duty=command[dev]['duty'],
+                                                       output=command[dev]['output'],
                                                        channel=self.modulator_channel[dev])
 
             # wait a bit before trying to read the results
