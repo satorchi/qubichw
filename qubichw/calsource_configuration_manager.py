@@ -432,7 +432,7 @@ class calsource_configuration_manager():
                 if settings is None:
                     msg += ' %s:UNKNOWN' % dev
                 else:
-                    msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s' % \
+                    msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s %s:OUTPUT=%s' % \
                         (dev_name,settings['shape'],
                          dev_name,settings['frequency'],
                          dev_name,settings['amplitude'],
