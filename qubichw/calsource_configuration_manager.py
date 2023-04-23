@@ -30,9 +30,6 @@ from qubichw.amplifier import amplifier
 #from qubichw.modulator_tg5012a import tg5012 as modulator
 from qubichw.modulator_siglent import siglent as modulator
 
-# the Arduino Uno
-from qubichw.arduino import arduino
-
 class calsource_configuration_manager():
 
     def __init__(self,role=None, verbosity=0):
@@ -80,8 +77,6 @@ class calsource_configuration_manager():
             txt += 'valid commands for %s: %s\n' % (dev,valid_commands)
         txt += '\nFor the modulator, frequency is given in Hz\n'
         txt += 'For the calibration source, frequency is given in GHz\n'
-        txt += '\nFor the arduino, duration is given in seconds.\n'
-        txt += 'Note that this command will immediately start an acquisition.\n'
         txt += '\nExample:\n'
         txt += 'calsource:on amplifier:on modulator:on modulator:frequency=0.333 modulator:duty=33 modulator:shape=squ calsource:frequency=150\n'
         print(txt)
@@ -96,7 +91,7 @@ class calsource_configuration_manager():
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         # the device list is in the order that they are plugged into the Energenie powerbar
-        self.device_list = ['modulator','calsource','lamp','amplifier','arduino','cf']
+        self.device_list = ['modulator','calsource','lamp','amplifier','cf']
 
         self.modulator_channel = {}
         self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
@@ -124,7 +119,6 @@ class calsource_configuration_manager():
                                             'invert',
                                             'default']
         self.valid_commands['lamp' ]     = ['on','off']
-        self.valid_commands['arduino']   = ['duration']
 
         # time it takes for a device to register with the operating system
         # the Siglent signal generator requires 33 seconds !!!
@@ -194,7 +188,6 @@ class calsource_configuration_manager():
             #self.energenie = PMSDevice('energenie', '1')
             self.device['modulator'] = modulator()
             self.device['calsource'] = calibration_source('LF')
-            self.device['arduino']   = arduino()
             self.device['amplifier'] = amplifier()
 
         self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
@@ -239,12 +232,7 @@ class calsource_configuration_manager():
                 for dev in ['calsource','amplifier','modulator','cf']:
                     command[dev]['default'] = True
                 continue
-
-            if cmd=='save':
-                command['arduino']['save'] = True
-                continue
-                    
-            
+                                
             cmd_lst = cmd.split(':')
             try:
                 devcmd = cmd_lst[1]
@@ -579,18 +567,6 @@ class calsource_configuration_manager():
                         ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
                         retval['%s state' % dev] = self.device[dev].state
         
-        # run the Arduino last of all
-        dev = 'arduino'
-        if dev in command.keys():
-            if 'duration' in command[dev].keys():
-                filename = self.device[dev].acquire(command[dev]['duration'])
-                if filename is None:
-                    ack += '%s:acquisition=failed ' % dev
-                else:
-                    ack += '%s:file=%s ' % (dev,filename)
-
-            if 'save' in command[dev].keys():
-                self.device[dev].interrupt()
 
         # STATUS
         if command['all']['status']:
@@ -619,41 +595,10 @@ class calsource_configuration_manager():
             received_date = dt.datetime.fromtimestamp(received_tstamp)
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
-            # forget about the arduino save stuff... multiprocess buggers up the modulator
             retval = {}
             retval['ACK'] = 'no acknowledgement'
             retval = self.interpret_commands(command,retval)
             cmdstr = None
-            # # interpret the commands in a separate process and continue listening
-            # context = multiprocessing.get_context('fork')
-            # manager = context.Manager()
-            # retval = manager.dict()
-            # retval['ACK'] = 'no acknowledgement'
-            # proc = context.Process(target=self.interpret_commands, args=(command,retval))
-            # proc.start()
-            # if 'arduino' in command.keys() and 'duration' in command['arduino'].keys():
-            #     delta = dt.timedelta(seconds=command['arduino']['duration'])
-            #     now = dt.datetime.utcnow()
-            #     stoptime = now + delta
-            #     self.send_acknowledgement('Send command "save" to interrupt and save immediately',addr)
-            #     working = True
-            #     self.log("going into loop until %s or until 'save' command received" % stoptime.strftime('%Y-%m-%d %H:%M:%S UT'))
-            #     while working and now<stoptime:
-            #         received_tstamp, cmdstr, addr = self.listen_for_command()
-            #         now = dt.datetime.utcnow()
-            #         command2 = self.parse_command_string(cmdstr)
-            #         if 'arduino' in command2.keys() and 'save' in command2['arduino'].keys():
-            #             self.device['arduino'].interrupt()
-            #             working = False
-            #             cmdstr = None
-            #         elif now<stoptime:
-            #             self.send_acknowledgement("I'm busy and can only respond to the 'save' command",addr)
-            #         else:
-            #             self.log('command will be carried into main loop: %s' % cmdstr)
-            # else:
-            #     cmdstr = None
-
-            # proc.join()
             if len(retval)==0:
                 ack = 'no acknowledgement'
             else:
@@ -748,13 +693,6 @@ class calsource_configuration_manager():
             # check if we're doing an acquisition or other things that require extra time
             duration = 0
             for cmd in cmd_list:
-                if cmd.find('arduino:duration=')==0:
-                    duration_str = cmd.split('=')[1]
-                    try:
-                        duration += eval(duration_str)
-                    except:
-                        self.log('Could not interpret Arduino duration')
-                    continue
 
                 if cmd.find('on')>=0 or cmd.find('off')>=0:
                     duration += self.energenie_timeout
