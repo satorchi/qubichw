@@ -380,7 +380,7 @@ class calsource_configuration_manager():
             for socket_no in states_read.keys():
                 if isinstance(socket_no,str): continue # states also has 'ok' and 'error_message'
                 state = states_read[socket_no]
-                dev = self.powerbar.socket[socket_no]
+                dev = powerbar.socket[socket_no]
                 self.device_on[dev] = state
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
