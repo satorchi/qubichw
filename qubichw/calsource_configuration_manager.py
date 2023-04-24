@@ -382,6 +382,7 @@ class calsource_configuration_manager():
                 state = states_read[socket_no]
                 dev = powerbar.socket[socket_no]
                 self.device_on[dev] = state
+            self.device_on['cf'] = self.device_on['modulator'] # carbon fibre and modulator are the same device
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         return ack
