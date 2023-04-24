@@ -136,10 +136,11 @@ class calsource_configuration_manager():
         self.wait_after_switch_on['modulator'] = 0
         self.wait_after_switch_on['calsource'] = 1
         self.wait_after_switch_on['amplifier'] = 1
+        self.wait_after_switch_on['cf'] = self.wait_after_switch_on['modulator']
 
         self.estimated_wait = deepcopy(self.wait_after_switch_on)
         self.estimated_wait['modulator'] = 33
-        
+        self.estimated_wait['cf'] = self.estimated_wait['modulator']
         
         self.device = {} # the objects instantiated for each device
         self.device_on = {} # on/off state of each device
