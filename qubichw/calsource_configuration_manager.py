@@ -527,8 +527,10 @@ class calsource_configuration_manager():
                 
 
         # the modulator configuration also for the carbon fibre
-        for dev in ['modulator','cf']:
-            if dev in command.keys() and modulator_configure:
+        if modulator_configure:
+            for dev in ['modulator','cf']:
+                if dev not in command.keys(): continue
+            
                 if 'default' in command[dev].keys() and command[dev]['default']:
                     self.device['modulator'].set_default_settings(channel=self.modulator_channel[dev])
                 else:
