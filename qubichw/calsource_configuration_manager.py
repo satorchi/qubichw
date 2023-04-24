@@ -90,8 +90,16 @@ class calsource_configuration_manager():
         self.role = role
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
-        # the device list is in the order that they are plugged into the Energenie powerbar
-        self.device_list = ['modulator','calsource','lamp','amplifier','cf']
+
+        # the device list is the list of devices plugged into the Energenie powerbar
+        self.powersocket = {}
+        self.powersocket['modulator'] = 1
+        self.powersocket['calsource'] = 2
+        self.powersocket['lamp'] = 3
+        self.powersocket['amplifier'] = 4
+        self.powersocket['cf'] = 2
+        self.device_list = list(self.powersocket.keys())
+        
 
         self.modulator_channel = {}
         self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
@@ -133,11 +141,9 @@ class calsource_configuration_manager():
         self.estimated_wait['modulator'] = 33
         
         
-        self.device = {}
-        self.powersocket = {}
-        self.device_on = {}
-        for idx,dev in enumerate(self.device_list):
-            self.powersocket[dev] = idx + 1
+        self.device = {} # the objects instantiated for each device
+        self.device_on = {} # on/off state of each device
+        for dev in self.device_list:
             self.device[dev] = None
             self.device_on[dev] = None
 
