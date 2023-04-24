@@ -97,7 +97,7 @@ class calsource_configuration_manager():
         self.powersocket['calsource'] = 2
         self.powersocket['lamp'] = 3
         self.powersocket['amplifier'] = 4
-        self.powersocket['cf'] = 2
+        self.powersocket['cf'] = 1
         self.device_list = list(self.powersocket.keys())
         
 
@@ -227,7 +227,7 @@ class calsource_configuration_manager():
 
             if cmd=='on' or cmd=='off':
                 command['all']['onoff'] = cmd
-                for dev in ['calsource','amplifier','modulator','cf']:
+                for dev in ['calsource','amplifier','modulator']:
                     command[dev]['onoff'] = cmd
                 continue
             
@@ -258,10 +258,10 @@ class calsource_configuration_manager():
                 
                 try:
                     command[dev][parm] = eval(val)
-                    self.log('%s %s = %f (a number)' % (dev,parm,command[dev][parm]),verbosity=2)
+                    self.log('%s %s = %f (a number)' % (dev,parm,command[dev][parm]),verbosity=3)
                 except:
                     command[dev][parm] = val
-                    self.log('%s %s = %s (a string)' % (dev,parm,command[dev][parm]),verbosity=2)
+                    self.log('%s %s = %s (a string)' % (dev,parm,command[dev][parm]),verbosity=3)
                     
             else:
                 if devcmd=='on' or devcmd=='off':
@@ -487,7 +487,7 @@ class calsource_configuration_manager():
 
             # initialize devices that need initializing
             already_waited = 0
-            for dev in ['modulator','calsource','amplifier']:
+            for dev in ['modulator','calsource','amplifier','cf']:
                 powersocket = self.powersocket[dev]
                 if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
                     wait_time = self.wait_after_switch_on[dev] - already_waited
@@ -641,7 +641,7 @@ class calsource_configuration_manager():
 
         s.sendto(msg.encode(), (self.receiver, self.broadcast_port))
         sockname = s.getsockname()
-        self.log("send_command() NOT closing socket: (%s,%i)" % sockname, verbosity=3)
+        self.log("send_command() NOT closing socket: (%s,%i)" % sockname, verbosity=5)
         #s.close()
         return
 
@@ -668,7 +668,7 @@ class calsource_configuration_manager():
             self.log('Error! Could not send acknowledgement to %s:%i' % (addr,self.broadcast_port))
 
         sockname = s.getsockname()
-        self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=3)
+        self.log("send_ack() NOT closing socket: (%s,%i)" % sockname, verbosity=5)
         #s.close()
         return
     
