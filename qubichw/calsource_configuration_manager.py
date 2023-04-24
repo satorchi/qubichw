@@ -194,6 +194,7 @@ class calsource_configuration_manager():
             self.device['modulator'] = modulator()
             self.device['calsource'] = calibration_source('LF')
             self.device['amplifier'] = amplifier()
+            self.device['cf'] = self.device['modulator']
 
         self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
         return None
