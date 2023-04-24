@@ -504,7 +504,8 @@ class calsource_configuration_manager():
                         
                             
                     self.log('asking for default settings on %s' % dev)
-                    if dev=='cf': # an inelegant hack
+                    # an inelegant hack
+                    if (dev=='cf' or dev=='modulator') and 'onoff' in command[dev].keys() and command[dev]['onoff']=='on': 
                         self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
                     else:
                         self.device[dev].set_default_settings()
