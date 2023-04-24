@@ -65,7 +65,8 @@ class energenie:
                 verify_cmd = 'ssh pigps which sispmctl' 
                 self.manager = 'ssh pigps sispmctl'
 
-                
+
+            # make sure this is the same as in the calsource_configuration_manager
             self.socket[1] ='modulator'
             self.socket[2] ='calsource'
             self.socket[3] ='lamp'

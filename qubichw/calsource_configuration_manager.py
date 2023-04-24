@@ -147,8 +147,6 @@ class calsource_configuration_manager():
             self.device[dev] = None
             self.device_on[dev] = None
 
-        # the cf and modulator are the same device (different outputs)
-        self.powersocket['cf'] = self.powersocket['modulator']
             
         self.energenie_lastcommand_date = dt.datetime.utcnow()
         self.energenie_timeout = 1
@@ -381,9 +379,8 @@ class calsource_configuration_manager():
         if ack.find('FAILED_GET_STATES')<0:
             for socket_no in states_read.keys():
                 if isinstance(socket_no,str): continue # states also has 'ok' and 'error_message'
-                socket_idx = socket_no - 1
                 state = states_read[socket_no]
-                dev = self.device_list[socket_idx]
+                dev = self.powerbar.socket[socket_no]
                 self.device_on[dev] = state
 
         self.energenie_lastcommand_date = dt.datetime.utcnow()
