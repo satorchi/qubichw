@@ -360,7 +360,7 @@ class siglent:
         '''
         configure with default settings
         '''
-        self.log('modulator: setting default settings')
+        self.log('modulator: setting default settings for channel %i' % channel)
 
         if not self.is_connected():
             self.log('modulator: asked for default settings but not connected.  Trying to connect.')
