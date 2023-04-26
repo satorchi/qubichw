@@ -314,7 +314,7 @@ class obsmount:
         retval['AZ TIMESTAMP'] = ans['AZ']['TIMESTAMP']
         retval['EL'] = ans['EL']['ACT_POSITION'] + self.el_zero_offset
         retval['EL TIMESTAMP'] = ans['EL']['TIMESTAMP']
-        retval['TIMESTAMP reception'] = ans['TIMESTAMP']
+        retval['TIMESTAMP'] = ans['TIMESTAMP']
         return retval
 
     def show_azel(self):
