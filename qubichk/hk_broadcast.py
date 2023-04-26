@@ -309,7 +309,10 @@ class hk_broadcast :
             return None
 
         recname_lookup = {'AZ':'AZIMUTH','EL':'ELEVATION'}
-        tstamp = ans['tstamp']
+        tstamp_rx = ans['TIMESTAMP']
+        tstamp_az = ans['AZ TIMESTAMP']
+        tstamp_el = ans['EL TIMESTAMP']
+        tstamp = min([tstamp_rx,tstamp_az,tstamp_el])
         for key in recname_lookup.keys():
             recname = recname_lookup[key]
             val = ans[key]
