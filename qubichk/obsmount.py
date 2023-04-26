@@ -72,7 +72,7 @@ elevation commanded to 8.5 degrees is 50.1 degrees elevation
 raw elevation: 17.952062612098484 is 50 degrees elevation
 
 '''
-import socket,time
+import sys,socket,time
 import datetime as dt
 
 class obsmount:
@@ -154,7 +154,10 @@ class obsmount:
             self.error = 'TIMEOUT'
         except:
             self.subscribed[port] = False
-            self.error = 'SOCKET ERROR'
+            str_list = ['SOCKET ERROR:']
+            for info in sys.exc_info():
+                if info is not None:  str_list.append(str(info))            
+            self.error = ' '.join(str_list)
 
         if self.error is None: return True
         
@@ -206,8 +209,11 @@ class obsmount:
                 lines.append(dat.decode())
                 self.printmsg('[%i] %s' % (idx,lines[-1]))
         except:
-            retval['error'] = 'could not get az,el data'
             self.subscribed[port] = False
+            str_list = ['could not get az,el data:']
+            for info in sys.exc_info():
+                if info is not None:  str_list.append(str(info))            
+            retval['error'] = ' '.join(str_list)
             self.return_with_error(retval)
 
         for line in lines:
@@ -232,8 +238,11 @@ class obsmount:
                     try:
                         data[key] = eval(col[idx])
                     except:
-                        retval['error'] = 'could not interpret data: %s' % col[idx]
                         retval['data'] = data
+                        str_list = [str(col[idx])]
+                        for info in sys.exc_info():
+                            if info is not None:  str_list.append(str(info))            
+                        retval['error'] = 'could not interpret data: %s' % ' '.join(str_list)
                         return self.return_with_error(retval)
                 
             retval[data['AXIS']] = data
@@ -278,8 +287,11 @@ class obsmount:
         try:
             self.sock[port].send(full_cmd_str.encode())
         except:
-            retval['error'] = 'command unsuccessful'
             self.subscribed[port] = False
+            str_list = ['command unsuccessful:']
+            for info in sys.exc_info():
+                if info is not None:  str_list.append(str(info))            
+            retval['error'] = ' '.join(str_list)
             self.return_with_error(retval)
 
         return retval
