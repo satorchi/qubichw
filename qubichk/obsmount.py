@@ -187,6 +187,7 @@ class obsmount:
         retval = {}
         retval['ok'] = True
         retval['error'] = 'NONE'
+        retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
 
         # check that we are subscribed
         if not self.subscribed[port]:
@@ -197,6 +198,7 @@ class obsmount:
             return self.return_with_error(retval)
 
         lines = []
+        retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
         try:
             for idx in range(2):
                 time.sleep(self.wait)
@@ -238,6 +240,12 @@ class obsmount:
             
         return retval
 
+    def get_data(self):
+        '''
+        this is a wrapper for read_data() because I keep forgetting
+        '''
+        return self.read_data()
+    
     def send_command(self,cmd_str):
         '''
         send a command to the observation mount
@@ -291,10 +299,10 @@ class obsmount:
 
 
         retval['AZ'] = ans['AZ']['ACT_POSITION']
-        retval['AZ tstamp'] = ans['AZ']['tstamp']
+        retval['AZ TIMESTAMP'] = ans['AZ']['TIMESTAMP']
         retval['EL'] = ans['EL']['ACT_POSITION'] + self.el_zero_offset
-        retval['EL tstamp'] = ans['EL']['tstamp']
-        retval['tstamp reception'] = dt.datetime.utcnow().timestamp()
+        retval['EL TIMESTAMP'] = ans['EL']['TIMESTAMP']
+        retval['TIMESTAMP reception'] = ans['TIMESTAMP']
         return retval
 
     def show_azel(self):
