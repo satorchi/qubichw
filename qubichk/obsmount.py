@@ -71,6 +71,9 @@ elevation commanded to 8.5 degrees is 50.1 degrees elevation
 2023-04-19 08:18:57
 raw elevation: 17.952062612098484 is 50 degrees elevation
 
+2023-04-26 13:39:49
+raw elevation:  10.58209685308984 is 50 degrees elevation
+
 '''
 import sys,socket,time
 import datetime as dt
@@ -83,7 +86,7 @@ class obsmount:
     mount_ip = '192.168.2.103'
     listen_port = 4546
     command_port = 4545
-    el_zero_offset = 50 - 17.952062612098484
+    el_zero_offset = 50 - 10.58209685308984
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
