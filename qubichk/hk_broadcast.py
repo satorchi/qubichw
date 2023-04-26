@@ -310,14 +310,12 @@ class hk_broadcast :
 
         recname_lookup = {'AZ':'AZIMUTH','EL':'ELEVATION'}
         tstamp_rx = ans['TIMESTAMP']
-        tstamp_az = ans['AZ TIMESTAMP']
-        tstamp_el = ans['EL TIMESTAMP']
-        tstamp = min([tstamp_rx,tstamp_az,tstamp_el])
         for key in recname_lookup.keys():
             recname = recname_lookup[key]
             val = ans[key]
+            tstamp = ans['%s TIMESTAMP' % key]
             self.record[recname][0] = val
-            self.log_hk(recname,tstamp,val)
+            self.log_hk(recname,tstamp,val,tstamp_rx)
 
         return self.record        
     
