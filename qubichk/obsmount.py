@@ -15,12 +15,12 @@ email from Carlos, 2022-12-07 17:25:40
 
 The data obtained after the subscribe method will be:
 
-DATA : AXIS : ACT_VELOCITY : TARGET_VELOCITY : ACT_POSITION : TARGET_POSITION : ACT_TORQUE : IS_READY : IS_HOMED
+TIMESTAMP : AXIS : ACT_VELOCITY : TARGET_VELOCITY : ACT_POSITION : TARGET_POSITION : ACT_TORQUE : IS_READY : IS_HOMED
 
 example:
-DATA:AZ:0:0:31.998101199445816:0.0:0:1:1
+1682446097.96:AZ:0:0:1.0101177366738976:0.0:False:1:1
 
-DATA: constant string
+TIMESTAMP: seconds since 1970-01-01
 
 AXIS: AZ or EL
 
@@ -85,7 +85,7 @@ class obsmount:
     command_port = 4545
     el_zero_offset = 50 - 17.952062612098484
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
-    data_keys = 'DATA:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
+    data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
     verbosity = 0
@@ -216,19 +216,24 @@ class obsmount:
                             
             data = {}
             for idx,key in enumerate(self.data_keys):
-                if idx>1:
+                if key=='AXIS':
+                    data[key] = col[idx]
+
+                elif key=='IS_READY':
+                    tf_str = col[idx]
+                    if tf_str=='False':
+                        data[key] = False
+                    else:
+                        data[key] = True
+                else:
+    
                     try:
                         data[key] = eval(col[idx])
                     except:
                         retval['error'] = 'could not interpret data: %s' % col[idx]
+                        retval['data'] = data
                         return self.return_with_error(retval)
-                else:
-                    data[key] = col[idx]
                 
-            if data['DATA']!='DATA':
-                retval['error'] = 'unrecognized data'
-                return return_with_error(retval)
-
             retval[data['AXIS']] = data
             
         return retval
@@ -284,13 +289,12 @@ class obsmount:
         if not ans['ok']:
             return self.return_with_error(ans)
 
-        az = ans['AZ']['ACT_POSITION']
-        el = ans['EL']['ACT_POSITION']
-        tstamp = dt.datetime.utcnow().timestamp()
 
-        retval['AZ'] = az
-        retval['EL'] = el + self.el_zero_offset
-        retval['tstamp'] = tstamp
+        retval['AZ'] = ans['AZ']['ACT_POSITION']
+        retval['AZ tstamp'] = ans['AZ']['tstamp']
+        retval['EL'] = ans['EL']['ACT_POSITION'] + self.el_zero_offset
+        retval['EL tstamp'] = ans['EL']['tstamp']
+        retval['tstamp reception'] = dt.datetime.utcnow().timestamp()
         return retval
 
     def show_azel(self):
