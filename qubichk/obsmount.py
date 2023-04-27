@@ -308,9 +308,11 @@ class obsmount:
         retval['ok'] = True
         retval['error'] = 'NONE'
 
-        ans = self.read_data()
-        if not ans['ok']:
-            return self.return_with_error(ans)
+        # we have to clear the buffer.  25 reads should do it (2023-04-27 14:29:45)
+        for idx in range(25):
+            ans = self.read_data()
+            if not ans['ok']:
+                return self.return_with_error(ans)
 
 
         retval['AZ'] = ans['AZ']['ACT_POSITION']
