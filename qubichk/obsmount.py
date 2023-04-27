@@ -185,9 +185,12 @@ class obsmount:
 
         return self.subscribed[port]
 
-    def read_data(self):
+    def read_data(self,buffercycle=100):
         '''
         once we're subscribed, we can listen for the data
+        
+        The buffercycle is the number of times to read before accepting the result.
+        This is done to clear the buffer
         '''
         port = 'data'
         retval = {}
@@ -206,7 +209,7 @@ class obsmount:
         lines = []
         retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
         try:
-            for idx in range(2):
+            for idx in range(buffercycle):
                 time.sleep(self.wait)
                 dat = self.sock[port].recv(128)
                 lines.append(dat.decode())
@@ -308,11 +311,9 @@ class obsmount:
         retval['ok'] = True
         retval['error'] = 'NONE'
 
-        # we have to clear the buffer.  25 reads should do it (2023-04-27 14:29:45)
-        for idx in range(25):
-            ans = self.read_data()
-            if not ans['ok']:
-                return self.return_with_error(ans)
+        ans = self.read_data()
+        if not ans['ok']:
+            return self.return_with_error(ans)
 
 
         retval['AZ'] = ans['AZ']['ACT_POSITION']
