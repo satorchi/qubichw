@@ -721,13 +721,15 @@ class qubic_bot :
                 tempans=fmt_str % (chan_str,val)
             else:
                 tempans='\n%s : %.4f Ohm' % (chan_str,val)        
-            if tempans.find('MCST3601')<0:
-                answer+=tempans
 
             tstamp = 1e-3*eval(cols[0]) + tstart
             reading_date = dt.datetime.utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
+
+            if tempans.find('MCST3601')<0:
+                answer+='[%s]  %s' % (reading_date.strftime(self.time_fmt),tempans)
+
             
         now='\n\nTime: %s' % latest_date.strftime(self.time_fmt)
         answer+=now
