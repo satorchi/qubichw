@@ -684,7 +684,7 @@ class qubic_bot :
 
         latest_date = dt.datetime.utcfromtimestamp(0)
     
-        answer=''
+        answer_list = []
         filelist=glob(tempdir+'/*')
         for f in filelist:
             chan_str = re.sub('\.log','',os.path.basename(f))
@@ -714,13 +714,13 @@ class qubic_bot :
             val=float(cols[1])
             if len(cols)==3:
                 if val<1:
-                    fmt_str = '\n%s : %.1f mK'
+                    fmt_str = '%s : %.1f mK'
                     val *= 1000
                 else:
-                    fmt_str = '\n%s : %.3f K'
+                    fmt_str = '%s : %.3f K'
                 tempans=fmt_str % (chan_str,val)
             else:
-                tempans='\n%s : %.4f Ohm' % (chan_str,val)        
+                tempans='%s : %.4f Ohm' % (chan_str,val)        
 
             tstamp = 1e-3*eval(cols[0]) + tstart
             reading_date = dt.datetime.utcfromtimestamp(tstamp)
@@ -728,11 +728,14 @@ class qubic_bot :
                 latest_date = reading_date
 
             if tempans.find('MCST3601')<0:
-                answer+='[%s]  %s' % (reading_date.strftime(self.time_fmt),tempans)
+                answer_list.append('[%s]  %s' % (reading_date.strftime(self.time_fmt),tempans))
+                
 
             
-        now='\n\nTime: %s' % latest_date.strftime(self.time_fmt)
-        answer+=now
+        now='\nTime: %s' % latest_date.strftime(self.time_fmt)
+        answer_list.append(now)
+
+        answer = '\n'.join(answer_list)
     
         self._send_message(answer)
         return answer
