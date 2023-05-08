@@ -45,7 +45,7 @@ if not ok:
     error_msg = '\n'.join(msg)
     alarm_recipients = get_alarm_recipients()
 
-    if not comm_error:
+    if not comm_error and not os.path.isfile('/tmp/DONT_SEND_COMPRESSOR_MESSAGE'):
         for chatid in alarm_recipients:
             send_telegram(error_msg,chatid=chatid)
     else:
