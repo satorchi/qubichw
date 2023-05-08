@@ -156,7 +156,7 @@ def send_telegram(msg,rx=None,chatid=None):
             try:
                 bot.sendMessage(chatid,msg_part)
             except:
-                print('could not send message to %i' % chatid
+                print('could not send message to %i' % chatid)
                 
             line_start = line_idx
             byte_count = 0
