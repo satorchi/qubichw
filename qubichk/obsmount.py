@@ -206,10 +206,13 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        lines = []
         retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
         try:
-            dat_str = self.sock[port].recv(bufsize).decode()
+            dat = self.sock[port].recv(bufsize)
+        except socket.timeout:
+            self.subscribed[port] = False
+            retval['error'] = 'socket time out'
+            self.return_with_error(retval)
         except:
             self.subscribed[port] = False
             str_list = ['could not get az,el data:']
@@ -244,6 +247,7 @@ class obsmount:
                 
         #     retval[data['AXIS']] = data
 
+        dat_str = dat.decode()
         match = re.search('EL|AZ',dat_str)
         dat_start = min(match.span())
 
