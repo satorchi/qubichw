@@ -41,11 +41,11 @@ for compressor_num in [1,2]:
     online = online and info[-1]['online']
 
 
-if not ok:
+if not ok and not os.path.isfile('/tmp/DONT_SEND_COMPRESSOR_MESSAGE'):
     error_msg = '\n'.join(msg)
     alarm_recipients = get_alarm_recipients()
 
-    if not comm_error and not os.path.isfile('/tmp/DONT_SEND_COMPRESSOR_MESSAGE'):
+    if not comm_error:
         for chatid in alarm_recipients:
             send_telegram(error_msg,chatid=chatid)
     else:
