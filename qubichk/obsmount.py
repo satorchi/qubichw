@@ -207,6 +207,7 @@ class obsmount:
             return self.return_with_error(retval)
 
         retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
+        dat = None
         try:
             dat = self.sock[port].recv(bufsize)
         except socket.timeout:
@@ -220,6 +221,12 @@ class obsmount:
                 if info is not None:  str_list.append(str(info))            
             retval['error'] = ' '.join(str_list)
             self.return_with_error(retval)
+
+        if dat is None:
+            self.subscribed[port] = False
+            retval['error'] = 'socket unknown error'
+            self.return_with_error(retval)
+            
 
                             
         # data = {}
