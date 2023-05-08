@@ -207,25 +207,20 @@ class obsmount:
             return self.return_with_error(retval)
 
         retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
-        dat = None
         try:
             dat = self.sock[port].recv(bufsize)
         except socket.timeout:
             self.subscribed[port] = False
             retval['error'] = 'socket time out'
-            self.return_with_error(retval)
+            return self.return_with_error(retval)
         except:
             self.subscribed[port] = False
             str_list = ['could not get az,el data:']
             for info in sys.exc_info():
                 if info is not None:  str_list.append(str(info))            
             retval['error'] = ' '.join(str_list)
-            self.return_with_error(retval)
+            return self.return_with_error(retval)
 
-        if dat is None:
-            self.subscribed[port] = False
-            retval['error'] = 'socket unknown error'
-            self.return_with_error(retval)
                             
         # data = {}
         # for idx,key in enumerate(self.data_keys):
@@ -252,8 +247,6 @@ class obsmount:
                 
         #     retval[data['AXIS']] = data
 
-        # what is the problem here?
-        print(dat)
         dat_str = dat.decode()
         match = re.search('EL|AZ',dat_str)
         dat_start = min(match.span())
@@ -325,7 +318,7 @@ class obsmount:
             for info in sys.exc_info():
                 if info is not None:  str_list.append(str(info))            
             retval['error'] = ' '.join(str_list)
-            self.return_with_error(retval)
+            return self.return_with_error(retval)
 
         return retval
 
