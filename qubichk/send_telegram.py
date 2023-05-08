@@ -138,7 +138,10 @@ def send_telegram(msg,rx=None,chatid=None):
 
     # check for message size.  There is a Telegram limit of 4096 bytes
     if len(msg)<=4096:
-        bot.sendMessage(chatid,msg)
+        try:
+            bot.sendMessage(chatid,msg)
+        except:
+            print('could not send message to %i' % chatid)
         return True
 
     max_msg_len = 2048
@@ -150,7 +153,11 @@ def send_telegram(msg,rx=None,chatid=None):
         byte_count += len(line)
         if byte_count>=max_msg_len:
             msg_part = '\n'.join(msg_lines[line_start:line_idx])
-            bot.sendMessage(chatid,msg_part)
+            try:
+                bot.sendMessage(chatid,msg_part)
+            except:
+                print('could not send message to %i' % chatid
+                
             line_start = line_idx
             byte_count = 0
                      

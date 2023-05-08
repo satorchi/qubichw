@@ -46,7 +46,8 @@ if not ok:
     alarm_recipients = get_alarm_recipients()
 
     if not comm_error:
-        for chatid in alarm_recipients: send_telegram(error_msg,chatid=chatid)
+        for chatid in alarm_recipients:
+            send_telegram(error_msg,chatid=chatid)
     else:
         fullmsg = 'The following message is only sent to Steve'
         fullmsg += '\n- - - - - -\n'
