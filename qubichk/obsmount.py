@@ -75,7 +75,7 @@ raw elevation: 17.952062612098484 is 50 degrees elevation
 raw elevation:  10.58209685308984 is 50 degrees elevation
 
 '''
-import sys,socket,time
+import sys,socket,time,re
 import datetime as dt
 
 class obsmount:
@@ -89,6 +89,7 @@ class obsmount:
     el_zero_offset = 50 - 10.58209685308984
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
+    nkeys = len(data_keys)-1 # hack
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
     verbosity = 0
@@ -185,12 +186,11 @@ class obsmount:
 
         return self.subscribed[port]
 
-    def read_data(self,buffercycle=100):
+    def read_data(self,bufsize=16384):
         '''
         once we're subscribed, we can listen for the data
         
-        The buffercycle is the number of times to read before accepting the result.
-        This is done to clear the buffer
+        The bufsize is the number of bytes to read.
         '''
         port = 'data'
         retval = {}
@@ -209,11 +209,7 @@ class obsmount:
         lines = []
         retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
         try:
-            for idx in range(buffercycle):
-                time.sleep(self.wait)
-                dat = self.sock[port].recv(128)
-                lines.append(dat.decode())
-                self.printmsg('[%i] %s' % (idx,lines[-1]))
+            dat_str = self.sock[port].recv(bufsize).decode()
         except:
             self.subscribed[port] = False
             str_list = ['could not get az,el data:']
@@ -222,44 +218,64 @@ class obsmount:
             retval['error'] = ' '.join(str_list)
             self.return_with_error(retval)
 
-        for line in lines:
-            col = line.split(':')
-            if len(col)!=len(self.data_keys):
-                retval['error'] = 'inappropriate data length'
-                return return_with_error(retval)
                             
-            data = {}
-            for idx,key in enumerate(self.data_keys):
-                if key=='AXIS':
-                    data[key] = col[idx]
+        # data = {}
+        # for idx,key in enumerate(self.data_keys):
+        #     if key=='AXIS':
+        #         data[key] = col[idx]
 
-                elif key=='IS_READY':
-                    tf_str = col[idx]
-                    if tf_str=='False':
-                        data[key] = False
-                    else:
-                        data[key] = True
-                else:
-    
-                    try:
-                        data[key] = eval(col[idx])
-                    except:
-                        retval['data'] = data
-                        str_list = [str(col[idx])]
-                        for info in sys.exc_info():
-                            if info is not None:  str_list.append(str(info))            
-                        retval['error'] = 'could not interpret data: %s' % ' '.join(str_list)
-                        return self.return_with_error(retval)
+        #     elif key=='IS_READY':
+        #         tf_str = col[idx]
+        #         if tf_str=='False':
+        #             data[key] = False
+        #         else:
+        #             data[key] = True
+        #     else:
                 
-            retval[data['AXIS']] = data
+        #         try:
+        #             data[key] = eval(col[idx])
+        #         except:
+        #             retval['data'] = data
+        #             str_list = [str(col[idx])]
+        #             for info in sys.exc_info():
+        #                 if info is not None:  str_list.append(str(info))            
+        #             retval['error'] = 'could not interpret data: %s' % ' '.join(str_list)
+        #             return self.return_with_error(retval)
+                
+        #     retval[data['AXIS']] = data
+
+        match = re.search('EL|AZ',dat_str)
+        dat_start = min(match.span())
+
+        pre_dat_list = dat_str[:dat_start].split(':')
+        if len(pre_dat_list)<3:
+            match = re.search('EL|AZ',dat_str[dat_start+2:])
+            dat_start = min(match.span())
+            pre_dat_list = dat_str[:dat_start].split(':')
+
+        dat_list = [pre_dat_list[-2]] + dat_str[dat_start:].split(':')
+
+        retval['AZ'] = []
+        retval['EL'] = []
+
+        idx = 0
+        while idx<len(dat_list)-self.nkeys:
+            tstamp_str = dat_list[idx]
+            is_homed = eval(tstamp_str[0])
+            tstamp = eval(tstamp_str[1:])
+            axis = dat_list[idx+1]
+            val = eval(dat_list[idx+4])
+            retval[axis].append((tstamp,val))
+            idx += self.nkeys
+        
             
         return retval
 
-    def get_data(self):
+    def get_data(self,bufsize=16384):
         '''
         this is a wrapper for read_data() because I keep forgetting
         '''
-        return self.read_data()
+        return self.read_data(bufsize=bufsize)
     
     def send_command(self,cmd_str):
         '''
