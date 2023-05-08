@@ -226,8 +226,6 @@ class obsmount:
             self.subscribed[port] = False
             retval['error'] = 'socket unknown error'
             self.return_with_error(retval)
-            
-
                             
         # data = {}
         # for idx,key in enumerate(self.data_keys):
@@ -254,6 +252,8 @@ class obsmount:
                 
         #     retval[data['AXIS']] = data
 
+        # what is the problem here?
+        print(dat)
         dat_str = dat.decode()
         match = re.search('EL|AZ',dat_str)
         dat_start = min(match.span())
