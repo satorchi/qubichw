@@ -151,6 +151,7 @@ class obsmount:
             self.printmsg('sending OK')
             ans = self.sock[port].send('OK'.encode())
             self.printmsg('return from socket.send: %s' % ans)
+            time.sleep(0.1)
             ans = self.sock[port].recv(128)
             self.printmsg('first read chunk from socket: %s' % ans.decode())
             self.subscribed[port] = True
@@ -327,7 +328,17 @@ class obsmount:
         if not ans['ok']:
             return self.return_with_error(ans)
 
+        if len(ans['AZ'])==0:
+            retval['error'] = 'no azimuth data'
+            retval['data'] = ans
+            return self.return_with_error(retval)
 
+        if len(ans['EL'])==0:
+            retval['error'] = 'no elevation data'
+            retval['data'] = ans
+            return self.return_with_error(retval)
+        
+            
         retval['AZ'] = ans['AZ'][-1]['ACT_POSITION']
         retval['AZ TIMESTAMP'] = ans['AZ'][-1]['TIMESTAMP']
         retval['EL'] = ans['EL'][-1]['ACT_POSITION'] + self.el_zero_offset
