@@ -159,9 +159,6 @@ class obsmount:
             self.printmsg('sending OK')
             ans = self.sock[port].send('OK'.encode())
             self.printmsg('return from socket.send: %s' % ans)
-            time.sleep(0.1)
-            ans = self.sock[port].recv(128)
-            self.printmsg('first read chunk from socket: %s' % ans.decode())
             self.subscribed[port] = True
             self.error = None
         except socket.timeout:
