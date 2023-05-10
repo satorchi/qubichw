@@ -125,6 +125,8 @@ def assign_val_string(val,units):
         val_str = '%7.3f n%s' % (val*1e9,units)
     elif abs(val)>=1e-12:
         val_str = '%7.3f p%s' % (val*1e12,units)
+    elif abs(val)==0.0:
+        val_str = '0 %s' % units
     else:
         val_str = '%12.5e %s' % (val,units)
     return val_str
