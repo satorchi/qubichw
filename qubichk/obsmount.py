@@ -88,8 +88,8 @@ class obsmount:
     command_port = 4545
     el_zero_offset = 50 - 10.58209685308984
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
-    data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED'.split(':')
-    nkeys = len(data_keys)-1 # hack
+    data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:UNKNOWN'.split(':')
+    nkeys = len(data_keys)
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
     verbosity = 0
@@ -222,55 +222,44 @@ class obsmount:
             return self.return_with_error(retval)
 
                             
-        # data = {}
-        # for idx,key in enumerate(self.data_keys):
-        #     if key=='AXIS':
-        #         data[key] = col[idx]
-
-        #     elif key=='IS_READY':
-        #         tf_str = col[idx]
-        #         if tf_str=='False':
-        #             data[key] = False
-        #         else:
-        #             data[key] = True
-        #     else:
-                
-        #         try:
-        #             data[key] = eval(col[idx])
-        #         except:
-        #             retval['data'] = data
-        #             str_list = [str(col[idx])]
-        #             for info in sys.exc_info():
-        #                 if info is not None:  str_list.append(str(info))            
-        #             retval['error'] = 'could not interpret data: %s' % ' '.join(str_list)
-        #             return self.return_with_error(retval)
-                
-        #     retval[data['AXIS']] = data
 
         dat_str = dat.decode()
-        match = re.search('EL|AZ',dat_str)
-        dat_start = min(match.span())
-
-        pre_dat_list = dat_str[:dat_start].split(':')
-        if len(pre_dat_list)<3:
-            match = re.search('EL|AZ',dat_str[dat_start+2:])
-            dat_start = min(match.span())
-            pre_dat_list = dat_str[:dat_start].split(':')
-
-        dat_list = [pre_dat_list[-2]] + dat_str[dat_start:].split(':')
+        dat_list = dat_str.split('DATA:')
+        # remove the first and last which could be partial
+        del(dat_list[0])
+        del(dat_list[-1])
 
         retval['AZ'] = []
         retval['EL'] = []
 
-        idx = 0
-        while idx<len(dat_list)-self.nkeys:
-            tstamp_str = dat_list[idx]
-            is_homed = eval(tstamp_str[0])
-            tstamp = eval(tstamp_str[1:])
-            axis = dat_list[idx+1]
-            val = eval(dat_list[idx+4])
-            retval[axis].append((tstamp,val))
-            idx += self.nkeys
+        for line in dat_list:
+            col = line.split(':')
+            
+            data = {}
+            for idx,key in enumerate(self.data_keys):
+                if key=='AXIS':
+                    data[key] = col[idx]
+                    continue
+
+                if key=='IS_READY':
+                    tf_str = col[idx]
+                    if tf_str=='False':
+                        data[key] = False
+                    else:
+                        data[key] = True
+                    continue
+                
+                try:
+                    data[key] = eval(col[idx])
+                except:
+                    retval['data'] = data
+                    str_list = [str(col[idx])]
+                    for info in sys.exc_info():
+                        if info is not None:  str_list.append(str(info))            
+                    retval['error'] = 'could not interpret data: %s' % ' '.join(str_list)
+                    return self.return_with_error(retval)
+                
+            retval[data['AXIS']].append(data)
         
             
         return retval
