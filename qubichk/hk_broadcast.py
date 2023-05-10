@@ -35,7 +35,8 @@ class hk_broadcast :
         self.RECEIVER = '192.168.2.8' # QubicStudio on the QUBIC private network
         self.LISTENER = ''          # client listens on ethernet device (usually eth0)
         self.LISTENER = '127.0.0.1' # client listens on localhost
-        self.sampling_period = 0.0 # sampling period faster while we have az,el here (2023-04-18 11:25:28)
+        # self.sampling_period = 0.0 # sampling period faster while we have az,el here (2023-04-18 11:25:28)
+        self.sampling_period = 0.2 # zero sampling period is too fast for obsmount
         self.nENTROPY_TEMPERATURE = 8
         self.nMECH = 2
         self.nHEATER = 8 # QubicStudio is expecting 8 heaters (there are only 6)
