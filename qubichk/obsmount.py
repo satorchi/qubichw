@@ -136,7 +136,7 @@ class obsmount:
         retval['ok'] = True
         if port=='data':
             port_num = self.listen_port
-            socktype = socket.SOCK_DGRAM
+            socktype = socket.SOCK_STREAM
         else:
             port_num = self.command_port
             socktype = socket.SOCK_STREAM
