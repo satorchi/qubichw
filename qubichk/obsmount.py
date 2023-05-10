@@ -74,6 +74,9 @@ raw elevation: 17.952062612098484 is 50 degrees elevation
 2023-04-26 13:39:49
 raw elevation:  10.58209685308984 is 50 degrees elevation
 
+2023-05-10 09:17:06
+raw elevation:  2.049 is 50 degrees elevation
+
 '''
 import sys,socket,time,re
 import datetime as dt
@@ -86,7 +89,7 @@ class obsmount:
     mount_ip = '192.168.2.103'
     listen_port = 4546
     command_port = 4545
-    el_zero_offset = 50 - 10.58209685308984
+    el_zero_offset = 50 - 2.049
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:UNKNOWN'.split(':')
     nkeys = len(data_keys)
