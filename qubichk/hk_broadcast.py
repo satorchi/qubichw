@@ -305,7 +305,7 @@ class hk_broadcast :
         ans = self.hk_azel.get_azel()
         
         if not ans['ok']:
-            if ans['error'].find('no azimuth data')>0 or ans['error'].find('no elevation data')>0:
+            if ans['error'].find('no azimuth data')>=0 or ans['error'].find('no elevation data')>=0:
                 verbosity = 2
             else:
                 verbosity = 1
