@@ -305,7 +305,7 @@ class hk_broadcast :
         ans = self.hk_azel.get_azel()
         
         if not ans['ok']:
-            self.log('ERROR! obsmount: %s' % ans['error'])
+            self.log('ERROR! obsmount: %s' % ans['error'],verbosity=2)
             return None
 
         recname_lookup = {'AZ':'AZIMUTH','EL':'ELEVATION'}
