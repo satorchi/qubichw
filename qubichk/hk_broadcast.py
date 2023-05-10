@@ -214,7 +214,7 @@ class hk_broadcast :
             cmd=self.powersupply.parseargs(argv)
             dat=self.powersupply.runCommands(cmd)
             if not dat or isinstance(dat,str) or len(dat)!=3 or isinstance(dat[0],str) or isinstance(dat[1],str):
-                self.log('ERROR! Strange reply from power supply %s: %s' % (heater,str(dat)),verbosity=2)
+                self.log('ERROR! Strange reply from power supply %s: %s' % (heater,str(dat)),verbosity=3)
                 dat = None
                 
 
@@ -231,7 +231,7 @@ class hk_broadcast :
                         self.log_hk(recname,tstamp,dat[_idx],status)
                     except:
                         self.record[recname][0] = -1
-                        self.log('ERROR! Unable to interpret answer from power supply: %s' % dat)
+                        self.log('ERROR! Unable to interpret answer from power supply: %s' % dat,verbosity=2)
                         
                     
 
@@ -250,14 +250,14 @@ class hk_broadcast :
             self.hk_temperature.connect()
             
         if not self.hk_temperature.connected:
-            self.log('ERROR! Temperature diodes not communicating',verbosity=2)
+            self.log('ERROR! Temperature diodes not communicating',verbosity=3)
             data_ok = False
             temperatures = -np.ones(self.hk_temperature.nT)
         else:
             temperatures = self.hk_temperature.get_temperatures()
 
         if temperatures is None:
-            self.log('ERROR! Bad reply from Temperature diodes',verbosity=2)
+            self.log('ERROR! Bad reply from Temperature diodes',verbosity=3)
             temperatures = -np.ones(self.hk_temperature.nT)
             data_ok = False
             
@@ -279,10 +279,10 @@ class hk_broadcast :
         gauge = 'PRESSURE1'
         dat = self.hk_pressure.read_pressure()
         if dat is None:
-            self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=2)
+            self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=3)
             
         if isinstance(dat,str):
-            self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=1)
+            self.log('ERROR! Strange reply from power supply: %s' % str(dat),verbosity=2)
             dat = None
                 
         # if no data (maybe gauge not connected) return -1 and do not log
@@ -305,7 +305,11 @@ class hk_broadcast :
         ans = self.hk_azel.get_azel()
         
         if not ans['ok']:
-            self.log('ERROR! obsmount: %s' % ans['error'],verbosity=2)
+            if ans['error'].find('no azimuth data')>0 or ans['error'].find('no elevation data')>0:
+                verbosity = 2
+            else:
+                verbosity = 1
+            self.log('ERROR! obsmount: %s' % ans['error'],verbosity=verbosity)
             return None
 
         recname_lookup = {'AZ':'AZIMUTH','EL':'ELEVATION'}
@@ -456,7 +460,7 @@ class hk_broadcast :
             else:
                 line = '%f %e %s\n' % (tstamp,data,str(data2))
         except:
-            self.log('ERROR! Could not convert timestamp,data for log_hk()',verbosity=2)
+            self.log('ERROR! Could not convert timestamp,data for log_hk()',verbosity=3)
             return False
         
         filename='%s.txt' % rootname
