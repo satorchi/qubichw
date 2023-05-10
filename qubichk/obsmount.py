@@ -38,6 +38,8 @@ ACT_POSITION: actual position. This value is already converted via a
 TARGET_POSITION: the last target position that was written into the
                  KEB driver.
 
+ACT_TORQUE:
+
 IS_READY: this is a bit from the StatusWord of the KEB driver and
           means that it is ready for operation (no exception was
           raised)......maybe this is too obvious.
@@ -47,6 +49,9 @@ IS_HOMED: this is a boolean variable from the program and not from the
           HomingRoutine should be executed every time the system is
           restarted. This decision was committed thinking about system
           security.
+
+STATUSWORD: 16bit StatusWord of the axis driver
+
 
 In order to subscribe to the update service you should send the "OK" message to
 the RPi to the 4546 port. After that you will start receiving messages with the
@@ -91,7 +96,7 @@ class obsmount:
     command_port = 4545
     el_zero_offset = 50 - 2.049
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
-    data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:UNKNOWN'.split(':')
+    data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:STATUSWORD'.split(':')
     nkeys = len(data_keys)
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
@@ -248,14 +253,6 @@ class obsmount:
                     data[key] = col[idx]
                     continue
 
-                if key=='IS_READY':
-                    tf_str = col[idx]
-                    if tf_str=='False':
-                        data[key] = False
-                    else:
-                        data[key] = True
-                    continue
-                
                 try:
                     data[key] = eval(col[idx])
                 except:
