@@ -186,12 +186,13 @@ class obsmount:
 
         return self.subscribed[port]
 
-    def read_data(self,bufsize=16384):
+    def read_data(self,bufsize=None):
         '''
         once we're subscribed, we can listen for the data
         
         The bufsize is the number of bytes to read.
         '''
+        if bufsize is None: bufsize = 65536
         port = 'data'
         retval = {}
         retval['ok'] = True
@@ -264,7 +265,7 @@ class obsmount:
             
         return retval
 
-    def get_data(self,bufsize=16384):
+    def get_data(self,bufsize=None):
         '''
         this is a wrapper for read_data() because I keep forgetting
         '''
@@ -325,10 +326,10 @@ class obsmount:
             return self.return_with_error(ans)
 
 
-        retval['AZ'] = ans['AZ']['ACT_POSITION']
-        retval['AZ TIMESTAMP'] = ans['AZ']['TIMESTAMP']
-        retval['EL'] = ans['EL']['ACT_POSITION'] + self.el_zero_offset
-        retval['EL TIMESTAMP'] = ans['EL']['TIMESTAMP']
+        retval['AZ'] = ans['AZ'][-1]['ACT_POSITION']
+        retval['AZ TIMESTAMP'] = ans['AZ'][-1]['TIMESTAMP']
+        retval['EL'] = ans['EL'][-1]['ACT_POSITION'] + self.el_zero_offset
+        retval['EL TIMESTAMP'] = ans['EL'][-1]['TIMESTAMP']
         retval['TIMESTAMP'] = ans['TIMESTAMP']
         return retval
 
