@@ -203,7 +203,7 @@ class obsmount:
         
         The bufsize is the number of bytes to read.
         '''
-        if bufsize is None: bufsize = 65536
+        if bufsize is None: bufsize = 512
         port = 'data'
         retval = {}
         retval['ok'] = True
