@@ -100,7 +100,7 @@ class obsmount:
     nkeys = len(data_keys)
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
-    verbosity = 0
+    verbosity = 1
     testmode = False
     
     def __init__(self):
