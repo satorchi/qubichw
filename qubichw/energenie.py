@@ -19,6 +19,11 @@ class energenie:
     class to turn on/off devices using the Energenie power bar
     '''
     verbosity = 2
+    serial_no = {}
+    serial_no['electronics rack'] = '01:01:5c:f9:d0'
+    serial_no['cryostat']         = '01:01:4f:ce:8d'  # to be confirmed
+    serial_no['mount']            = '01:01:4f:c4:8f'  # to be confirmed
+    serial_no['calsource']        = '01:01:5f:06:f2'
 
     def __init__(self,name='electronics rack'):
         if 'HOSTNAME' in os.environ.keys():
@@ -26,65 +31,64 @@ class energenie:
         else:
             hostname,err = shellcommand('hostname')
 
-        valid_names = ['electronics rack','calsource','cryostat','rack 1','rack 2']
+        valid_names = ['electronics rack','calsource','cryostat','mount']
         self.socket = {}
         self.ok = False
 
         if name not in valid_names:
             self.log('invalid Energenie identifier: %s' % name)
             self.manager = None
-            return
-        
+            return        
 
-        if name=='electronics rack' or name=='rack 1':
-            verify_cmd = 'which sispmctl' 
-            self.manager = 'sispmctl -d 0'
+        if name=='electronics rack':
+            if not self.verify_app('which sispmctl'): return
+            self.manager = self.get_manager(name,'sispmctl')
             self.socket[1] = 'horn'
             self.socket[2] = 'heaters'
             self.socket[3] = 'hwp'
             self.socket[4] = 'thermos'
 
-        if name=='cryostat' or name=='rack 2':
-            verify_cmd = 'which sispmctl' 
-            self.manager = 'sispmctl -d 1'
+        if name=='cryostat':
+            if not self.verify_app('which sispmctl'): return
+            self.manager = self.get_manager(name,'sispmctl')
             self.socket[1] = 'network switch'
             self.socket[2] = 'unused'
             self.socket[3] = 'Opal Kelly RaspberryPi'
             self.socket[4] = 'FPGA'
+
+        if name=='mount':
+            if not self.verify_app('which sispmctl'): return
+            self.manager = self.get_manager(name,'sispmctl')
+            self.socket[1] = 'motor'
+            self.socket[2] = 'unused'
+            self.socket[3] = 'unused'
+            self.socket[4] = 'unused'
+            
             
         if name=='calsource':
             if hostname.find('pigps')>=0:
-                verify_cmd = 'which sispmctl'
-                self.manager = 'sispmctl -d 0'
+                if not self.verify_app('which sispmctl'): return
+                self.manager = self.get_manager(name,'sispmctl')
             else:
                 pingresult = ping('pigps',verbosity=self.verbosity)
                 if not pingresult['ok']:
                     msg = 'ERROR: PiGPS is UNREACHABLE'
                     self.log(msg,verbosity=1)
                     return
-                verify_cmd = 'ssh pigps which sispmctl' 
-                self.manager = 'ssh pigps sispmctl'
-
+                if not self.verify_app('ssh pigps which sispmctl'): return
+                self.manager = self.get_manager(name,'ssh pigps sispmctl')
 
             # make sure this is the same as in the calsource_configuration_manager
             self.socket[1] ='modulator'
             self.socket[2] ='calsource'
             self.socket[3] ='lamp'
             self.socket[4] ='amplifier'
-
-
+        
         # reverse look-up
         self.devicesocket = {}
         for socknum in self.socket.keys():
             self.devicesocket[self.socket[socknum]] = socknum
     
-        # check that the Energenie manager application is installed
-        out,err = shellcommand(verify_cmd)
-        if out=='':
-            error_message = '%s application not found.' % self.manager
-            msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % error_message
-            self.log(msg,verbosity=1)
-            return
         
         self.ok = True
         return
@@ -102,6 +106,49 @@ class energenie:
         print(msg)
         return
 
+
+    def verify_app(self,verify_cmd):
+        '''
+        verify that the Energenie manager application is installed
+        '''
+        out,err = shellcommand(verify_cmd)
+        if out=='':
+            error_message = '%s application not found.' % self.manager
+            msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % error_message
+            self.log(msg,verbosity=1)
+            return False
+        return True
+                
+    
+    def get_manager(self,pbname,manager):
+        '''
+        get the manager command (including the device index) of the required Energenie powerbar
+        '''
+
+        if pbname not in self.serial_no.keys():
+            self.log('ERROR! unknown Energenie power bar: %s' % pbname,verbosity=1)
+            return None
+        
+        cmd = '%s -s' % manager
+        out,err = shellcommand(cmd) # scan for Energenie devices
+
+        device_index = {}        
+        idx = 0
+        for line in x.split('\n'):
+            if line.find('serial number')==0:
+                snum = line.replace('serial number:','').strip()
+                device_index[snum] = idx
+                idx += 1
+
+        
+        snum = self.serial_no[pbname]
+        if snum not in device_index.keys():
+            self.log('ERROR! Energenie power bar not connected: %s with serial number %s' % (pbname,snum))
+            return None
+        
+        dev_idx = device_index[snum]
+        manager_cmd = '%s -d%i' % (manager,dev_idx)
+        return manager_cmd
 
     def get_socket_states(self):
         '''
