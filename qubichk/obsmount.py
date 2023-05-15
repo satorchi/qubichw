@@ -12,13 +12,16 @@ class to read/command the Observation mount motors
 motor interface developed by Carlos Reyes and Luciano Ferreyro
 
 email from Carlos, 2022-12-07 17:25:40
+email from Carlos, 2023-05-15 05:46:57
 
 The data obtained after the subscribe method will be:
 
-TIMESTAMP : AXIS : ACT_VELOCITY : TARGET_VELOCITY : ACT_POSITION : TARGET_POSITION : ACT_TORQUE : IS_READY : IS_HOMED
+DATA:TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:AXIS_STATUSWORD:ERROR_CODE:WARNING_BITS:GLOBAL_DRIVER_STATE
 
 example:
 1682446097.96:AZ:0:0:1.0101177366738976:0.0:False:1:1
+
+DATA: keyword to separate data packages
 
 TIMESTAMP: seconds since 1970-01-01
 
@@ -50,8 +53,13 @@ IS_HOMED: this is a boolean variable from the program and not from the
           restarted. This decision was committed thinking about system
           security.
 
-STATUSWORD: 16bit StatusWord of the axis driver
+AXIS_STATUSWORD: 16bit StatusWord of the axis driver
 
+ERROR_CODE:
+
+WARNING_BITS:
+
+GLOBAL_DRIVER_STATE
 
 In order to subscribe to the update service you should send the "OK" message to
 the RPi to the 4546 port. After that you will start receiving messages with the
@@ -96,7 +104,19 @@ class obsmount:
     command_port = 4545
     el_zero_offset = 50 - 2.049
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
-    data_keys = 'TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:STATUSWORD'.split(':')
+    data_keys = ['TIMESTAMP',
+                 'AXIS',
+                 'ACT_VELOCITY',
+                 'TARGET_VELOCITY',
+                 'ACT_POSITION',
+                 'TARGET_POSITION',
+                 'ACT_TORQUE',
+                 'IS_READY',
+                 'IS_HOMED',
+                 'AXIS_STATUSWORD',
+                 'ERROR_CODE',
+                 'WARNING_BITS',
+                 'GLOBAL_DRIVER_STATE']
     nkeys = len(data_keys)
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
