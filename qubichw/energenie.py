@@ -34,6 +34,7 @@ class energenie:
         valid_names = ['electronics rack','calsource','cryostat','mount']
         self.socket = {}
         self.ok = False
+        self.name = name
 
         if name not in valid_names:
             self.log('invalid Energenie identifier: %s' % name)
@@ -236,7 +237,7 @@ class energenie:
     
     def get_status(self,verbosity=1,modulator_state=False):
         '''
-        check for the status of the calsource Energenie sockets
+        check for the status of the Energenie sockets
         '''
         retval = {}
         retval['ok'] = True
@@ -249,7 +250,7 @@ class energenie:
         max_count = 3
         states = None
         while (states is None and error_counter<max_count):
-            msg = 'checking for calsource Energenie socket states'
+            msg = 'checking for %s Energenie socket states' % self.name
             self.log(msg,verbosity=1)
             time.sleep(3)
             states = self.get_socket_states()
@@ -263,12 +264,12 @@ class energenie:
                     else:
                         msg = '%s is OFF' % dev
                     self.log(msg,verbosity=1)
-                msg_list.append(msg)
+                    msg_list.append(msg)
 
             else:
                 error_counter += 1
                 states = None
-                msg = 'Could not get socket states from calsource Energenie powerbar: error count=%i' % error_counter
+                msg = 'Could not get socket states from %s Energenie powerbar: error count=%i' % (self.name,error_counter)
                 self.log(msg,verbosity=1)
                 msg_list.append(msg)
                 errmsg_list.append(msg)
