@@ -30,8 +30,8 @@ alarm_recipients = get_alarm_recipients()
 machines = ['PiGPS',
             'qubicstudio',
             'hwp',
-            'motor1',
-            'motor2',
+            'mountpi',
+            'motorcortex',
             'majortom',
             'horns',
             'mgc',
@@ -92,7 +92,7 @@ def check_power(verbosity=1):
     msg_list = []
     if verbosity>0: print('\n============ checking for power connections ============')
 
-    powerbar_names = ['electronics rack','cryostat']
+    powerbar_names = ['electronics rack','cryostat','mount']
     for pb_id in powerbar_names:
         powerbar = energenie(pb_id)
         
