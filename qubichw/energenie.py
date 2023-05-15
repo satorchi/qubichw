@@ -134,7 +134,7 @@ class energenie:
 
         device_index = {}        
         idx = 0
-        for line in x.split('\n'):
+        for line in out.split('\n'):
             if line.find('serial number')==0:
                 snum = line.replace('serial number:','').strip()
                 device_index[snum] = idx
