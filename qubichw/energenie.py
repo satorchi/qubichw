@@ -296,6 +296,8 @@ class energenie:
             states = self.get_socket_states()
             if states is not None:
                 for socknum in self.socket.keys():
+                    if not isinstance(socknum,int): continue
+                    
                     dev = self.socket[socknum]
                     if socknum not in states.keys():
                         msg = '%s is UNKNOWN' % dev
