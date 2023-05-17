@@ -63,6 +63,12 @@ def parseargs():
 # main program
 if __name__=='__main__':
     parms = parseargs()
+
+    print('arguments list:')
+    for key in parms.keys():
+        print('%s: %s' % (key,parms[key]))
+    print('\n')
+    
     if not parms['ok']: 
         usage()
         quit()
