@@ -20,7 +20,7 @@ def usage():
     '''
     print a usage message
     '''
-    msg = 'usage: %s <Energenie name> <on|off>' % sys.argv[0]
+    msg = 'usage: %s <Energenie name> <%s>' % (sys.argv[0],'|'.join(valid_cmds))
     msg += '\nvalid Energenie names are: %s' % (', '.join(socketinfo.keys()))
     msg += '\nvalid commands are: %s\n' % (', '.join(valid_cmds))
     print(msg)
@@ -31,10 +31,12 @@ def parseargs():
     '''
     parse the arguments.  There should be only two: device name, command
     '''
-    if len(sys.argv)<3:
-        return usage()
-
     parms = {}
+    parms['ok'] = False
+
+    if len(sys.argv)<3:
+        return parms
+
     for arg in sys.argv[1:]:
         if arg.lower() in valid_cmds:
             parms['cmd'] = arg.lower()
@@ -61,7 +63,7 @@ def parseargs():
 # main program
 if __name__=='__main__':
     parms = parseargs()
-    if parms is None or not parms['ok']: 
+    if not parms['ok']: 
         usage()
         quit()
 
