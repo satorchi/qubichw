@@ -34,7 +34,7 @@ def parseargs():
     parms = {}
     parms['ok'] = False
 
-    if len(sys.argv)<3:
+    if len(sys.argv)<2:
         return parms
 
     for arg in sys.argv[1:]:

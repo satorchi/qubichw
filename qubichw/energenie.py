@@ -272,7 +272,7 @@ class energenie:
         '''
         wrapper to switch off the given device
         '''
-        return self.switch_onff(devname,'off')
+        return self.switch_onoff(devname,'off')
     
     
     def get_status(self,verbosity=1):
