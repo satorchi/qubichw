@@ -69,7 +69,7 @@ if __name__=='__main__':
 
     if parms['cmd'] == 'on':
         print('Switching on %s' % parms['device'])
-        pb.switchon(parms['device']
+        pb.switchon(parms['device'])
 
     if parms['cmd'] == 'off':
         print('Switching off %s' % parms['device'])
