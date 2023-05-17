@@ -254,6 +254,11 @@ class obsmount:
 
         dat_str = dat.decode()
         dat_list = dat_str.split('DATA:')
+
+        if len(dat_list)<3:
+            retval['error'] = 'partial data: %s' % dat_str
+            return self.return_with_error(retval)
+        
         # remove the first and last which could be partial
         del(dat_list[0])
         del(dat_list[-1])
