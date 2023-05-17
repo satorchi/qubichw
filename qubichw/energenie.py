@@ -255,7 +255,7 @@ class energenie:
         out,err = shellcommand(cmd)
         if err:
             retval['error_message'] = err.strip()
-            self.log(retval['error_message'),verbosity=1)
+            self.log(retval['error_message'],verbosity=1)
             return retval
         retval['ok'] =  True
         return retval
