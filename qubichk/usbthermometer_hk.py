@@ -21,6 +21,7 @@ class usbthermometer_hk:
     def __init__(self,port=42377):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         self.client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.client.settimeout(0.5)
         self.client.bind(('', port))
         return
 
@@ -28,10 +29,17 @@ class usbthermometer_hk:
         '''
         get the latest data.  loop a few times to eliminate latency
         '''
+        retval['ok'] = True
         fmts = '<Bdf'
         time_diff = 1e6
         for idx in range(300):
-            x, addr = self.client.recvfrom(1024)
+            try: 
+                x, addr = self.client.recvfrom(1024)
+            except:
+                retval['ok'] = False
+                retval['error'] = 'no broadcast from usb thermometer'
+                break
+            
             data_tuple = struct.unpack(fmts,x)
             tstamp = data_tuple[1]
             date = dt.datetime.utcfromtimestamp(tstamp)
@@ -40,7 +48,9 @@ class usbthermometer_hk:
             val = data_tuple[2]
             if time_diff<0.005: break
 
-        return (tstamp,val)
+        retval['tstamp'] = tstamp
+        retval['temperature'] = val
+        return retval
 
 
     

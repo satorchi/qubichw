@@ -21,6 +21,7 @@ from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
 from qubichk.utilities import shellcommand
 from qubichk.obsmount import obsmount
+from qubichk.usbthermometer_hk import usbthermometer_hk
 
 class hk_broadcast :
     '''a class for broadcasting  and receiving QUBIC housekeeping data
@@ -40,8 +41,9 @@ class hk_broadcast :
         self.nENTROPY_TEMPERATURE = 8
         self.nMECH = 2
         self.nHEATER = 8 # QubicStudio is expecting 8 heaters (there are only 6)
-        self.nPRESSURE = 6 # QubicStudio is expecting 8 pressure gauges (there is only 1)
+        self.nPRESSURE = 5 # QubicStudio is expecting 8 pressure gauges (there is only 1)
         # two of the spots reserved for pressure are used for azimuth and elevation
+        # one of the spots reserved for pressure is used for the cryostat outside temperature
         self.record = self.define_hk_record()
         self.hk_entropy = None
         self.powersupply = None
@@ -130,6 +132,13 @@ class hk_broadcast :
             fmts.append('f8')
             record_zero.append(dummy_val)
             dummy_val -= 1
+
+        # cryostat outside temperature
+        name = 'CRYOSTAT'
+        names.append(name)
+        fmts.append('f8')
+        record_zero.append(dummy_val)
+        dummy_val -= 1
 
         # azimuth and elevation
         for name in ['AZIMUTH','ELEVATION']:
@@ -322,7 +331,24 @@ class hk_broadcast :
             self.record[recname][0] = val
             self.log_hk(recname,tstamp,val,tstamp_rx)
 
-        return self.record        
+        return self.record
+
+    def get_cryostat_temperature_hk(self):
+        '''get the temperature broadcast from the usb thermometer
+        '''
+        if self.cryostat_temp is None:
+            self.cryostat_temp = get_usbthermometer_hk()
+
+        ans = self.cryostat_temp.get_latest()
+        recname = 'CRYOSTAT'
+        if ans['ok']:
+            val = ans['temperature']
+            tstamp = ans['tstamp']
+            self.record[recname][0] = val
+            self.log_hk(recname,tstamp,val)
+
+        return self.record
+        
     
     def get_all_hk(self):
         '''sample all the housekeeping from the various sensors
@@ -332,6 +358,7 @@ class hk_broadcast :
         self.get_temperature_hk()
         self.get_pressure_hk()
         self.get_azel_hk()
+        self.get_cryostat_temperature_hk()
         self.record[0].DATE = self.current_timestamp()
         return self.record
 
