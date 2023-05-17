@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 receive the temperature data broadcast from the RaspberryPi with the usbthermometer
 It's the temperature of the outside of the cryostat
 '''
-import time,socket
+import time,socket,struct
 import datetime as dt
 import numpy as np
 
@@ -30,7 +30,7 @@ class usbthermometer_hk:
         '''
         time_diff = 1e6
         for idx in range(300):
-            x, addr = client.recvfrom(1024)
+            x, addr = self.client.recvfrom(1024)
             data_tuple = struct.unpack(fmts,x)
             tstamp = data_tuple[1]
             date = dt.datetime.utcfromtimestamp(tstamp)
