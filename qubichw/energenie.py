@@ -14,16 +14,43 @@ import time,re,os
 import datetime as dt
 from qubichk.utilities import shellcommand, ping
 
+energenie_app = 'sispmctl'
+
+socketinfo = {}
+socketinfo['electronics rack'] = {}
+socketinfo['electronics rack']['serial'] = '01:01:5c:f9:d0'
+socketinfo['electronics rack'][1] = 'horn'
+socketinfo['electronics rack'][2] = 'heaters'
+socketinfo['electronics rack'][3] = 'hwp'
+socketinfo['electronics rack'][4] = 'thermos'
+
+socketinfo['cryostat'] = {}
+socketinfo['cryostat']['serial'] = '01:01:4f:ce:8d'  # to be confirmed
+socketinfo['cryostat'][1] = 'network switch'
+socketinfo['cryostat'][2] = 'unused'
+socketinfo['cryostat'][3] = 'Opal Kelly RaspberryPi'
+socketinfo['cryostat'][4] = 'FPGA'
+
+socketinfo['mount'] = {}
+socketinfo['mount']['serial'] = '01:01:4f:c4:8f'  # to be confirmed
+socketinfo['mount'][1] = 'motor'
+socketinfo['mount'][2] = 'unused'
+socketinfo['mount'][3] = 'unused'
+socketinfo['mount'][4] = 'unused'
+
+socketinfo['calsource'] = {}
+socketinfo['calsource']['serial'] = '01:01:5f:06:f2'
+socketinfo['calsource'][1] ='modulator'
+socketinfo['calsource'][2] ='calsource'
+socketinfo['calsource'][3] ='lamp'
+socketinfo['calsource'][4] ='amplifier'
+
+
 class energenie:
     '''
     class to turn on/off devices using the Energenie power bar
     '''
     verbosity = 2
-    serial_no = {}
-    serial_no['electronics rack'] = '01:01:5c:f9:d0'
-    serial_no['cryostat']         = '01:01:4f:ce:8d'  # to be confirmed
-    serial_no['mount']            = '01:01:4f:c4:8f'  # to be confirmed
-    serial_no['calsource']        = '01:01:5f:06:f2'
 
     def __init__(self,name='electronics rack'):
         if 'HOSTNAME' in os.environ.keys():
@@ -31,65 +58,37 @@ class energenie:
         else:
             hostname,err = shellcommand('hostname')
 
-        valid_names = ['electronics rack','calsource','cryostat','mount']
-        self.socket = {}
+        valid_names = socketinfo.keys()
         self.ok = False
         self.name = name
 
         if name not in valid_names:
             self.log('invalid Energenie identifier: %s' % name)
             self.manager = None
-            return        
+            return
 
-        if name=='electronics rack':
-            if not self.verify_app('which sispmctl'): return
-            self.manager = self.get_manager(name,'sispmctl')
-            self.socket[1] = 'horn'
-            self.socket[2] = 'heaters'
-            self.socket[3] = 'hwp'
-            self.socket[4] = 'thermos'
+        self.socket = socketinfo[name]
 
-        if name=='cryostat':
-            if not self.verify_app('which sispmctl'): return
-            self.manager = self.get_manager(name,'sispmctl')
-            self.socket[1] = 'network switch'
-            self.socket[2] = 'unused'
-            self.socket[3] = 'Opal Kelly RaspberryPi'
-            self.socket[4] = 'FPGA'
+        which_cmd = 'which %s' % energenie_app
+        app_cmd = '%s' % energenie_app
+        
+        if name=='calsource' and hostname.find('pigps')<0:
+            pingresult = ping('pigps',verbosity=self.verbosity)
+            if not pingresult['ok']:
+                msg = 'ERROR: PiGPS is UNREACHABLE'
+                self.log(msg,verbosity=1)
+                return
+            which_cmd = 'ssh pigps which %s' % energenie_app
+            app_cmd = 'ssh pigps %s' % energenie_app
 
-        if name=='mount':
-            if not self.verify_app('which sispmctl'): return
-            self.manager = self.get_manager(name,'sispmctl')
-            self.socket[1] = 'motor'
-            self.socket[2] = 'unused'
-            self.socket[3] = 'unused'
-            self.socket[4] = 'unused'
             
-            
-        if name=='calsource':
-            if hostname.find('pigps')>=0:
-                if not self.verify_app('which sispmctl'): return
-                self.manager = self.get_manager(name,'sispmctl')
-            else:
-                pingresult = ping('pigps',verbosity=self.verbosity)
-                if not pingresult['ok']:
-                    msg = 'ERROR: PiGPS is UNREACHABLE'
-                    self.log(msg,verbosity=1)
-                    return
-                if not self.verify_app('ssh pigps which sispmctl'): return
-                self.manager = self.get_manager(name,'ssh pigps sispmctl')
-
-            # make sure this is the same as in the calsource_configuration_manager
-            self.socket[1] ='modulator'
-            self.socket[2] ='calsource'
-            self.socket[3] ='lamp'
-            self.socket[4] ='amplifier'
+        if not self.verify_app(which_cmd): return
+        self.manager = self.get_manager(name,app_cmd)
         
         # reverse look-up
         self.devicesocket = {}
-        for socknum in self.socket.keys():
+        for socknum in socketinfo.keys():
             self.devicesocket[self.socket[socknum]] = socknum
-    
         
         self.ok = True
         return
@@ -126,7 +125,7 @@ class energenie:
         get the manager command (including the device index) of the required Energenie powerbar
         '''
 
-        if pbname not in self.serial_no.keys():
+        if pbname not in socketinfo.keys():
             self.log('ERROR! unknown Energenie power bar: %s' % pbname,verbosity=1)
             return None
         
@@ -141,8 +140,7 @@ class energenie:
                 device_index[snum] = idx
                 idx += 1
 
-        
-        snum = self.serial_no[pbname]
+        snum = socketinfo[pbname]['serial']
         if snum not in device_index.keys():
             self.log('ERROR! Energenie power bar not connected: %s with serial number %s' % (pbname,snum))
             return None
@@ -272,10 +270,10 @@ class energenie:
         '''
         wrapper to switch off the given device
         '''
-        return self.switch_ononff(devname,'off')
+        return self.switch_onff(devname,'off')
     
     
-    def get_status(self,verbosity=1,modulator_state=False):
+    def get_status(self,verbosity=1):
         '''
         check for the status of the Energenie sockets
         '''
