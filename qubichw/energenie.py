@@ -87,7 +87,7 @@ class energenie:
         
         # reverse look-up
         self.devicesocket = {}
-        for socknum in socketinfo.keys():
+        for socknum in self.socket.keys():
             self.devicesocket[self.socket[socknum]] = socknum
         
         self.ok = True
