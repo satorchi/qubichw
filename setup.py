@@ -149,7 +149,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/kellypi_on',
            'scripts/kellypi_off',
            'scripts/fpga_on',
-           'scripts/fpga_off']
+           'scripts/fpga_off',
+           'scripts/energenie_commander.py']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
