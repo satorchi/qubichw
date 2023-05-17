@@ -183,6 +183,8 @@ class energenie:
    
 
         for socknum in self.socket.keys():
+            if not isinstance(socknum,int): continue
+            
             find_str = '(Status of outlet %i:\t)(off|on)' % socknum
             match = re.search(find_str,out)
             if match is None:
