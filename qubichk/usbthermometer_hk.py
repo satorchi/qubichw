@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 receive the temperature data broadcast from the RaspberryPi with the usbthermometer
 It's the temperature of the outside of the cryostat
 '''
-import time,socket,struct
+import time,socket,struct,sys
 import datetime as dt
 import numpy as np
 
@@ -22,7 +22,12 @@ class usbthermometer_hk:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         self.client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.client.settimeout(0.5)
-        self.client.bind(('', port))
+        try:
+            self.client.bind(('', port))
+        except:
+            self.client = None
+            msg = ' '.join(sys.exc_info())
+            print(msg)
         return
 
     def get_latest(self):
@@ -30,7 +35,9 @@ class usbthermometer_hk:
         get the latest data.  loop a few times to eliminate latency
         '''
         retval = {}
-        retval['ok'] = True
+        retval['ok'] = False
+        if self.client is None: return retval
+        
         fmts = '<Bdf'
         time_diff = 1e6
         for idx in range(300):
@@ -49,6 +56,7 @@ class usbthermometer_hk:
             val = data_tuple[2]
             if time_diff<0.005: break
 
+        retval['ok'] = True
         retval['tstamp'] = tstamp
         retval['temperature'] = val
         return retval
