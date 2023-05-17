@@ -25,14 +25,14 @@ socketinfo['electronics rack'][3] = 'hwp'
 socketinfo['electronics rack'][4] = 'thermos'
 
 socketinfo['cryostat'] = {}
-socketinfo['cryostat']['serial'] = '01:01:4f:ce:8d'  # to be confirmed
+socketinfo['cryostat']['serial'] = '01:01:4f:c4:8f'
 socketinfo['cryostat'][1] = 'network switch'
 socketinfo['cryostat'][2] = 'unused'
 socketinfo['cryostat'][3] = 'Opal Kelly RaspberryPi'
 socketinfo['cryostat'][4] = 'FPGA'
 
 socketinfo['mount'] = {}
-socketinfo['mount']['serial'] = '01:01:4f:c4:8f'  # to be confirmed
+socketinfo['mount']['serial'] = '01:01:4f:ce:8d'
 socketinfo['mount'][1] = 'motor'
 socketinfo['mount'][2] = 'unused'
 socketinfo['mount'][3] = 'unused'
