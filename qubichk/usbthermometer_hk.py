@@ -29,6 +29,7 @@ class usbthermometer_hk:
         '''
         get the latest data.  loop a few times to eliminate latency
         '''
+        retval = {}
         retval['ok'] = True
         fmts = '<Bdf'
         time_diff = 1e6
