@@ -234,6 +234,46 @@ class energenie:
         
         return retval
 
+    def switch_onoff(self,devname,onoff):
+        '''
+        switch on a particular device
+        '''
+        retval = {}
+        retval['message'] = ''
+        retval['error_message'] = ''
+        retval['ok'] = False
+        
+        if onoff.lower()=='on':
+            onoff_cmd = '-o'
+        else:
+            onoff_cmd = '-f'
+        
+        if devname not in self.devicesocket.keys():
+            retval['error_message'] = 'unknown device: %s' % devname
+            self.log(retval['error_message'],verbosity=1)
+            return retval
+
+        cmd = '%s %s %i' % (self.manager,onoff_cmd,self.devicesocket[devname])
+        out,err = shellcommand(cmd)
+        if err:
+            retval['error_message'] = err.strip()
+            self.log(retval['error_message'),verbosity=1)
+            return retval
+        retval['ok'] =  True
+        return retval
+
+    def switchon(self,devname):
+        '''
+        wrapper to switch on the given device
+        '''
+        return self.switch_onoff(devname,'on')
+
+    def switchoff(self,devname):
+        '''
+        wrapper to switch off the given device
+        '''
+        return self.switch_ononff(devname,'off')
+    
     
     def get_status(self,verbosity=1,modulator_state=False):
         '''
