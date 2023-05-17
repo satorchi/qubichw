@@ -44,7 +44,7 @@ def parseargs():
 
         for pbname in socketinfo.keys():
             for socknum in socketinfo[pbname].keys():
-                if not isinstance(socket_no,int): continue
+                if not isinstance(socknum,int): continue
                 
                 devname = socketinfo[pbname][socknum]
                 if devname.lower().find(arg.lower())>=0:
