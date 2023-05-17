@@ -1,1 +1,1 @@
-sispmctl -d 0 -f 3
+energenie_commander.py hwp off

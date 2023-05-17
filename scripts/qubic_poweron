@@ -1,20 +1,10 @@
 #!/bin/bash
-let d=0
-while [ $d -le 1 ]
-do
-    let n=1
-    while [ $n -le 4 ]
-    do
-    	if [ $d -eq 1 -a $n -eq 3 ]
-	then # Opal Kelly bridge should be off for normal operation
-	    sispmctl -d $d -f $n
-	else
-	    sispmctl -d $d -o $n
-	fi
-	sleep 1
-	let n+=1
-    done
-    let d+=1
-done
 
-  
+hwpon
+heaterson
+thermoson
+hornon
+kellypi_off # Opal Kelly should be off during normal operation
+fpga_on
+energenie_commander.py network on
+energenie_commander.py motor on

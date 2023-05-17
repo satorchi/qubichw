@@ -1,10 +1,10 @@
-let d=0
-while [ $d -le 1 ]; do
-    let n=1
-    while [ $n -le 4 ]; do
-	sispmctl -d $d -f $n
-	sleep 1
-	let n+=1
-    done
-    let d+=1
-done
+#!/bin/bash
+
+hwpoff
+heatersoff
+thermosoff
+hornoff
+kellypi_off
+fpga_off
+energenie_commander.py network off
+energenie_commander.py motor off

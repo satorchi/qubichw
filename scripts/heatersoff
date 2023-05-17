@@ -1,1 +1,1 @@
-sispmctl -d 0 -f 2
+energenie_commander.py heaters on

@@ -1,1 +1,1 @@
-sispmctl -d 1 -f 4
+energenie_commander.py fpga off
