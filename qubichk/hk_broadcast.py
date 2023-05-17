@@ -338,7 +338,7 @@ class hk_broadcast :
         '''get the temperature broadcast from the usb thermometer
         '''
         if self.cryostat_temp is None:
-            self.cryostat_temp = get_usbthermometer_hk()
+            self.cryostat_temp = usbthermometer_hk()
 
         ans = self.cryostat_temp.get_latest()
         recname = 'CRYOSTAT'
