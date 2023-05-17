@@ -51,6 +51,7 @@ class hk_broadcast :
         self.dump_diode_rawData = True
         self.hk_pressure = None
         self.hk_azel = None
+        self.cryostat_temp = None
         self.verbosity_threshold = verbosity
         return None
 
