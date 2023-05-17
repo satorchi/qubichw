@@ -99,7 +99,7 @@ class energenie:
         '''
         if verbosity > self.verbosity: return
         
-        filename = 'energenie.log'
+        filename = '%s/energenie.log' % os.environ['HOME']
         h = open(filename,'a')
         h.write('%s|ENERGENIE| %s\n' % (dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'),msg))
         h.close()
