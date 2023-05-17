@@ -28,6 +28,7 @@ class usbthermometer_hk:
         '''
         get the latest data.  loop a few times to eliminate latency
         '''
+        fmts = '<Bdf'
         time_diff = 1e6
         for idx in range(300):
             x, addr = self.client.recvfrom(1024)
