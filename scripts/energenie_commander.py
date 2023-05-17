@@ -14,13 +14,15 @@ switch on/off desired sockets in one of the Energenie power bar
 import sys
 from qubichw.energenie import energenie, socketinfo
 
+valid_cmds = ['status','on','off']
+
 def usage():
     '''
     print a usage message
     '''
     msg = 'usage: %s <Energenie name> <on|off>' % sys.argv[0]
-    msg += '\nvalid Energenie names are: 1 or 2'
-    msg += '\nvalid commands are: status, on, off\n'
+    msg += '\nvalid Energenie names are: %s' % (', '.join(socketinfo.keys()))
+    msg += '\nvalid commands are: %s\n' % (', '.join(valid_cmds))
     print(msg)
     return None
 
@@ -31,8 +33,6 @@ def parseargs():
     '''
     if len(sys.argv)<3:
         return usage()
-
-    valid_cmds = ['status','on','off']
 
     parms = {}
     for arg in sys.argv[1:]:
@@ -61,7 +61,7 @@ def parseargs():
 # main program
 if __name__=='__main__':
     parms = parseargs()
-    if not parms['ok']: 
+    if parms is None or not parms['ok']: 
         usage()
         quit()
 
