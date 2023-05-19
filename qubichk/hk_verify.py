@@ -104,6 +104,8 @@ def check_power(verbosity=1):
         
             
         for socknum in powerbar.socket.keys():
+            if not isinstance(socknum,int): continue # skip serial number
+            
             subsys = powerbar.socket[socknum]
             state = states[socknum]
             if state:
