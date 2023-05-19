@@ -312,7 +312,14 @@ def check_temps(verbosity=1):
     if verbosity>0: print('\n============ checking recent housekeeping values...',end='',flush=True)
     hk_dir = '/home/qubic/data/temperature/broadcast'
 
-    patterns = ['TEMPERATURE??.txt','AVS47*.txt','MHS*.txt','HEATER*.txt','PRESSURE*.txt']
+    patterns = ['TEMPERATURE??.txt',
+                'AVS47*.txt',
+                'MHS*.txt',
+                'HEATER*.txt',
+                'PRESSURE*.txt',
+                'CRYOSTAT.txt',
+                'AZIMUTH.txt',
+                'ELEVATION.txt']
 
     hk_files = []
     for pattern in patterns:
