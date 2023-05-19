@@ -309,7 +309,9 @@ def check_temps(verbosity=1):
     # 12 for 6 heaters (voltage and current) There used to be 7 heaters
     # 18 temperature sensors
     # 1 pressure sensor
-    nfiles = 46    
+    # 1 usb thermometer
+    # 2 position (az,el)
+    nfiles = 49    
     delta_max = 6 # seconds. if latest HK is earlier than this, we have a problem
     if verbosity>0: print('\n============ checking recent housekeeping values...',end='',flush=True)
     hk_dir = '/home/qubic/data/temperature/broadcast'
@@ -342,10 +344,10 @@ def check_temps(verbosity=1):
         h = open(F,'rb')
         h.seek(0,os.SEEK_END)
         fsize = h.tell()
-        if fsize<40:
+        if fsize<80:
             h.seek(0,os.SEEK_SET)
         else:
-            h.seek(-40,os.SEEK_END)
+            h.seek(-80,os.SEEK_END)
         x = h.read()
         h.close()
         lines = x.decode().split('\n')
@@ -363,7 +365,7 @@ def check_temps(verbosity=1):
             continue
 
         now = dt.datetime.utcnow()
-        tstamp_now = float(now.strftime('%s.%f'))
+        tstamp_now = now.timestamp()
         delta = tstamp_now - tstamp
         if delta > delta_max:
             info['ok'] = False
