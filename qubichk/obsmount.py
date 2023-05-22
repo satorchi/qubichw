@@ -253,8 +253,12 @@ class obsmount:
                             
 
         dat_str = dat.decode()
+        if len(dat_str)==0:
+            retval['error'] = 'no bytes received'
+            self.subscribed[port] = False
+            return self.return_with_error(retval)
+        
         dat_list = dat_str.split('DATA:')
-
         if len(dat_list)<3:
             retval['error'] = 'partial data: %s' % dat_str
             return self.return_with_error(retval)
