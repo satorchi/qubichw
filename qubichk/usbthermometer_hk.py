@@ -40,6 +40,7 @@ class usbthermometer_hk:
         
         fmts = '<Bdf'
         time_diff = 1e6
+        retval['ok'] = True
         for idx in range(300):
             try: 
                 x, addr = self.client.recvfrom(1024)

@@ -347,6 +347,8 @@ class hk_broadcast :
             tstamp = ans['tstamp']
             self.record[recname][0] = val
             self.log_hk(recname,tstamp,val)
+        else:
+            self.log('ERROR! USBTHERMOMETER: %s' % ans['error'])
 
         return self.record
         
