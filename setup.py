@@ -151,7 +151,7 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/fpga_on',
            'scripts/fpga_off',
            'scripts/energenie_commander.py',
-           'scripts/read_usbthermometer.py',
+           'qubichw/read_usbthermometer.py',
            'scripts/start_usbthermometer_acq.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
