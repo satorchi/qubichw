@@ -44,6 +44,7 @@ while True:
     rec[0].TIMESTAMP = np.float64(time.time())
     rec[0].VALUE = np.float32(Tkelvin)
     s.sendto(rec,rx)
+    print('%.3f %7.3f' %% (rec[0].TIMESTAMP, rec[0].VALUE))
     time.sleep(0.2)
 
 
