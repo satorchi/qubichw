@@ -46,14 +46,25 @@ class usbthermometer_hk:
         fmts = '<Bdf'
         time_diff = 1e6
         retval['ok'] = True
+        breakout = False
+        x = None
         for idx in range(300):
             try: 
                 x, addr = self.client.recvfrom(1024)
+            except socket.timeout:
+                breakout = True
             except:
                 retval['ok'] = False
                 retval['error'] = 'client did not receive data'
                 self.client = None
                 return retval
+
+            if x is None:
+                retval['ok'] = False
+                retval['error'] = 'client never received data'
+                self.client = None
+                return retval
+                
             
             data_tuple = struct.unpack(fmts,x)
             tstamp = data_tuple[1]
@@ -61,7 +72,7 @@ class usbthermometer_hk:
             rx_tstamp = time.time()
             time_diff = np.abs(rx_tstamp - tstamp)
             val = data_tuple[2]
-            if time_diff<0.005: break
+            if breakout or time_diff<0.005: break
 
         retval['ok'] = True
         retval['tstamp'] = tstamp
