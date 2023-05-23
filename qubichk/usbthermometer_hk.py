@@ -51,7 +51,8 @@ class usbthermometer_hk:
                 x, addr = self.client.recvfrom(1024)
             except:
                 retval['ok'] = False
-                retval['error'] = 'no broadcast from usb thermometer'
+                retval['error'] = ' '.join(sys.exc_info())
+                self.client = None
                 return retval
             
             data_tuple = struct.unpack(fmts,x)
