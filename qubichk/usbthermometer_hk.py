@@ -35,8 +35,13 @@ class usbthermometer_hk:
         get the latest data.  loop a few times to eliminate latency
         '''
         retval = {}
-        retval['ok'] = False
-        if self.client is None: return retval
+        if self.client is None:
+            self.__init__()
+            
+        if self.client is None:
+            retval['ok'] = False
+            retval['error'] = 'client socket not connected'
+            return retval
         
         fmts = '<Bdf'
         time_diff = 1e6
