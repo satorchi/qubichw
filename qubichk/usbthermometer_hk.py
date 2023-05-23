@@ -51,7 +51,7 @@ class usbthermometer_hk:
                 x, addr = self.client.recvfrom(1024)
             except:
                 retval['ok'] = False
-                retval['error'] = ' '.join(sys.exc_info())
+                retval['error'] = 'client did not receive data'
                 self.client = None
                 return retval
             
