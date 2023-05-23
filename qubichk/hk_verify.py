@@ -387,6 +387,7 @@ def check_calsource(verbosity=1):
     '''
     check that the calibration source manager is running on PiGPS
     check that the calibration source broadcaster is running on PiGPS
+    check that the cryostat shell temperature broadcaster is running on PiGPS
     '''
     retval = {}
     retval['ok'] = True
@@ -396,6 +397,7 @@ def check_calsource(verbosity=1):
     start_command['read_calsource.py'] = 'start_calsource_acq.sh'
     start_command['gpsd'] = 'gpsd'
     start_command['ntpd'] = 'ntpd'
+    start_command['read_usbthermometer.py'] = 'start_usbthermometer_acq.sh'
 
     if verbosity>0: print('\n============ checking calsource daemons ============')
     cmd = 'ssh pigps ps axwu'
