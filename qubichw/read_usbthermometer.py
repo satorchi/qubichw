@@ -29,7 +29,12 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 bus = UART_Adapter('/dev/thermometer')
-roms = bus.get_connected_ROMs()
+try:
+    roms = bus.get_connected_ROMs()
+except:
+    print('could not connect to USB thermometer')
+    quit()
+    
 rom = roms[0]
 sensor = TemperatureSensor(bus, rom)
 
