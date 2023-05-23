@@ -46,7 +46,7 @@ class usbthermometer_hk:
             except:
                 retval['ok'] = False
                 retval['error'] = 'no broadcast from usb thermometer'
-                break
+                return retval
             
             data_tuple = struct.unpack(fmts,x)
             tstamp = data_tuple[1]
