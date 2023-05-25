@@ -38,7 +38,8 @@ for compressor_num in [1,2]:
     msg.append(info[-1]['msg'])
     comm_error = comm_error or info[-1]['communication error']
     ok = ok and info[-1]['status']
-    online = online and info[-1]['online']
+    if 'online' in info[-1].keys():
+        online = online and info[-1]['online']
 
 
 if not ok and not os.path.isfile('/tmp/DONT_SEND_COMPRESSOR_MESSAGE'):
