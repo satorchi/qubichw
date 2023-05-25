@@ -349,7 +349,7 @@ class compressor:
 
         if not self.ok():
             retval['status'] = False
-            retval['msg'] = 'ERROR!  Device not configured.'
+            retval['msg'] = 'ERROR!  Compressor device not configured.'
             retval['status_message'] = self.status_message(retval)
             retval['log_message'] = self.status_log(retval)
             return retval
@@ -414,7 +414,7 @@ class compressor:
         switch on the pulse tube compressor
         '''
         if not self.ok():
-            print('ERROR!  Device not configured.')
+            print('ERROR!  Compressor device not configured.')
             return False
 
         cmdkey = 'on'
@@ -439,7 +439,7 @@ class compressor:
         '''
         
         if not self.ok():
-            print('ERROR!  Device not configured.')
+            print('ERROR!  Compressor device not configured.')
             return False
 
         cmdkey = 'off'
@@ -464,7 +464,7 @@ class compressor:
         reset the pulse tube compressor (clear alarms)
         '''
         if not self.ok():
-            print('ERROR!  Device not configured.')
+            print('ERROR!  Compressor device not configured.')
             return False
 
         cmdkey = 'reset'
@@ -478,7 +478,7 @@ class compressor:
         stop the rotary valve
         '''
         if not self.ok():
-            print('ERROR!  Device not configured.')
+            print('ERROR!  Compressor device not configured.')
             return False
 
         cmdkey = 'chpause'
@@ -492,7 +492,7 @@ class compressor:
         restart the rotary valve
         '''
         if not self.ok():
-            print('ERROR!  Device not configured.')
+            print('ERROR!  Compressor device not configured.')
             return False
 
         cmdkey = 'chrestart'
