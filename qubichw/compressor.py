@@ -374,7 +374,7 @@ class compressor:
         '''
         format the status info into a text
         '''
-        if not status['online']:
+        if 'online' in status.keys() and not status['online']:
             msg = 'PT Compressor %s is offline' % self.compressor_num
             return msg
         
