@@ -19,11 +19,13 @@ QS_DIR=pi@cam2:/qs2
 #QS_DIR=/qs # 2021-11-30 11:52:06 back to samba mount on qubic-central
 
 HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
+WEATHER_DIR=weather:TECMES
 ARCHIVE_DIR=/archive
 echo "`date +%Y-%m-%dT%H:%M:%S` starting archiving" >> $ARCHIVE_DIR/archive_log.txt
 
 CC_DIR=/sps/qubic/Data/Calib-TD
 JUPYTER_DIR=/qubic/Data/Calib-TD
+
 
 # find the start date of housekeeping data
 HK_FILES=`ls $HK_DIR/*.txt|grep -v -e LABEL -e RAW -e VOLT -e botId`
@@ -52,6 +54,7 @@ rsync -avztP $QS_DIR/QubicStudio $ARCHIVE_DIR
 rsync -avztP $QS_DIR/Script $ARCHIVE_DIR
 rsync -avztP $QS_DIR/Data/ $ARCHIVE_DIR
 rsync -avztP $HWP_DIR $ARCHIVE_DIR
+rsync -avztP $WEATHER_DIR $ARCHIVE_DIR/weather
 
 # use rsync to copy to CC
 rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
