@@ -90,6 +90,10 @@ raw elevation:  10.58209685308984 is 50 degrees elevation
 2023-05-10 09:17:06
 raw elevation:  2.049 is 50 degrees elevation
 
+2023-05-23 18:26:00
+azimuth offset
+on rocketchat from Manuel Platino: The most precise measurement of the az from outside is between 168° and 169°
+
 '''
 import sys,socket,time,re
 import datetime as dt
@@ -103,6 +107,7 @@ class obsmount:
     listen_port = 4546
     command_port = 4545
     el_zero_offset = 50 - 2.049
+    az_zero_offset = 168.5
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
                  'AXIS',
