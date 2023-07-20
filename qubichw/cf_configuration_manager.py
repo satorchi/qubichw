@@ -1,5 +1,5 @@
 '''
-$Id: calsource_configuration_manager.py
+$Id: cf_configuration_manager.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
 $created: Fri 08 Feb 2019 08:25:47 CET
 $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
@@ -8,8 +8,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           redistribute it.  There is NO WARRANTY, to the extent
           permitted by law.
 
-A class with methods to send/receive configuration command for the calibration source setup
-Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
+A class with methods to send/receive configuration command for the carbon fibre
+Commands are sent to switch on/off and configure the signal generator
 '''
 import socket,time,re,os,multiprocessing,sys
 import datetime as dt
@@ -30,7 +30,7 @@ from qubichw.amplifier import amplifier
 #from qubichw.modulator_tg5012a import tg5012 as modulator
 from qubichw.modulator_siglent import siglent as modulator
 
-class calsource_configuration_manager():
+class cf_configuration_manager():
 
     def __init__(self,role=None, verbosity=0):
         '''
@@ -55,7 +55,7 @@ class calsource_configuration_manager():
         '''
         if verbosity > self.verbosity: return
         
-        filename = 'calsource_configuration_%s.log' % self.role
+        filename = 'cf_configuration_%s.log' % self.role
         h = open(filename,'a')
         h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
         h.close()
@@ -67,7 +67,7 @@ class calsource_configuration_manager():
         print some help text to screen
         '''
         device_list_str = ', '.join(self.device_list)
-        txt  = 'Calibration Source Commander:  Help\n'
+        txt  = 'Carbon Fibre Commander:  Help\n'
         txt += 'commands should be given in the following format:\n'
         txt += '    <device>:<parameter>[=<value>]\n\n'
         txt += 'except for the following commands which are independent of device: help, status, on, off, save\n\n'
@@ -78,7 +78,7 @@ class calsource_configuration_manager():
         txt += '\nFor the modulator, frequency is given in Hz\n'
         txt += 'For the calibration source, frequency is given in GHz\n'
         txt += '\nExample:\n'
-        txt += 'calsource:on amplifier:on modulator:on modulator:frequency=0.333 modulator:duty=33 modulator:shape=squ calsource:frequency=150\n'
+        txt += 'cf:on cf:frequency=0.333 cf:duty=33 cf:shape=squ\n'
         print(txt)
         return
     
