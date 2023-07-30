@@ -10,6 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 A class with methods to send/receive configuration command for the carbon fibre
 Commands are sent to switch on/off and configure the signal generator
+
+This was originally the calsource_configuration_manager
 '''
 import socket,time,re,os,multiprocessing,sys
 import datetime as dt

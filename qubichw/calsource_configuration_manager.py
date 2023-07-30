@@ -15,19 +15,15 @@ import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
-# the Energenie powerbar
-#from PyMS import PMSDevice
-from qubichw.energenie import energenie
+from qubichw.relay import relay
 from qubichk.utilities import shellcommand
 # the calibration source
 from qubichw.calibration_source import calibration_source
 
 # the low noise amplifier
-from qubichw.amplifier import amplifier
+from qubichw.amplifier_femto import amplifier
 
-# the signal generator for modulating the calibration source
-#from qubichw.modulator import modulator
-#from qubichw.modulator_tg5012a import tg5012 as modulator
+# the signal generator for modulating the calibration source and for reading the calsource monitor
 from qubichw.modulator_siglent import siglent as modulator
 
 class calsource_configuration_manager():
