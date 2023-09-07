@@ -141,14 +141,18 @@ def acquire_gps(listener=None,verbosity=0):
     print('listening on: %s, %i' % (listener,PORT))
     h = open('calsource_orientation.dat','ab')
 
+    packet_period = 1/8
+    counter = 0
     while True:
+        counter += 1
         try:
             dat = client.recv(packetsize)
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
             if verbosity>0: print(dat_list)
+            time.sleep(packet_period)
         except socket.timeout:
-            print('timeout error on socket')
+            print('%8i: timeout error on socket' % counter)
             continue
         except KeyboardInterrupt:
             h.close()
