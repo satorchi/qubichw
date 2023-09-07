@@ -38,7 +38,7 @@ IP_GROUNDGPS = "134.158.187.230" # testing at APC
 receivers = [IP_GROUNDGPS] # testing at APC
 PORT = 31337
 
-def read_gps_chunk(chunk,sock):
+def read_gps_chunk(chunk,sock,verbosity=0):
     '''
     read the lines of SimpleRTK info and broadcast
     '''
@@ -55,7 +55,7 @@ def read_gps_chunk(chunk,sock):
         col = data_line.split(',')
         data_list = col[:-1] + col[-1].split('*')
         if len(data_list)<n_names:
-            print('INCOMPLETE LINE %i columns: %s' % (len(data_list),data_line))
+            if verbosity>0: print('INCOMPLETE LINE %i columns: %s' % (len(data_list),data_line))
             continue
 
         now = dt.datetime.utcnow()
@@ -63,7 +63,7 @@ def read_gps_chunk(chunk,sock):
         try:
             date = dt.datetime.strptime(date_str,'%Y%m%d%H%M%S.%f')
         except:
-            print('DATE ERROR: %s' % date_str)
+            if verbosity>0: print('DATE ERROR: %s' % date_str)
             continue
 
         
@@ -78,7 +78,7 @@ def read_gps_chunk(chunk,sock):
                 try:
                     val = eval(val_str)
                 except:
-                    print('ERROR DATA INTERPRETATION: %s' % (val_str))
+                    if verbosity>0: print('ERROR DATA INTERPRETATION: %s' % (val_str))
                     skipline = True
                     continue
             
@@ -128,7 +128,7 @@ def broadcast_gps():
 
 
 
-def acquire_gps(listener=None):
+def acquire_gps(listener=None,verbosity=0):
     '''
     read the SimpleRTK data on socket and write to file
     '''
@@ -146,12 +146,12 @@ def acquire_gps(listener=None):
             dat = client.recv(packetsize)
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
-            print(dat_list)
+            if verbosity>0: print(dat_list)
         except KeyboardInterrupt:
             h.close()
             return
         except:
-            print('problem reading socket')
+            if verbosity>0: print('problem reading socket')
             time.sleep(0.2)
 
     return
