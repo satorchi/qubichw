@@ -147,8 +147,12 @@ def acquire_gps(listener=None,verbosity=0):
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
             if verbosity>0: print(dat_list)
+        except socket.timeout:
+            print('timeout error on socket')
+            continue
         except KeyboardInterrupt:
             h.close()
+            print('exit using ctrl-c')
             return
         except:
             if verbosity>0: print('problem reading socket')
