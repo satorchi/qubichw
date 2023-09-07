@@ -12,7 +12,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 run the acquisition for the SimpleRTK, ie. the calsource box position and orientation
 '''
 from qubichw.read_gps import acquire_gps
-from qubichw.utilities import shellcommand
+from qubichk.utilities import shellcommand
 
 cmd = "/sbin/ifconfig eth0 |grep '\<inet\>'|awk '{print $2}'"
 ipaddr, err = shellcommand(cmd)
