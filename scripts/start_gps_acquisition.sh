@@ -14,7 +14,7 @@ if ! ps -aux | grep "run_gps_acquisition.py" | grep -v -e grep -e SCREEN; then
 	echo "GPS acquisition not running";
 	screen -X -S GPS quit
 	echo "Starting a new screen and launching the acquisition"
-	screen -S GPS -d -m /usr/local/bin/run_gps_acquisition.py	
+	screen -S GPS -d -m run_gps_acquisition.py	
 else
 	echo "Acquisition already running"
 fi
