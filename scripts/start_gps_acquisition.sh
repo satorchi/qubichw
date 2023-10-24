@@ -8,7 +8,7 @@
 #           redistribute it.  There is NO WARRANTY, to the extent
 #           permitted by law.
 #
-# start the calsource data acquisition in a screen on groundgps 
+# start the SimpleRTK data acquisition in a screen
 
 if ! ps -aux | grep "run_gps_acquisition.py" | grep -v -e grep -e SCREEN; then  
 	echo "GPS acquisition not running";
