@@ -97,7 +97,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         
 
 
-def broadcast_gps():
+def broadcast_gps(verbosity=0):
     '''
     read and broadcast the SimpleRTK data
     '''
@@ -125,7 +125,7 @@ def broadcast_gps():
                 quit()
             time.sleep(0.1)
             continue
-        status = read_gps_chunk(chunk,sock)
+        status = read_gps_chunk(chunk,sock,verbosity=verbosity)
 
     return
 

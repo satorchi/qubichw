@@ -11,6 +11,13 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 run the broadcasting of the SimpleRTK data.  i.e. the calsource box position and orientation
 '''
+import sys
 from qubichw.read_gps import broadcast_gps
 
-broadcast_gps()
+verbosity = 0
+for arg in sys.argv:
+    if arg.find('--verbosity=')==0:
+        verbosity = eval(arg.split('=')[-1])
+        continue
+
+broadcast_gps(verbosity=verbosity)
