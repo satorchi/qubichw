@@ -22,6 +22,7 @@ import datetime as dt
 import numpy as np
 import struct
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import pyplot as plt
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec = np.recarray(names="STX,timestamp,rpN,rpE,rpD,roll,yaw,pitchIMU,rollIMU,temperature,checksum",
