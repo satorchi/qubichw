@@ -11,11 +11,25 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 run the acquisition for the SimpleRTK, ie. the calsource box position and orientation
 '''
+import sys
 from qubichw.read_gps import acquire_gps
-from qubichk.utilities import shellcommand
 
-cmd = "/sbin/ifconfig eth0 |grep '\<inet\>'|awk '{print $2}'"
-ipaddr, err = shellcommand(cmd)
+monitor = False
+listener = None
+verbosity = 0
+for arg in sys.argv:
+    if arg=='--monitor':
+        monitor = True
+        continue
 
-if not ipaddr: ipaddr=None
-acquire_gps()
+    if arg.find('--verbosity=')==0:
+        verbosity = eval(arg.split('=')[-1])
+        continue
+
+    if arg.find('--listener=')==0:
+        listener = arg.split('=')[-1]
+        continue
+    
+    
+
+acquire_gps(listener=listener,monitor=monitor,verbosity=verbosity)

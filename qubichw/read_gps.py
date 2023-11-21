@@ -21,6 +21,7 @@ import socket,time
 import datetime as dt
 import numpy as np
 import struct
+from mpl_toolkits.mplot3d import Axes3D
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec = np.recarray(names="STX,timestamp,rpN,rpE,rpD,roll,yaw,pitchIMU,rollIMU,temperature,checksum",
@@ -127,12 +128,43 @@ def broadcast_gps():
 
     return
 
+def setup_plot_orientation():
+    '''
+    setup the plot for following the orientation angle in real time
+    '''
+    fig = plt.figure(figsize=(10,10))
+    fig.canvas.manager.set_window_title('plt: orientation')
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_ylabel('North Component (m)',fontsize=12)
+    ax.set_xlabel('East Component (m)',fontsize=12)
+    ax.set_zlabel('Down Component (m)',fontsize=12)
+    ax.set_xlim([-3, 3])
+    ax.set_ylim([-3, 3])
+    ax.set_zlim([-3, 3])
+    ax.tick_params(axis='both',labelsize=12)
+
+    return ax
+
+def plot_orientation(dat,ax,curve=None,scale = 1e9):
+    '''
+    plot the current orientation
+    '''
+    if curve is not None: curve.set_visible(False)
+    
+    North, East, Down = dat[0].rpN/scale, dat[0].rpE/scale, dat[0].rpD/scale
+    curve = ax.quiver(0 ,0, 0, North, East, Down, lw=2)
+    
+    return curve
 
 
-def acquire_gps(listener=None,verbosity=0):
+def acquire_gps(listener=None,verbosity=0,monitor=False):
     '''
     read the SimpleRTK data on socket and write to file
     '''
+    if monitor:
+        ax = setup_plot_orientation()
+        curve = None
+    
     if listener is None: listener = receivers[0]
     
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -151,6 +183,7 @@ def acquire_gps(listener=None,verbosity=0):
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
             if verbosity>0: print(dat_list)
+            if monitor: plot_orientation(dat_list, ax, curve)
             time.sleep(packet_period)
         except socket.timeout:
             print('%8i: timeout error on socket' % counter)
