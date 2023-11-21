@@ -145,6 +145,9 @@ def setup_plot_orientation():
     ax.set_zlim([-3, 3])
     ax.tick_params(axis='both',labelsize=12)
 
+    # wait for window to appear
+    plt.pause(0.5) 
+    
     return ax
 
 def plot_orientation(dat,ax,curve=None,scale = 1e9):
@@ -184,7 +187,7 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             dat = client.recv(packetsize)
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
-            if verbosity>0: print(dat_list)
+            if verbosity>0: print('%8i: %s' % (counter,dat_list))
             if monitor: plot_orientation(dat_list, ax, curve)
             time.sleep(packet_period)
         except socket.timeout:
@@ -192,10 +195,10 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             continue
         except KeyboardInterrupt:
             h.close()
-            print('exit using ctrl-c')
+            print('%8i: exit using ctrl-c' % counter)
             return
         except:
-            if verbosity>0: print('problem reading socket')
+            if verbosity>0: print('%8i: problem reading socket' % counter)
             time.sleep(0.2)
 
     return
