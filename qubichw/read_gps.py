@@ -150,12 +150,15 @@ def setup_plot_orientation():
     
     return ax
 
-def plot_orientation(dat,ax,curve=None,scale = 1e9):
+def plot_orientation(dat,ax,curve=None,scale=1e9):
     '''
     plot the current orientation
     '''
     if curve is not None: curve.set_visible(False)
 
+    if (dat[2],dat[3],dat[4])==(0xffff,0xffff,0xffff):
+        scale = 0xffff/3 # for testing
+    
     rpN = dat[2]/scale
     rpE = dat[3]/scale
     rpD = dat[4]/scale
