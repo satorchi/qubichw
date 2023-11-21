@@ -163,6 +163,7 @@ def plot_orientation(dat,ax,curve=None,scale=1e9):
     rpE = dat[3]/scale
     rpD = dat[4]/scale
     curve = ax.quiver(0 ,0, 0, rpN, rpE, rpD, lw=2)
+    plt.pause(0.1)
     
     return curve
 
