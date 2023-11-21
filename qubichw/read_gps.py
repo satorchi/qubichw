@@ -197,9 +197,9 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             h.close()
             print('%8i: exit using ctrl-c' % counter)
             return
-        except:
-            if verbosity>0: print('%8i: problem reading socket' % counter)
-            time.sleep(0.2)
+        # except:
+        #     if verbosity>0: print('%8i: problem reading socket' % counter)
+        #     time.sleep(0.2)
 
     return
 
