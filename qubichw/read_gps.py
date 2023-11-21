@@ -133,6 +133,7 @@ def setup_plot_orientation():
     '''
     setup the plot for following the orientation angle in real time
     '''
+    plt.ion()
     fig = plt.figure(figsize=(10,10))
     fig.canvas.manager.set_window_title('plt: orientation')
     ax = fig.add_subplot(111, projection='3d')
