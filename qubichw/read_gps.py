@@ -155,9 +155,11 @@ def plot_orientation(dat,ax,curve=None,scale = 1e9):
     plot the current orientation
     '''
     if curve is not None: curve.set_visible(False)
-    
-    North, East, Down = dat[0].rpN/scale, dat[0].rpE/scale, dat[0].rpD/scale
-    curve = ax.quiver(0 ,0, 0, North, East, Down, lw=2)
+
+    rpN = dat[2]/scale
+    rpE = dat[3]/scale
+    rpD = dat[4]/scale
+    curve = ax.quiver(0 ,0, 0, rpN, rpE, rpD, lw=2)
     
     return curve
 
