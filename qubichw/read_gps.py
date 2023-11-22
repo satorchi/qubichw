@@ -140,9 +140,9 @@ def setup_plot_orientation():
     ax.set_ylabel('North Component (m)',fontsize=12)
     ax.set_xlabel('East Component (m)',fontsize=12)
     ax.set_zlabel('Down Component (m)',fontsize=12)
-    ax.set_xlim([-3, 3])
-    ax.set_ylim([-3, 3])
-    ax.set_zlim([-3, 3])
+    ax.set_xlim([-1, 1])
+    ax.set_ylim([-1, 1])
+    ax.set_zlim([-1, 1])
     ax.tick_params(axis='both',labelsize=12)
 
     # wait for window to appear
@@ -150,18 +150,23 @@ def setup_plot_orientation():
     
     return ax
 
-def plot_orientation(dat,ax,curve=None,scale=1e9):
+def plot_orientation(dat,ax,curve=None,scale=None):
     '''
     plot the current orientation
     '''
     if curve is not None: curve.set_visible(False)
 
-    if (dat[2],dat[3],dat[4])==(0xffff,0xffff,0xffff):
-        scale = 0xffff/3 # for testing
-    
-    rpN = dat[2]/scale
-    rpE = dat[3]/scale
-    rpD = dat[4]/scale
+    if scale is None:
+        fixed_scale = False
+        norm = np.sqrt(dat[2]**2 + dat[3]**2 + dat[4]**2)
+        if norm==0.0: norm = 1.0
+    else:
+        fixed_scale = True
+        norm = scale
+        
+    rpN = dat[2]/norm
+    rpE = dat[3]/norm
+    rpD = dat[4]/norm
     curve = ax.quiver(0 ,0, 0, rpN, rpE, rpD, lw=2)
     plt.pause(0.1)
     
