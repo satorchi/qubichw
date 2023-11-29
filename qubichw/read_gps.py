@@ -170,7 +170,7 @@ def plot_orientation(dat,ax,curve=None,dateobj=None,scale=None):
     rpE = dat[3]/norm
     rpD = dat[4]/norm
     curve = ax.quiver(0 ,0, 0, rpN, rpE, rpD, lw=2)
-    dateobj = ax.text(-1,-1,2,date_str),va='bottom',ha='left',fontsize=20)
+    dateobj = ax.text(-1,-1,2,date_str,va='bottom',ha='left',fontsize=20)
     
     plt.pause(0.001)
     
