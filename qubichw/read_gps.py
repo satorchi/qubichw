@@ -155,6 +155,7 @@ def plot_orientation(dat,ax,curve=None,dateobj=None,scale=None):
     plot the current orientation
     '''
     if curve is not None: curve.remove()
+    if dateobj is not None: dateobj.remove()
     date = dt.datetime.utcfromtimestamp(dat[1])
     date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
 
