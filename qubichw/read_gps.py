@@ -154,7 +154,7 @@ def plot_orientation(dat,ax,curve=None,scale=None):
     '''
     plot the current orientation
     '''
-    if curve is not None: curve.set_visible(False)
+    if curve is not None: curve.remove()
 
     if scale is None:
         fixed_scale = False
@@ -168,7 +168,7 @@ def plot_orientation(dat,ax,curve=None,scale=None):
     rpE = dat[3]/norm
     rpD = dat[4]/norm
     curve = ax.quiver(0 ,0, 0, rpN, rpE, rpD, lw=2)
-    plt.pause(0.1)
+    plt.pause(0.001)
     
     return curve
 
@@ -180,6 +180,7 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
     if monitor:
         ax = setup_plot_orientation()
         curve = None
+    print_fmt = '%8i: 0x%X %s %8.2f %8.2f %8.2f '
     
     if listener is None: listener = receivers[0]
     
@@ -198,8 +199,11 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             dat = client.recv(packetsize)
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
-            if verbosity>0: print('%8i: %s' % (counter,dat_list))
-            if monitor: plot_orientation(dat_list, ax, curve)
+            if verbosity>0:
+                date = dt.datetime.utcfromtimestamp(dat_list[1])
+                date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
+                print(print_fmt % (counter,dat_list[0],date_str,dat_list[2],dat_list[3],dat_list[3]))
+            if monitor: curve = plot_orientation(dat_list, ax, curve)
             time.sleep(packet_period)
         except socket.timeout:
             print('%8i: timeout error on socket' % counter)
