@@ -180,7 +180,7 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
     if monitor:
         ax = setup_plot_orientation()
         curve = None
-    print_fmt = '%8i: 0x%X %s %8.2f %8.2f %8.2f '
+    print_fmt = '%8i: 0x%X %s %10.2f %10.2f %10.2f %10.2f %10.2f %8.3f %8.3f %5.1f'
     
     if listener is None: listener = receivers[0]
     
@@ -202,7 +202,18 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             if verbosity>0:
                 date = dt.datetime.utcfromtimestamp(dat_list[1])
                 date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
-                print(print_fmt % (counter,dat_list[0],date_str,dat_list[2],dat_list[3],dat_list[3]))
+                print(print_fmt % (counter,
+                                   dat_list[0],
+                                   date_str,
+                                   dat_list[2],
+                                   dat_list[3],
+                                   dat_list[4],
+                                   dat_list[5],
+                                   dat_list[6],
+                                   dat_list[7],
+                                   dat_list[8],
+                                   dat_list[9]
+                                   )
             if monitor: curve = plot_orientation(dat_list, ax, curve)
             time.sleep(packet_period)
         except socket.timeout:
