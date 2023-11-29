@@ -214,6 +214,7 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
                                    dat_list[8],
                                    dat_list[9]
                                    )
+                      )
             if monitor: curve = plot_orientation(dat_list, ax, curve)
             time.sleep(packet_period)
         except socket.timeout:
