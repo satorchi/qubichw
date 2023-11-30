@@ -158,6 +158,10 @@ def plot_orientation(dat,ax,curve=None,dateobj=None,scale=None):
     if dateobj is not None: dateobj.remove()
     date = dt.datetime.utcfromtimestamp(dat[1])
     date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
+    now = dt.datetime.utcnow()
+    now_str = now.strftime('%Y-%m-%d %H:%M:%S.%f')
+    delta = (now-date).total_seconds()
+    date_text = 'data: %s\nnow:  %s\ndiff: %.3f seconds' % (date_str,now_str,delta)
 
     if scale is None:
         fixed_scale = False
@@ -171,7 +175,7 @@ def plot_orientation(dat,ax,curve=None,dateobj=None,scale=None):
     rpE = dat[3]/norm
     rpD = dat[4]/norm
     curve = ax.quiver(0 ,0, 0, rpN, rpE, rpD, lw=2)
-    dateobj = ax.text(-1,-1,2,date_str,va='bottom',ha='left',fontsize=20)
+    dateobj = ax.text(-1,-1,2,date_text,va='bottom',ha='left',fontsize=20)
     
     plt.pause(0.001)
     
