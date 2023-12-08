@@ -228,11 +228,13 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             if monitor: curve,dateobj = plot_orientation(dat_list, ax, curve, dateobj)
             time.sleep(packet_period)
         except socket.timeout:
-            print('%8i: timeout error on socket' % counter)
+            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            print('%8i: %s timeout error on socket' % (counter,now_str))
             continue
         except KeyboardInterrupt:
             h.close()
-            print('%8i: exit using ctrl-c' % counter)
+            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            print('%8i: %s exit using ctrl-c' % (counter,now_str))
             return
         # except:
         #     if verbosity>0: print('%8i: problem reading socket' % counter)
