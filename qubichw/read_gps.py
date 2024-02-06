@@ -74,7 +74,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         for idx,key in enumerate(keys):
             data_idx = idx + 1
             val_str = data_list[data_idx]
-            if val_str=='FFFF':
+            if val_str=='NONE':
                 val = 65535
             else:
                 try:
@@ -90,7 +90,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         
         # broadcast the data
         for rx in receivers:
-            print('broadcasting to: %s' % rx)
+            print('%s broadcasting to: %s' % (date_str,rx))
             sock.sendto(rec,(rx,PORT))
     return True
 
