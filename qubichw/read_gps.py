@@ -70,7 +70,11 @@ def read_gps_chunk(chunk,sock,verbosity=0):
 
         
         rec[0].timestamp = date.timestamp()
-        rec[0].checksum = eval('0x%s' % data_list[-1])
+        try:
+            rec[0].checksum = eval('0x%s' % data_list[-1])
+        except:
+            if verbosity>0: print('CHECKSUM ERROR: %s' % data_list[-1])
+            continue
         for idx,key in enumerate(keys):
             data_idx = idx + 1
             val_str = data_list[data_idx]
