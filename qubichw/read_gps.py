@@ -94,7 +94,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         
         # broadcast the data
         for rx in receivers:
-            print('%s broadcasting to: %s' % (date_str,rx))
+            if verbosity>0: print('%s broadcasting to: %s' % (date_str,rx))
             sock.sendto(rec,(rx,PORT))
     return True
 
