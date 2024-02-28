@@ -134,10 +134,12 @@ def get_inside_weather(options):
     '''
     get the measurements from the weather station inside the dome
     '''
-    if options['verbosity']>0:
-        print('getting inside weather conditions')
         
     url = 'http://%s/index.html' % options['server']
+    if options['verbosity']>0:
+        print('getting inside weather conditions from: %s' % url)
+
+    
     values = {}
     values['ok'] = False
     values['temperature'] = None
