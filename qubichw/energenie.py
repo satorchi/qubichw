@@ -172,6 +172,7 @@ class energenie:
                 states['error_message'] = 'USB Energenie powerbar not detected: error count=%i' % error_counter
                 if err: states['error_message'] += '\n'+err
                 if out: states['error_message'] += '\n'+out
+                msg = states['error_message']
                 self.log(msg,verbosity=1)
                 if error_counter<max_count: time.sleep(3)
 
