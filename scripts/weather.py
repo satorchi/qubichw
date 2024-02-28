@@ -16,6 +16,10 @@ import datetime as dt
 from urllib.request import urlopen
 from qubichk.utilities import shellcommand
 
+server0 = '45.224.140.42:8989'
+server1 = '192.168.88.98'
+server2 = '192.168.88.47'
+
 def parseargs(argv):
     '''
     parse the command line arguments
@@ -65,9 +69,6 @@ def choose_server():
     '''
     decided whether we can use the internal network, or the internet
     '''
-    server0 = '45.224.140.42:8989'
-    server1 = '192.168.88.98'
-    server2 = '192.168.88.47'
     
     ip = None
     cmd = '/sbin/ip address show dev eth0'
@@ -149,9 +150,12 @@ def get_inside_weather(options):
     except:
         return values
 
+    if options['verbosity']>0:
+        print('vvvvvv webpage vvvvvv\n%s\n^^^^^^ webpage ^^^^^^' % pg.decode())
+        
     reslist = []
     srchpattern = ['^Humidity (\(.*\)) .*:(.*)$','^Temperature (\(.*\)) .*:(.*)$']
-    for idx,line in enumerate(pg.decode().split()):
+    for idx,line in enumerate(pg.decode().split('\n')):
         for pattern in srchpattern:
             m = re.search(pattern,line)
             if not m: continue
