@@ -157,11 +157,18 @@ class energenie:
         states['ok'] = True
         states['error_message'] = None
 
-        cmd = '%s -g all' % self.manager
-        
         # try a few times to connect to the Energenie USB powerbar
         error_counter = 0
         max_count = 3
+
+        # first check if it was found at all
+        if self.manager is None:
+            states['ok'] = False
+            states['error_message'] = 'USB Energenie powerbar not detected'
+            error_counter = max_count
+
+        cmd = '%s -g all' % self.manager
+        
         match = None
         find_str = '(Status of outlet [1-4]:\t)(off|on)'
         while match is None and error_counter<max_count:

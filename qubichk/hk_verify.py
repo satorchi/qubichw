@@ -107,11 +107,15 @@ def check_power(verbosity=1):
             if not isinstance(socknum,int): continue # skip serial number
             
             subsys = powerbar.socket[socknum]
-            state = states[socknum]
-            if state:
-                retval[subsys] = 'ON'
+            if socknum not in states.keys():
+                state = 'UNKNOWN'
+                retval[subsys] = 'UNKNOWN'
             else:
-                retval[subsys] = 'OFF'
+                state = states[socknum]
+                if state:
+                    retval[subsys] = 'ON'
+                else:
+                    retval[subsys] = 'OFF'
             msg = '%s is %s' % (subsys,state)
             msg_list.append(msg)
             
