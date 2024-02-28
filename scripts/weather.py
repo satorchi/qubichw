@@ -82,6 +82,9 @@ def get_weather(options):
     '''
     get the measurements from the webpage
     '''
+    if options['server']=='192.168.88.47': return get_inside_weather(options)
+    
+    
     url = 'http://%s/index.asp' % options['server']
     values = {}
     values['ok'] = False
