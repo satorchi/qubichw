@@ -47,6 +47,10 @@ def parseargs(argv):
             except:
                 continue
 
+        if arg.find('--server=')==0:
+            options['server'] = arg.split('=')[1]
+            continue
+
     if options['server'] is None:
         options['server'] = choose_server()
         
@@ -58,6 +62,7 @@ def choose_server():
     '''
     server0 = '45.224.140.42:8989'
     server1 = '192.168.88.98'
+    server2 = '192.168.88.47'
     
     ip = None
     cmd = '/sbin/ip address show dev eth0'
