@@ -178,7 +178,7 @@ class energenie:
 
         if match is None:
             states['ok'] = False
-            msg = 'ERROR! %s\n-->Please check USB connection' % retval['error_message']
+            msg = 'ERROR! %s\n-->Please check USB connection' % states['error_message']
             self.log(msg,verbosity=1)
             return states
    
