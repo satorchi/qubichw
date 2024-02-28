@@ -108,7 +108,7 @@ def check_power(verbosity=1):
             
             subsys = powerbar.socket[socknum]
             if socknum not in states.keys():
-                state = 'UNKNOWN'
+                state = False
                 retval[subsys] = 'UNKNOWN'
             else:
                 state = states[socknum]
