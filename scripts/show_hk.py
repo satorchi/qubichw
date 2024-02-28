@@ -36,7 +36,8 @@ exclude_files = ['TEMPERATURE_RAW.txt',
                  'compressor1_log.txt',
                  'compressor2_log.txt',
                  'ups_log.txt',
-                 'weather.txt']
+                 'weather.txt',
+                 'inside_weather.txt']
 touchname = 'AVS47_1_ch0.txt'
 
 def read_labels():
@@ -131,11 +132,17 @@ def assign_val_string(val,units):
         val_str = '%12.5e %s' % (val,units)
     return val_str
     
-def read_weather():
+def read_weather(site='outside'):
     '''
     return a list timestamps, and a list of strings with the weather data
     '''
-    basename = 'weather.txt'
+    if site=='outside':
+        basename = 'weather.txt'
+        temp_label = 'outside temperature'
+    else:
+        basename = 'inside_weather.txt'
+        temp_label = 'inside temperature'
+        
     rootname = basename.replace('.txt','')
     weather_file = '%s%s%s' % (hk_dir,os.sep,basename)
     vals = read_lastline(weather_file)
@@ -148,8 +155,7 @@ def read_weather():
     tstamps.append(tstamp)
     date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
     val_str = '%.1f C' % vals[1]
-    label = 'outside temperature'
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), temp_label.center(20), rootname)
     lines.append(line)
 
     tstamps.append(tstamp)
@@ -256,12 +262,16 @@ def read_compressor(compressor_num):
     
 
 # first look at the weather
-retval = read_weather()
+retval = read_weather('outside')
 if retval is None:
     lines = []
     tstamps = []
 else:
     tstamps,lines = retval
+retval = read_weather('inside')
+if retval is not None:
+    tstamps += retval[0]
+    lines += retval[1]
 
 # read the UPS status
 retval = read_ups()
