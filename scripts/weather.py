@@ -26,6 +26,7 @@ def parseargs(argv):
     options['print'] = True # print result to screen
     options['period'] = None # sampling period in seconds (if None, print once and exit)
     options['server'] = None
+    options['verbosity'] = 0
 
     for arg in argv:
         if arg=='--log':
@@ -49,6 +50,10 @@ def parseargs(argv):
 
         if arg.find('--server=')==0:
             options['server'] = arg.split('=')[1]
+            continue
+
+        if arg.find('--verbosity=')==0:
+            options['verbosity'] = eval(arg.split('=')[1])
             continue
 
     if options['server'] is None:
@@ -84,6 +89,8 @@ def get_weather(options):
     '''
     if options['server']=='192.168.88.47': return get_inside_weather(options)
     
+    if options['verbosity']>0:
+        print('getting outside weather conditions')
     
     url = 'http://%s/index.asp' % options['server']
     values = {}
@@ -126,6 +133,9 @@ def get_inside_weather(options):
     '''
     get the measurements from the weather station inside the dome
     '''
+    if options['verbosity']>0:
+        print('getting inside weather conditions')
+        
     url = 'http://%s/index.html' % options['server']
     values = {}
     values['ok'] = False
