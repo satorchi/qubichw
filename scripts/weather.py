@@ -119,6 +119,51 @@ def get_weather(options):
     values['ok'] = True
     return values
 
+def get_inside_weather(options):
+    '''
+    get the measurements from the weather station inside the dome
+    '''
+    url = 'http://%s/index.html' % options['server']
+    values = {}
+    values['ok'] = False
+    values['temperature'] = None
+    values['humidity'] = None
+    values['message'] = None
+
+    try:
+        website = urlopen(url,timeout=5)
+        pg = website.read()
+    except:
+        return values
+
+    reslist = []
+    srchpattern = ['^Humidity (\(.*\)) .*:(.*)$','^Temperature (\(.*\)) .*:(.*)$']
+    for idx,line in enumerate(pg.decode().split()):
+        for pattern in srchpattern:
+            m = re.search(pattern,line)
+            if not m: continue
+
+            valstr = m.groups()[1]
+            try: 
+                val = eval(valstr)
+            except:
+                continue
+
+            units = m.groups()[0].replace('(','').replace(')','')
+                
+            reslist.append('%.2f %s' % (val,units))
+            if units.find('C')>=0:
+                values['temperature'] = val
+            if units.find('%')>=0:
+                values['humidity'] = val
+
+
+    msg = ' '.join(reslist)
+    values['message'] = msg
+    values['ok'] = True
+    return values
+    
+
 def show_weather(values,options):
     '''
     log the weather and/or show it on screen
