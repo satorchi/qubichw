@@ -156,7 +156,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/run_gps_acquisition.py',
            'scripts/run_gps_broadcast.py',
            'scripts/start_gps_acquisition.sh',
-           'scripts/start_gps_broadcast.sh']
+           'scripts/start_gps_broadcast.sh',
+           'scripts/start_ups.sh']
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
     for F in scripts:
