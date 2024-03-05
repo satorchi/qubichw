@@ -21,7 +21,10 @@ from qubichk.utilities import shellcommand
 from qubichw.calibration_source import calibration_source
 
 # the low noise amplifier
-from qubichw.amplifier_femto import amplifier
+if os.uname.machine.find('arm')>=0:
+    from qubichw.amplifier_femto import amplifier
+else:
+    from qubichw.amplifier_dummy import amplifier
 
 # the signal generator for modulating the calibration source and for reading the calsource monitor
 from qubichw.modulator_siglent import siglent as modulator
