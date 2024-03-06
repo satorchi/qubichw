@@ -87,12 +87,12 @@ def get_weather(options):
     '''
     get the measurements from the webpage
     '''
-    if options['verbosity']>0:
+    if options['verbosity']>1:
         print('getting weather conditions from server: %s' % options['server'])
     
     if options['server']==server2: return get_inside_weather(options)
     
-    if options['verbosity']>0:
+    if options['verbosity']>1:
         print('getting outside weather conditions')
     
     url = 'http://%s/index.asp' % options['server']
@@ -138,7 +138,7 @@ def get_inside_weather(options):
     '''
         
     url = 'http://%s/index.html' % options['server']
-    if options['verbosity']>0:
+    if options['verbosity']>1:
         print('getting inside weather conditions from: %s' % url)
 
     
@@ -149,12 +149,14 @@ def get_inside_weather(options):
     values['message'] = None
 
     try:
-        website = urlopen(url,timeout=5)
+        website = urlopen(url,timeout=15)
         pg = website.read()
     except:
+        if options['verbosity']>0:
+            print('could not get weather info from %s' % url)
         return values
 
-    if options['verbosity']>0:
+    if options['verbosity']>1:
         print('vvvvvv webpage vvvvvv\n%s\n^^^^^^ webpage ^^^^^^' % pg.decode())
         
     reslist = []
