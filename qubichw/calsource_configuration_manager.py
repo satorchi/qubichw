@@ -21,7 +21,7 @@ from qubichk.utilities import shellcommand
 from qubichw.calibration_source import calibration_source
 
 # the low noise amplifier
-if os.uname.machine.find('arm')>=0:
+if os.uname().machine.find('arm')>=0:
     from qubichw.amplifier_femto import amplifier
 else:
     from qubichw.amplifier_dummy import amplifier
