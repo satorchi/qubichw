@@ -20,4 +20,17 @@ else
     echo "weather logger already running"
 fi
 
+
+if ! ps auxw | grep "/usr/local/bin/weather.py" | grep inside_weather | grep -v -e grep -e SCREEN; then  
+    echo "weather logger not running";
+    screen -X -S inside_weather quit
+    echo "Starting a new screen and launching the indoor weather logger"
+    cd $HOME/data/temperature/broadcast
+    screen -S weather -d -m /usr/local/bin/weather.py --log --period=3 --logfile=/home/qubic/data/temperature/broadcast/inside_weather.txt
+else
+    echo "weather logger already running"
+fi
+
+
+
 #start_weather.sh
