@@ -18,7 +18,7 @@ from qubichk.utilities import shellcommand
 
 server0 = '45.224.140.42:8989'
 server1 = '192.168.88.98'
-server2 = '192.168.88.47'
+server2 = '192.168.88.13'
 
 def parseargs(argv):
     '''
@@ -88,7 +88,7 @@ def get_weather(options):
     '''
     get the measurements from the webpage
     '''
-    if options['server']=='192.168.88.47': return get_inside_weather(options)
+    if options['server']==server2: return get_inside_weather(options)
     
     if options['verbosity']>0:
         print('getting outside weather conditions')
