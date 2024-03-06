@@ -88,6 +88,9 @@ def get_weather(options):
     '''
     get the measurements from the webpage
     '''
+    if options['verbosity']>0:
+        print('getting weather conditions from server: %s' % options['server'])
+    
     if options['server']==server2: return get_inside_weather(options)
     
     if options['verbosity']>0:
