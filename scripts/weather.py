@@ -27,7 +27,6 @@ def parseargs(argv):
     options = {}
     options['log'] = False  # log result
     options['logfile'] = '/home/qubic/data/temperature/broadcast/weather.txt'
-    options['print'] = True # print result to screen
     options['period'] = None # sampling period in seconds (if None, print once and exit)
     options['server'] = None
     options['verbosity'] = 0
@@ -42,7 +41,7 @@ def parseargs(argv):
             continue
 
         if arg=='--quiet':
-            options['print'] = False
+            options['verbosity'] = 0
             continue
 
         if arg.find('--period=')==0:
@@ -199,7 +198,7 @@ def show_weather(values,options):
         h.write(line)
         h.close()
 
-    if options['print']:
+    if options['verbosity']>0:
         print(values['message'])
 
     return
