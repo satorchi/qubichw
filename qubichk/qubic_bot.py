@@ -1156,7 +1156,13 @@ class qubic_bot :
         role = 'bot'
         cli = calsource_configuration_manager(role=role, verbosity=0)
         cli.send_command('status')
-        tstamp,ack = cli.listen_for_acknowledgement(timeout=20) # tstamp is when the info was received
+        retval = cli.listen_for_acknowledgement(timeout=20) # tstamp is when the info was received
+        if retval is None:
+            answer = 'No calsource information'
+            self._send_message(answer)
+            return
+
+        tstamp,ack = retval
 
         msg_list = ack.decode().split()
         if len(msg_list) < 3:
