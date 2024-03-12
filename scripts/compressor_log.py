@@ -56,9 +56,5 @@ if not ok and not os.path.isfile('/tmp/DONT_SEND_COMPRESSOR_MESSAGE'):
             fullmsg += error_msg
         else:
             fullmsg += '\n'.join(status_msg)
-            if os.path.isfile('/tmp/DONT_SEND_OFFLINE_MESSAGE'):
-                fullmsg = None
-
-        if fullmsg is not None:
-            send_telegram(fullmsg,'Steve')
+        send_telegram(fullmsg,'Steve')
 
