@@ -106,6 +106,7 @@ def get_weather(options):
         website = urlopen(url,timeout=5)
         pg = website.read()
     except:
+        if options['verbosity']>0: print('could not get weather info from %s' % url)
         return values
 
     reslist = []
