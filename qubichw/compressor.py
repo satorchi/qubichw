@@ -55,7 +55,8 @@ class compressor:
         self.statusbits[0] = 'System ON'
 
 
-        self.ttyID = ['FT4PIASF','FT4PFIW1']
+        #self.ttyID = ['FT4PIASF','FT4PFIW1']
+        self.ttyID = ['ftCYWB2W','AM0076OV'] # 2024-04-06 22:52:51
         self.initialized = False
         self.port = self.find_port(port)
         if self.port is not None:
