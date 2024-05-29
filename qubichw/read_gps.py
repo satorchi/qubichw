@@ -78,7 +78,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         for idx,key in enumerate(keys):
             data_idx = idx + 1
             val_str = data_list[data_idx]
-            if val_str=='NONE':
+            if val_str=='NONE' or val_str=='FFFF':
                 val = 65535
             else:
                 try:
