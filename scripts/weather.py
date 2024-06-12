@@ -20,6 +20,7 @@ server0 = '45.224.140.42:8989'
 server1 = '192.168.88.98'
 server2 = '192.168.88.13'
 server3 = '192.168.88.14'
+server4 = '192.168.88.20'
 
 def parseargs(argv):
     '''
@@ -80,8 +81,8 @@ def choose_server():
             break
         
     if ip is None: return server0
-    if ip.find('192.168.88.')==0: return server3
-    if ip.find('192.168.2.')==0: return server3
+    if ip.find('192.168.88.')==0: return server4
+    if ip.find('192.168.2.')==0: return server4
     return server0
 
 def get_weather(options):
