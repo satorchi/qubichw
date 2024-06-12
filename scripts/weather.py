@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 read the weather stuff from the weather station online
 '''
-import sys,re,time
+import sys,re,time,os
 import datetime as dt
 from urllib.request import urlopen
 from qubichk.utilities import shellcommand
