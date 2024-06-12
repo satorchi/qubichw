@@ -204,7 +204,14 @@ def get_weather_csv(options):
     if weather_data is None:
         return values
 
-    return weather_data
+    for key in ['ok','message']:
+        values[key] = weather_data[key]
+
+    for key in ['temperature','humidity']:
+        values[key] = weather_data[key][-1]
+    
+
+    return values
 
 def get_outside_weather(options):
     '''
