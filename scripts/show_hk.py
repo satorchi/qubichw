@@ -103,6 +103,7 @@ def read_lastline(filename):
 
     val_list = []
     for val_str in col:
+        val_str = val_str.strip()
         try:
             val = eval(val_str)
         except:
