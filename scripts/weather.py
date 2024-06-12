@@ -207,7 +207,7 @@ def get_weather_csv(options):
     for key in ['ok','message']:
         values[key] = weather_data[key]
 
-    for key in ['temperature','humidity']:
+    for key in ['date','temperature','humidity']:
         values[key] = weather_data[key][-1]
     
 
@@ -284,8 +284,11 @@ def show_weather(values,options):
     log the weather and/or show it on screen
     '''
     if not values['ok']: return
-    
-    tstamp = dt.datetime.utcnow().timestamp()
+
+    if 'date' in values.keys():
+        tstamp = values['date'].timestamp()
+    else:
+        tstamp = dt.datetime.utcnow().timestamp()
     line = '%f %f %f\n' % (tstamp,values['temperature'],values['humidity'])
     if options['log']:
         h = open(options['logfile'],'a')
