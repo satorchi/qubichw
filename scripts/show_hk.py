@@ -393,6 +393,13 @@ for F in hk_files:
     if retval is None: continue
     tstamp,val,onoff = retval
     if val=='inf': val=1e6
+
+    try:
+        date = dt.datetime.utcfromtimestamp(tstamp)
+        date_str = date.strftime(date_fmt)
+    except:
+        print('*** ERROR READING TIMESTAMP *** %s' % tstamp)
+        continue    
     tstamps.append(tstamp)
 
     label = ''
@@ -425,13 +432,6 @@ for F in hk_files:
         units = 'degrees'
     else:
         units = ''
-
-    try:
-        date = dt.datetime.utcfromtimestamp(tstamp)
-        date_str = date.strftime(date_fmt)
-    except:
-        print('*** ERROR READING TIMESTAMP *** %s' % tstamp)
-        continue
     
     if units == 'steps':
         val_str = '%10i %s' % (int(val), units)
