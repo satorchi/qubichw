@@ -279,13 +279,14 @@ def show_weather(values,options):
     if not values['ok']: return
     
     tstamp = dt.datetime.utcnow().timestamp()
+    line = '%f %f %f\n' % (tstamp,values['temperature'],values['humidity'])
     if options['log']:
-        line = '%f %f %f\n' % (tstamp,values['temperature'],values['humidity'])
         h = open(options['logfile'],'a')
         h.write(line)
         h.close()
 
     if options['verbosity']>0:
+        print(line)
         print(values['message'])
 
     return
