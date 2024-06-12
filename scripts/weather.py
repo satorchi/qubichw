@@ -31,6 +31,7 @@ def parseargs(argv):
     options['logfile'] = '/home/qubic/data/temperature/broadcast/weather.txt'
     options['period'] = None # sampling period in seconds (if None, print once and exit)
     options['server'] = None
+    options['username'] = 'wstation01'
     options['verbosity'] = 0
 
     for arg in argv:
@@ -57,6 +58,10 @@ def parseargs(argv):
             options['server'] = arg.split('=')[1]
             continue
 
+        if arg.find('--user=')==0:
+            options['username'] = arg.split('=')[1]
+            continue
+        
         if arg.find('--verbosity=')==0:
             options['verbosity'] = eval(arg.split('=')[1])
             continue
@@ -182,15 +187,16 @@ def get_weather_csv(options):
     values['message'] = None
 
     if options['server'] is None:
-        server = server4
+        server = choose_server()
     else:
         server = options['server']
 
+    username = options['username']
     weather_data_dir = 'TECMES/data'
-    out,err = shellcommand('ssh %s "ls -t %s/????????.csv"' % (server,weather_data_dir))
+    out,err = shellcommand('ssh %s@%s "ls -t %s/????????.csv"' % (username,server,weather_data_dir))
     csvfile_fullpath = out.split('\n')[0]
     csvfile = os.path.basename(csvfile_fullpath)
-    out,err = shellcommand('scp -p %s:%s .' % (server,csvfile_fullpath))
+    out,err = shellcommand('scp -p %s@%s:%s .' % (username,server,csvfile_fullpath))
 
     weather_data = read_weather_csv(csvfile)
     if weather_data is None:
