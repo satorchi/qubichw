@@ -173,6 +173,8 @@ def read_weather_csv(weather_file):
                 continue
             weather_data[key].append(eval(col[idx]))
 
+    weather_data['ok'] = True
+    weather_data['message'] = 'data read from %s' % weather_file
     return weather_data
 
 
@@ -202,7 +204,6 @@ def get_weather_csv(options):
     if weather_data is None:
         return values
 
-    weather_data['ok'] = True
     return weather_data
 
 def get_outside_weather(options):
