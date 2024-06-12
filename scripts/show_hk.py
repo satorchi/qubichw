@@ -102,12 +102,13 @@ def read_lastline(filename):
         return None
 
     val_list = []
+    badchar = '\x00'
     for val_str in col:
-        val_str = val_str.strip()
+        clean_val_str = val_str.strip().replace(badchar,'')
         try:
-            val = eval(val_str)
+            val = eval(clean_val_str)
         except:
-            val = val_str
+            val = clean_val_str
         val_list.append(val)
             
     if len(col)<3:
