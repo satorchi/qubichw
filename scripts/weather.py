@@ -187,10 +187,10 @@ def get_weather_csv(options):
         server = options['server']
 
     weather_data_dir = 'TECMES/data'
-    out,err = shellcommand('ssh weather "ls -t %s/????????.csv"' % weather_data_dir)
+    out,err = shellcommand('ssh %s "ls -t %s/????????.csv"' % (server,weather_data_dir))
     csvfile_fullpath = out.split('\n')[0]
     csvfile = os.path.basename(csvfile_fullpath)
-    out,err = shellcommand('scp -p %s .' % csvfile_fullpath)
+    out,err = shellcommand('scp -p %s:%s .' % (server,csvfile_fullpath))
 
     weather_data = read_weather_csv(csvfile)
     if weather_data is None:
