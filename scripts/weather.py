@@ -186,9 +186,10 @@ def get_weather_csv(options):
     else:
         server = options['server']
 
-    out,err = shellcommand('ssh weather "ls -t TECMES/data/????????.csv"')
-    csvfile = out.split('\n')[0]
-    csvfile_fullpath = 'TECMES/data/%s' % csvfile
+    weather_data_dir = 'TECMES/data'
+    out,err = shellcommand('ssh weather "ls -t %s/????????.csv"' % weather_data_dir)
+    csvfile_fullpath = out.split('\n')[0]
+    csvfile = os.basename(csvfile_fullpath)
     out,err = shellcommand('scp -p %s .' % csvfile_fullpath)
 
     weather_data = read_weather_csv(csvfile)
