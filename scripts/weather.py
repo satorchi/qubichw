@@ -93,10 +93,14 @@ def get_weather(options):
         print('getting weather conditions from server: %s' % options['server'])
     
     if options['server']==server2: return get_inside_weather(options)
-    
-    if options['verbosity']>1:
-        print('getting outside weather conditions')
-    
+
+    return get_outside_weather(options)
+
+def get_weather_html(options):
+    '''
+    get the measurements from the weather station outside the dome running an html server
+    '''
+
     url = 'http://%s/index.asp' % options['server']
     values = {}
     values['ok'] = False
@@ -134,6 +138,76 @@ def get_weather(options):
     values['message'] = msg
     values['ok'] = True
     return values
+
+    
+def read_weather_csv(weather_file):
+    '''
+    read the CSV file from the weather station
+    '''
+    weather_keys = ['date','temperature','humidity','battery','pressure','windspeed','winddir','radiation','rain']
+
+    if not os.path.isfile(weather_file):
+        print('weather file not found: %s' % weather_file)
+        return None
+
+    
+    h = open(weather_file)
+    lines = h.read().split('\n')
+    h.close()
+    del(lines[-1])
+
+    weather_data = {}
+    for key in weather_keys:
+        weather_data[key] = []
+
+    for line in lines:
+        col = line.split(',')
+        for idx,key in enumerate(weather_keys):
+            if key=='date':
+                weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y'))
+                continue
+            weather_data[key].append(eval(col[idx]))
+
+    return weather_data
+
+
+def get_weather_csv(options):
+    '''
+    get the weather measurements from the CSV file on the weather station server
+    '''
+    values = {}
+    values['ok'] = False
+    values['temperature'] = None
+    values['humidity'] = None
+    values['message'] = None
+
+    if options['server'] is None:
+        server = server4
+    else:
+        server = options['server']
+
+    out,err = shellcommand('ssh weather "ls -t TECMES/data/????????.csv"')
+    csvfile = out.split('\n')[0]
+    csvfile_fullpath = 'TECMES/data/%s' % csvfile
+    out,err = shellcommand('scp -p %s .' % csvfile_fullpath)
+
+    weather_data = read_weather_csv(csvfile)
+    if weather_data is None:
+        return values
+
+    weather_data['ok'] = True
+    return weather_data
+
+def get_outside_weather(options):
+    '''
+    get the measurements from the weather station outside the dome
+    '''
+
+    if options['verbosity']>1:
+        print('getting outside weather conditions')
+    
+    return get_weather_csv(options)
+
 
 def get_inside_weather(options):
     '''
