@@ -77,7 +77,7 @@ def choose_server():
     '''
     
     ip = None
-    cmd = '/sbin/ip address show dev eth0'
+    cmd = '/sbin/ip address show dev eth2'
     out,err = shellcommand(cmd)
     for line in out.split('\n'):
         col = line.strip().split()
@@ -111,7 +111,7 @@ def get_weather_html(options):
     values['ok'] = False
     values['temperature'] = None
     values['humidity'] = None
-    values['message'] = None
+    values['message'] = 'No info'
 
     try:
         website = urlopen(url,timeout=5)
@@ -184,7 +184,7 @@ def get_weather_csv(options):
     values['ok'] = False
     values['temperature'] = None
     values['humidity'] = None
-    values['message'] = None
+    values['message'] = 'No info'
 
     if options['server'] is None:
         server = choose_server()
@@ -230,7 +230,7 @@ def get_inside_weather(options):
     values['ok'] = False
     values['temperature'] = None
     values['humidity'] = None
-    values['message'] = None
+    values['message'] = 'No info'
 
     try:
         website = urlopen(url,timeout=15)
