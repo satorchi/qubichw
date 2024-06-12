@@ -398,7 +398,7 @@ for F in hk_files:
         date = dt.datetime.utcfromtimestamp(tstamp)
         date_str = date.strftime(date_fmt)
     except:
-        print('*** ERROR READING TIMESTAMP *** %s' % tstamp)
+        print('*** ERROR READING TIMESTAMP *** >>>%s<<<' % tstamp)
         continue    
     tstamps.append(tstamp)
 
