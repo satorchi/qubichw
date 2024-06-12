@@ -36,7 +36,7 @@ chunksize = 4096 # size of ASCII chunk read from the GPS device
 
 #IP_BROADCAST = "192.168.2.255"
 IP_QUBIC_CENTRAL = "192.168.2.1"
-IP_GROUNDGPS = "134.158.187.142" # testing at APC
+IP_GROUNDGPS = "134.158.187.114" # testing at APC
 receivers = [IP_GROUNDGPS] # testing at APC
 PORT = 31337
 
