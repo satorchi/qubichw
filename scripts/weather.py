@@ -150,7 +150,8 @@ def read_weather_csv(weather_file):
     read the CSV file from the weather station
     '''
     weather_keys = ['date','temperature','humidity','battery','pressure','windspeed','winddir','radiation','rain']
-
+    utoffset = dt.timedelta(hours=3) # weather station data is in ART
+    
     if not os.path.isfile(weather_file):
         print('weather file not found: %s' % weather_file)
         return None
@@ -169,7 +170,7 @@ def read_weather_csv(weather_file):
         col = line.split(',')
         for idx,key in enumerate(weather_keys):
             if key=='date':
-                weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y'))
+                weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y') + utoffset)
                 continue
             weather_data[key].append(eval(col[idx]))
 
