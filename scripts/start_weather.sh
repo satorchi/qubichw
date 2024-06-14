@@ -15,7 +15,7 @@ if ! ps auxw | grep "/usr/local/bin/weather.py" | grep -v -e grep -e SCREEN -e i
     screen -X -S weather quit
     echo "Starting a new screen and launching the weather logger"
     cd $HOME/data/temperature/broadcast
-    screen -S weather -d -m /usr/local/bin/weather.py --log --period=60.5 --logfile=$HOME/data/temperature/broadcast/weather.txt
+    screen -S weather -d -m /usr/local/bin/weather.py --log --period=60 --logfile=$HOME/data/temperature/broadcast/weather.txt
 else
     echo "weather logger already running"
 fi
