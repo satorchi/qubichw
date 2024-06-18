@@ -95,6 +95,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         # broadcast the data
         for rx in receivers:
             if verbosity>0: print('%s broadcasting to: %s' % (date_str,rx))
+            else: time.sleep(0.05) # need a delay before reading GPS data again
             sock.sendto(rec,(rx,PORT))
     return True
 
@@ -197,12 +198,12 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
     print_fmt = '%8i: 0x%X %s %10.2f %10.2f %10.2f %10.2f %10.2f %8.3f %8.3f %5.1f'
     
     if listener is None: listener = receivers[0]
+    print('listening on: %s, %i' % (listener,PORT))
     
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     client.settimeout(0.2)
     client.bind((listener,PORT))
-    print('listening on: %s, %i' % (listener,PORT))
     h = open('calsource_orientation.dat','ab')
 
     packet_period = 1/8
