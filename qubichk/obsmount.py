@@ -180,6 +180,15 @@ class obsmount:
         try:
             self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
             self.sock[port].connect((self.mount_ip,port_num))
+            self.printmsg('Getting acknowledgement from %s' % self.mount_ip)
+            ack_bin = self.sock[port].recv(4)
+            ack = ack_bin.decode()
+            if ack!='True':
+                self.error = 'BAD ACK'
+                self.subscribed[port] = False
+                retval['error'] = 'Did not receive correct acknowledgement: %s' % ack
+                return self.return_with_error(retval)
+            
             time.sleep(self.wait)
             self.printmsg('sending OK')
             ans = self.sock[port].send('OK'.encode())
@@ -197,7 +206,7 @@ class obsmount:
             self.error = ' '.join(str_list)
 
         if self.error is None: return True
-        
+
         retval['error'] = 'could not communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num)
         return self.return_with_error(retval)
 
