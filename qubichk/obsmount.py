@@ -125,6 +125,7 @@ class obsmount:
     nkeys = len(data_keys)
     available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
     wait = 0.0 # seconds to wait before next socket command
+    default_bufsize = 131072
     verbosity = 1
     testmode = False
     
@@ -158,7 +159,50 @@ class obsmount:
         retval['ok'] = False
         self.printmsg('ERROR! %s' % retval['error'])
         return retval
-                      
+
+
+    def do_handshake(self,port='data'):
+        '''
+        do the handshake with the server
+        '''
+        retval = {}
+        retval['ok'] = False
+        
+        self.printmsg('Getting acknowledgement from %s on %s port' % (self.mount_ip,port))
+        try:
+            ack_bin = self.sock[port].recv(4)
+        except socket.timeout:
+            self.subscribed[port] = False
+            self.error = 'HANDSHAKE TIMEOUT'
+            retval['error'] = 'Timeout error for handshake with motor %s' % port
+            return self.return_with_error(retval)
+        except:
+            self.subscribed[port] = False
+            self.error = 'HANDSHAKE FAIL'
+            retval['error'] = 'Failed handshake with motor %s' % port
+            return self.return_with_error(retval)
+            
+        ack = ack_bin.decode()
+        if port=='command' and ack!='True':
+            self.error = 'BAD ACK'
+            self.subscribed[port] = False
+            retval['error'] = 'Did not receive correct acknowledgement: %s' % ack
+            return self.return_with_error(retval)
+
+
+        if port=='command':
+            time.sleep(self.wait)
+            self.printmsg('sending OK')
+            ans = self.sock[port].send('OK'.encode())
+            self.printmsg('return from socket.send: %s' % ans)
+        
+
+        self.retval['ok'] = True
+        self.error = None
+        self.printmsg('Handshake successful: ack=%s' % ack)
+        return retval
+                    
+        
 
     def init_socket(self,port='data'):
         '''
@@ -166,7 +210,10 @@ class obsmount:
         the port is either 'data' or 'command'
         '''
         retval = {}
-        retval['ok'] = True
+        retval['ok'] = False
+        retval['error'] = 'init error'
+        self.error = None
+        
         if port=='data':
             port_num = self.listen_port
             socktype = socket.SOCK_STREAM
@@ -180,19 +227,9 @@ class obsmount:
         try:
             self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
             self.sock[port].connect((self.mount_ip,port_num))
-            self.printmsg('Getting acknowledgement from %s' % self.mount_ip)
-            ack_bin = self.sock[port].recv(4)
-            ack = ack_bin.decode()
-            if ack!='True':
-                self.error = 'BAD ACK'
-                self.subscribed[port] = False
-                retval['error'] = 'Did not receive correct acknowledgement: %s' % ack
-                return self.return_with_error(retval)
+            retval = self.get_ack(port)
+            if not retval['ok']: return self.return_with_error(retval)
             
-            time.sleep(self.wait)
-            self.printmsg('sending OK')
-            ans = self.sock[port].send('OK'.encode())
-            self.printmsg('return from socket.send: %s' % ans)
             self.subscribed[port] = True
             self.error = None
         except socket.timeout:
@@ -234,7 +271,7 @@ class obsmount:
         
         The bufsize is the number of bytes to read.
         '''
-        if bufsize is None: bufsize = 512
+        if bufsize is None: bufsize = self.default_bufsize
         port = 'data'
         retval = {}
         retval['ok'] = True
