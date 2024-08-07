@@ -176,36 +176,48 @@ class obsmount:
         '''
         retval = {}
         retval['ok'] = False
-        
-        self.printmsg('Getting acknowledgement from %s on %s port' % (self.mount_ip,port))
+
+        if port=='command':
+            self.printmsg('Getting acknowledgement from %s on %s port' % (self.mount_ip,port))
+            try:
+                ack_bin = self.sock[port].recv(4)
+            except socket.timeout:
+                self.subscribed[port] = False
+                self.error = 'HANDSHAKE TIMEOUT'
+                retval['error'] = 'Timeout error for handshake with motor %s' % port
+                return self.return_with_error(retval)
+            except:
+                self.subscribed[port] = False
+                self.error = 'HANDSHAKE FAIL'
+                retval['error'] = 'Failed handshake with motor %s' % port
+                return self.return_with_error(retval)
+            
+            
+            ack = ack_bin.decode()
+            if ack!='True':
+                self.error = 'BAD ACK'
+                self.subscribed[port] = False
+                retval['error'] = 'Did not receive correct acknowledgement for %s port: %s' % (port,ack)
+                return self.return_with_error(retval)
+
+            
+        time.sleep(self.wait)
+        self.printmsg('sending OK')
+
         try:
-            ack_bin = self.sock[port].recv(4)
+            ans = self.sock[port].send('OK'.encode())
         except socket.timeout:
             self.subscribed[port] = False
-            self.error = 'HANDSHAKE TIMEOUT'
-            retval['error'] = 'Timeout error for handshake with motor %s' % port
+            self.error = 'HANDSHAKE TIMEOUT ON SEND'
+            retval['error'] = 'Timeout error for sending handshake to motor %s' % port
             return self.return_with_error(retval)
         except:
             self.subscribed[port] = False
-            self.error = 'HANDSHAKE FAIL'
-            retval['error'] = 'Failed handshake with motor %s' % port
+            self.error = 'HANDSHAKE FAIL ON SEND'
+            retval['error'] = 'Failed to send handshake to motor %s' % port
             return self.return_with_error(retval)
             
-        ack = ack_bin.decode()
-        if port=='command' and ack!='True':
-            self.error = 'BAD ACK'
-            self.subscribed[port] = False
-            retval['error'] = 'Did not receive correct acknowledgement: %s' % ack
-            return self.return_with_error(retval)
-
-
-        if port=='command':
-            time.sleep(self.wait)
-            self.printmsg('sending OK')
-            ans = self.sock[port].send('OK'.encode())
-            self.printmsg('return from socket.send: %s' % ans)
         
-
         self.retval['ok'] = True
         self.error = None
         self.printmsg('Handshake successful: ack=%s' % ack)
