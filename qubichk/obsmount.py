@@ -218,7 +218,7 @@ class obsmount:
             return self.return_with_error(retval)
             
         
-        self.retval['ok'] = True
+        retval['ok'] = True
         self.error = None
         self.printmsg('Handshake successful: ack=%s' % ack)
         return retval
