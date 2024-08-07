@@ -176,6 +176,7 @@ class obsmount:
         '''
         retval = {}
         retval['ok'] = False
+        ack = 'NO ACK'
 
         if port=='command':
             self.printmsg('Getting acknowledgement from %s on %s port' % (self.mount_ip,port))
