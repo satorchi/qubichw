@@ -123,7 +123,16 @@ class obsmount:
                  'WARNING_BITS',
                  'GLOBAL_DRIVER_STATE']
     nkeys = len(data_keys)
-    available_commands = ['AZ','EL','DOHOMING','STOP','ABORT']
+    available_commands = ['AZ',       # move to azimuth
+                          'EL',       # move to elevation
+                          'ROT',      # move to rotation (bore-sight)
+                          'AZS',      # set azimuth speed
+                          'ELS',      # set elevation speed
+                          'DOHOMING', # go to home position
+                          'STOP',     # stop
+                          'ABORT',    # abort command.  motors will show an alert status
+                          'END'       # end connection (unsubscribe)
+                          ]
     wait = 0.0 # seconds to wait before next socket command
     default_bufsize = 131072
     verbosity = 1
@@ -227,7 +236,7 @@ class obsmount:
         try:
             self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
             self.sock[port].connect((self.mount_ip,port_num))
-            retval = self.get_ack(port)
+            retval = self.do_handshake(port)
             if not retval['ok']: return self.return_with_error(retval)
             
             self.subscribed[port] = True
