@@ -95,8 +95,12 @@ azimuth offset
 on rocketchat from Manuel Platino: The most precise measurement of the az from outside is between 168° and 169°
 
 '''
-import sys,socket,time,re
+import os,sys,socket,time,re
 import datetime as dt
+import numpy as np
+
+hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
+rec_fmt = '<Bdd'
 
 class obsmount:
     '''
@@ -414,8 +418,27 @@ class obsmount:
 
         return retval
 
+    def dump_data(self,data):
+        '''
+        write all data to binary data file
+        '''
+        for axis in ['AZ','EL']:
+            npts = len(data[axis])
+            recnames = 'STX,TIMESTAMP,VALUE'
+            rec = np.recarray(names=recnames,formats="uint8,float64,float64",shape=(npts))
+            for idx in range(npts):
+                rec[idx].STX = 0xAA
+                rec[idx].TIMESTAMP = data[axis][idx]['TIMESTAMP']
+                rec.VALUE = data[axis][idx]['ACT_POSITION']
 
-    def get_azel(self):
+            filename = '%s%s%s.dat' % (hk_dir,os.sep,axis)
+            h = open(filename,'ab')
+            h.write(rec)
+            h.close()
+            
+        return True
+    
+    def get_azel(self,dump=False):
         '''
         get the azimuth and elevation and return it with a timestamp
         '''
@@ -427,22 +450,33 @@ class obsmount:
         if not ans['ok']:
             return self.return_with_error(ans)
 
+        errmsg = []
+        errlevel = 0
+        retval['TIMESTAMP'] = ans['TIMESTAMP']
+        retval['data'] = ans
         if len(ans['AZ'])==0:
-            retval['error'] = 'no azimuth data'
-            retval['data'] = ans
-            return self.return_with_error(retval)
+            errmsg.append('no azimuth data')
+            errlevel += 1
+        else:
+            retval['AZ'] = ans['AZ'][-1]['ACT_POSITION']
+            retval['AZ TIMESTAMP'] = ans['AZ'][-1]['TIMESTAMP']
+
 
         if len(ans['EL'])==0:
-            retval['error'] = 'no elevation data'
-            retval['data'] = ans
-            return self.return_with_error(retval)
-        
+            errmsg.append('no elevation data')
+            errlevel += 1
+        else:                        
+            retval['EL'] = ans['EL'][-1]['ACT_POSITION'] + self.el_zero_offset
+            retval['EL TIMESTAMP'] = ans['EL'][-1]['TIMESTAMP']
+
+        if errlevel >= 2:
+            retval['error'] = '\n'.join(errmsg)
+            return self.return_with_error(retval)        
+
+        if dump:
+            dump_ok = self.dump_data(ans)
             
-        retval['AZ'] = ans['AZ'][-1]['ACT_POSITION']
-        retval['AZ TIMESTAMP'] = ans['AZ'][-1]['TIMESTAMP']
-        retval['EL'] = ans['EL'][-1]['ACT_POSITION'] + self.el_zero_offset
-        retval['EL TIMESTAMP'] = ans['EL'][-1]['TIMESTAMP']
-        retval['TIMESTAMP'] = ans['TIMESTAMP']
+            
         return retval
 
     def show_azel(self):
