@@ -102,6 +102,20 @@ import numpy as np
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
 
+def make_errmsg(msg=None):
+    '''
+    make an error message using all the sys exec info
+    '''
+    if msg is None:
+        err_list = []
+    else:
+        err_list = [msg]
+    for info in sys.exc_info():
+        if info is not None:  err_list.append(str(info))            
+    errormsg = ' \n'.join(err_list)
+    return errormsg
+    
+    
 class obsmount:
     '''
     class to read to and command the observation mount
@@ -138,7 +152,7 @@ class obsmount:
                           'END'       # end connection (unsubscribe)
                           ]
     wait = 0.0 # seconds to wait before next socket command
-    default_bufsize = 131072
+    default_chunksize = 131072
     verbosity = 1
     testmode = False
     
@@ -263,10 +277,7 @@ class obsmount:
             self.error = 'TIMEOUT'
         except:
             self.subscribed[port] = False
-            str_list = ['SOCKET ERROR:']
-            for info in sys.exc_info():
-                if info is not None:  str_list.append(str(info))            
-            self.error = ' '.join(str_list)
+            self.error = make_errormsg('SOCKET ERROR')
 
         if self.error is None: return True
 
@@ -291,13 +302,13 @@ class obsmount:
 
         return self.subscribed[port]
 
-    def read_data(self,bufsize=None):
+    def read_data(self,chunksize=None):
         '''
         once we're subscribed, we can listen for the data
         
-        The bufsize is the number of bytes to read.
+        The chunksize is the number of bytes to read.
         '''
-        if bufsize is None: bufsize = self.default_bufsize
+        if chunksize is None: chunksize = self.default_chunksize
         port = 'data'
         retval = {}
         retval['ok'] = True
@@ -314,17 +325,14 @@ class obsmount:
 
         retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
         try:
-            dat = self.sock[port].recv(bufsize)
+            dat = self.sock[port].recv(chunksize)
         except socket.timeout:
             self.subscribed[port] = False
             retval['error'] = 'socket time out'
             return self.return_with_error(retval)
         except:
             self.subscribed[port] = False
-            str_list = ['could not get az,el data:']
-            for info in sys.exc_info():
-                if info is not None:  str_list.append(str(info))            
-            retval['error'] = ' '.join(str_list)
+            retval['error'] = error = make_errormsg('could not get az,el data')
             return self.return_with_error(retval)
 
                             
@@ -360,10 +368,7 @@ class obsmount:
                     data[key] = eval(col[idx])
                 except:
                     retval['data'] = data
-                    str_list = [str(col[idx])]
-                    for info in sys.exc_info():
-                        if info is not None:  str_list.append(str(info))            
-                    retval['error'] = 'could not interpret data: %s' % ' '.join(str_list)
+                    retval['error'] = error = make_errormsg('could not interpret data: %s' % str(col[idx]))
                     return self.return_with_error(retval)
                 
             retval[data['AXIS']].append(data)
@@ -371,11 +376,11 @@ class obsmount:
             
         return retval
 
-    def get_data(self,bufsize=None):
+    def get_data(self,chunksize=None):
         '''
         this is a wrapper for read_data() because I keep forgetting
         '''
-        return self.read_data(bufsize=bufsize)
+        return self.read_data(chunksize=chunksize)
     
     def send_command(self,cmd_str):
         '''
@@ -410,10 +415,7 @@ class obsmount:
             self.sock[port].send(full_cmd_str.encode())
         except:
             self.subscribed[port] = False
-            str_list = ['command unsuccessful:']
-            for info in sys.exc_info():
-                if info is not None:  str_list.append(str(info))            
-            retval['error'] = ' '.join(str_list)
+            retval['error'] = make_errmsg('command unsuccessful')
             return self.return_with_error(retval)
 
         return retval
@@ -438,7 +440,7 @@ class obsmount:
             
         return True
     
-    def get_azel(self,dump=False):
+    def get_azel(self,dump=False,chunksize=None):
         '''
         get the azimuth and elevation and return it with a timestamp
         '''
@@ -446,7 +448,7 @@ class obsmount:
         retval['ok'] = True
         retval['error'] = 'NONE'
 
-        ans = self.read_data()
+        ans = self.read_data(chunksize=chunksize)
         if not ans['ok']:
             return self.return_with_error(ans)
 
@@ -474,8 +476,11 @@ class obsmount:
             return self.return_with_error(retval)        
 
         if dump:
-            dump_ok = self.dump_data(ans)
-            
+            try:
+                dump_ok = self.dump_data(ans)
+            except:
+                retval['error'] = make_errmsg('Could not dump data to file')
+                return self.return_with_error(retval)            
             
         return retval
 
