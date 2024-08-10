@@ -98,22 +98,13 @@ on rocketchat from Manuel Platino: The most precise measurement of the az from o
 import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
+from qubichk import make_errmsg
 
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
+rec_names = 'STX,TIMESTAMP,VALUE'
+rec_nbytes = 17
 
-def make_errmsg(msg=None):
-    '''
-    make an error message using all the sys exec info
-    '''
-    if msg is None:
-        err_list = []
-    else:
-        err_list = [msg]
-    for info in sys.exc_info():
-        if info is not None:  err_list.append(str(info))            
-    errormsg = ' \n'.join(err_list)
-    return errormsg
     
     
 class obsmount:
@@ -426,8 +417,7 @@ class obsmount:
         '''
         for axis in ['AZ','EL']:
             npts = len(data[axis])
-            recnames = 'STX,TIMESTAMP,VALUE'
-            rec = np.recarray(names=recnames,formats="uint8,float64,float64",shape=(npts))
+            rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(npts))
             for idx in range(npts):
                 rec[idx].STX = 0xAA
                 rec[idx].TIMESTAMP = data[axis][idx]['TIMESTAMP']
@@ -540,3 +530,50 @@ class obsmount:
         
 
         
+def read_obsmount_bindat(filename,verbosity=0):
+    '''
+    read the binary data acquired from the observation mount and saved to disk
+    '''
+    if not os.path.isfile(filename):
+        print('ERROR!  File not found: %s' % filename)
+        return
+
+    # read the data
+    h = open(filename,'rb')
+    bindat = h.read()
+    h.close()
+
+    # interpret the binary data
+    names = rec_names.split(',')
+    data = {}
+    for name in names:
+        data[name] = []    
+
+    idx = 0
+    while idx+rec_nbytes<len(bindat):
+        packet = bindat[idx:idx+rec_nbytes]
+        dat_list = struct.unpack(fmt,packet)
+
+        if len(dat_list)!=len(names):
+            print('ERROR:  Incompatible data at byte %i' % idx)
+            if verbosity>1: input('enter to continue ')
+            idx += 1
+            continue
+
+        if dat_list[0]!=0xAA:
+            print('ERROR: Incorrect data at byte %i' % idx)
+            if verbosity>1: input('enter to continue ')
+            idx += 1
+            continue
+            
+
+        for datidx,name in enumerate(names):
+            data[name].append(dat_list[datidx])
+            if verbosity>0: print(dat_list)
+
+        idx += nbytes
+
+    for name in data.keys():
+        data[name] = np.array(data[name])
+        
+    return data
