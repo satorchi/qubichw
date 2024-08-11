@@ -10,7 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 utilities used by various modules in qubichk/hw especially hk_verify
 '''
-import subprocess,re
+import subprocess,re,struct
+import numpy as np
 
 def shellcommand(cmd):
     '''
