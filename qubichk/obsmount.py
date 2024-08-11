@@ -534,46 +534,5 @@ def read_obsmount_bindat(filename,verbosity=0):
     '''
     read the binary data acquired from the observation mount and saved to disk
     '''
-    if not os.path.isfile(filename):
-        print('ERROR!  File not found: %s' % filename)
-        return
 
-    # read the data
-    h = open(filename,'rb')
-    bindat = h.read()
-    h.close()
-
-    # interpret the binary data
-    names = rec_names.split(',')
-    data = {}
-    for name in names:
-        data[name] = []    
-
-    idx = 0
-    while idx+rec_nbytes<len(bindat):
-        packet = bindat[idx:idx+rec_nbytes]
-        dat_list = struct.unpack(fmt,packet)
-
-        if len(dat_list)!=len(names):
-            print('ERROR:  Incompatible data at byte %i' % idx)
-            if verbosity>1: input('enter to continue ')
-            idx += 1
-            continue
-
-        if dat_list[0]!=0xAA:
-            print('ERROR: Incorrect data at byte %i' % idx)
-            if verbosity>1: input('enter to continue ')
-            idx += 1
-            continue
-            
-
-        for datidx,name in enumerate(names):
-            data[name].append(dat_list[datidx])
-            if verbosity>0: print(dat_list)
-
-        idx += nbytes
-
-    for name in data.keys():
-        data[name] = np.array(data[name])
-        
-    return data
+    return read_bindat(filename,names=rec_names,fmt=rec_fmt,STX=0xAA,verbosity=verbosity)
