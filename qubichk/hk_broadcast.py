@@ -19,7 +19,7 @@ from qubichk.powersupply import PowerSupply, PowerSupplies, known_supplies
 from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
-from qubichk.utilities import shellcommand
+from qubichk.utilities import shellcommand, fmt_translation
 from qubichk.obsmount import obsmount
 from qubichk.usbthermometer_hk import usbthermometer_hk
 
@@ -368,14 +368,6 @@ class hk_broadcast :
     def unpack_data(self,data):
         '''unpack the received data packet
         '''
-        fmt_translation={}
-        fmt_translation['int8']    = 'b'
-        fmt_translation['int16']   = 'h'
-        fmt_translation['int32']   = 'i'
-        fmt_translation['int64']   = 'q'
-        fmt_translation['float32'] = 'f'
-        fmt_translation['float64'] = 'd'
-
         names=self.record.dtype.names
         fmt='<'
         for name in names:
