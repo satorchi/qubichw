@@ -98,14 +98,11 @@ on rocketchat from Manuel Platino: The most precise measurement of the az from o
 import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
-from qubichk import make_errmsg
+from qubichk.utilities import make_errmsg
 
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
-rec_names = 'STX,TIMESTAMP,VALUE'
-rec_nbytes = 17
-
-    
+rec_names = 'STX,TIMESTAMP,VALUE'    
     
 class obsmount:
     '''
@@ -526,13 +523,3 @@ class obsmount:
         cmd_el = el - self.el_zero_offset
         return self.send_command('EL %f' % cmd_el)
             
-
-        
-
-        
-def read_obsmount_bindat(filename,verbosity=0):
-    '''
-    read the binary data acquired from the observation mount and saved to disk
-    '''
-
-    return read_bindat(filename,names=rec_names,fmt=rec_fmt,STX=0xAA,verbosity=verbosity)
