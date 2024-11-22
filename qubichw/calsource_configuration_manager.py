@@ -25,7 +25,7 @@ from qubichw.relay import relay
 
 valid_commands = {}
 for dev in device_list:
-    valid_command[dev] = ['on','off']
+    valid_commands[dev] = ['on','off']
 
 # the calibration source
 from qubichw.calibration_source import calibration_source

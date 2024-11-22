@@ -49,6 +49,8 @@ default_setting['LF']['frequency']  = 150.0
 default_setting['HF'] = {}
 default_setting['HF']['frequency']  = 220.0
 
+date_fmt = '%Y-%m-%d %H:%M:%S.%f'
+
 class calibration_source:
     '''
     a class to communicate with the calibration sources
@@ -66,7 +68,7 @@ class calibration_source:
         '''
         print messages
         '''
-        fullmsg = '%s: CALSOURCE - %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg)
+        fullmsg = '%s: CALSOURCE - %s' % (dt.datetime.utcnow().strftime(date_fmt),msg)
         print(fullmsg)
         return fullmsg
 
