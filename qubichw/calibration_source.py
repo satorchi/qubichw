@@ -15,6 +15,13 @@ send commands to the QUBIC calibration source
 see documentation in:
  Tx 263 130-170GHz User Guide.pdf
  Tx 264 190-245GHz User Guide.pdf
+ VDIE Synthesizer Programming Manual.pdf
+ VDI Frequency Counter User Manual 2b.pdf
+
+ https://box.in2p3.fr/s/Yib8dsGQJQZsQxo
+ https://box.in2p3.fr/s/94qiMAfpbp5RTX5
+ https://box.in2p3.fr/s/pCCR7WRQf2DZerH
+ https://box.in2p3.fr/s/2NfFjFNEPB6jMC3
 
 udev rules should be setup in order to identify the calibration source
 the udev rules can be found in the scripts directory of pystudio
@@ -28,13 +35,19 @@ ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="VDIE0031", AC
 
 
 '''
-from __future__ import division, print_function
 import os,serial
 import numpy as np
+import datetime as dt
 
 import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
+
+default_setting = {}
+default_setting['LF'] = {}
+default_setting['LF']['frequency']  = 150.0
+default_setting['HF'] = {}
+default_setting['HF']['frequency']  = 220.0
 
 class calibration_source:
     '''
@@ -48,6 +61,14 @@ class calibration_source:
         self.state = None
         self.init(source=source)
         return None
+
+    def log(self,msg):
+        '''
+        print messages
+        '''
+        fullmsg = '%s: CALSOURCE - %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg)
+        print(fullmsg)
+        return fullmsg
 
     def init(self,source=None):
         '''
@@ -75,15 +96,15 @@ class calibration_source:
 
         
         if not os.path.exists(dev):
-            print('ERROR! No device for the %s Frequency Calibration Source.' % which_freq)
+            self.log('ERROR! No device for the %s Frequency Calibration Source.' % which_freq)
             return None
 
         try:
             self.s = serial.Serial(dev,timeout=0.5)
             self.port = dev
-            print('DEBUG: calsource initialized on port: %s' % self.port)
+            self.log('calsource initialized on port: %s' % self.port)
         except:
-            print('ERROR! could not connect to the %s Frequency Calibration Source.' % which_freq)
+            self.log('ERROR! could not connect to the %s Frequency Calibration Source.' % which_freq)
             self.s = None
         return
 
@@ -103,19 +124,19 @@ class calibration_source:
 
         
         if self.s is None:
-            print('DEBUG:CALSOURCE is_connected:self.s is None.  initializing.')
+            self.log('is_connected:self.s is None.  initializing.')
             self.init()
         
         if self.s is None:
-            print('DEBUG:CALSOURCE is_connected:self.s is None')
+            self.log('is_connected:self.s is None')
             return False
 
         if self.port is None:
-            print('DEBUG:CALSOURCE is_connected:self.port is None')
+            self.log('is_connected:self.port is None')
             return False
 
         if not os.path.exists(self.port):
-            print('DEBUG:CALSOURCE is_connected:self.port does not exist: %s' % self.port)
+            self.log('is_connected:self.port does not exist: %s' % self.port)
             self.clear_connection()
             return False
         
@@ -162,6 +183,57 @@ class calibration_source:
         return (s+response[0])
 
 
+    def send_command(self,cmd):
+        '''
+        send a command to the VDI device
+        '''
+        if self.calsource is None:
+            self.log('Please initialize the calibration source')
+            return None
+
+        if not self.is_connected():
+            self.log('initializing calibration source %s' % self.calsource)
+            self.init(source=self.calsource)
+
+        if not self.is_connected():
+            return None
+                    
+        try:
+            self.s.write(cmd)
+        except:
+            self.log("communication error: Could not send command.")
+            self.clear_connection()
+            return None
+
+        try:
+            response=bytearray(self.s.read(6))
+        except:
+            self.log("communication error:  Could not receive response.")
+            self.clear_connection()
+            return None
+
+        if len(response)==0:
+            self.log("communication error:  zero length response.")
+            self.clear_connection()
+            return None
+        
+        if response[0]!=85:
+            self.log("communication error:  Invalid response.")
+            self.clear_connection()
+            return None
+
+        if len(response)<2:
+            self.log("error: no frequency value returned.")
+            self.clear_connection()
+            return None
+        
+        of=self.output_Frequency(response[1:])
+        self.log('The output frequency is %.3f GHz' % of)
+        self.state = {}
+        self.state['frequency'] = self.factor*of
+        self.state['synthesiser_frequency'] = of
+        return state
+
     def set_Frequency(self,f):
         '''
         this is a wrapper to send the frequency command.
@@ -179,56 +251,10 @@ class calibration_source:
         set the frequency.  Note that this will send the command to the device.
         the method set_FreqCommand() only formats the command without sending
         '''
-        self.state = None
-        
-        if self.calsource is None:
-            print('Please initialize the calibration source')
-            return None
-
-        if not self.is_connected():
-            print('initializing calibration source %s' % self.calsource)
-            self.init(source=self.calsource)
-
-        if not self.is_connected():
-            return None
-            
-        
-        cmd=self.set_FreqCommand(f/self.factor)
-        try:
-            self.s.write(cmd)
-        except:
-            print("calsource communication error: Could not send command.")
-            self.clear_connection()
-            return None
-
-        try:
-            response=bytearray(self.s.read(6))
-        except:
-            print("calsource communication error:  Could not receive response.")
-            self.clear_connection()
-            return None
-
-        if len(response)==0:
-            print("calsource communication error:  zero length response.")
-            self.clear_connection()
-            return None
-        
-        if response[0]!=85:
-            print("calsource communication error:  Invalid response.")
-            self.clear_connection()
-            return None
-
-        if len(response)<2:
-            print("calsource error: no frequency value returned.")
-            self.clear_connection()
-            return None
-        
-        of=self.output_Frequency(response[1:])
-        print('The output frequency is %.3f GHz' % of)
-        self.state = {}
-        self.state['frequency'] = f
-        self.state['synthesiser_frequency'] = of
-        return of
+        cmd = self.set_FreqCommand(f/self.factor)
+        self.state = self.send_command(cmd)
+        if self.state is None: return None
+        return self.state['frequency']
 
     def set_default_settings(self):
         '''
@@ -243,8 +269,29 @@ class calibration_source:
         of = self.set_Frequency(freq)
         return of
     
+    def get_Frequency(self):
+        '''
+        get the synthesiser frequency
+        measure the frequency counter over a period of 100ms.
+        see example in VDI Frequency Counter User Manual 2b.pdf
+        '''
+        cmd = bytearray([0x03, 0xFC, 0x64, 0x00, 0x9B])
+        self.state = self.send_command(cmd)
+        return self.state
 
+    def status(self):
+        '''
+        return a status message compatible with the calsource_configuration_manager
+        '''
+        state = self.get_Frequency()
+        if state is None:
+            msg = 'calsource_%s:frequency=UNKNOWN' % self.calsource
+            msg += ' synthesiser:frequency=UNKNOWN'
+            return msg
     
-
+            
+        msg = 'calsource_%s:frequency=%+06fGHz' % (self.calsource,state['frequency'])
+        msg += ' synthesiser:frequency=%+06fGHz' % state['synthesiser_frequency']
+        return msg
+    
         
-    

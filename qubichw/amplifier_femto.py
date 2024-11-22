@@ -12,9 +12,15 @@ control/command of the FEMTO amplifier on the GPIO of the RaspberryPi
 '''
 
 import os,time
-import RPi.GPIO as gpio
 import numpy as np
 import datetime as dt
+if os.uname().machine.find('arm')>=0:
+    import RPi.GPIO as gpio
+
+default_setting = {}
+default_setting['gain'] = 20
+default_setting['bandwidth'] = 100
+default_setting['coupling'] = 'DC'
 
 class amplifier:
     '''
@@ -36,10 +42,7 @@ class amplifier:
         self.state['gain'] = None
         self.state['overload'] = None
 
-        self.default_setting = {}
-        self.default_setting['gain'] = 20
-        self.default_setting['bandwidth'] = 100
-        self.default_setting['coupling'] = 'DC'
+        self.default_setting = default_setting
         
         self.init()
         self.set_default_settings()

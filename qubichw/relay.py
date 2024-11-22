@@ -16,6 +16,19 @@ import serial,sys,os,re
 from glob import glob
 import datetime as dt
 from qubichk.utilities import shellcommand
+
+device_address = {}
+device_address['heater']        = 15
+device_address['fan']           =  7
+device_address['amplifier']     = 14
+device_address['modulator']     = 10
+device_address['bnc']           = 8
+
+# to be verified
+device_address['laser']         = 11
+device_address['calsource_150'] = 12
+device_address['calsource_220'] = 13
+
 class relay:
     '''
     class to turn on/off power supplies using the Numato relay
@@ -33,17 +46,7 @@ class relay:
         if isinstance(devices,dict):
             self.device_address = devices
         else:
-            self.device_address = {}
-            self.device_address['heater']        = 15
-            self.device_address['fan']           =  7
-            self.device_address['amplifier']     = 14
-            self.device_address['modulator']     = 10
-            self.device_address['bnc']           = 8
-
-            # to be verified
-            self.device_address['laser']         = 11
-            self.device_address['calsource 150'] = 12
-            self.device_address['calsource 220'] = 13
+            self.device_address = device_address
             
 
         self.default_setting = {}
@@ -226,21 +229,10 @@ class relay:
             else:
                 devlist = [devlist]
 
-        # In order not to switch off something which is already on, we must read the current state
-        bits = self.get_state()
-        if not isinstance(bits,int): bits = 0
-        
+        state = {}
         for dev in devlist:
-            if dev not in self.device_address.keys():
-                self.log('unknown device: %s' % dev,verbosity=1)
-                continue
-            
-            bits = bits | 2**self.device_address[dev]
-
-
-        cmd = 'relay writeall %04x' % bits
-        ans = self.send_command(cmd)
-        return ans
+            state[dev] = 1
+        return self.set_state(state)
 
     def switchoff(self,devlist):
         '''
@@ -248,30 +240,17 @@ class relay:
         '''                
         if isinstance(devlist,str):
             if devlist.lower()=='all':
-                return self.send_command('relay writeall 0000')
+                devlist = self.device_address.keys()
             else:
                 devlist = [devlist]
 
-
-        # In order not to switch off something which we want to remain on, we must read the current state
-        bits = self.get_state()
-        if not isinstance(bits,int): bits = 0
-        
+        state = {}
         for dev in devlist:
-            if dev not in self.device_address.keys():
-                self.log('unknown device: %s' % dev,verbosity=1)
-                continue
+            state[dev] = 0
+        return self.set_state(state)
 
-            bit = 2**self.device_address[dev]
-            bitmask = 0xffff ^ bit
-            bits = bits & bitmask
             
-
-        cmd = 'relay writeall %04x' % bits
-        ans = self.send_command(cmd)
-        return ans
-            
-    def select_bnc(src=None):
+    def select_bnc(self,src=None):
         '''
         select which calsource power monitor goes to the amplifier
         '''
@@ -291,3 +270,37 @@ class relay:
 
         return self.switchon('bnc')
         
+    def set_state(self,state):
+        '''
+        switch on/off and select BNC given the state of all devices
+        argument: state is a dictionary with the on/off state of each device
+                  it may not contain all the devices
+        '''
+        info = {} # return information
+        info['ok'] = False
+        info['message'] = ''
+
+        # In order not to change the state of something which is not specified, we must read the current state
+        bits = self.get_state()
+        if not isinstance(bits,int): bits = 0 # assume all off by default
+
+        devlist = state.keys()
+        for dev in devlist:
+            if dev not in self.device_address.keys():
+                self.log('unknown device: %s' % dev,verbosity=1)
+                continue
+
+            bit = 2**self.device_address[dev]
+            if state[dev]==1:            
+                bits = bits | bit
+            else:
+                bitmask = 0xffff ^ bit
+                bits = bits & bitmask
+                
+
+
+        cmd = 'relay writeall %04x' % bits
+        ans = self.send_command(cmd)
+        info['response'] = ans
+        info['ok'] = True
+        return info

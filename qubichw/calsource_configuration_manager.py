@@ -15,19 +15,34 @@ import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
-from qubichw.relay import relay
 from qubichk.utilities import shellcommand
+
+
+# the numato relay for switching on/off
+from qubichw.relay import device_address as relay_device_address
+device_list = list(relay_device_address.keys())
+from qubichw.relay import relay
+
+valid_commands = {}
+for dev in device_list:
+    valid_command[dev] = ['on','off']
+
 # the calibration source
 from qubichw.calibration_source import calibration_source
+valid_commands['calsource_150'] = ['on','off','frequency','default']
+valid_commands['calsource_220'] = ['on','off','frequency','default']
 
 # the low noise amplifier
+from qubichw.amplifier_femto import default_setting as amplifier_default_setting
+valid_commands['amplifier'] += ['default'] + list(amplifier_default_setting.keys())
 if os.uname().machine.find('arm')>=0:
     from qubichw.amplifier_femto import amplifier
-else:
-    from qubichw.amplifier_dummy import amplifier
 
-# the signal generator for modulating the calibration source and for reading the calsource monitor
-from qubichw.modulator_siglent import siglent as modulator
+# the redpitaya for modulating the calibration source and for reading the calsource monitor
+from qubichw.redpitaya import default_setting as modulator_default_setting
+valid_commands['modulator'] += ['default'] + list(modulator_default_setting.keys())
+from qubichw.redpitaya import redpitaya as modulator
+
 
 class calsource_configuration_manager():
 
@@ -90,56 +105,20 @@ class calsource_configuration_manager():
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
-        # the device list is the list of devices plugged into the Energenie powerbar
-        self.powersocket = {}
-        self.powersocket['modulator'] = 1
-        self.powersocket['calsource'] = 2
-        self.powersocket['lamp'] = 3
-        self.powersocket['amplifier'] = 4
-        self.powersocket['cf'] = 1
-        self.device_list = list(self.powersocket.keys())
+        self.device_list = device_list
         
-
-        self.modulator_channel = {}
-        self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
-        self.modulator_channel['cf'] = 2
-        
-        self.valid_commands = {}
-        self.valid_commands['modulator'] = ['on','off',
-                                            'output',
-                                            'frequency',
-                                            'amplitude',
-                                            'offset',
-                                            'duty',
-                                            'shape',
-                                            'default']
-        self.valid_commands['cf'] = self.valid_commands['modulator']
-        
-        self.valid_commands['calsource'] = ['on','off','frequency','default']
-        self.valid_commands['amplifier'] = ['on','off',
-                                            'filter_mode',
-                                            'dynamic_range',
-                                            'gain',
-                                            'filter_low_frequency',
-                                            'filter_high_frequency',
-                                            'coupling',
-                                            'invert',
-                                            'default']
-        self.valid_commands['lamp' ]     = ['on','off']
+        self.valid_commands = valid_commands
 
         # time it takes for a device to register with the operating system
-        # the Siglent signal generator requires 33 seconds !!!
         # the calsource, only 1 second
-        # the SR560 amplifier requires ??
+        # the redpitaya requires ??
         self.wait_after_switch_on = {}
-        self.wait_after_switch_on['modulator'] = 0
+        self.wait_after_switch_on['modulator'] = 5
         self.wait_after_switch_on['calsource'] = 1
         self.wait_after_switch_on['amplifier'] = 1
-        self.wait_after_switch_on['cf'] = self.wait_after_switch_on['modulator']
 
         self.estimated_wait = deepcopy(self.wait_after_switch_on)
-        self.estimated_wait['modulator'] = 33
-        self.estimated_wait['cf'] = self.estimated_wait['modulator']
+        self.estimated_wait['modulator'] = 5
         
         self.device = {} # the objects instantiated for each device
         self.device_on = {} # on/off state of each device
@@ -148,18 +127,20 @@ class calsource_configuration_manager():
             self.device_on[dev] = None
 
             
-        self.energenie_lastcommand_date = dt.datetime.utcnow()
-        self.energenie_timeout = 1
+        self.relay_lastcommand_date = dt.datetime.utcnow()
+        self.relay_timeout = 1
 
         self.known_hosts = {}
         self.known_hosts['qubic-central'] = "192.168.2.1"
         self.known_hosts['qubic-studio']  = "192.168.2.8"
         self.known_hosts['calsource']     = "192.168.2.5"
-        self.known_hosts['pigps'] = '192.168.2.17'
+        self.known_hosts['pigps']         = '192.168.2.17'
+        self.known_hosts['redpitaya']     = "192.168.2.21"
+        self.known_hosts['groundgps']     = "192.168.2.22"
         
         self.broadcast_port = 37020
         self.nbytes = 1024
-        self.receiver = self.known_hosts['pigps']
+        self.receiver = self.known_hosts['calsource']
 
         self.hostname = None
         if self.hostname is None and 'HOST' in os.environ.keys():
@@ -189,11 +170,11 @@ class calsource_configuration_manager():
                 
         if role=='manager':
             self.log('I am the calsource configuration manager')
-            #self.energenie = PMSDevice('energenie', '1')
             self.device['modulator'] = modulator()
-            self.device['calsource'] = calibration_source('LF')
+            self.device['calsource_150'] = calibration_source('LF')
+            self.device['calsource_220'] = calibration_source('HF')
             self.device['amplifier'] = amplifier()
-            self.device['cf'] = self.device['modulator']
+            self.device['relay'] = relay()
 
         self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
         return None
@@ -234,7 +215,7 @@ class calsource_configuration_manager():
             
             if cmd=='default':
                 command['all']['default'] = True
-                for dev in ['calsource','amplifier','modulator','cf']:
+                for dev in ['calsource','amplifier','modulator']:
                     command[dev]['default'] = True
                 continue
                                 
@@ -344,12 +325,12 @@ class calsource_configuration_manager():
     def onoff(self,states=None):
         '''
         switch on or off devices
-        we have to wait for the Energenie powerbar to reset
+        argument: states is a dictionary with on/off state for each device
+                  if states is None, get status
         '''
-        reset_delta = self.energenie_timeout # minimum time to wait
+        reset_delta = self.relay_timeout # minimum time to wait
         now = dt.datetime.utcnow()
-        delta = (now - self.energenie_lastcommand_date).total_seconds()
-        powerbar = energenie('calsource')
+        delta = (now - self.relay_lastcommand_date).total_seconds()
 
         if delta < reset_delta:
             extra_wait = reset_delta - delta
@@ -357,35 +338,30 @@ class calsource_configuration_manager():
 
         ack = ''
         if states is not None:
-            info = powerbar.set_socket_states(states)
+            info = relay.set_state(states)
             if info['ok']:
                 ack = 'OK-'
             else:
-                ack = 'FAILED_SET_STATES-'
+                ack = 'FAILED_SET_STATE-'
             if 'error_message' in info.keys():
-                self.log('energenie error: %s' % info['error_message'])
-            self.log('energenie message: %s' % info['message'])
+                self.log('RELAY error: %s' % info['error_message'])
+            self.log('RELAY message: %s' % info['message'])
             
                 
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
-        states_read = powerbar.get_socket_states()
+        states_read = relay.state()
         if states_read is not None:
             ack += 'OK'
-            self.log('retrieved energenie states: %s' % states_read,verbosity=2)
+            self.log('retrieved RELAY states: %s' % states_read,verbosity=2)
         else:
             ack += 'FAILED_GET_STATES'
-            self.log('FAILED to get energenie states',verbosity=2)
+            self.log('FAILED to get RELAY states',verbosity=2)
             
         if ack.find('FAILED_GET_STATES')<0:
-            for socket_no in states_read.keys():
-                if isinstance(socket_no,str): continue # states also has 'ok' and 'error_message'
-                state = states_read[socket_no]
-                dev = powerbar.socket[socket_no]
-                self.device_on[dev] = state
-            self.device_on['cf'] = self.device_on['modulator'] # carbon fibre and modulator are the same device
+            self.device_on = states_read
 
-        self.energenie_lastcommand_date = dt.datetime.utcnow()
+        self.relay_lastcommand_date = dt.datetime.utcnow()
         return ack
 
 
@@ -395,7 +371,7 @@ class calsource_configuration_manager():
         '''
         msg = ''
 
-        # get on/off status from Energenie powerbar
+        # get on/off status
         ack = self.onoff()
         for dev in self.device_list:
             if self.device_on[dev] is not None:
@@ -406,38 +382,11 @@ class calsource_configuration_manager():
             else:
                 msg += ' %s:UNKNOWN' % dev
 
-        dev = 'amplifier'
-        if (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
-            msg += ' '+self.device[dev].status()
-            
-        dev = 'calsource'
-        if self.device_on[dev]:
-            if self.device[dev].state is not None:
-                msg += ' %s:frequency=%+06fGHz' % (dev,self.device[dev].state['frequency'])
-                msg += ' synthesiser:frequency=%+06fGHz' % self.device[dev].state['synthesiser_frequency']
+        for dev in self.device_list:
+            if (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
+                msg += ' '+self.device[dev].status()
             else:
-                msg += ' %s:frequency=UNKNOWN' % dev
-                msg += ' synthesiser:frequency=UNKNOWN'
-            
-        dev = 'modulator'
-        if self.device_on[dev] and not self.device[dev].is_connected():
-            self.log('%s is ON, but not responding.  Trying to reinitialize.' % dev)
-            self.device[dev].init()
-        if self.device[dev].is_connected():
-            for dev_name in self.modulator_channel.keys():
-                
-                settings = self.device[dev].read_settings(show=False,channel=self.modulator_channel[dev_name])
-                if settings is None:
-                    msg += ' %s:UNKNOWN' % dev_name
-                else:
-                    msg += ' %s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s %s:OUTPUT=%s' % \
-                        (dev_name,settings['shape'],
-                         dev_name,settings['frequency'],
-                         dev_name,settings['amplitude'],
-                         dev_name,settings['offset'],
-                         dev_name,settings['duty'],
-                         dev_name,settings['output'])
-
+                msg += ' %s:UNKNOWN' % dev
             
         return msg
     
@@ -448,15 +397,6 @@ class calsource_configuration_manager():
         '''
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
 
-        # add None to modulator parameters that are to be set by default
-        modulator_configure = False
-        for dev in ['modulator','cf']:
-            for parm in ['frequency','amplitude','shape','offset','duty','output','default']:
-                if parm in command[dev].keys():
-                    modulator_configure = True
-                else:
-                    command[dev][parm] = None
-                
         # get current on/off status from Energenie powerbar
         onoff_ack = self.onoff()
         device_was_off = {}
@@ -474,23 +414,22 @@ class calsource_configuration_manager():
             if parm in command[dev].keys():
                 state = None
                 if command[dev][parm] == 'on':
-                    state = True
+                    state = 1
                 if command[dev][parm] == 'off':
-                    state = False
+                    state = 0
                 if state is not None:
-                    states[self.powersocket[dev]] = state
+                    states[dev] = state
                     msg += '%s:%s ' % (dev,command[dev][parm])
         if states:
-            msg += 'energenie:%s ' % self.onoff(states)
+            msg += 'relay:%s ' % self.onoff(states)
             retval['device_on'] = self.device_on
             self.log(msg)
             ack += '%s ' % msg
 
             # initialize devices that need initializing
             already_waited = 0
-            for dev in ['modulator','calsource','amplifier','cf']:
-                powersocket = self.powersocket[dev]
-                if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
+            for dev in ['modulator','calsource','amplifier']:
+                if dev in states.keys() and states[dev] and device_was_off[dev]:
                     wait_time = self.wait_after_switch_on[dev] - already_waited
                     if wait_time > 0:
                         self.log('waiting %i seconds after switch on' % wait_time,verbosity=0)
@@ -502,14 +441,8 @@ class calsource_configuration_manager():
                         self.device[dev].init()
                         
                             
-                    # an inelegant hack
-                    if (dev=='cf' or dev=='modulator'):
-                        if 'onoff' in command[dev].keys() and command[dev]['onoff']=='on': 
-                            self.log('asking for default settings on %s with output channel %i' % (dev,self.modulator_channel[dev]))
-                            self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
-                    else:
-                        self.log('asking for default settings on %s (NOT modulator nor cf)' % dev)
-                        self.device[dev].set_default_settings()
+                    self.log('asking for default settings on %s' % dev)
+                    self.device[dev].set_default_settings()
                     retval['%s state' % dev] = self.device[dev].state
                 else:
                     self.log('not doing anything for %s' % dev)
@@ -534,36 +467,37 @@ class calsource_configuration_manager():
             ack += '%s ' % msg
                 
 
-        # the modulator configuration also for the carbon fibre
-        if modulator_configure:
-            for dev in ['modulator','cf']:
-                if dev not in command.keys(): continue
+        # the modulator configuration
+        dev = 'modulator'
+        if dev in command.keys():
             
-                if 'default' in command[dev].keys() and command[dev]['default']:
-                    self.device['modulator'].set_default_settings(channel=self.modulator_channel[dev])
-                else:
-                    self.device['modulator'].configure(frequency=command[dev]['frequency'],
-                                                       amplitude=command[dev]['amplitude'],
-                                                       shape=command[dev]['shape'],
-                                                       offset=command[dev]['offset'],
-                                                       duty=command[dev]['duty'],
-                                                       output=command[dev]['output'],
-                                                       channel=self.modulator_channel[dev])
+            if 'default' in command[dev].keys() and command[dev]['default']:
+                self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
+            else:
+                for modcmd in valid_commands[dev]:
+                    if modcmd not in command[dev].keys():
+                        command[dev][modcmd] = None
+                self.device[dev].configure(frequency=command[dev]['frequency'],
+                                           amplitude=command[dev]['amplitude'],
+                                           shape=command[dev]['shape'],
+                                           offset=command[dev]['offset'],
+                                           duty=command[dev]['duty'],
+                                           output=command[dev]['output'],
+                                           input_gain=command[dev]['input_gain'],
+                                           acquisition_units=command[dev]['acquisition_units'],
+                                           decimation=command[dev]['decimation'],
+                                           coupling=command[dev]['coupling'],
+                                           channel=self.modulator_channel[dev])
+
 
             # wait a bit before trying to read the results
             time.sleep(1)
-            settings = self.device['modulator'].read_settings(show=False,channel=self.modulator_channel[dev])
-            if settings is None:
+            status = self.device[dev].status()
+            if status is None:
                 msg = '%s:FAILED' % dev
             else:
-                msg = '%s:SHAPE=%s %s:FREQUENCY=%s %s:AMPLITUDE=%s %s:OFFSET=%s %s:DUTY_CYCLE=%s %s:OUTPUT=%s' % \
-                    (dev,settings['shape'],
-                     dev,settings['frequency'],
-                     dev,settings['amplitude'],
-                     dev,settings['offset'],
-                     dev,settings['duty'],
-                     dev,settings['output'])
-                    
+                msg = status
+                
             self.log(msg)
             ack += '%s ' % msg
 
@@ -576,9 +510,9 @@ class calsource_configuration_manager():
                 ack += '%s:default_settings ' % dev
             else:
                 for parm in command[dev].keys():
-                    if parm!='onoff': # ignore on/off.  This is executed above.
-                        ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
-                        retval['%s state' % dev] = self.device[dev].state
+                    if parm=='onoff': continue # ignore on/off.  This is executed above.
+                    ack += '%s ' % self.device[dev].set_setting(parm,command[dev][parm])
+                    retval['%s state' % dev] = self.device[dev].state
         
 
         # STATUS

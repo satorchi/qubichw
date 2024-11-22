@@ -13,6 +13,22 @@ control the RedPitaya oscilloscope/signal-generator
 import time,socket,os,sys
 import numpy as np
 import datetime as dt
+
+default_setting = {}
+default_setting['frequency'] = 0.7
+default_setting['shape'] = 'SINE'
+default_setting['amplitude'] = 1.0
+default_setting['offset'] = 2.0
+default_setting['duty'] = 33
+default_setting['input_gain'] = 'HV'
+default_setting['acquisition_units'] = 'RAW'
+default_setting['decimation'] = 65536
+default_setting['coupling'] = 'DC'
+# number of bytes to receive by default (but not for acquisition)
+default_setting['chunksize'] = 4096 
+# wait time after sending a command and before requesting a response
+default_setting['response_delay'] = 0.1
+
 class redpitaya:
     '''
     class to control the RedPitaya oscilloscope/signal-generator
@@ -25,25 +41,12 @@ class redpitaya:
     max_sample_rate = 250e6 # with decimation=1
     buffer_size = None
 
-    current_settings = {}
-    current_settings[1] = {}
-    current_settings[2] = {}
-    default_settings = {}
-    default_settings['frequency'] = 0.7
-    default_settings['shape'] = 'SINE'
-    default_settings['amplitude'] = 1.0
-    default_settings['offset'] = 2.0
-    default_settings['duty cycle'] = 33
-    default_settings['input gain'] = 'HV'
-    default_settings['acquisition units'] = 'RAW'
-    default_settings['decimation'] = 65536
-    default_settings['coupling'] = 'DC'
-    
-    # number of bytes to receive by default (but not for acquisition)
-    default_settings['chunksize'] = 4096 
+    current_setting = {}
+    current_setting[1] = {}
+    current_setting[2] = {}
 
-    # wait time after sending a command and before requesting a response
-    default_settings['response delay'] = 0.1
+    default_setting = default_setting # class variable taken from toplevel which is used also in calsource_configuration_manager
+    
 
     date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
@@ -110,7 +113,7 @@ class redpitaya:
             self.connection_status = False
             return False        
 
-        self.set_decimation(self.default_settings['decimation'])
+        self.set_decimation(self.default_setting['decimation'])
         self.get_buffer_size()
         return None
 
@@ -135,7 +138,7 @@ class redpitaya:
         get the result of an inquiry command
         '''
         if chunksize is None:
-            chunksize = self.default_settings['chunksize']
+            chunksize = self.default_setting['chunksize']
         try:
             ans = self.sock.recv(chunksize)
         except socket.timeout:
@@ -163,7 +166,7 @@ class redpitaya:
         We pause before reading the response, otherwise there's a trailing byte leftover
         '''
         ans = self.send_command(cmd)
-        pausetime = self.default_settings['response delay']
+        pausetime = self.default_setting['response_delay']
         time.sleep(pausetime)
         return self.get_response(string=string)
 
@@ -172,7 +175,7 @@ class redpitaya:
         get the identity string
         '''
         id = self.get_info('*IDN?',string=True)
-        self.current_settings['id'] = id
+        self.current_setting['id'] = id
         return id
     
     def set_decimation(self,decimnum):
@@ -188,7 +191,7 @@ class redpitaya:
         get the decimation value:  max is 65536
         '''
         decnum = self.get_info('ACQ:DEC?',string=False)
-        self.current_settings['decimation'] = decnum
+        self.current_setting['decimation'] = decnum
         return decnum
     
     def get_buffer_size(self):
@@ -196,7 +199,7 @@ class redpitaya:
         get the buffer size.  This is 16384.  but in case you want the Red Pitaya to tell you...
         '''
         self.buffer_size = self.get_info('ACQ:BUF:SIZE?',string=False)
-        self.current_settings['buffer size'] = self.buffer_size
+        self.current_setting['buffer size'] = self.buffer_size
         return self.buffer_size
 
     def get_sample_rate(self):
@@ -209,7 +212,7 @@ class redpitaya:
         if decnum is None: return None
 
         sample_rate = self.max_sample_rate/decnum
-        self.current_settings['sample rate'] = sample_rate
+        self.current_setting['sample rate'] = sample_rate
         return sample_rate
 
     def get_sample_period(self):
@@ -218,7 +221,7 @@ class redpitaya:
         '''
         sample_rate = self.get_sample_rate()
         sample_period = self.buffer_size/sample_rate
-        self.current_settings['sample period'] = sample_period
+        self.current_setting['sample period'] = sample_period
         return sample_period
         
 
@@ -228,7 +231,7 @@ class redpitaya:
         '''
         cmd = 'OUTPUT%1i:STATE?' % ch
         onoff = self.get_info(cmd,string=False)
-        self.current_settings[ch]['output state'] = onoff
+        self.current_setting[ch]['output state'] = onoff
         return onoff
 
     def set_output_on(self,ch=1):
@@ -254,7 +257,7 @@ class redpitaya:
 
         # we store the frequency commanded because the RedPitaya only returns a whole number for the frequency
         # even though the setting might have a fractional Hz
-        self.current_settings[ch]['frequency'] = freq
+        self.current_setting[ch]['frequency'] = freq
         return self.send_command(cmd)
 
     def get_frequency(self,ch=1):
@@ -286,7 +289,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:FUNC?' % ch
         shape = self.get_info(cmd,string=True)
-        self.current_settings[ch]['shape'] = shape
+        self.current_setting[ch]['shape'] = shape
 
     def set_duty(self,duty,ch=1):
         '''
@@ -301,7 +304,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:DCYC?' % ch
         duty = self.get_info(cmd,string=False)
-        self.current_settings[ch]['duty cycle'] = duty
+        self.current_setting[ch]['duty'] = duty
         return duty
 
     def set_offset(self,offset,ch=1):
@@ -317,7 +320,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:VOLT:OFFS?' % (ch)
         offset = self.get_info(cmd,string=False)
-        self.current_settings[ch]['offset'] = offset
+        self.current_setting[ch]['offset'] = offset
         return offset
 
     def set_amplitude(self,amplitude,ch=1):
@@ -333,7 +336,7 @@ class redpitaya:
         '''
         cmd = 'SOUR%1i:VOLT?' % ch
         a = self.get_info(cmd,string=False)
-        self.current_settings[ch]['amplitude'] = a
+        self.current_setting[ch]['amplitude'] = a
         return a
         
 
@@ -358,14 +361,14 @@ class redpitaya:
         '''
         cmd = 'ACQ:DATA:UNITS?'
         acqunits = self.get_info(cmd,string=True)
-        self.current_settings['units'] = acqunits
+        self.current_setting['units'] = acqunits
         return acqunits
 
     def set_acquisition_units(self,units=None):
         '''
         set the data acquisition units, either RAW or VOLTS
         '''
-        if units is None: units = self.default_settings['acquisition units']
+        if units is None: units = self.default_setting['acquisition_units']
         cmd = 'ACQ:DATA:UNITS %s' % units.upper()
         return self.send_command(cmd)
 
@@ -374,7 +377,7 @@ class redpitaya:
         '''
         set the input gain: HV or LV (high or low)
         '''
-        if gain is None: gain = self.default_settings['input gain']
+        if gain is None: gain = self.default_setting['input_gain']
         if gain.upper()=='HIGH': gain = 'HV'
         if gain.upper()=='LOW': gain = 'LV'
         cmd = 'ACQ:SOUR%1i:GAIN %s' % (ch,gain.upper())
@@ -386,7 +389,7 @@ class redpitaya:
         '''
         cmd = 'ACQ:SOUR%1i:GAIN?' % ch
         gain = self.get_info(cmd,string=True)
-        self.current_settings[ch]['gain'] = gain
+        self.current_setting[ch]['gain'] = gain
         return gain
 
     def set_input_coupling(self,coupling='DC',ch=1):
@@ -406,7 +409,7 @@ class redpitaya:
         '''
         cmd = 'ACQ:SOUR%1i:COUP?' % ch
         coupling = self.get_info(cmd,string=True)
-        self.current_settings[ch]['coupling'] = coupling
+        self.current_setting[ch]['coupling'] = coupling
         return coupling
         
         
@@ -418,15 +421,15 @@ class redpitaya:
             self.log('ERROR! default settings: Device not connected')
             return False
         
-        self.set_frequency(self.default_settings['frequency'],ch)
-        self.set_shape(self.default_settings['shape'],ch)
-        self.set_amplitude(self.default_settings['amplitude'],ch)
-        self.set_offset(self.default_settings['offset'],ch)
-        self.set_duty(self.default_settings['duty cycle'],ch)
-        self.set_input_gain(self.default_settings['input gain'],ch)
-        self.set_acquisition_units(self.default_settings['acquisition units'])
-        self.set_decimation(self.default_settings['decimation'])
-        self.set_input_coupling(self.default_settings['coupling'],ch)
+        self.set_frequency(self.default_setting['frequency'],ch)
+        self.set_shape(self.default_setting['shape'],ch)
+        self.set_amplitude(self.default_setting['amplitude'],ch)
+        self.set_offset(self.default_setting['offset'],ch)
+        self.set_duty(self.default_setting['duty'],ch)
+        self.set_input_gain(self.default_setting['input_gain'],ch)
+        self.set_acquisition_units(self.default_setting['acquisition_units'])
+        self.set_decimation(self.default_setting['decimation'])
+        self.set_input_coupling(self.default_setting['coupling'],ch)
         self.set_output_on(ch)
 
         if not self.connection_status:
@@ -435,6 +438,59 @@ class redpitaya:
         
         return True
 
+    def configure(self,
+                  channel=1,
+                  frequency=None,
+                  shape=None,
+                  amplitude=None,
+                  offset=None,
+                  duty=None,
+                  input_gain=None,
+                  acquisition_units=None,
+                  decimation=None,
+                  coupling=None):
+        '''
+        configure the settings for a given output channel
+        '''
+        if not self.connection_status:
+            self.log('ERROR! default settings: Device not connected')
+            return None
+
+        if frequency is not None:
+            self.set_frequency(frequency,channel)
+            
+        if shape is not None:
+            self.set_shape(shape,channel)
+
+        if amplitude is not None:
+            self.set_amplitude(amplitude,channel)
+
+        if offset is not None:
+            self.set_offset(offset,channel)
+
+        if duty is not None:
+            self.set_duty(duty,channel)
+
+        if input_gain is not None:
+            self.set_input_gain(input_gain,channel)
+
+        if acquisition_units is not None:
+            self.set_acquisition_units(acquisition_units)
+
+        if decimation is not None:
+            self.set_decimation(decimation)
+
+        if input_coupling is not None:
+            self.set_input_coupling(coupling,channel)
+            
+        self.set_output_on(ch)
+
+        if not self.connection_status:
+            self.log('ERROR! configure: Problem setting parameters')
+            return False
+        
+        return True
+    
     def state(self):
         '''
         update the current settings and return the dictionary of current settings
@@ -457,10 +513,10 @@ class redpitaya:
             ans = self.get_output_state(ch)
             ans = self.get_input_coupling(ch)
 
-            if 'frequency' not in self.current_settings[ch].keys():
-                self.current_settings[ch]['frequency'] = self.get_frequency(ch)
+            if 'frequency' not in self.current_setting[ch].keys():
+                self.current_setting[ch]['frequency'] = self.get_frequency(ch)
 
-        return self.current_settings
+        return self.current_setting
 
     def show_status(self):
         '''
@@ -470,15 +526,15 @@ class redpitaya:
         ans = self.state()
         
         # print first, the global parameters
-        for key in self.current_settings.keys():
+        for key in self.current_setting.keys():
             if key==1 or key==2: continue
-            print(key,' = ',self.current_settings[key])
+            print(key,' = ',self.current_setting[key])
 
         # print the parameters for each channel
         for ch in [1,2]:
             print('-----------------')
-            for key in self.current_settings[ch].keys():
-                line = 'ch%i: %s = %s' % (ch,key,self.current_settings[ch][key])
+            for key in self.current_setting[ch].keys():
+                line = 'ch%i: %s = %s' % (ch,key,self.current_setting[ch][key])
                 print(line)
         return
 
@@ -490,17 +546,17 @@ class redpitaya:
         ans = self.state()
         msg_list = []
         # first, the global parameters
-        for key in self.current_settings.keys():
+        for key in self.current_setting.keys():
             if key==1 or key==2: continue
             key_str = key.replace(' ','_')
-            msg = 'modulator:%s=%s' % (key_str,self.current_settings[key])
+            msg = 'modulator:%s=%s' % (key_str,self.current_setting[key])
             msg_list.append(msg)
 
         # the parameters for each channel
         for ch in [1,2]:
-            for key in self.current_settings[ch].keys():
+            for key in self.current_setting[ch].keys():
                 key_str = key.replace(' ','_')
-                msg_list.append('modulator%i:%s=%s' % (ch,key_str,self.current_settings[ch][key]))
+                msg_list.append('modulator%i:%s=%s' % (ch,key_str,self.current_setting[ch][key]))
                 
         msg = ' '.join(msg_list)
         return msg
@@ -515,7 +571,7 @@ class redpitaya:
         
         cmd = 'ACQ:SOUR%1i:DATA?' % ch
         self.send_command(cmd)
-        pausetime = self.default_settings['response delay']
+        pausetime = self.default_setting['response_delay']
         time.sleep(sample_period+pausetime)
 
         acq_str = self.get_response(chunksize=2**18,string=True)
