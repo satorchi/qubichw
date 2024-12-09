@@ -234,7 +234,7 @@ class calibration_source:
         self.state = {}
         self.state['frequency'] = self.factor*of
         self.state['synthesiser_frequency'] = of
-        return state
+        return self.state
 
     def set_Frequency(self,f):
         '''
