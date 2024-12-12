@@ -274,6 +274,7 @@ class calibration_source:
         get the synthesiser frequency
         measure the frequency counter over a period of 100ms.
         see example in VDI Frequency Counter User Manual 2b.pdf
+        NOTE:  THIS DOES NOT WORK!
         '''
         cmd = bytearray([0x03, 0xFC, 0x64, 0x00, 0x9B])
         self.state = self.send_command(cmd)

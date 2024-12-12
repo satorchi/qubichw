@@ -29,8 +29,8 @@ for dev in device_list:
 
 # the calibration source
 from qubichw.calibration_source import calibration_source
-valid_commands['calsource_150'] = ['on','off','frequency','default']
-valid_commands['calsource_220'] = ['on','off','frequency','default']
+valid_commands['calsource_150'] += ['default','frequency']
+valid_commands['calsource_220'] += ['default','frequency']
 
 # the low noise amplifier
 from qubichw.amplifier_femto import default_setting as amplifier_default_setting
@@ -428,29 +428,31 @@ class calsource_configuration_manager():
 
             # initialize devices that need initializing
             already_waited = 0
-            for dev in ['modulator','calsource','amplifier']:
-                if dev in states.keys() and states[dev] and device_was_off[dev]:
-                    wait_time = self.wait_after_switch_on[dev] - already_waited
-                    if wait_time > 0:
-                        self.log('waiting %i seconds after switch on' % wait_time,verbosity=0)
-                        time.sleep(wait_time)
-                        already_waited += wait_time
+            for dev in ['modulator','calsource_150','calsource_220','amplifier']:
+                if not (dev in states.keys() and states[dev] and device_was_off[dev]):
+                    self.log('not doing anything for %s' % dev)
+                    continue
+                    
+                wait_time = self.wait_after_switch_on[dev] - already_waited
+                if wait_time > 0:
+                    self.log('waiting %i seconds after switch on' % wait_time,verbosity=0)
+                    time.sleep(wait_time)
+                    already_waited += wait_time
 
-                    if not self.device[dev].is_connected():
-                        self.log('%s is not connected.  re-initializing.' % dev)
-                        self.device[dev].init()
+                if not self.device[dev].is_connected():
+                    self.log('%s is not connected.  re-initializing.' % dev)
+                    self.device[dev].init()
                         
                             
-                    self.log('asking for default settings on %s' % dev)
-                    self.device[dev].set_default_settings()
-                    retval['%s state' % dev] = self.device[dev].state
-                else:
-                    self.log('not doing anything for %s' % dev)
+                self.log('asking for default settings on %s' % dev)
+                self.device[dev].set_default_settings()
+                retval['%s state' % dev] = self.device[dev].state
+                    
 
         # do configuration command for calsource
-        dev = 'calsource'
         parm =  'frequency'
-        if dev in command.keys():
+        for dev in ['calsource_150','calsource_220']:
+            if dev not in command.keys(): continue
             if 'default' in command[dev].keys() and command[dev]['default']:
                 of = self.device[dev].set_default_settings()
                 msg += '%s:frequency=%+06fGHz' % (dev,of)
