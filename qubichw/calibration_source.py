@@ -24,14 +24,12 @@ see documentation in:
  https://box.in2p3.fr/s/2NfFjFNEPB6jMC3
 
 udev rules should be setup in order to identify the calibration source
-the udev rules can be found in the scripts directory of pystudio
-and also here.  
 
 save the following in file /etc/udev/rules.d/calibration-source.rules
 
-ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="VDIE0032", ACTION=="add", OWNER="qubic", GROUP="users", MODE="0644", SYMLINK+="calsource-HF"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="VDIE0032", ACTION=="add", OWNER="qubic", GROUP="users", MODE="0644", SYMLINK+="calsource-HF"
 
-ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="VDIE0031", ACTION=="add", OWNER="qubic", GROUP="users", MODE="0644", SYMLINK+="calsource-LF"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="VDIE0031", ACTION=="add", OWNER="qubic", GROUP="users", MODE="0644", SYMLINK+="calsource-LF"
 
 
 '''
