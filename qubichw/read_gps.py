@@ -25,9 +25,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
+rec_formats = "uint8,float64,int32,int32,int32,int32,int32,float32,float32,float32,int32"
+rec_formats_list = rec.formats.split(',')
+fmt = '<Bdiiiiifffi'
 rec = np.recarray(names="STX,timestamp,rpN,rpE,rpD,roll,yaw,pitchIMU,rollIMU,temperature,checksum",
-                  formats="uint8,float64,int32,int32,int32,int32,int32,float64,float64,float64,int32",shape=(1))
-fmt = '<Bdiiiiidddi'
+                  formats=rec_formats,shape=(1))
 keys = rec.dtype.names[2:-1] # STX, timestamp, and checksum are treated separately
 n_names = len(rec.dtype.names) - 1 # STX is not given by the SimpleRTK
 rec[0].STX = 0xAA
@@ -88,7 +90,11 @@ def read_gps_chunk(chunk,sock,verbosity=0):
                     skipline = True
                     continue
 
-            cmd = 'rec[0].%s = %i' % (key,val)
+            data_type = rec_format_list[data_idx]
+            if data_type.find('int')>=0:
+                cmd = 'rec[0].%s = %i' % (key,val)
+            else:
+                cmd = 'rec[0].%s = %f' % (key,val)
             if verbosity>4: print('executing: %s' % cmd)
             exec(cmd)
             if verbosity>3: print('"%s" %f' % (val_str,val))
