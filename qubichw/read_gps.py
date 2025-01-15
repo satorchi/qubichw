@@ -94,7 +94,8 @@ def read_gps_chunk(chunk,sock,verbosity=0):
         
         # broadcast the data
         for rx in receivers:
-            if verbosity>0: print('%s %s %s' % (date_str,rx,rec))
+            if verbosity==1: print('%s %s %s' % (date_str,rx,rec))
+            if verbosity==2: print(line)
             else: time.sleep(0.05) # need a delay before reading GPS data again
             sock.sendto(rec,(rx,PORT))
     return True
