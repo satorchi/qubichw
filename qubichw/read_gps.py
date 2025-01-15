@@ -90,12 +90,13 @@ def read_gps_chunk(chunk,sock,verbosity=0):
                     skipline = True
                     continue
 
-            data_type = rec_formats_list[data_idx]
+            fmt_idx = idx + 2
+            data_type = rec_formats_list[fmt_idx]
             if data_type.find('int')>=0:
                 cmd = 'rec[0].%s = %i' % (key,val)
             else:
                 cmd = 'rec[0].%s = %f' % (key,val)
-            if verbosity>3: print('"%s" %f | %s | executing: %s' % (val_str,val,data_type,cmd))
+            if verbosity>3: print('"%10s" %f16.6 | %16s | executing: %s' % (val_str,val,data_type,cmd))
             exec(cmd)
             
         if skipline: continue
