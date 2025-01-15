@@ -87,8 +87,10 @@ def read_gps_chunk(chunk,sock,verbosity=0):
                     if verbosity>0: print('ERROR DATA INTERPRETATION: %s' % (val_str))
                     skipline = True
                     continue
-            
-            exec('rec[0].%s = %i' % (key,val))
+
+            cmd = 'rec[0].%s = %i' % (key,val)
+            if verbosity>4: print('executing: %s' % cmd)
+            exec(cmd)
             if verbosity>3: print('"%s" %f' % (val_str,val))
             
         if skipline: continue
