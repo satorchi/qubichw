@@ -26,8 +26,8 @@ from matplotlib import pyplot as plt
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec = np.recarray(names="STX,timestamp,rpN,rpE,rpD,roll,yaw,pitchIMU,rollIMU,temperature,checksum",
-                  formats="uint8,float64,int32,int32,int32,int32,int32,float32,float32,float32,int32",shape=(1))
-fmt = '<Bdiiiiifffi'
+                  formats="uint8,float64,int32,int32,int32,int32,int32,float64,float64,float64,int32",shape=(1))
+fmt = '<Bdiiiiidddi'
 keys = rec.dtype.names[2:-1] # STX, timestamp, and checksum are treated separately
 n_names = len(rec.dtype.names) - 1 # STX is not given by the SimpleRTK
 rec[0].STX = 0xAA
