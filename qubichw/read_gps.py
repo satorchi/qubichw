@@ -95,9 +95,8 @@ def read_gps_chunk(chunk,sock,verbosity=0):
                 cmd = 'rec[0].%s = %i' % (key,val)
             else:
                 cmd = 'rec[0].%s = %f' % (key,val)
-            if verbosity>4: print('executing: %s' % cmd)
+            if verbosity>3: print('"%s" %f | executing: %s' % (val_str,val,cmd))
             exec(cmd)
-            if verbosity>3: print('"%s" %f' % (val_str,val))
             
         if skipline: continue
         
