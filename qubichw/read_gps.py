@@ -26,7 +26,7 @@ from matplotlib import pyplot as plt
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec_formats = "uint8,float64,int32,int32,int32,int32,int32,float32,float32,float32,int32"
-rec_formats_list = rec.formats.split(',')
+rec_formats_list = rec_formats.split(',')
 fmt = '<Bdiiiiifffi'
 rec = np.recarray(names="STX,timestamp,rpN,rpE,rpD,roll,yaw,pitchIMU,rollIMU,temperature,checksum",
                   formats=rec_formats,shape=(1))
