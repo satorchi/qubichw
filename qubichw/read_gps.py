@@ -90,7 +90,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
                     skipline = True
                     continue
 
-            data_type = rec_format_list[data_idx]
+            data_type = rec_formats_list[data_idx]
             if data_type.find('int')>=0:
                 cmd = 'rec[0].%s = %i' % (key,val)
             else:
