@@ -105,7 +105,7 @@ def broadcast_temperatures(verbosity=0):
 
     while True:
         try:
-            temperatures = read_temperatures.read()        
+            temperatures = read_temperatures()        
             trycount = 0
         except KeyboardInterrupt:
             print('loop exit with ctrl-c')
