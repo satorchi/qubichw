@@ -89,7 +89,7 @@ def read_temperatures():
         temperatures[idx] = Tkelvin
         return temperatures
                 
-def broadcast_gps(verbosity=0):
+def broadcast_temperatures(verbosity=0):
     '''
     read and broadcast the MCP9809 temperature data
     '''
@@ -132,8 +132,9 @@ def broadcast_gps(verbosity=0):
         # broadcast the data
         for rx in receivers:
             if verbosity>0: print('%s %s %s' % (date_str,rx,rec))
-            else: time.sleep(0.05) # need a delay before reading GPS data again
+            else: time.sleep(0.05) # need a delay before reading data again
             sock.sendto(rec,(rx,PORT))
 
     
     return
+
