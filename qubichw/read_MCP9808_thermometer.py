@@ -73,7 +73,9 @@ def read_temperatures(verbosity=0):
     # Read data back from 0x05(5), 2 bytes
     # Temp MSB, TEMP LSB
     base_address = 0x18
-    for idx,Tidx in enumerate(sensors):
+    #for idx,Tidx in enumerate(sensors):
+    for Tidx in sensors:
+        idx = Tidx
         addr = base_address + Tidx
         if verbosity>0: print('addr: %i' % addr)
 
