@@ -18,7 +18,9 @@ code copied from controleverything.com
 # https://www.controleverything.com/content/Temperature?sku=MCP9808_I2CS#tabs-0-product_tabset-2
 '''
 
-import socket,time,struct,smbus
+import os,socket,time,struct
+if os.uname().machine.find('arm')>=0:
+    import smbus
 import datetime as dt
 import numpy as np
 
@@ -33,7 +35,7 @@ rec_formats_list = rec_formats.split(',')
 fmt = '<Bdffff'
 rec_names_list = ['STX','timestamp']
 for sensor in sensors:
-        rec_names_list.append('T%i' % sensor)
+    rec_names_list.append('T%i' % sensor)
 rec_names = ','.join(rec_names_list)
 rec = np.recarray(names=rec_names, formats=rec_formats,shape=(1))
 rec[0].STX = 0xAA
@@ -79,13 +81,13 @@ def read_temperatures():
             # Convert the data to 13-bits
             Tcelsius = ((data[0] & 0x1F) * 256) + data[1]
             if Tcelsius > 4095 :
-                    Tcelsius -= 8192
+                Tcelsius -= 8192
                 
-                    Tcelsius = Tcelsius * 0.0625
-                    Tkelvin = Tcelsius + 273.15
+                Tcelsius = Tcelsius * 0.0625
+                Tkelvin = Tcelsius + 273.15
 
         except:
-                Tkelvin = -1
+            Tkelvin = -1
         temperatures[idx] = Tkelvin
         return temperatures
                 
@@ -138,3 +140,57 @@ def broadcast_temperatures(verbosity=0):
     
     return
 
+def acquire_MCP9808_temperatures(listener=None,verbosity=0,monitor=False):
+    '''
+    read the MCP9808 temperature sensors on socket and write to file
+    '''
+    print_fmt = '%8i: 0x%X %s %10.2f %10.2f %10.2f %10.2f'
+    
+    if listener is None: listener = get_myip()
+    print('listening on: %s, %i' % (listener,PORT))
+    if listener is None:
+        print('ERROR! Not a valid listening address.  Not connected to the network?')
+        return None
+              
+    
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    client.settimeout(0.2)
+    client.bind((listener,PORT))
+    h = open('calbox_temperatures.dat','ab')
+
+    packet_period = 1/8
+    counter = 0
+    while True:
+        counter += 1
+        try:
+            dat = client.recv(packetsize)
+            h.write(dat)
+            dat_list = struct.unpack(fmt,dat)
+            if verbosity>0:
+                date = dt.datetime.utcfromtimestamp(dat_list[1])
+                date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
+                print(print_fmt % (counter,
+                                   dat_list[0],
+                                   date_str,
+                                   dat_list[2],
+                                   dat_list[3],
+                                   dat_list[4],
+                                   dat_list[5]
+                                   )
+                      )
+            time.sleep(packet_period)
+        except socket.timeout:
+            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            print('%8i: %s timeout error on socket' % (counter,now_str))
+            continue
+        except KeyboardInterrupt:
+            h.close()
+            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            print('%8i: %s exit using ctrl-c' % (counter,now_str))
+            return
+        # except:
+        #     if verbosity>0: print('%8i: problem reading socket' % counter)
+        #     time.sleep(0.2)
+
+    return
