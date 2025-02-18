@@ -49,7 +49,7 @@ receivers = [IP_GROUNDGPS] # testing at APC
 PORT = 51337
 
 
-def read_temperatures():
+def read_temperatures(verbosity=0):
     '''
     read the MCP9808 temperatures
     '''
@@ -84,6 +84,7 @@ def read_temperatures():
             if Tcelsius > 4095: Tcelsius -= 8192                
             Tcelsius = Tcelsius * 0.0625
             Tkelvin = Tcelsius + 273.15
+            if verbosity>0: print("T%i: %.2f K" % (Tidx,Tkelvin))
 
         except:
             Tkelvin = -1
