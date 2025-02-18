@@ -119,7 +119,7 @@ def broadcast_temperatures(verbosity=0):
         rec[0].STX = 0xAA
         rec[0].timestamp = dt.datetime.utcnow().timestamp()
 
-        for idx,sensor in sensors:
+        for idx,sensor in enumerate(sensors):
             fmt_idx = idx + 2
             data_type = rec_formats_list[fmt_idx]
             if data_type.find('int')>=0:
