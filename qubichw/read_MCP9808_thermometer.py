@@ -98,7 +98,7 @@ def broadcast_temperatures(verbosity=0):
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
     date_now = dt.datetime.utcnow()
-    old_date = date_now
+    date_str = date_now.strftime('%Y-%m-%d %H:%M:%S.%f')
     trycount = 0
 
     while True:
