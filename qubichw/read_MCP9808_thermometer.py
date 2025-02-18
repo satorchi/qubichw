@@ -23,7 +23,7 @@ if os.uname().machine.find('arm')>=0:
     import smbus
 import datetime as dt
 import numpy as np
-from qubichw.utilities import get_myip
+from qubichk.utilities import get_myip
 
 # 4 sensors in the calsource box
 sensors = [0,1.2,4]
