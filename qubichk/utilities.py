@@ -147,7 +147,24 @@ def read_conf_file(filename):
 
     return config
               
-        
+
+def get_receiver_list(conf_file='calbox.conf'):
+    '''
+    read the list of receivers from the config file (eg. calbox.conf)
+    '''
+    conf_file_fullpath = get_fullpath(conf_file)
+    if conf_file_fullpath is None:
+        print('Default receiver is qubic-central: %s' % IP_QUBIC_CENTRAL)
+        return [IP_QUBIC_CENTRAL]
+
+    conf = read_conf_file(conf_file_fullpath)
+
+    if 'receivers' not in conf.keys():
+        print('No Receiver section in configuration file: %s' % conf_file_fullpath)
+        print('Default receiver is qubic-central: %s' % IP_QUBIC_CENTRAL)
+        return [IP_QUBIC_CENTRAL]
+
+    return conf['receivers']
         
 def get_myip():
     '''
