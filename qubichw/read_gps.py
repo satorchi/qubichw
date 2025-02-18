@@ -16,13 +16,14 @@ manual:  simpleRTK2B-SBC-CNRS_APC_ICD_01.pdf
          https://box.in2p3.fr/index.php/s/JZ5JKEe8iDYF5Rt
 
 '''
-import serial
-import socket,time
+import serial, socket, time, struct
 import datetime as dt
 import numpy as np
-import struct
+from qubichk.utilities import get_myip, get_receiver_list
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
+
+receivers = get_receiver_list('calbox.conf')
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec_formats = "uint8,float64,int32,int32,int32,int32,int32,float32,float32,float32,int32"
@@ -39,7 +40,6 @@ chunksize = 4096 # size of ASCII chunk read from the GPS device
 #IP_BROADCAST = "192.168.2.255"
 IP_QUBIC_CENTRAL = "192.168.2.1"
 IP_GROUNDGPS = "134.158.187.114" # testing at APC
-receivers = [IP_GROUNDGPS] # testing at APC
 PORT = 31337
 
 def read_gps_chunk(chunk,sock,verbosity=0):
@@ -208,8 +208,12 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
         dateobj = None
     print_fmt = '%8i: 0x%X %s %10.2f %10.2f %10.2f %10.2f %10.2f %8.3f %8.3f %5.1f'
     
-    if listener is None: listener = receivers[0]
+    if listener is None: listener = get_myip()
     print('listening on: %s, %i' % (listener,PORT))
+    if listener is None:
+        print('ERROR! Not a valid listening address.  Not connected to the network?')
+        return None
+              
     
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
