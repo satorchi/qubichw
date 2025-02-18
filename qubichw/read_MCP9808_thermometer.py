@@ -27,6 +27,7 @@ from qubichk.utilities import get_myip
 
 # 4 sensors in the calsource box
 sensors = [0,1.2,4]
+sensors = range(8)
 nsensors = len(sensors)
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
