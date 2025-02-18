@@ -119,14 +119,13 @@ def broadcast_temperatures(verbosity=0):
         rec[0].STX = 0xAA
         rec[0].timestamp = dt.datetime.utcnow().timestamp()
 
+        temperatures = read_temperatures()
         for idx,sensor in enumerate(sensors):
             fmt_idx = idx + 2
             data_type = rec_formats_list[fmt_idx]
-            if data_type.find('int')>=0:
-                cmd = 'rec[0].T%i = %i' % (sensor,val)
-            else:
-                cmd = 'rec[0].T%i = %f' % (sensor,val)
-            if verbosity>3: print('"%10s" %16.6f | %16s | executing: %s' % (val_str,val,data_type,cmd))
+            val = temperatures[idx]
+            cmd = 'rec[0].T%i = %f' % (sensor,val)
+            if verbosity>3: print('%16.6f | %16s | executing: %s' % (val,data_type,cmd))
             exec(cmd)
         
         # broadcast the data
