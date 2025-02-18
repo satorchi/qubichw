@@ -113,3 +113,17 @@ def make_errmsg(msg=None):
     return errormsg
 
 
+def read_conf_file(filename):
+    '''
+    read some parameters from a configuration file
+    used for calsource box, but maybe will be implemented for other things
+    '''
+    if not os.path.isfile(filename):
+        print('ERROR! File not found: %s' % filename
+        return None
+
+    h = open(filename,'r')
+    lines = h.read().split('\n')
+    h.close()
+
+    
