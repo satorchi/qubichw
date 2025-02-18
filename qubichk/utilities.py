@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 utilities used by various modules in qubichk/hw especially hk_verify
 '''
-import subprocess,re,struct
+import sys,os,subprocess,re,struct
 
 def get_fullpath(filename=None):
     '''
@@ -119,11 +119,53 @@ def read_conf_file(filename):
     used for calsource box, but maybe will be implemented for other things
     '''
     if not os.path.isfile(filename):
-        print('ERROR! File not found: %s' % filename
+        print('ERROR! File not found: %s' % filename)
         return None
 
     h = open(filename,'r')
     lines = h.read().split('\n')
     h.close()
 
+    config = {}
+    section = None
+    for line in lines:
+        if len(line)==0: continue
+        if line[0]=='#': continue
+
+        if line[0]=='[':
+              section = line.strip().replace('[','').replace(']','').lower()
+              continue
+
+        if section is None: continue
+
+        if section not in config.keys():
+              config[section] = []
+
+        # remove comments
+        val = line.strip().split('#')[0].strip()
+        config[section].append(val)
+
+    return config
+              
+        
+        
+def get_myip():
+    '''
+    get the IP address of the local machine
+    '''
+    cmd = '/sbin/ip addr show up scope global'
     
+    out,err = shellcommand(cmd)
+
+    lines = out.split('\n')
+    for line in lines:
+        cleanline = line.strip()
+        if cleanline.find('inet ')!=0: continue
+
+        fulladdr = line.split()[1]
+        addr = fulladdr.split('/')[0]
+        return addr
+
+    return None
+
+
