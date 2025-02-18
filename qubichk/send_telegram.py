@@ -13,35 +13,13 @@ send a message on the Telegram messaging service
 '''
 import os,sys
 import telepot
-
-def telegram_datafile(filename=None):
-    '''
-    get the full path to the desired Telegram data file
-    filename can be botId.txt or telegram_addressbook
-    '''
-    search_dirs = []
-    if 'XDG_DATA_HOME' in os.environ.keys():
-        search_dirs.append('%s/qubic' % os.environ['XDG_DATA_HOME'])
-    if 'HOME' in os.environ.keys():
-        homedir = os.environ['HOME']        
-    else:
-        homedir = '/home/qubic'
-    search_dirs.append('%s/.local/share/qubic' % homedir)
-    search_dirs.append('./')
-    search_dirs.append('/home/qubic/.local/share/qubic')
-
-    for d in search_dirs:
-        fullpath = '%s/%s' % (d,filename)
-        if os.path.isfile(fullpath):
-            return fullpath
-
-    return None
+from qubichk.utilities import get_fullpath
 
 def get_botId():
     '''
     get the bot Id information, which is not kept on the GitHub server
     '''
-    botId_file = telegram_datafile('botId.txt')
+    botId_file = get_fullpath('botId.txt')
     if botId_file is None:
         print('ERROR! Could not find telebot Id: botId.txt')
         return None
@@ -56,7 +34,7 @@ def get_TelegramAddresses():
     '''
     read the known chat Id's
     '''
-    addrbook_file = telegram_datafile('telegram-addresses')
+    addrbook_file = get_fullpath('telegram-addresses')
     if addrbook_file is None: return None
 
     h = open(addrbook_file,'r')
@@ -83,7 +61,7 @@ def get_alarm_recipients():
     read the list of alarm recipients
     '''
     chatid_dict = get_TelegramAddresses()
-    rx_file = telegram_datafile('telegram-alarm-recipients')
+    rx_file = get_fullpath('telegram-alarm-recipients')
     if rx_file is None:
         if chatid_dict is None: return None
         if 'Steve' not in chatid_dict.keys(): return None

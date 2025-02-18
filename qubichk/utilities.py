@@ -12,6 +12,30 @@ utilities used by various modules in qubichk/hw especially hk_verify
 '''
 import subprocess,re,struct
 
+def get_fullpath(filename=None):
+    '''
+    get the full path to the desired file
+    usually it's in the .local/share/qubic directory
+    filename might be botId.txt, telegram_addressbook, powersupply.conf, calbox.conf, whatever...
+    '''
+    search_dirs = []
+    if 'XDG_DATA_HOME' in os.environ.keys():
+        search_dirs.append('%s/qubic' % os.environ['XDG_DATA_HOME'])
+    if 'HOME' in os.environ.keys():
+        homedir = os.environ['HOME']        
+    else:
+        homedir = '/home/qubic'
+    search_dirs.append('%s/.local/share/qubic' % homedir)
+    search_dirs.append('./')
+    search_dirs.append('/home/qubic/.local/share/qubic')
+
+    for d in search_dirs:
+        fullpath = '%s/%s' % (d,filename)
+        if os.path.isfile(fullpath):
+            return fullpath
+
+    return None
+
 def shellcommand(cmd):
     '''
     run a shell command
