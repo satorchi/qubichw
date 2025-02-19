@@ -13,7 +13,7 @@ if ! ps -aux | grep "run_MCP9808_broadcast.py" | grep -v -e grep -e SCREEN; then
 	echo "MCP9808 broadcasting is not running";
 	screen -X -S MCP9808 quit
 	echo "Starting a new screen and launching the broadcasting"
-	screen -S MCP9808 -d -m python3 /usr/local/bin/run_MCP9808_broadcast.py	--verbosity=1
+	screen -S MCP9808 -d -m python3 /usr/local/bin/run_MCP9808_broadcast.py	--verbosity=0
 else
 	echo "MCP9808 broadcasting is already running"
 fi
