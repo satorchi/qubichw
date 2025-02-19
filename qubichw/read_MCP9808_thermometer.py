@@ -23,7 +23,7 @@ if os.uname().machine.find('arm')>=0:
     import smbus
 import datetime as dt
 import numpy as np
-from qubichk.utilities import get_myip
+from qubichk.utilities import get_myip, get_receiver_list
 
 # 4 sensors in the calsource box
 sensors = [0,1,2,4]
@@ -44,7 +44,7 @@ packetsize = rec.nbytes # size of data packet broadcast on ethernet
 #IP_BROADCAST = "192.168.2.255"
 IP_QUBIC_CENTRAL = "192.168.2.1"
 IP_GROUNDGPS = "134.158.187.128" # testing at APC
-receivers = [IP_GROUNDGPS] # testing at APC
+receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
 
