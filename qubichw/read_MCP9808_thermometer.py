@@ -73,9 +73,8 @@ def read_temperatures(verbosity=0):
     # Temp MSB, TEMP LSB
     base_address = 0x18
     for idx,Tidx in enumerate(sensors):
-        idx = Tidx
         addr = base_address + Tidx
-        if verbosity>0: print('addr: %i' % addr)
+        if verbosity>1: print('addr: %i' % addr)
 
         try:
             data = bus.read_i2c_block_data(addr, 0x05, 2)
