@@ -90,9 +90,9 @@ def read_temperatures(verbosity=0):
             if verbosity>0: print("T%i: %.2f K" % (Tidx,Tkelvin))
 
         except:
-            Tkelvin = -1
+            Tkelvin = -2
         temperatures[idx] = Tkelvin
-        return temperatures
+    return temperatures
                 
 def broadcast_temperatures(verbosity=0):
     '''
