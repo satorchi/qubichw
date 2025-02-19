@@ -28,6 +28,7 @@ from qubichk.utilities import get_myip, get_receiver_list
 # 4 sensors in the calsource box
 sensors = [0,1,2,4]
 nsensors = len(sensors)
+sensor_labels = ['calsource 150','heater','calsource 220','outside']
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec_formats = "uint8,float64,float32,float32,float32,float32"
