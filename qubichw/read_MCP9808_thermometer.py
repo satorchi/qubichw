@@ -27,7 +27,6 @@ from qubichk.utilities import get_myip
 
 # 4 sensors in the calsource box
 sensors = [0,1.2,4]
-sensors = list(range(8))
 nsensors = len(sensors)
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
@@ -73,8 +72,7 @@ def read_temperatures(verbosity=0):
     # Read data back from 0x05(5), 2 bytes
     # Temp MSB, TEMP LSB
     base_address = 0x18
-    #for idx,Tidx in enumerate(sensors):
-    for Tidx in sensors:
+    for idx,Tidx in enumerate(sensors):
         idx = Tidx
         addr = base_address + Tidx
         if verbosity>0: print('addr: %i' % addr)
@@ -87,7 +85,7 @@ def read_temperatures(verbosity=0):
             if Tcelsius > 4095: Tcelsius -= 8192                
             Tcelsius = Tcelsius * 0.0625
             Tkelvin = Tcelsius + 273.15
-            if verbosity>0: print("T%i: %.2f K" % (Tidx,Tkelvin))
+            if verbosity>0: print("[%i] T%i: %.2f K" % (idx,Tidx,Tkelvin))
 
         except:
             Tkelvin = -2
