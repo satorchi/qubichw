@@ -74,7 +74,6 @@ def read_temperatures(verbosity=0):
     base_address = 0x18
     for idx,Tidx in enumerate(sensors):
         addr = base_address + Tidx
-        if verbosity>1: print('addr: %i' % addr)
 
         try:
             data = bus.read_i2c_block_data(addr, 0x05, 2)
@@ -84,10 +83,11 @@ def read_temperatures(verbosity=0):
             if Tcelsius > 4095: Tcelsius -= 8192                
             Tcelsius = Tcelsius * 0.0625
             Tkelvin = Tcelsius + 273.15
-            if verbosity>0: print("[%i] T%i: %.2f K" % (idx,Tidx,Tkelvin))
 
         except:
             Tkelvin = -2
+            
+        if verbosity>0: print("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin))
         temperatures[idx] = Tkelvin
     return temperatures
                 
