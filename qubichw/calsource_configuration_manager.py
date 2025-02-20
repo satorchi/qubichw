@@ -140,23 +140,18 @@ class calsource_configuration_manager():
         
         self.broadcast_port = 37020
         self.nbytes = 1024
-        self.receiver = self.known_hosts['calsource']
 
-        self.hostname = None
-        if self.hostname is None and 'HOST' in os.environ.keys():
-            self.hostname = os.environ['HOST']
-            
         # try to get hostname from the ethernet device
         ip_addr = get_myip()
+        self.hostname = ip_addr
         if ip_addr is not None and ip_addr in self.known_hosts.values():
             self.hostname = next(key for key,val in self.known_hosts.items() if val==ip_addr)
-        else:
-            self.hostname = ip_addr
 
         # finally, if still undefined
         if self.hostname is None:
             self.hostname = 'localhost'
 
+        self.receiver = ip_addr
         if role is None:
             if self.hostname=='calsource' or self.hostname=='pigps':
                 role = 'manager'
