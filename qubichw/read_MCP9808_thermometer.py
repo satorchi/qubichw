@@ -42,9 +42,6 @@ rec = np.recarray(names=rec_names, formats=rec_formats,shape=(1))
 rec[0].STX = 0xAA
 packetsize = rec.nbytes # size of data packet broadcast on ethernet
 
-#IP_BROADCAST = "192.168.2.255"
-IP_QUBIC_CENTRAL = "192.168.2.1"
-IP_GROUNDGPS = "134.158.187.128" # testing at APC
 receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
