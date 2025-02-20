@@ -265,11 +265,11 @@ class calsource_configuration_manager():
         listen for a command string arriving on socket
         this message is called by the "manager"
         '''
+        self.log('listening on %s' % self.receiver)
+
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.bind((self.receiver, self.broadcast_port))
-
-        self.log('listening on %s' % self.receiver)
 
         now = dt.datetime.utcnow()        
         try:
