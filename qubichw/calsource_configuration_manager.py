@@ -152,15 +152,16 @@ class calsource_configuration_manager():
                 role = 'commander'
         self.role = role
                 
-        if role=='manager':
-            self.log('I am the calsource configuration manager')
+        self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
+        
+        if self.role=='manager':
+            self.log('creating hardware modules',verbosity=2)
             self.device['modulator'] = modulator()
             self.device['calsource_150'] = calibration_source('LF')
             self.device['calsource_220'] = calibration_source('HF')
             self.device['amplifier'] = amplifier()
-            self.device['relay'] = relay()
+            self.device['relay'] = relay()            
 
-        self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
         return None
 
     def parse_command_string(self,cmdstr):
@@ -279,23 +280,22 @@ class calsource_configuration_manager():
         listen for an acknowledgement string arriving on socket
         this message is called by the "commander" after sending a command
         '''
-        calsource_host = get_calsource_host()
         
         if timeout is None: timeout = max(self.estimated_wait.values())
         if timeout < 25: timeout = 25
+        self.log('waiting up to %.0f seconds for acknowledgement from %s' % (timeout,self.receiver))
         
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        s.bind((calsource_host, self.broadcast_port))
+        s.bind((self.receiver, self.broadcast_port))
 
         now = dt.datetime.utcnow()
-        self.log('waiting up to %.0f seconds for acknowledgement from %s' % (timeout,calsource_host))
 
         try:
             ack, addr = s.recvfrom(self.nbytes)
         except:
-            self.log('no response from Calibration Source Manager: %s' % calsource_host)
+            self.log('no response from Calibration Source Manager')
             return None
         received_date = dt.datetime.utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
@@ -556,6 +556,7 @@ class calsource_configuration_manager():
         '''
         send commands to the calibration source manager
         '''
+        calsource_host = get_calsource_host()
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
@@ -566,9 +567,9 @@ class calsource_configuration_manager():
         len_remain = self.nbytes - len_nowstr - 1
         fmt = '%%%is %%%is' % (len_nowstr,len_remain)
         msg = fmt % (now_str,cmd_str)
-        #self.log('sending socket data: %s' % msg)
+        self.log('sending socket data to %s: %s' % (calsource_host,msg),verbosity=1)
 
-        s.sendto(msg.encode(), (self.receiver, self.broadcast_port))
+        s.sendto(msg.encode(), (calsource_host, self.broadcast_port))
         sockname = s.getsockname()
         self.log("send_command() NOT closing socket: (%s,%i)" % sockname, verbosity=5)
         #s.close()
