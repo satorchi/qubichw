@@ -21,6 +21,8 @@ import datetime as dt
 import numpy as np
 import struct
 
+from qubichk.utilities import get_receiver_list
+
 # data is sent as a numpy record, to be unpacked by QubicStudio (and others)
 rec = np.recarray(names="STX,TIMESTAMP,VALUE",formats="uint8,float64,int64",shape=(1))
 rec[0].STX = 0xAA
@@ -40,16 +42,7 @@ chan0 = AnalogIn(ads, ADS.P0)
 ads.mode = 0x0000
 ads.comparator_config = 0
 
-#IP_BROADCAST = "192.168.2.255"
-IP_QUBIC_CENTRAL = "192.168.2.1"
-IP_PIGPS = "192.168.2.17"
-IP_QUBICSTUDIO = "192.168.2.8"
-
-receivers = [IP_QUBICSTUDIO,
-             IP_QUBIC_CENTRAL,
-             IP_PIGPS]
-
-
+receivers = get_receiver_list()
 PORT = 31337
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
