@@ -12,7 +12,12 @@ control the Numato relay for power supply
 ref: Numato-16-Channel-USB Relay-Module.pdf
 https://numato.com/docs/16-channel-usb-relay-module/
 '''
-import serial,sys,os,re
+import sys,os,re
+
+# serial is only required for the manager on the raspberry pi
+if os.uname().machine.find('arm')>=0:
+    import serial
+
 from glob import glob
 import datetime as dt
 from qubichk.utilities import shellcommand
