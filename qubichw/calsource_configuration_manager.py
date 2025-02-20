@@ -250,7 +250,7 @@ class calsource_configuration_manager():
         listen for a command string arriving on socket
         this message is called by the "manager"
         '''
-        self.log('listening on %s' % self.receiver)
+        self.log('listening on %s port %i' % (self.receiver,self.broadcast_port)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -324,7 +324,7 @@ class calsource_configuration_manager():
 
         ack = ''
         if states is not None:
-            info = relay.set_state(states)
+            info = self.device['relay'].set_state(states)
             if info['ok']:
                 ack = 'OK-'
             else:
@@ -336,7 +336,7 @@ class calsource_configuration_manager():
                 
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
-        states_read = relay.state()
+        states_read = self.device['relay'].state()
         if states_read is not None:
             ack += 'OK'
             self.log('retrieved RELAY states: %s' % states_read,verbosity=2)
