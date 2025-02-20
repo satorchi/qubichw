@@ -15,7 +15,7 @@ import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
-from qubichk.utilities import shellcommand, get_myip
+from qubichk.utilities import shellcommand, get_myip, known_hosts
 
 
 # the numato relay for switching on/off
@@ -129,14 +129,6 @@ class calsource_configuration_manager():
             
         self.relay_lastcommand_date = dt.datetime.utcnow()
         self.relay_timeout = 1
-
-        self.known_hosts = {}
-        self.known_hosts['qubic-central'] = "192.168.2.1"
-        self.known_hosts['qubic-studio']  = "192.168.2.8"
-        self.known_hosts['calsource']     = "192.168.2.5"
-        self.known_hosts['pigps']         = '192.168.2.17'
-        self.known_hosts['redpitaya']     = "192.168.2.21"
-        self.known_hosts['groundgps']     = "192.168.2.22"
         
         self.broadcast_port = 37020
         self.nbytes = 1024
@@ -144,8 +136,8 @@ class calsource_configuration_manager():
         # try to get hostname from the ethernet device
         ip_addr = get_myip()
         self.hostname = ip_addr
-        if ip_addr is not None and ip_addr in self.known_hosts.values():
-            self.hostname = next(key for key,val in self.known_hosts.items() if val==ip_addr)
+        if ip_addr is not None and ip_addr in known_hosts.values():
+            self.hostname = next(key for key,val in known_hosts.items() if val==ip_addr)
 
         # finally, if still undefined
         if self.hostname is None:
