@@ -381,6 +381,7 @@ class calsource_configuration_manager():
         interpret the dictionary of commands, and take the necessary steps
         this method is called by the "manager"
         '''
+        self.log('interpreting command: %s' % command,verbosity=2)
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
 
         # get current on/off status from Energenie powerbar
