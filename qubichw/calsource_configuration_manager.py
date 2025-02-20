@@ -21,27 +21,29 @@ from qubichk.utilities import shellcommand, get_myip, known_hosts
 # the numato relay for switching on/off
 from qubichw.relay import device_address as relay_device_address
 device_list = list(relay_device_address.keys())
-from qubichw.relay import relay
 
 valid_commands = {}
 for dev in device_list:
     valid_commands[dev] = ['on','off']
 
 # the calibration source
-from qubichw.calibration_source import calibration_source
 valid_commands['calsource_150'] += ['default','frequency']
 valid_commands['calsource_220'] += ['default','frequency']
 
 # the low noise amplifier
 from qubichw.amplifier_femto import default_setting as amplifier_default_setting
 valid_commands['amplifier'] += ['default'] + list(amplifier_default_setting.keys())
-if os.uname().machine.find('arm')>=0:
-    from qubichw.amplifier_femto import amplifier
 
 # the redpitaya for modulating the calibration source and for reading the calsource monitor
 from qubichw.redpitaya import default_setting as modulator_default_setting
 valid_commands['modulator'] += ['default'] + list(modulator_default_setting.keys())
 from qubichw.redpitaya import redpitaya as modulator
+
+# only import hardware modules if we are on the Raspberry Pi
+if os.uname().machine.find('arm')>=0:
+    from qubichw.relay import relay
+    from qubichw.calibration_source import calibration_source
+    from qubichw.amplifier_femto import amplifier
 
 
 class calsource_configuration_manager():
