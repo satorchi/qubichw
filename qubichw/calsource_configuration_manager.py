@@ -439,7 +439,7 @@ class calsource_configuration_manager():
         # do configuration command for calsource
         parm =  'frequency'
         for dev in ['calsource_150','calsource_220']:
-            if dev not in command.keys(): continue
+            if len(command[dev])==0: continue
             if 'default' in command[dev].keys() and command[dev]['default']:
                 of = self.device[dev].set_default_settings()
                 msg += '%s:frequency=%+06fGHz' % (dev,of)
@@ -458,7 +458,7 @@ class calsource_configuration_manager():
 
         # the modulator configuration
         dev = 'modulator'
-        if dev in command.keys():
+        if len(command[dev])>0:
             
             if 'default' in command[dev].keys() and command[dev]['default']:
                 self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
@@ -493,7 +493,7 @@ class calsource_configuration_manager():
 
         # the amplifier configuration
         dev = 'amplifier'
-        if dev in command.keys():
+        if len(command[dev])>0:
             if 'default' in command[dev].keys() and command[dev]['default']:
                 self.device[dev].set_default_settings()
                 ack += '%s:default_settings ' % dev
