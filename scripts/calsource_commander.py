@@ -21,6 +21,7 @@ invoke with command line argument "manager" to run the "manager"
 import sys
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 
+verbosity = 2
 role = None
 for arg in sys.argv:
     if arg.lower() == 'manager':
@@ -31,7 +32,11 @@ for arg in sys.argv:
         role = 'commander'
         continue
 
-cli = calsource_configuration_manager(role=role, verbosity=2)
+    if arg.find('--verbosity=')==0:
+        verbosity = eval(arg.split('=')[-1])
+        continue
+
+cli = calsource_configuration_manager(role=role, verbosity=verbosity)
 
 
     
