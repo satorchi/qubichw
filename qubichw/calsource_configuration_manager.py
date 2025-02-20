@@ -15,7 +15,7 @@ import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
-from qubichk.utilities import shellcommand
+from qubichk.utilities import shellcommand, get_myip
 
 
 # the numato relay for switching on/off
@@ -147,15 +147,11 @@ class calsource_configuration_manager():
             self.hostname = os.environ['HOST']
             
         # try to get hostname from the ethernet device
-        cmd = '/sbin/ifconfig -a'
-        out, err = shellcommand(cmd)
-        match = re.match('.* inet (192\.168\.2\..*?) ',out.replace('\n',' '))
-        if match:
-            ip_addr = match.groups()[0]
-            if ip_addr in self.known_hosts.values():
-                self.hostname = next(key for key,val in self.known_hosts.items() if val==ip_addr)
-            else:
-                self.hostname = ip_addr
+        ip_addr = get_myip()
+        if ip_addr is not None and ip_addr in self.known_hosts.values():
+            self.hostname = next(key for key,val in self.known_hosts.items() if val==ip_addr)
+        else:
+            self.hostname = ip_addr
 
         # finally, if still undefined
         if self.hostname is None:
