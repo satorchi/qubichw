@@ -557,17 +557,18 @@ class calsource_configuration_manager():
         send commands to the calibration source manager
         '''
         calsource_host = get_calsource_host()
-        s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
 
-        now=dt.datetime.utcnow()
+        now = dt.datetime.utcnow()
         now_str = now.strftime('%s.%f')
         len_nowstr = len(now_str)
         len_remain = self.nbytes - len_nowstr - 1
         fmt = '%%%is %%%is' % (len_nowstr,len_remain)
         msg = fmt % (now_str,cmd_str)
-        self.log('sending socket data to %s: %s' % (calsource_host,msg),verbosity=1)
+        log_msg = ' '.join(msg.split())
+        self.log('sending socket data to %s: %s' % (calsource_host,log_msg),verbosity=1)
 
         s.sendto(msg.encode(), (calsource_host, self.broadcast_port))
         sockname = s.getsockname()
