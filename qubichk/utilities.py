@@ -188,7 +188,7 @@ def get_calsource_host(conf_file='calbox.conf'):
 
     if 'manager' not in conf.keys():
         print('No Manager section in configuration file: %s' % conf_file_fullpath)
-        print('Default manager is calsource: %s' % known_hosts['calsouce'])
+        print('Default manager is calsource: %s' % known_hosts['calsource'])
         return known_hosts['calsource']
 
     return conf['manager'][0]
