@@ -384,7 +384,7 @@ class calsource_configuration_manager():
         self.log('interpreting command: %s' % command,verbosity=2)
         ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
 
-        # get current on/off status from Energenie powerbar
+        # get current on/off status from the relay
         onoff_ack = self.onoff()
         device_was_off = {}
         for dev in self.device_on.keys():
@@ -631,9 +631,6 @@ class calsource_configuration_manager():
             # check if we're doing an acquisition or other things that require extra time
             duration = 0
             for cmd in cmd_list:
-
-                if cmd.find('on')>=0 or cmd.find('off')>=0:
-                    duration += self.energenie_timeout
 
                 if cmd.find('on')>=0:
                     duration += max(self.estimated_wait.values())
