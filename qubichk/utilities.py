@@ -12,6 +12,14 @@ utilities used by various modules in qubichk/hw especially hk_verify
 '''
 import sys,os,subprocess,re,struct
 
+known_hosts = {}
+known_hosts['qubic-central'] = "192.168.2.1"
+known_hosts['qubic-studio']  = "192.168.2.8"
+known_hosts['calsource']     = "192.168.2.5"
+known_hosts['pigps']         = "192.168.2.17"
+known_hosts['redpitaya']     = "192.168.2.21"
+known_hosts['groundgps']     = "192.168.2.22"
+
 def get_fullpath(filename=None):
     '''
     get the full path to the desired file
