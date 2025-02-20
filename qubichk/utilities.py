@@ -162,17 +162,37 @@ def get_receiver_list(conf_file='calbox.conf'):
     '''
     conf_file_fullpath = get_fullpath(conf_file)
     if conf_file_fullpath is None:
-        print('Default receiver is qubic-central: %s' % IP_QUBIC_CENTRAL)
-        return [IP_QUBIC_CENTRAL]
+        print('Default receiver is qubic-central: %s' % known_hosts['qubic-central'])
+        return [known_hosts['qubic-central']]
 
     conf = read_conf_file(conf_file_fullpath)
 
     if 'receivers' not in conf.keys():
         print('No Receiver section in configuration file: %s' % conf_file_fullpath)
-        print('Default receiver is qubic-central: %s' % IP_QUBIC_CENTRAL)
-        return [IP_QUBIC_CENTRAL]
+        print('Default receiver is qubic-central: %s' % known_hosts['qubic-central'])
+        return [known_hosts['qubic-central']]
 
     return conf['receivers']
+
+def get_calsource_host(conf_file='calbox.conf'):
+    '''
+    get the IP address of the calsource configuration manager
+    it's written in calbox.conf configuration file, otherwise use the default from known_hosts
+    '''
+    conf_file_fullpath = get_fullpath(conf_file)
+    if conf_file_fullpath is None:
+        print('Default calsource manager is calsource: %s' % known_hosts['calsource'])
+        return known_hosts['calsource']
+
+    conf = read_conf_file(conf_file_fullpath)
+
+    if 'manager' not in conf.keys():
+        print('No Manager section in configuration file: %s' % conf_file_fullpath)
+        print('Default manager is calsource: %s' % known_hosts['calsouce'])
+        return known_hosts['calsource']
+
+    return conf['manager']
+
         
 def get_myip():
     '''
