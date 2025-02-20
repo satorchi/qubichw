@@ -15,8 +15,7 @@ import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
-from qubichk.utilities import shellcommand, get_myip, known_hosts
-
+from qubichk.utilities import shellcommand, get_myip, known_hosts, get_calsource_host
 
 # the numato relay for switching on/off
 from qubichw.relay import device_address as relay_device_address
@@ -280,21 +279,23 @@ class calsource_configuration_manager():
         listen for an acknowledgement string arriving on socket
         this message is called by the "commander" after sending a command
         '''
+        calsource_host = get_calsource_host()
+        
         if timeout is None: timeout = max(self.estimated_wait.values())
         if timeout < 25: timeout = 25
         
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        s.bind((self.hostname, self.broadcast_port))
+        s.bind((calsource_host, self.broadcast_port))
 
         now = dt.datetime.utcnow()
-        self.log('waiting up to %.0f seconds for acknowledgement on %s' % (timeout,self.hostname))
+        self.log('waiting up to %.0f seconds for acknowledgement from %s' % (timeout,calsource_host))
 
         try:
             ack, addr = s.recvfrom(self.nbytes)
         except:
-            self.log('no response from Calibration Source Manager')
+            self.log('no response from Calibration Source Manager: %s' % calsource_host)
             return None
         received_date = dt.datetime.utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
