@@ -37,9 +37,6 @@ rec[0].STX = 0xAA
 packetsize = rec.nbytes # size of data packet broadcast on ethernet
 chunksize = 4096 # size of ASCII chunk read from the GPS device
 
-#IP_BROADCAST = "192.168.2.255"
-IP_QUBIC_CENTRAL = "192.168.2.1"
-IP_GROUNDGPS = "134.158.187.114" # testing at APC
 PORT = 31337
 
 def read_gps_chunk(chunk,sock,verbosity=0):
