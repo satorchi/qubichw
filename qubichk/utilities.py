@@ -191,7 +191,7 @@ def get_calsource_host(conf_file='calbox.conf'):
         print('Default manager is calsource: %s' % known_hosts['calsouce'])
         return known_hosts['calsource']
 
-    return conf['manager']
+    return conf['manager'][0]
 
         
 def get_myip():
