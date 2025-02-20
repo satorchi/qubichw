@@ -568,7 +568,7 @@ class calsource_configuration_manager():
         fmt = '%%%is %%%is' % (len_nowstr,len_remain)
         msg = fmt % (now_str,cmd_str)
         log_msg = ' '.join(msg.split())
-        self.log('sending socket data to %s: %s' % (calsource_host,log_msg),verbosity=1)
+        self.log('sending socket data to %s port %i: %s' % (calsource_host,self.broadcast_port,log_msg),verbosity=1)
 
         s.sendto(msg.encode(), (calsource_host, self.broadcast_port))
         sockname = s.getsockname()
