@@ -369,7 +369,9 @@ class calsource_configuration_manager():
                 msg += ' %s:UNKNOWN' % dev
 
         for dev in self.device_list:
-            if (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
+            if self.device[dev] is None:
+                msg += ' %s:UNINITIALIZED' % dev
+            elif (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
                 msg += ' '+self.device[dev].status()
             else:
                 msg += ' %s:UNKNOWN' % dev
