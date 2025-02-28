@@ -28,14 +28,14 @@ defined_mode = {}
 defined_mode['off'] = {'duty': 0,
                         'on_duration': 0
                         }
-defined_mode['slow'] = {'duty': 0.2,
-                         'on_duration': 3
+defined_mode['slow'] = {'duty': 0.1,
+                         'on_duration': 2
                          }
 defined_mode['mid'] = {'duty': 0.5,
-                        'on_duration': 3
+                        'on_duration': 2
                         }
 defined_mode['fast'] = {'duty': 0.8,
-                         'on_duration': 3
+                         'on_duration': 4
                          }
 defined_mode['full'] = {'duty': 1,
                          'on_duration': 1
