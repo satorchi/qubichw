@@ -356,6 +356,7 @@ class calsource_configuration_manager():
         return status of all the components
         '''
         msg = ''
+        get_status_list = []
 
         # get on/off status
         ack = self.onoff()
@@ -363,18 +364,15 @@ class calsource_configuration_manager():
             if self.device_on[dev] is not None:
                 if self.device_on[dev]:
                     msg += ' %s:ON' % dev
+                    get_status_list.append(dev)
                 else:
                     msg += ' %s:OFF' % dev
             else:
                 msg += ' %s:UNKNOWN' % dev
 
-        for dev in self.device_list:
-            if self.device[dev] is None:
-                msg += ' %s:UNINITIALIZED' % dev
-            elif (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
+        for dev in get_status_list:
+            if self.device[dev] is not None and self.device[dev].is_connected():
                 msg += ' '+self.device[dev].status()
-            else:
-                msg += ' %s:UNKNOWN' % dev
             
         return msg
     
