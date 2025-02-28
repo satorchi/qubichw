@@ -17,7 +17,7 @@ import datetime as dt
 from qubichw.relay import relay as numato_relay
 from qubichk.utilities import get_myip
 
-PORT = 71337
+PORT = 41337
 LISTENER = get_myip()
 timeout = 0.1
 nbytes = 256
