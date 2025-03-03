@@ -182,10 +182,10 @@ class heater():
                 cmd_result['mode'] = 'full'
                 continue
 
-            if cmd in defined_mode.keys():
+            if cmd in self.defined_mode.keys():
                 cmd_result['mode'] = cmd
-                cmd_result['duty'] = defined_mode[cmd]['duty']
-                cmd_result['on_duration'] = defined_mode[cmd]['on_duration']
+                cmd_result['duty'] = self.defined_mode[cmd]['duty']
+                cmd_result['on_duration'] = self.defined_mode[cmd]['on_duration']
                 continue
 
             if cmd in ['duty','on_duration']:
