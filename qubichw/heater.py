@@ -174,7 +174,7 @@ def run_command(commandments):
 
     return cmd_result
 
-def operation_loop():
+def operation_loop(verbosity=verbosity_threshold):
     '''
     run a state machine to implement the heater modes
     '''
