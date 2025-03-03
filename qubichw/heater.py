@@ -201,7 +201,7 @@ class heater():
         '''
         run a state machine to implement the heater modes
         '''
-        self.verbosity = verbosity
+        self.verbosity_threshold = verbosity
 
         sock = self.init_socket()
         if sock is None:
