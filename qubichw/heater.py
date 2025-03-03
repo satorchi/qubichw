@@ -41,10 +41,23 @@ defined_mode['full'] = {'duty': 1,
                          'on_duration': 1
                          }
 
+verbosity_threshold = 1
+def log(msg,verbosity=0):
+    '''
+    print to screen if sufficiently verbose
+    '''
+    if verbosity<verbosity_threshold: return
+    date_fmt = '%Y-%m-%d %H:%M:%S.%f'
+    now = dt.datetime.utcnow()
+    full_msg = '%s|HEATER| %s' % (dt.datetime.utcnow().strftime(date_fmt),msg)
+    print(full_msg)
+    return
+
 def heateron():
     '''
     switch on the heater
     '''
+    log('switching on the heater',verbosity=1)
     relay.switchon('heater')
     return
 
@@ -52,6 +65,7 @@ def heateroff():
     '''
     switch off the heater
     '''
+    log('switching off the heater',verbosity=1)
     relay.switchoff('heater')
     return
 
@@ -85,7 +99,7 @@ def check_for_command():
     received_date = dt.datetime.utcnow()
     received_tstamp = received_date.timestamp()
 
-    print('%s received command from %s: %s' % (received_date.strftime('%Y-%m-%d %H:%M:%S'),addr_tple[0],msgbytes.decode()))
+    log('%s received command from %s: %s' % (received_date.strftime('%Y-%m-%d %H:%M:%S'),addr_tple[0],msgbytes.decode()))
 
     return interpret_command(received_tstamp, msgbytes)
 
@@ -199,7 +213,14 @@ def operation_loop():
             off_duration = on_duration/duty
             new_mode = None
 
-        if current_mode in ['off','full']:
+        if current_mode=='off':
+            # check that the heater is really off
+            if is_heateron(): heateroff()
+            continue
+        
+        if current_mode=='full':
+            # check that the heater is really on
+            if not is_heateron(): heateron()
             continue
 
         now = dt.datetime.utcnow()
