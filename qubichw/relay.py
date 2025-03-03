@@ -148,10 +148,21 @@ class relay:
             return None
 
         cmd = '%s\r' % command
-        self.s.write(cmd.encode())
+        try:
+            self.s.write(cmd.encode())
+        except:
+            self.log('Error! could not write to port',verbosity=1)
+            self.close()
+            return None
+        
         # read back the command to avoid filling the buffer.
         # This will be the response required for a query.  No separate read command is required.
-        ans = self.s.read(1024)
+        try:
+            ans = self.s.read(1024)
+        except:
+            self.log('Error! could not read response from device',verbosity=1)
+            self.close()
+            return None
         ans_str = ans.decode().replace('\n\r>','').strip()
         self.close()
         return ans_str
