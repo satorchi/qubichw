@@ -93,11 +93,11 @@ def check_for_command():
 
     try:
         msgbytes, addr_tple = s.recvfrom(nbytes)
-    except socket.timeout:
-        log('no message',verbosity=2)
-        return None
+    # except socket.timeout:
+    #     log('no message',verbosity=3)
+    #     return None
     except:
-        log('unknown error listening to socket',verbosity=1)
+        log('unknown error listening to socket',verbosity=3)
         return None
     
     received_date = dt.datetime.utcnow()
@@ -174,7 +174,7 @@ def run_command(commandments):
 
     return cmd_result
 
-def operation_loop(verbosity=verbosity_threshold):
+def operation_loop():
     '''
     run a state machine to implement the heater modes
     '''
