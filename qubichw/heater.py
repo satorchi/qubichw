@@ -65,6 +65,16 @@ class heater():
         print(full_msg)
         return
 
+    def init_socket(self):
+        '''
+        initialize the socket for listening for commands
+        '''
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.settimeout(self.timeout)
+        s.bind((self.LISTENER, self.PORT))
+        return s        
+
     def heateron(self):
         '''
         switch on the heater
@@ -90,17 +100,15 @@ class heater():
         return bool(onoff)
     
 
-    def check_for_command(self):
+    def check_for_command(self,s=None):
         '''
         listen for an acknowledgement string arriving on socket
         this message is called by the "commander" after sending a command
         '''
-
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(self.timeout)
-        s.bind((self.LISTENER, self.PORT))
-
+        if s is None:
+            self.log('Error! socket is not initialized')
+            return None
+        
         now = dt.datetime.utcnow()
 
         try:
@@ -120,7 +128,7 @@ class heater():
                                                       )
         self.log(logmsg,verbosity=1)
 
-        return interpret_command(received_tstamp, msgbytes)
+        return self.interpret_command(received_tstamp, msgbytes)
 
     def interpret_command(self,tstamp, cmdbytes):
         '''
@@ -194,6 +202,11 @@ class heater():
         run a state machine to implement the heater modes
         '''
         self.verbosity = verbosity
+
+        sock = self.init_socket()
+        if sock is None:
+            self.log('Error! could not initialize socket',verbosity=0)
+            return None
         
         keepgoing = True
         current_mode = 'off'
@@ -205,9 +218,10 @@ class heater():
     
         while keepgoing:
             try:
-                cmd = self.check_for_command()
+                cmd = self.check_for_command(sock)
             except KeyboardInterrupt:
                 print('loop exit with ctrl-c')
+                sock.close()
                 return
 
             if cmd is not None:        
@@ -216,7 +230,8 @@ class heater():
                 if 'mode' in cmd_result.keys(): new_mode = cmd_result['mode']
             
             if not keepgoing:
-                self.heateroff()            
+                self.heateroff()
+                sock.close()
                 return
 
             if new_mode=='off':
@@ -266,5 +281,6 @@ class heater():
         
 
         # we should never get this far, but just in case, switch off before exit
+        sock.close()
         self.heateroff()
         return
