@@ -75,9 +75,10 @@ class relay:
         
         filename = 'relay.log'
         h = open(filename,'a')
-        h.write('%s|RELAY| %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
+        full_msg = '%s|RELAY| %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg)
+        h.write(full_msg+'\n')
         h.close()
-        print(msg)
+        print(full_msg)
         return
 
     def init_port(self,port=None):
@@ -321,5 +322,8 @@ class relay:
         cmd = 'relay writeall %04x' % bits
         ans = self.send_command(cmd)
         info['response'] = ans
-        info['ok'] = True
+        if ans is None:
+            info['ok'] = False
+        else:
+            info['ok'] = True
         return info
