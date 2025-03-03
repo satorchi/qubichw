@@ -160,6 +160,10 @@ class relay:
         # This will be the response required for a query.  No separate read command is required.
         try:
             ans = self.s.read(1024)
+        except KeyboardInterrupt:
+            self.log('received ctrl-c')
+            self.close()
+            return 'QUIT'
         except:
             self.log('Error! could not read response from device',verbosity=1)
             self.close()
@@ -174,7 +178,7 @@ class relay:
         get the current state of the relay on/off
         '''
         ans = self.send_command('relay readall')
-        if ans is None: return None
+        if ans is None or ans=='QUIT': return ans
         
         lines = ans.split('\n')
         try:
@@ -322,7 +326,7 @@ class relay:
         cmd = 'relay writeall %04x' % bits
         ans = self.send_command(cmd)
         info['response'] = ans
-        if ans is None:
+        if ans is None or ans=='QUIT':
             info['ok'] = False
         else:
             info['ok'] = True
