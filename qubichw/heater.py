@@ -41,7 +41,7 @@ defined_mode['full'] = {'duty': 1,
                          'on_duration': 1
                          }
 
-verbosity_threshold = 1
+verbosity_threshold = 2
 def log(msg,verbosity=0):
     '''
     print to screen if sufficiently verbose
@@ -93,7 +93,11 @@ def check_for_command():
 
     try:
         msgbytes, addr_tple = s.recvfrom(nbytes)
+    except socket.timeout:
+        log('no message',verbosity=2)
+        return None
     except:
+        log('unknown error listening to socket',verbosity=1)
         return None
     
     received_date = dt.datetime.utcnow()
@@ -183,7 +187,11 @@ def operation_loop():
     off_duration = 1.0e6
     
     while keepgoing:
-        cmd = check_for_command()
+        try:
+            cmd = check_for_command()
+        except KeyboardInterrupt:
+            print('loop exit with ctrl-c')
+            return
 
         if cmd is not None:        
             cmd_result = run_command(cmd)
