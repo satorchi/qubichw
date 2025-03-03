@@ -64,8 +64,6 @@ class relay:
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
         self.log('creating new relay object',verbosity=3)
-        if not self.init_port(port=port):
-            self.log('initialization unsuccessful.  No port found',verbosity=2)
             
         return None
     
@@ -141,6 +139,9 @@ class relay:
         '''
         send a command to the relay
         '''
+        if not self.init_port():
+            self.log('initialization unsuccessful.  No port found',verbosity=2)
+            
         if self.s is None:
             self.log('Error!  no port configured',verbosity=1)
             return None
@@ -151,6 +152,7 @@ class relay:
         # This will be the response required for a query.  No separate read command is required.
         ans = self.s.read(1024)
         ans_str = ans.decode().replace('\n\r>','').strip()
+        self.close()
         return ans_str
         
     
