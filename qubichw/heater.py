@@ -22,7 +22,6 @@ class heater():
     class to operate the heater in different heating modes
     '''
     
-    verbosity_threshold = 2
     PORT = 41337
     LISTENER = get_myip()
     timeout = 0.1
@@ -46,10 +45,11 @@ class heater():
                             }
 
 
-    def __init__(self):
+    def __init__(self,verbosity=0):
         '''
         create the heater object
         '''
+        self.verbosity_threshold = verbosity
         self.relay = numato_relay()
         
         return
@@ -58,7 +58,7 @@ class heater():
         '''
         print to screen if sufficiently verbose
         '''
-        if verbosity<self.verbosity_threshold: return
+        if verbosity>self.verbosity_threshold: return
         date_fmt = '%Y-%m-%d %H:%M:%S.%f'
         now = dt.datetime.utcnow()
         full_msg = '%s|HEATER| %s' % (dt.datetime.utcnow().strftime(date_fmt),msg)
@@ -98,13 +98,13 @@ class heater():
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(timeout)
-        s.bind((LISTENER, PORT))
+        s.settimeout(self.timeout)
+        s.bind((self.LISTENER, self.PORT))
 
         now = dt.datetime.utcnow()
 
         try:
-            msgbytes, addr_tple = s.recvfrom(nbytes)
+            msgbytes, addr_tple = s.recvfrom(self.nbytes)
         # except socket.timeout:
         #     self.log('no message',verbosity=3)
         #     return None
