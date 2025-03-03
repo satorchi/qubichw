@@ -29,7 +29,7 @@ defined_mode['off'] = {'duty': 0,
                         'on_duration': 0
                         }
 defined_mode['slow'] = {'duty': 0.1,
-                         'on_duration': 2
+                         'on_duration': 1
                          }
 defined_mode['mid'] = {'duty': 0.5,
                         'on_duration': 2
@@ -84,6 +84,8 @@ def check_for_command():
     
     received_date = dt.datetime.utcnow()
     received_tstamp = received_date.timestamp()
+
+    print('%s received command from %s: %s' % (received_date.strftime('%Y-%m-%d %H:%M:%S'),addr_tple[0],msgbytes.decode()))
 
     return interpret_command(received_tstamp, msgbytes)
 
