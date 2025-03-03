@@ -138,6 +138,7 @@ class relay:
     def send_command(self,command):
         '''
         send a command to the relay
+        we open and close the port to the device for each command so that we don't block access to the device for other applications
         '''
         if not self.init_port():
             self.log('initialization unsuccessful.  No port found',verbosity=2)
