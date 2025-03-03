@@ -152,6 +152,8 @@ def run_command(commandments):
             cmd_result['mode'] = 'other'
             continue
 
+        cmd_result[cmd] = 'unknown command'
+
     return cmd_result
 
 def operation_loop():
@@ -172,7 +174,7 @@ def operation_loop():
         if cmd is not None:        
             cmd_result = run_command(cmd)
             keepgoing = cmd_result['keepgoing']
-            new_mode = cmd_result['mode']
+            if 'mode' in cmd_result.keys(): new_mode = cmd_result['mode']
             
         if not keepgoing:
             heateroff()            
