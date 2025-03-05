@@ -271,7 +271,7 @@ class calsource_configuration_manager():
             
         
         received_date = dt.datetime.utcnow()
-        received_tstamp = eval(received_date.strftime('%s.%f'))
+        received_tstamp = received_date.timestamp()
         self.log('received a command from %s at %s: %s' % (addr,received_date.strftime(self.date_fmt),cmdstr_clean))
         return received_tstamp, cmdstr_clean, addr
 
