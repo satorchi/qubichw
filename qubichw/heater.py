@@ -31,9 +31,12 @@ class heater():
     defined_mode['off'] = {'duty': 0,
                            'on_duration': 0
                            }
-    defined_mode['slow'] = {'duty': 0.1,
+    defined_mode['slow'] = {'duty': 0.05,
                             'on_duration': 1
                             }
+    defined_mode['simmer'] = {'duty': 0.1,
+                              'on_duration': 1
+                              }
     defined_mode['mid'] = {'duty': 0.5,
                            'on_duration': 2
                            }
