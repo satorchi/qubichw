@@ -137,11 +137,11 @@ def broadcast_temperatures(verbosity=0):
     
     return
 
-def acquire_MCP9808_temperatures(listener=None,verbosity=0,monitor=False):
+def acquire_MCP9808_temperatures(listener=None,verbosity=0):
     '''
     read the MCP9808 temperature sensors on socket and write to file
     '''
-    print_fmt = '%8i: 0x%X %s %10.2f %10.2f %10.2f %10.2f'
+    print_fmt = '%8i: 0x%X %s %10.2fs %10.2fK %10.2fK %10.2fK %10.2fK'
     
     if listener is None: listener = get_myip()
     print('listening on: %s, %i' % (listener,PORT))
@@ -160,16 +160,19 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0,monitor=False):
     counter = 0
     while True:
         counter += 1
+        now_tstamp = dt.datetime.utcnow().timestamp()
         try:
             dat = client.recv(packetsize)
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
+            latency = now_tstamp - dat_list[1]
             if verbosity>0:
                 date = dt.datetime.utcfromtimestamp(dat_list[1])
                 date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
                 print(print_fmt % (counter,
                                    dat_list[0],
                                    date_str,
+                                   latency,
                                    dat_list[2],
                                    dat_list[3],
                                    dat_list[4],
