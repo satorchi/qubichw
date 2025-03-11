@@ -101,6 +101,7 @@ def broadcast_temperatures(verbosity=0):
     date_str = date_now.strftime('%Y-%m-%d %H:%M:%S.%f')
     trycount = 0
 
+    rec[0].STX = 0xAA
     while True:
         try:
             temperatures = read_temperatures()        
@@ -116,7 +117,6 @@ def broadcast_temperatures(verbosity=0):
             time.sleep(0.1)
             continue
 
-        rec[0].STX = 0xAA
         rec[0].timestamp = dt.datetime.utcnow().timestamp()
 
         temperatures = read_temperatures()
