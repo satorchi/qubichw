@@ -29,4 +29,4 @@ for arg in sys.argv:
         listener = arg.split('=')[-1]
         continue
 
-acquire_MCP9808_temperatures(listener=listener,monitor=monitor,verbosity=verbosity)
+acquire_MCP9808_temperatures(listener=listener,verbosity=verbosity)
