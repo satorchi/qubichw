@@ -141,7 +141,7 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0):
     '''
     read the MCP9808 temperature sensors on socket and write to file
     '''
-    print_fmt = '%8i: 0x%X %s %10.2fs %10.2fK %10.2fK %10.2fK %10.2fK'
+    print_fmt = '%8i: 0x%X %s %8.4fs %10.2fK %10.2fK %10.2fK %10.2fK'
     
     if listener is None: listener = get_myip()
     print('listening on: %s, %i' % (listener,PORT))
