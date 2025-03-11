@@ -79,7 +79,7 @@ def read_temperatures(verbosity=0):
             # Convert the data to 13-bits
             Tcelsius = ((data[0] & 0x1F) * 256) + data[1]
             if Tcelsius > 4095: Tcelsius -= 8192                
-            Tcelsius = Tcelsius * 0.0625
+            Tcelsius *= 0.0625
             Tkelvin = Tcelsius + 273.15
 
         except:
