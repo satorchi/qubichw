@@ -160,7 +160,7 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0):
     counter = 0
     while True:
         counter += 1
-        now_tstamp = dt.datetime.utcnow().timestamp()
+        now_tstamp = dt.datetime.now().timestamp()
         try:
             dat = client.recv(packetsize)
             h.write(dat)
