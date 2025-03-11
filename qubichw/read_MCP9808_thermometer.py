@@ -179,7 +179,7 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0):
                                    dat_list[5]
                                    )
                       )
-            time.sleep(packet_period)
+            #time.sleep(packet_period)
         except socket.timeout:
             now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
             print('%8i: %s timeout error on socket' % (counter,now_str))
