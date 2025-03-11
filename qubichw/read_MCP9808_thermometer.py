@@ -85,7 +85,7 @@ def read_temperatures(verbosity=0):
         except:
             Tkelvin = -2
             
-        if verbosity>0: print("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin))
+        if verbosity>1: print("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin))
         temperatures[idx] = Tkelvin
     return temperatures
                 
