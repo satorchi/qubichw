@@ -209,6 +209,8 @@ class relay:
         The dictionary is updated with every call to get_state() (see above)
         '''
         statebits = self.get_state()
+        if statebits=='QUIT':
+            self.current_setting['QUIT'] = 'QUIT'
         return self.current_setting
     
     def show_status(self):

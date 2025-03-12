@@ -337,16 +337,17 @@ class calsource_configuration_manager():
         # check for the on/off status
         time.sleep(reset_delta) # wait a bit before sending another command
         states_read = self.device['relay'].state()
-        if states_read is not None:
-            ack += 'OK'
-            self.log('retrieved RELAY states: %s' % states_read,verbosity=2)
-        else:
+        if states_read=='QUIT':
+            ack += 'QUIT_GET_STATES'
+            self.log('received QUIT command',verbosity=1)
+        elif states_read is None:
             ack += 'FAILED_GET_STATES'
             self.log('FAILED to get RELAY states',verbosity=2)
-            
-        if ack.find('FAILED_GET_STATES')<0:
+        else:
+            ack += 'OK'
             self.device_on = states_read
-
+            self.log('retrieved RELAY states: %s' % states_read,verbosity=2)
+            
         self.relay_lastcommand_date = dt.datetime.utcnow()
         return ack
 

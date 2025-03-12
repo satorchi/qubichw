@@ -99,7 +99,10 @@ class heater():
         get the current on/off status of the heater
         '''
         relay_state = self.relay.state()
-        onoff = relay_state['heater']
+        if 'QUIT' in relay_state.keys():
+            return relay_state['QUIT']
+        
+        onoff = relay_state['heater']        
         return bool(onoff)
     
 
@@ -256,20 +259,27 @@ class heater():
                 off_duration = on_duration/duty
                 new_mode = None
 
+            heater_state = self.is_heateron()
+            if heater_state=='QUIT':
+                keepgoing = False
+                self.heateroff()
+                sock.close()
+                return
+            
             if current_mode=='off':
                 # check that the heater is really off
-                if self.is_heateron(): self.heateroff()
+                if heater_state: self.heateroff()
                 continue
         
             if current_mode=='full':
                 # check that the heater is really on
-                if not self.is_heateron(): self.heateron()
+                if not heater_state: self.heateron()
                 continue
 
             now = dt.datetime.utcnow()
             delta = now - last_statechange
             delta_seconds = delta.total_seconds()
-            if self.is_heateron():
+            if heater_state:
                 if delta_seconds >= on_duration:
                     self.heateroff()
                     last_statechange = now
