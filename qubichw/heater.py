@@ -169,30 +169,32 @@ class heater():
         cmd_result['keepgoing'] = True
 
         for cmd in commandments.keys():
-            if cmd=='off':
+            CMD = cmd.upper()
+            cmd_lower = cmd.lower()
+            if CMD=='OFF':
                 self.heateroff()
                 cmd_result['mode'] = 'off'
                 return cmd_result
 
-            if cmd=='quit':
+            if CMD=='QUIT':
                 self.heateroff()
                 cmd_result['mode'] = 'off'
                 cmd_result['keepgoing'] = False
                 return cmd_result
 
-            if cmd=='on' or cmd=='full':
+            if CMD=='ON' or CMD=='FULL':
                 self.heateron()
                 cmd_result['mode'] = 'full'
                 continue
 
-            if cmd in self.defined_mode.keys():
-                cmd_result['mode'] = cmd
-                cmd_result['duty'] = self.defined_mode[cmd]['duty']
-                cmd_result['on_duration'] = self.defined_mode[cmd]['on_duration']
+            if cmd_lower in self.defined_mode.keys():
+                cmd_result['mode'] = cmd_lower
+                cmd_result['duty'] = self.defined_mode[cmd_lower]['duty']
+                cmd_result['on_duration'] = self.defined_mode[cmd_lower]['on_duration']
                 continue
 
-            if cmd in ['duty','on_duration']:
-                cmd_result[cmd] = commandments[cmd]
+            if cmd_lower in ['duty','on_duration']:
+                cmd_result[cmd_lower] = commandments[cmd]
                 cmd_result['mode'] = 'other'
                 continue
 
