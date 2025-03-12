@@ -156,7 +156,7 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0):
     client.bind((listener,PORT))
     h = open('calbox_temperatures.dat','ab')
 
-    packet_period = 1/8
+    packet_period = 1/8 # not used:  this is for sleeping between packet reception requests
     counter = 0
     while True:
         counter += 1
