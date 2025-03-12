@@ -202,12 +202,10 @@ class heater():
 
         return cmd_result
 
-    def operation_loop(self,verbosity=0):
+    def operation_loop(self):
         '''
         run a state machine to implement the heater modes
         '''
-        self.verbosity_threshold = verbosity
-
         sock = self.init_socket()
         if sock is None:
             self.log('Error! could not initialize socket',verbosity=0)

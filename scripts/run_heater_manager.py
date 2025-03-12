@@ -18,6 +18,7 @@ verbosity = 0
 for arg in sys.argv:
     if arg.find('--verbosity=')==0:
         verbosity = eval(arg.split('=')[-1])
+        print('assigning verbosity level: %i' % verbosity)
         continue
 
 heater_manager = heater(verbosity=verbosity)
