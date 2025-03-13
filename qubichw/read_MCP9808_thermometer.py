@@ -45,6 +45,11 @@ packetsize = rec.nbytes # size of data packet broadcast on ethernet
 receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
+setpoint_temperature = 305.0 # default setpoint in K
+setpoint_sensor_idx = 0 # use the calsource plate temperature sensor
+pid_npts = 20000 # this corresponds to about 20 minutes
+temperature_buffer = -np.ones(pid_npts,dtype=float)
+tstamp_buffer = -np.ones(pid_npts,dtype=float)
 
 def read_temperatures(verbosity=0):
     '''
@@ -127,7 +132,11 @@ def broadcast_temperatures(verbosity=0):
             cmd = 'rec[0].T%i = %f' % (sensor,val)
             if verbosity>3: print('%16.6f | %16s | executing: %s' % (val,data_type,cmd))
             exec(cmd)
-        
+
+        # FIFO for PID
+        temperature_buffer = np.roll(temperature_buffer,-1)
+        temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
+            
         # broadcast the data
         for rx in receivers:
             if verbosity>0: print('%s %s %s' % (date_str,rx,rec))
@@ -163,6 +172,19 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0):
         now_tstamp = dt.datetime.now().timestamp()
         try:
             dat = client.recv(packetsize)
+        except socket.timeout:
+            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            print('%8i: %s timeout error on socket' % (counter,now_str))
+            continue
+        except KeyboardInterrupt:
+            h.close()
+            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            print('%8i: %s exit using ctrl-c' % (counter,now_str))
+            return
+        # except:
+        #     if verbosity>0: print('%8i: problem reading socket' % counter)
+        #     time.sleep(0.2)
+        else: # continue as normal if no exception
             h.write(dat)
             dat_list = struct.unpack(fmt,dat)
             latency = now_tstamp - dat_list[1]
@@ -180,17 +202,6 @@ def acquire_MCP9808_temperatures(listener=None,verbosity=0):
                                    )
                       )
             #time.sleep(packet_period)
-        except socket.timeout:
-            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            print('%8i: %s timeout error on socket' % (counter,now_str))
-            continue
-        except KeyboardInterrupt:
-            h.close()
-            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            print('%8i: %s exit using ctrl-c' % (counter,now_str))
-            return
-        # except:
-        #     if verbosity>0: print('%8i: problem reading socket' % counter)
-        #     time.sleep(0.2)
+            
 
     return
