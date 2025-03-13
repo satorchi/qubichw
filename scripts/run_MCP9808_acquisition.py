@@ -13,14 +13,9 @@ run the acquisition for the MCP9808 temperature sensors in the calibration box
 import sys
 from qubichw.read_MCP9808_thermometer import acquire_MCP9808_temperatures
 
-monitor = False
 listener = None
 verbosity = 0
 for arg in sys.argv:
-    if arg=='--monitor':
-        monitor = True
-        continue
-
     if arg.find('--verbosity=')==0:
         verbosity = eval(arg.split('=')[-1])
         continue
