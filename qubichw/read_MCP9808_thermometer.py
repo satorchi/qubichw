@@ -80,15 +80,15 @@ def read_temperatures(verbosity=0):
 
         try:
             data = bus.read_i2c_block_data(addr, 0x05, 2)
-                        
+        except:
+            Tkelvin = -2
+        else:                        
             # Convert the data to 13-bits
             Tcelsius = ((data[0] & 0x1F) * 256) + data[1]
             if Tcelsius > 4095: Tcelsius -= 8192                
             Tcelsius *= 0.0625
             Tkelvin = Tcelsius + 273.15
-
-        except:
-            Tkelvin = -2
+            
             
         if verbosity>1: print("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin))
         temperatures[idx] = Tkelvin
@@ -110,7 +110,6 @@ def broadcast_temperatures(verbosity=0):
     while True:
         try:
             temperatures = read_temperatures()        
-            trycount = 0
         except KeyboardInterrupt:
             print('loop exit with ctrl-c')
             return
@@ -121,6 +120,9 @@ def broadcast_temperatures(verbosity=0):
                 quit()
             time.sleep(0.1)
             continue
+        else:
+            trycount = 0
+
 
         rec[0].timestamp = dt.datetime.utcnow().timestamp()
 
