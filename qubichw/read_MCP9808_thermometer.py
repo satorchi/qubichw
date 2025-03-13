@@ -117,7 +117,7 @@ def broadcast_temperatures(verbosity=0):
             trycount+=1
             if trycount>10000:
                 print('ERROR! possible I/O error.')
-                quit()
+                return
             time.sleep(0.1)
             continue
         else:
