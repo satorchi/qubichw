@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 Read and broadcast the temperatures in the calsource box
 
-code copied from controleverything.com
+code used in method read_temperatures() was copied from controleverything.com
 # Distributed with a free-will license.
 # Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
 # MCP9808
@@ -46,167 +46,200 @@ receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
 setpoint_temperature = 305.0 # default setpoint in K
+PID_sensor = 'calsource'
 setpoint_sensor_idx = 0 # use the calsource plate temperature sensor
 pid_npts = 20000 # this corresponds to about 20 minutes
-temperature_buffer = -np.ones(pid_npts,dtype=float)
-tstamp_buffer = -np.ones(pid_npts,dtype=float)
 
-def read_temperatures(verbosity=0):
+
+class MCP9808:
     '''
-    read the MCP9808 temperatures
+    class to read/broadcast/acquire/control temperatures
+
+    Arguments:
+    setpoint: the temperature in Kelvin where we want the calbox to be
+    PID_interval: the interval time in seconds over which we calculate the integral and derivative for the PID
+    PID_sensor: the name of the sensor used for measuring the temperature to control (usually 'calsource')
+    verbosity: level of verboseness for printing to screen.  Default is 0 (no print statements, except error messages)
+    
+    ===========
+    
+    Return: runs an endless loop and does not return unless receiving a 'quit' command, or a ctrl-c interrupt
+        
     '''
-    temperatures = -np.ones(nsensors,dtype=float)
 
-    # Get I2C bus
-    bus = smbus.SMBus(1)
+    def __init__(self,
+                 setpoint=305.0,
+                 PID_interval=1200,
+                 PID_sensor='calsource',
+                 verbosity=0
+                 ):
+        self.setpoint_temperature = setpoint
+        self.PID_interval = PID_interval
+        self.PID_sensor = PID_sensor
+        self.verbosity_threshold = verbosity
+        return
 
-    # MCP9808 address, 0x18(24)
-    # Select configuration register, 0x01(1)
-    # 0x0000(00)	Continuous conversion mode, Power-up default
-    config = [0x00, 0x00]
-    bus.write_i2c_block_data(0x18, 0x01, config)
-    # MCP9808 address, 0x18(24)
-    # Select resolution rgister, 0x08(8)
-    #	0x03(03)	Resolution = +0.0625 / C
-    bus.write_byte_data(0x18, 0x08, 0x03)
+    def log(self,msg,verbosity=0):
+        '''
+        print a statement if we are sufficiently verbose
+        '''
+        if verbosity<self.verbosity_threshold: return
+        print(msg)
+        return
+                 
+    def read_temperatures(self):
+        '''
+        read the MCP9808 temperatures
+        '''
+        temperatures = -np.ones(nsensors,dtype=float)
+
+        # Get I2C bus
+        bus = smbus.SMBus(1)
+
+        # MCP9808 address, 0x18(24)
+        # Select configuration register, 0x01(1)
+        # 0x0000(00)	Continuous conversion mode, Power-up default
+        config = [0x00, 0x00]
+        bus.write_i2c_block_data(0x18, 0x01, config)
+        # MCP9808 address, 0x18(24)
+        # Select resolution rgister, 0x08(8)
+        #	0x03(03)	Resolution = +0.0625 / C
+        bus.write_byte_data(0x18, 0x08, 0x03)
 
 
-    # MCP9808 address, 0x18(24)
-    # Read data back from 0x05(5), 2 bytes
-    # Temp MSB, TEMP LSB
-    base_address = 0x18
-    for idx,Tidx in enumerate(sensors):
-        addr = base_address + Tidx
+        # MCP9808 address, 0x18(24)
+        # Read data back from 0x05(5), 2 bytes
+        # Temp MSB, TEMP LSB
+        base_address = 0x18
+        for idx,Tidx in enumerate(sensors):
+            addr = base_address + Tidx
 
-        try:
-            data = bus.read_i2c_block_data(addr, 0x05, 2)
-        except:
-            Tkelvin = -2
-        else:                        
-            # Convert the data to 13-bits
-            Tcelsius = ((data[0] & 0x1F) * 256) + data[1]
-            if Tcelsius > 4095: Tcelsius -= 8192                
-            Tcelsius *= 0.0625
-            Tkelvin = Tcelsius + 273.15
+            try:
+                data = bus.read_i2c_block_data(addr, 0x05, 2)
+            except:
+                Tkelvin = -2
+            else:                        
+                # Convert the data to 13-bits
+                Tcelsius = ((data[0] & 0x1F) * 256) + data[1]
+                if Tcelsius > 4095: Tcelsius -= 8192                
+                Tcelsius *= 0.0625
+                Tkelvin = Tcelsius + 273.15
             
             
-        if verbosity>1: print("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin))
-        temperatures[idx] = Tkelvin
-    return temperatures
+            self.log("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin),verbosity=1)
+            temperatures[idx] = Tkelvin
+        return temperatures
                 
-def broadcast_temperatures(verbosity=0):
-    '''
-    read and broadcast the MCP9809 temperature data
-    '''
+    def broadcast_temperatures(self):
+        '''
+        read and broadcast the MCP9809 temperature data
+        '''
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    date_now = dt.datetime.utcnow()
-    date_str = date_now.strftime('%Y-%m-%d %H:%M:%S.%f')
-    trycount = 0
+        date_now = dt.datetime.utcnow()
+        date_str = date_now.strftime('%Y-%m-%d %H:%M:%S.%f')
+        trycount = 0
 
-    rec[0].STX = 0xAA
-    while True:
-        try:
-            temperatures = read_temperatures()        
-        except KeyboardInterrupt:
-            print('loop exit with ctrl-c')
-            return
-        except:
-            trycount+=1
-            if trycount>10000:
-                print('ERROR! possible I/O error.')
+        rec[0].STX = 0xAA
+        while True:
+            try:
+                temperatures = read_temperatures()        
+            except KeyboardInterrupt:
+                print('loop exit with ctrl-c')
                 return
-            time.sleep(0.1)
-            continue
-        else:
-            trycount = 0
+            except:
+                trycount+=1
+                if trycount>10000:
+                    print('ERROR! possible I/O error.')
+                    return
+                time.sleep(0.1)
+                continue
+            else:
+                trycount = 0
 
 
-        rec[0].timestamp = dt.datetime.utcnow().timestamp()
+            rec[0].timestamp = dt.datetime.utcnow().timestamp()
 
-        temperatures = read_temperatures()
-        for idx,sensor in enumerate(sensors):
-            fmt_idx = idx + 2
-            data_type = rec_formats_list[fmt_idx]
-            val = temperatures[idx]
-            cmd = 'rec[0].T%i = %f' % (sensor,val)
-            if verbosity>3: print('%16.6f | %16s | executing: %s' % (val,data_type,cmd))
-            exec(cmd)
+            temperatures = read_temperatures()
+            for idx,sensor in enumerate(sensors):
+                fmt_idx = idx + 2
+                data_type = rec_formats_list[fmt_idx]
+                val = temperatures[idx]
+                cmd = 'rec[0].T%i = %f' % (sensor,val)
+                self.log('%16.6f | %16s | executing: %s' % (val,data_type,cmd),verbosity=3)
+                exec(cmd)
 
-        # FIFO for PID
-        temperature_buffer = np.roll(temperature_buffer,-1)
-        temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
-        tstamp_buffer = np.roll(tstamp_buffer,-1)
-        tstamp_buffer[-1] = rec[0].timestamp
+            # FIFO for PID
+            temperature_buffer = np.roll(temperature_buffer,-1)
+            temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
+            tstamp_buffer = np.roll(tstamp_buffer,-1)
+            tstamp_buffer[-1] = rec[0].timestamp
         
             
-        # broadcast the data
-        for rx in receivers:
-            if verbosity>0: print('%s %s %s' % (date_str,rx,rec))
-            else: time.sleep(0.05) # need a delay before reading data again
-            sock.sendto(rec,(rx,PORT))
+            # broadcast the data
+            for rx in receivers:
+                self.log('%s %s %s' % (date_str,rx,rec),verbosity=1)
+                if self.verbosity==0: time.sleep(0.05) # need a delay before sending data again
+                sock.sendto(rec,(rx,PORT))
 
     
-    return
+        return
 
-def acquire_MCP9808_temperatures(listener=None,verbosity=0):
-    '''
-    read the MCP9808 temperature sensors on socket and write to file
-    '''
-    print_fmt = '%8i: 0x%X %s %8.4fs %10.2fK %10.2fK %10.2fK %10.2fK'
+    def acquire_MCP9808_temperatures(self,listener=None):
+        '''
+        read the MCP9808 temperature sensors on socket and write to file
+        '''
+        print_fmt = '%8i: 0x%X %s %8.4fs %10.2fK %10.2fK %10.2fK %10.2fK'
     
-    if listener is None: listener = get_myip()
-    print('listening on: %s, %i' % (listener,PORT))
-    if listener is None:
-        print('ERROR! Not a valid listening address.  Not connected to the network?')
-        return None
+        if listener is None: listener = get_myip()
+        self.log('listening on: %s, %i' % (listener,PORT),verbosity=0)
+        if listener is None:
+            self.log('ERROR! Not a valid listening address.  Not connected to the network?',verbosity=0)
+            return None
               
     
-    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    client.settimeout(0.2)
-    client.bind((listener,PORT))
-    h = open('calbox_temperatures.dat','ab')
+        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        client.settimeout(0.2)
+        client.bind((listener,PORT))
+        h = open('calbox_temperatures.dat','ab')
 
-    packet_period = 1/8 # not used:  this is for sleeping between packet reception requests
-    counter = 0
-    while True:
-        counter += 1
-        now_tstamp = dt.datetime.now().timestamp()
-        try:
-            dat = client.recv(packetsize)
-        except socket.timeout:
-            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            print('%8i: %s timeout error on socket' % (counter,now_str))
-            continue
-        except KeyboardInterrupt:
-            h.close()
-            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            print('%8i: %s exit using ctrl-c' % (counter,now_str))
-            return
-        # except:
-        #     if verbosity>0: print('%8i: problem reading socket' % counter)
-        #     time.sleep(0.2)
-        else: # continue as normal if no exception
-            h.write(dat)
-            dat_list = struct.unpack(fmt,dat)
-            latency = now_tstamp - dat_list[1]
-            if verbosity>0:
-                date = dt.datetime.utcfromtimestamp(dat_list[1])
-                date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
-                print(print_fmt % (counter,
-                                   dat_list[0],
-                                   date_str,
-                                   latency,
-                                   dat_list[2],
-                                   dat_list[3],
-                                   dat_list[4],
-                                   dat_list[5]
-                                   )
-                      )
-            #time.sleep(packet_period)
+        packet_period = 1/8 # not used:  this is for sleeping between packet reception requests
+        counter = 0
+        while True:
+            counter += 1
+            now_tstamp = dt.datetime.now().timestamp()
+            try:
+                dat = client.recv(packetsize)
+            except socket.timeout:
+                now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                self.log('%8i: %s timeout error on socket' % (counter,now_str),verbosity=0)
+                continue
+            except KeyboardInterrupt:
+                h.close()
+                now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                self.log('%8i: %s exit using ctrl-c' % (counter,now_str),verbosity=0)
+                return
+            else: # continue as normal if no exception
+                h.write(dat)
+                dat_list = struct.unpack(fmt,dat)
+                latency = now_tstamp - dat_list[1]
+                if self.verbosity>0:
+                    date = dt.datetime.utcfromtimestamp(dat_list[1])
+                    date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
+                    self.log(print_fmt % (counter,
+                                          dat_list[0],
+                                          date_str,
+                                          latency,
+                                          dat_list[2],
+                                          dat_list[3],
+                                          dat_list[4],
+                                          dat_list[5]
+                                          ), verbosity=1
+                             )
+                #time.sleep(packet_period)
             
 
     return

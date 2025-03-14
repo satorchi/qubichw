@@ -12,7 +12,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 broadcast the MCP9808 temperature sensor data from the calibration box
 '''
 import sys
-from qubichw.read_MCP9808_thermometer import broadcast_temperatures
+from qubichw.read_MCP9808_thermometer import MCP9808
+
 
 verbosity = 0
 for arg in sys.argv:
@@ -20,4 +21,5 @@ for arg in sys.argv:
         verbosity = eval(arg.split('=')[-1])
         continue
 
-broadcast_temperatures(verbosity=verbosity)
+thermometers = MCP9808(verbosity=verbosity)
+cli = thermometers.broadcast_temperatures()

@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 run the acquisition for the MCP9808 temperature sensors in the calibration box
 '''
 import sys
-from qubichw.read_MCP9808_thermometer import acquire_MCP9808_temperatures
+from qubichw.read_MCP9808_thermometer import MCP9808
 
 listener = None
 verbosity = 0
@@ -24,4 +24,5 @@ for arg in sys.argv:
         listener = arg.split('=')[-1]
         continue
 
-acquire_MCP9808_temperatures(listener=listener,verbosity=verbosity)
+thermometers = MCP9808(verbosity=verbosity)
+cli = thermometers.acquire_MCP9808_temperatures(listener=listener)
