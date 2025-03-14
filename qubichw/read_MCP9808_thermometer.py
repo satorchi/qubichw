@@ -138,6 +138,9 @@ def broadcast_temperatures(verbosity=0):
         # FIFO for PID
         temperature_buffer = np.roll(temperature_buffer,-1)
         temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
+        tstamp_buffer = np.roll(tstamp_buffer,-1)
+        tstamp_buffer[-1] = rec[0].timestamp
+        
             
         # broadcast the data
         for rx in receivers:
