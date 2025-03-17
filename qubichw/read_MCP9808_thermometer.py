@@ -180,7 +180,7 @@ class MCP9808:
         broadcast_temperature_buffer = -np.ones((self.broadcast_buffer_npts,nsensors),dtype=float)
         while True:
             try:
-                temperatures = read_temperatures()        
+                temperatures = self.read_temperatures()        
             except KeyboardInterrupt:
                 print('loop exit with ctrl-c')
                 return
@@ -194,9 +194,6 @@ class MCP9808:
             else:
                 trycount = 0
 
-            # read the temperatures
-            temperatures = read_temperatures()
-
             # add temperatures to the buffer
             broadcast_temperature_buffer[broadcast_buffer_idx,:] = temperatures
             broadcast_buffer_idx += 1
@@ -204,6 +201,7 @@ class MCP9808:
             # if we haven't filled the buffer, take another sample
             if broadcast_buffer_idx < self.broadcast_buffer_npts:
                 continue
+            broadcast_buffer_idx = 0
 
             # average the samples
             temperatures = broadcast_temperature_buffer.mean(axis=0)
