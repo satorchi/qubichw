@@ -170,7 +170,7 @@ class MCP9808:
 
         # parameters for the PID
         setpoint_sensor_idx = sensor_indexes[self.PID_sensor]
-        PID_npts = int(np.ceil(PID_interval*acquisition_rate))
+        PID_npts = int(np.ceil(self.PID_interval*acquisition_rate))
         self.PID_temperature_buffer = -np.ones(PID_npts,dtype=float)
         self.PID_tstamp_buffer = -np.ones(PID_npts,dtype=float)
         tstamp_buffer_offset = date_now.timestamp() # so we don't need double float precision
