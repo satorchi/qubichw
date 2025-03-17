@@ -16,10 +16,48 @@ from qubichw.read_MCP9808_thermometer import MCP9808
 
 
 verbosity = 0
+broadcast_buffer=8
+setpoint=305.0
+PID_interval=1200
+PID_sensor='calsource'
+Kp=1
+Ki=1
+Kd=1
 for arg in sys.argv:
     if arg.find('--verbosity=')==0:
         verbosity = eval(arg.split('=')[-1])
         continue
 
-thermometers = MCP9808(verbosity=verbosity)
+    if arg.find('--broadcast_buffer=')==0:
+        broadcast_buffer = eval(arg.split('=')[-1])
+        continue
+    if arg.find('--setpoint=')==0:
+        setpoint = eval(arg.split('=')[-1])
+        continue
+    if arg.find('--PID_interval=')==0:
+        PID_interval = eval(arg.split('=')[-1])
+        continue
+    if arg.find('--Kp=')==0:
+        Kp = eval(arg.split('=')[-1])
+        continue
+    if arg.find('--Ki=')==0:
+        Ki = eval(arg.split('=')[-1])
+        continue
+    if arg.find('--Kd=')==0:
+        Kd = eval(arg.split('=')[-1])
+        continue
+    if arg.find('--PID_sensor=')==0:
+        verbosity = arg.split('=')[-1]
+        continue
+    
+
+thermometers = MCP9808(verbosity=verbosity,
+                       broadcast_buffer=broadcast_buffer,
+                       setpoint=setpoint,
+                       PID_interval=PID_interval,
+                       PID_sensor=PID_sensor,
+                       Kp=Kp,
+                       Ki=Ki,
+                       Kd=Kd
+                       )
 cli = thermometers.broadcast_temperatures()
