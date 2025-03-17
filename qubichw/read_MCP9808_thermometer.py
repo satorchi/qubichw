@@ -30,7 +30,7 @@ sensors = [0,1,2,4] # these numbers correspond to which GPIO the sensor is conne
 nsensors = len(sensors)
 sensor_labels = ['calsource','heater','amplifier','outside']
 sensor_indexes = {}
-for idx,lbl in sensor_labels:
+for idx,lbl in enumerate(sensor_labels):
     sensor_indexes[lbl] = idx
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
