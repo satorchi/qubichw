@@ -16,13 +16,13 @@ from qubichw.read_MCP9808_thermometer import MCP9808
 
 
 verbosity = 0
-broadcast_buffer=8
-setpoint=305.0
-PID_interval=1200
-PID_sensor='calsource'
-Kp=1
-Ki=1
-Kd=1
+broadcast_buffer=None
+setpoint=None
+PID_interval=None
+PID_sensor=None
+Kp=None
+Ki=None
+Kd=None
 for arg in sys.argv:
     if arg.find('--verbosity=')==0:
         verbosity = eval(arg.split('=')[-1])

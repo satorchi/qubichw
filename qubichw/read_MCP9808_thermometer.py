@@ -70,22 +70,50 @@ class MCP9808:
     '''
 
     def __init__(self,
-                 broadcast_buffer=8,
-                 setpoint=305.0,
-                 PID_interval=1200,
-                 PID_sensor='calsource',
-                 Kp=1,
-                 Ki=1,
-                 Kd=1,
+                 broadcast_buffer=None,
+                 setpoint=None,
+                 PID_interval=None,
+                 PID_sensor=None,
+                 Kp=None,
+                 Ki=None,
+                 Kd=None,
                  verbosity=0
                  ):
-        self.broadcast_buffer_npts = broadcast_buffer
-        self.setpoint_temperature = setpoint
-        self.PID_interval = PID_interval
-        self.PID_sensor = PID_sensor
-        self.Kp = Kp,
-        self.Ki = Ki,
-        self.Kd = Kd,
+        if broadcast_buffer is None:
+            self.broadcast_buffer_npts = 8
+        else:
+            self.broadcast_buffer_npts = broadcast_buffer
+
+        if setpoint is None:
+            self.setpoint_temperature = 305.0
+        else:
+            self.setpoint_temperature = setpoint
+
+        if PID_interval is None:
+            self.PID_interval = 1200
+        else:
+            self.PID_interval = PID_interval
+
+        if PID_sensor is None:
+            self.PID_sensor = 'calsource'
+        else:
+            self.PID_sensor = PID_sensor
+
+        if Kp is None:
+            self.Kp = 1
+        else:
+            self.Kp = Kp
+
+        if Ki is None:
+            self.Ki = 1
+        else:
+            self.Ki = Ki
+
+        if Kd is None:
+            self.Kd = 1
+        else:
+            self.Kd = Kd
+        
         self.verbosity_threshold = verbosity
         return
 
