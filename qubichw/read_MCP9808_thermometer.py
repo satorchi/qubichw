@@ -80,7 +80,7 @@ class MCP9808:
                  verbosity=0
                  ):
         if broadcast_buffer is None:
-            self.broadcast_buffer_npts = 256
+            self.broadcast_buffer_npts = 128
         else:
             self.broadcast_buffer_npts = broadcast_buffer
 
