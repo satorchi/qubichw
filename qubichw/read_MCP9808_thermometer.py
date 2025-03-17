@@ -246,7 +246,7 @@ class MCP9808:
     
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        client.settimeout(0.2)
+        client.settimeout(self.broadcast_buffer_npts/acquisition_rate)
         client.bind((listener,PORT))
         h = open('calbox_temperatures.dat','ab')
 
