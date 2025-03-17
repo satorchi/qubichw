@@ -26,9 +26,12 @@ import numpy as np
 from qubichk.utilities import get_myip, get_receiver_list
 
 # 4 sensors in the calsource box
-sensors = [0,1,2,4]
+sensors = [0,1,2,4] # these numbers correspond to which GPIO the sensor is connected
 nsensors = len(sensors)
 sensor_labels = ['calsource','heater','amplifier','outside']
+sensor_indexes = {}
+for idx,lbl in sensor_labels:
+    sensor_indexes[lbl] = idx
 
 # data is sent as a numpy record, to be unpacked by qubic-central and QubicStudio
 rec_formats = "uint8,float64,float32,float32,float32,float32"
@@ -45,20 +48,19 @@ packetsize = rec.nbytes # size of data packet broadcast on ethernet
 receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
-setpoint_temperature = 305.0 # default setpoint in K
-PID_sensor = 'calsource'
-setpoint_sensor_idx = 0 # use the calsource plate temperature sensor
-pid_npts = 20000 # this corresponds to about 20 minutes
-
+acquisition_rate = 16.3025 # samples per second measured on 2025-03-13 at APC
 
 class MCP9808:
     '''
     class to read/broadcast/acquire/control temperatures
 
     Arguments:
+
+    broadcast_buffer: the number of temperature samples averaged together before broadcasting
     setpoint: the temperature in Kelvin where we want the calbox to be
     PID_interval: the interval time in seconds over which we calculate the integral and derivative for the PID
     PID_sensor: the name of the sensor used for measuring the temperature to control (usually 'calsource')
+    Kp, Ki, Kd: gain factors for the PID
     verbosity: level of verboseness for printing to screen.  Default is 0 (no print statements, except error messages)
     
     ===========
@@ -68,14 +70,22 @@ class MCP9808:
     '''
 
     def __init__(self,
+                 broadcast_buffer=8,
                  setpoint=305.0,
                  PID_interval=1200,
                  PID_sensor='calsource',
+                 Kp=1,
+                 Ki=1,
+                 Kd=1,
                  verbosity=0
                  ):
+        self.broadcast_buffer_npts = broadcast_buffer
         self.setpoint_temperature = setpoint
         self.PID_interval = PID_interval
         self.PID_sensor = PID_sensor
+        self.Kp = Kp,
+        self.Ki = Ki,
+        self.Kd = Kd,
         self.verbosity_threshold = verbosity
         return
 
@@ -130,6 +140,22 @@ class MCP9808:
             temperatures[idx] = Tkelvin
         return temperatures
                 
+    def PID(self):
+        '''
+        calculate the Proporional-Integral-Derivative parameters
+        and command the heater/fan as appropriate
+        https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller
+
+        The data is updated in broadcast_temperatures()
+        '''
+
+        error_value = self.setpoint - self.PID_temperature_buffer
+
+        
+        
+        return
+
+
     def broadcast_temperatures(self):
         '''
         read and broadcast the MCP9809 temperature data
@@ -142,7 +168,16 @@ class MCP9808:
         date_str = date_now.strftime('%Y-%m-%d %H:%M:%S.%f')
         trycount = 0
 
+        # parameters for the PID
+        setpoint_sensor_idx = sensor_indexes[self.PID_sensor]
+        PID_npts = int(np.ceil(PID_interval*acquisition_rate))
+        self.PID_temperature_buffer = -np.ones(PID_npts,dtype=float)
+        self.PID_tstamp_buffer = -np.ones(PID_npts,dtype=float)
+        tstamp_buffer_offset = date_now.timestamp() # so we don't need double float precision
+
         rec[0].STX = 0xAA
+        broadcast_buffer_idx = 0
+        broadcast_temperature_buffer = -np.ones((self.broadcast_buffer_npts,nsensors),dtype=float)
         while True:
             try:
                 temperatures = read_temperatures()        
@@ -159,10 +194,22 @@ class MCP9808:
             else:
                 trycount = 0
 
-
-            rec[0].timestamp = dt.datetime.utcnow().timestamp()
-
+            # read the temperatures
             temperatures = read_temperatures()
+
+            # add temperatures to the buffer
+            broadcast_temperature_buffer[broadcast_buffer_idx,:] = temperatures
+            broadcast_buffer_idx += 1
+
+            # if we haven't filled the buffer, take another sample
+            if broadcast_buffer_idx < self.broadcast_buffer_npts:
+                continue
+
+            # average the samples
+            temperatures = broadcast_temperature_buffer.mean(axis=0)
+                
+                
+            rec[0].timestamp = dt.datetime.utcnow().timestamp()
             for idx,sensor in enumerate(sensors):
                 fmt_idx = idx + 2
                 data_type = rec_formats_list[fmt_idx]
@@ -170,20 +217,19 @@ class MCP9808:
                 cmd = 'rec[0].T%i = %f' % (sensor,val)
                 self.log('%16.6f | %16s | executing: %s' % (val,data_type,cmd),verbosity=3)
                 exec(cmd)
-
-            # FIFO for PID
-            temperature_buffer = np.roll(temperature_buffer,-1)
-            temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
-            tstamp_buffer = np.roll(tstamp_buffer,-1)
-            tstamp_buffer[-1] = rec[0].timestamp
-        
-            
+                    
             # broadcast the data
             for rx in receivers:
                 self.log('%s %s %s' % (date_str,rx,rec),verbosity=1)
                 if self.verbosity==0: time.sleep(0.05) # need a delay before sending data again
                 sock.sendto(rec,(rx,PORT))
 
+            # FIFO for PID
+            self.PID_temperature_buffer = np.roll(self.PID_temperature_buffer,-1)
+            self.PID_temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
+            self.PID_tstamp_buffer = np.roll(self.PID_tstamp_buffer,-1)
+            self.PID_tstamp_buffer[-1] = rec[0].timestamp - tstamp_buffer_offset
+            pid_result = self.PID()
     
         return
 
@@ -206,7 +252,6 @@ class MCP9808:
         client.bind((listener,PORT))
         h = open('calbox_temperatures.dat','ab')
 
-        packet_period = 1/8 # not used:  this is for sleeping between packet reception requests
         counter = 0
         while True:
             counter += 1
@@ -239,7 +284,6 @@ class MCP9808:
                                           dat_list[5]
                                           ), verbosity=1
                              )
-                #time.sleep(packet_period)
             
 
     return
