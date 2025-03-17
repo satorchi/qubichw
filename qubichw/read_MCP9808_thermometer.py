@@ -149,7 +149,7 @@ class MCP9808:
         The data is updated in broadcast_temperatures()
         '''
 
-        error_value = self.setpoint - self.PID_temperature_buffer
+        error_value = self.setpoint_temperature - self.PID_temperature_buffer
 
         
         
