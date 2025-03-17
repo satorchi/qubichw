@@ -122,7 +122,7 @@ class MCP9808:
         print a statement if we are sufficiently verbose
         '''
         if verbosity>self.verbosity_threshold: return
-        print(msg)
+        print('%s|MCP9808|%s' % (dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),msg))
         return
                  
     def read_temperatures(self):
@@ -164,7 +164,7 @@ class MCP9808:
                 Tkelvin = Tcelsius + 273.15
             
             
-            self.log("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin),verbosity=3)
+            self.log("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin),verbosity=4)
             temperatures[idx] = Tkelvin
         return temperatures
                 
@@ -246,7 +246,7 @@ class MCP9808:
                     
             # broadcast the data
             for rx in receivers:
-                self.log('%s %s %s' % (date_str,rx,rec),verbosity=1)
+                self.log('%s %s' % (rx,rec),verbosity=1)
                 if self.verbosity_threshold==0: time.sleep(0.05) # need a delay before sending data again
                 sock.sendto(rec,(rx,PORT))
 
