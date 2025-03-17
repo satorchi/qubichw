@@ -295,18 +295,22 @@ class MCP9808:
                 return
             else: # continue as normal if no exception
                 h.write(dat)
-                dat_list = struct.unpack(fmt,dat)
-                latency = now_tstamp - dat_list[1]
-                self.log(print_fmt % (counter,
-                                      dat_list[0],
-                                      dt.datetime.utcfromtimestamp(dat_list[1]).strftime('%Y-%m-%d %H:%M:%S.%f'),
-                                      latency,
-                                      dat_list[2],
-                                      dat_list[3],
-                                      dat_list[4],
-                                      dat_list[5]
-                                      ), verbosity=1
-                         )
+                h.flush()
+                if self.verbosity_threshold>0:
+                    dat_list = struct.unpack(fmt,dat)
+                    latency = now_tstamp - dat_list[1]
+                    date_str = dt.datetime.utcfromtimestamp(dat_list[1]).strftime('%Y-%m-%d %H:%M:%S.%f')
+                    self.log(print_fmt % (counter,
+                                          dat_list[0],
+                                          date_str,
+                                          latency,
+                                          dat_list[2],
+                                          dat_list[3],
+                                          dat_list[4],
+                                          dat_list[5]
+                                          ),
+                             verbosity=1
+                             )
             
 
         # end of acquire_MCP9808_temperatures.  
