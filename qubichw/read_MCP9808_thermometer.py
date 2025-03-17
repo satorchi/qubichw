@@ -164,7 +164,7 @@ class MCP9808:
                 Tkelvin = Tcelsius + 273.15
             
             
-            self.log("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin),verbosity=1)
+            self.log("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin),verbosity=3)
             temperatures[idx] = Tkelvin
         return temperatures
                 
