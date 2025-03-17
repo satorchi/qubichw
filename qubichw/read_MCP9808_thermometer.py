@@ -80,7 +80,7 @@ class MCP9808:
                  verbosity=0
                  ):
         if broadcast_buffer is None:
-            self.broadcast_buffer_npts = 8
+            self.broadcast_buffer_npts = 256
         else:
             self.broadcast_buffer_npts = broadcast_buffer
 
@@ -274,7 +274,8 @@ class MCP9808:
     
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        client.settimeout(self.broadcast_buffer_npts/acquisition_rate)
+        timeout = 3*self.broadcast_buffer_npts/acquisition_rate
+        client.settimeout(timeout)
         client.bind((listener,PORT))
         h = open('calbox_temperatures.dat','ab')
 
