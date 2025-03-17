@@ -23,6 +23,7 @@ if os.uname().machine.find('arm')>=0:
     import smbus
 import datetime as dt
 import numpy as np
+from scipy.optimize import curve_fit
 from qubichk.utilities import get_myip, get_receiver_list
 
 # 4 sensors in the calsource box
@@ -49,6 +50,13 @@ receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
 acquisition_rate = 16.3025 # samples per second measured on 2025-03-13 at APC
+
+def line_model(x,m,b):
+    '''
+    function of a straight line used for curve_fit
+    '''
+    y = m*x + b
+    return y
 
 class MCP9808:
     '''
@@ -167,21 +175,34 @@ class MCP9808:
             self.log("[%i] 0x%2x T%i: %.2f K" % (idx,addr,Tidx,Tkelvin),verbosity=4)
             temperatures[idx] = Tkelvin
         return temperatures
-                
+
+    
     def PID(self):
         '''
         calculate the Proporional-Integral-Derivative parameters
-        and command the heater/fan as appropriate
         https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller
 
         The data is updated in broadcast_temperatures()
         '''
 
+        # Proportional
         error_value = self.setpoint_temperature - self.PID_temperature_buffer
+        P = self.Kp * error_value
 
-        
-        
-        return
+        # Integral
+        error_sum = error_value.sum()
+        interval = self.PID_tstamp_buffer[-1] - self.PID_tstamp_buffer[0]
+        I = self.Ki * error_sum * interval
+
+        # Derivative
+        fitresult = curve_fit(line_model,self.PID_tstamp_buffer,error_value,p0=[0,0])
+        m = fitresult[0][0]
+        D = self.Kd * m
+
+        # Control function
+        U = P + I + D
+
+        return U
 
 
     def broadcast_temperatures(self):
@@ -255,7 +276,12 @@ class MCP9808:
             self.PID_temperature_buffer[-1] = temperatures[setpoint_sensor_idx]
             self.PID_tstamp_buffer = np.roll(self.PID_tstamp_buffer,-1)
             self.PID_tstamp_buffer[-1] = rec[0].timestamp - tstamp_buffer_offset
-            pid_result = self.PID()
+
+            # PID is calculated using the buffer values (not passed as arguments)
+            control_value = self.PID()
+
+            # decided what to do with the heater or fan
+            
     
         return
 
