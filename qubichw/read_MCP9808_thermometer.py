@@ -121,7 +121,7 @@ class MCP9808:
         '''
         print a statement if we are sufficiently verbose
         '''
-        if verbosity<self.verbosity_threshold: return
+        if verbosity>self.verbosity_threshold: return
         print(msg)
         return
                  
