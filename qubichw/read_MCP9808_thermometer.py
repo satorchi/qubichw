@@ -219,7 +219,7 @@ class MCP9808:
             # broadcast the data
             for rx in receivers:
                 self.log('%s %s %s' % (date_str,rx,rec),verbosity=1)
-                if self.verbosity==0: time.sleep(0.05) # need a delay before sending data again
+                if self.verbosity_threshold==0: time.sleep(0.05) # need a delay before sending data again
                 sock.sendto(rec,(rx,PORT))
 
             # FIFO for PID
