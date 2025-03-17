@@ -225,6 +225,7 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
         try:
             dat = client.recv(packetsize)
             h.write(dat)
+            h.flush()
             dat_list = struct.unpack(fmt,dat)
             if verbosity>0:
                 date = dt.datetime.utcfromtimestamp(dat_list[1])
