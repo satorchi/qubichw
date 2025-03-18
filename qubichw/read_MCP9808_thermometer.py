@@ -202,8 +202,24 @@ class MCP9808:
         # Control function
         U = P + I + D
 
-        return U
+        return P,I,D,U
 
+    def control_action(self,tstamp,control_value):
+        '''
+        take action according to the control value
+        possible actions:
+           start heater in a standard mode, or by changing the duty cycle proportion
+           stop heater
+           start fan
+           stop fan
+
+        for now, we just record the PID result to see what's going on
+        '''
+        P,I,D = control_value
+        msg = '%17.6f %e %e %e\n' % (tstamp,P,I,D))
+        self.PID_log_handle.write(msg)
+        self.PID_log_handle.flush()
+        return
 
     def broadcast_temperatures(self):
         '''
@@ -223,6 +239,9 @@ class MCP9808:
         self.PID_temperature_buffer = -np.ones(PID_npts,dtype=float)
         self.PID_tstamp_buffer = -np.ones(PID_npts,dtype=float)
         tstamp_buffer_offset = date_now.timestamp() # so we don't need double float precision
+        FIFO_counter = 0
+
+        self.PID_log_handle = open('PID_logger.txt','a')
 
         rec[0].STX = 0xAA
         broadcast_buffer_idx = 0
@@ -232,11 +251,13 @@ class MCP9808:
                 temperatures = self.read_temperatures()        
             except KeyboardInterrupt:
                 print('loop exit with ctrl-c')
+                self.PID_log_handle.close()
                 return
             except:
                 trycount+=1
                 if trycount>10000:
                     print('ERROR! possible I/O error.')
+                    self.PID_log_handle.close()
                     return
                 time.sleep(0.1)
                 continue
@@ -277,11 +298,15 @@ class MCP9808:
             self.PID_tstamp_buffer = np.roll(self.PID_tstamp_buffer,-1)
             self.PID_tstamp_buffer[-1] = rec[0].timestamp - tstamp_buffer_offset
 
-            # PID is calculated using the buffer values (not passed as arguments)
-            control_value = self.PID()
-
-            # decided what to do with the heater or fan
+            # if the buffer is completely filled, we continue to calculating the PID with every new sample (overkill?)
+            FIFO_counter += 1
+            if FIFO_counter<PID_npts: continue
             
+            # PID is calculated using the buffer values (not passed as arguments)
+            PID_result = self.PID()
+
+            # decide what to do with the heater or fan
+            control_result = self.control_action(PID_result)
     
         return
 
