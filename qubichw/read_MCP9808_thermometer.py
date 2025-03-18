@@ -216,7 +216,7 @@ class MCP9808:
         for now, we just record the PID result to see what's going on
         '''
         P,I,D = control_value
-        msg = '%17.6f %e %e %e\n' % (tstamp,P,I,D))
+        msg = '%17.6f %e %e %e\n' % (tstamp,P,I,D)
         self.PID_log_handle.write(msg)
         self.PID_log_handle.flush()
         return
