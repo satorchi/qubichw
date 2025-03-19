@@ -191,12 +191,12 @@ class MCP9808:
         # Integral
         error_sum = error_value.sum()
         interval = self.PID_tstamp_buffer[-1] - self.PID_tstamp_buffer[0]
-        I = self.Ki * error_sum * interval
+        I = self.Ki * error_sum / interval
 
         # Derivative
         fitresult = np.polyfit(self.PID_tstamp_buffer,error_value,1)
         m = fitresult[0]
-        D = self.Kd * m
+        D = self.Kd * m * interval
 
         # Control function
         U = P + I + D
