@@ -201,6 +201,8 @@ class MCP9808:
         # Control function
         U = P + I + D
 
+        print('******** DEBUG: PID result: ',P,I,D,U)
+
         return P,I,D,U
 
     def control_action(self,tstamp,control_value):
