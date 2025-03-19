@@ -186,7 +186,7 @@ class MCP9808:
 
         # Proportional
         error_value = self.setpoint_temperature - self.PID_temperature_buffer
-        P = self.Kp * error_value
+        P = self.Kp * error_value.mean()
 
         # Integral
         error_sum = error_value.sum()
@@ -200,8 +200,6 @@ class MCP9808:
 
         # Control function
         U = P + I + D
-
-        print('******** DEBUG: PID result: ',P,I,D,U)
 
         return P,I,D,U
 
