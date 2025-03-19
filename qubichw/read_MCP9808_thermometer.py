@@ -234,7 +234,12 @@ class MCP9808:
 
         # parameters for the PID
         setpoint_sensor_idx = sensor_indexes[self.PID_sensor]
-        PID_npts = int(np.ceil(self.PID_interval*acquisition_rate))
+
+        # the number of points used for PID calculation is determined by:
+        #    PID_interval in seconds
+        #    acquisition_rate in samples per second when there is *no* buffer
+        #    number of samples to fill the buffer
+        PID_npts = int(np.ceil(self.PID_interval*acquisition_rate/self.broadcast_buffer_npts))
         self.PID_temperature_buffer = -np.ones(PID_npts,dtype=float)
         self.PID_tstamp_buffer = -np.ones(PID_npts,dtype=float)
         tstamp_buffer_offset = date_now.timestamp() # so we don't need double float precision
@@ -245,6 +250,10 @@ class MCP9808:
         rec[0].STX = 0xAA
         broadcast_buffer_idx = 0
         broadcast_temperature_buffer = -np.ones((self.broadcast_buffer_npts,nsensors),dtype=float)
+        self.log('entering temperature broadcast loop',verbosity=0)
+        self.log(' setpoint: %.2fK' % self.setpoint_temperature,verbosity=0)
+        
+
         while True:
             try:
                 temperatures = self.read_temperatures()        
