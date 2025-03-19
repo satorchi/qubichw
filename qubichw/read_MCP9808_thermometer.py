@@ -250,9 +250,12 @@ class MCP9808:
         rec[0].STX = 0xAA
         broadcast_buffer_idx = 0
         broadcast_temperature_buffer = -np.ones((self.broadcast_buffer_npts,nsensors),dtype=float)
-        self.log('entering temperature broadcast loop',verbosity=0)
-        self.log(' setpoint: %.2fK' % self.setpoint_temperature,verbosity=0)
-        
+        logmsg_list = ['entering temperature broadcast loop',
+                       'setpoint: %.2fK' % self.setpoint_temperature,
+                       'sample buffer size: %i' % self.broadcast_buffer_npts,
+                       'PID buffer size: %i' % PID_npts
+                       ]
+        self.log('\n   '.join(logmsg_list),verbosity=0)
 
         while True:
             try:
@@ -314,7 +317,7 @@ class MCP9808:
             PID_result = self.PID()
 
             # decide what to do with the heater or fan
-            control_result = self.control_action(PID_result)
+            control_result = self.control_action(rec[0].timestamp,PID_result)
     
         return
 
