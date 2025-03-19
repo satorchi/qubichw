@@ -23,7 +23,6 @@ if os.uname().machine.find('arm')>=0:
     import smbus
 import datetime as dt
 import numpy as np
-from scipy.optimize import curve_fit
 from qubichk.utilities import get_myip, get_receiver_list
 
 # 4 sensors in the calsource box
@@ -195,8 +194,8 @@ class MCP9808:
         I = self.Ki * error_sum * interval
 
         # Derivative
-        fitresult = curve_fit(line_model,self.PID_tstamp_buffer,error_value,p0=[0,0])
-        m = fitresult[0][0]
+        fitresult = np.polyfit(self.PID_tstamp_buffer,error_value,1)
+        m = fitresult[0]
         D = self.Kd * m
 
         # Control function
