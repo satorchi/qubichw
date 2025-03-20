@@ -185,7 +185,7 @@ class MCP9808:
         '''
 
         # Proportional
-        error_value = self.setpoint_temperature - self.PID_temperature_buffer
+        error_value = self.PID_temperature_buffer - self.setpoint_temperature
         P = self.Kp * error_value.mean()
 
         # Integral
