@@ -99,7 +99,7 @@ class MCP9808:
             self.acquisition_rate = acquisition_rate
             
         if broadcast_buffer is None:
-            self.broadcast_buffer_npts = 128
+            self.broadcast_buffer_npts = 16
         else:
             self.broadcast_buffer_npts = broadcast_buffer
 
@@ -109,7 +109,7 @@ class MCP9808:
             self.setpoint_temperature = setpoint
 
         if PID_interval is None:
-            self.PID_interval = 1200
+            self.PID_interval = 300
         else:
             self.PID_interval = PID_interval
 
