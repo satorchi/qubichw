@@ -74,7 +74,7 @@ class MCP9808:
     Return: runs an endless loop and does not return unless receiving a 'quit' command, or a ctrl-c interrupt
 
     ==========
-    Note regarding acquisiton_rate
+    Note regarding acquisition_rate
       acquisition rate was measured to be 16.3025 on 2025-03-13 at APC
       but this included the time for broadcasting
       without broadcasting, reading the thermometers can be done much faster
@@ -251,7 +251,7 @@ class MCP9808:
         #    PID_interval in seconds
         #    acquisition_rate in samples per second when there is *no* buffer
         #    number of samples to fill the buffer
-        PID_npts = int(np.ceil(self.PID_interval*acquisition_rate/self.broadcast_buffer_npts))
+        PID_npts = int(np.ceil(self.PID_interval*self.acquisition_rate/self.broadcast_buffer_npts))
         self.PID_temperature_buffer = -np.ones(PID_npts,dtype=float)
         self.PID_tstamp_buffer = -np.ones(PID_npts,dtype=float)
         tstamp_buffer_offset = date_now.timestamp() # so we don't need double float precision
@@ -355,7 +355,7 @@ class MCP9808:
     
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        timeout = 3*self.broadcast_buffer_npts/acquisition_rate
+        timeout = 3*self.broadcast_buffer_npts/self.acquisition_rate
         client.settimeout(timeout)
         client.bind((listener,PORT))
         h = open('calbox_temperatures.dat','ab')
