@@ -16,18 +16,22 @@ from qubichw.read_MCP9808_thermometer import MCP9808
 
 
 verbosity = 0
-broadcast_buffer=None
-setpoint=None
-PID_interval=None
-PID_sensor=None
-Kp=None
-Ki=None
-Kd=None
+acquisiton_rate = None
+broadcast_buffer = None
+setpoint = None
+PID_interval = None
+PID_sensor = None
+Kp = None
+Ki = None
+Kd = None
 for arg in sys.argv:
     if arg.find('--verbosity=')==0:
         verbosity = eval(arg.split('=')[-1])
         continue
 
+    if arg.find('--acquisition_rate=')==0:
+        acquisition_rate = eval(arg.split('=')[-1])
+        continue
     if arg.find('--broadcast_buffer=')==0:
         broadcast_buffer = eval(arg.split('=')[-1])
         continue
@@ -52,6 +56,7 @@ for arg in sys.argv:
     
 
 thermometers = MCP9808(verbosity=verbosity,
+                       acquisition_rate=acquisition_rate,
                        broadcast_buffer=broadcast_buffer,
                        setpoint=setpoint,
                        PID_interval=PID_interval,

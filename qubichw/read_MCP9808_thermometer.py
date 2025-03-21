@@ -48,8 +48,6 @@ packetsize = rec.nbytes # size of data packet broadcast on ethernet
 receivers = get_receiver_list('calbox.conf')
 PORT = 51337
 
-acquisition_rate = 16.3025 # samples per second measured on 2025-03-13 at APC
-
 def line_model(x,m,b):
     '''
     function of a straight line used for curve_fit
@@ -63,6 +61,7 @@ class MCP9808:
 
     Arguments:
 
+    acquisition_rate: number of samples per second for reading the temperature
     broadcast_buffer: the number of temperature samples averaged together before broadcasting
     setpoint: the temperature in Kelvin where we want the calbox to be
     PID_interval: the interval time in seconds over which we calculate the integral and derivative for the PID
@@ -73,10 +72,18 @@ class MCP9808:
     ===========
     
     Return: runs an endless loop and does not return unless receiving a 'quit' command, or a ctrl-c interrupt
+
+    ==========
+    Note regarding acquisiton_rate
+      acquisition rate was measured to be 16.3025 on 2025-03-13 at APC
+      but this included the time for broadcasting
+      without broadcasting, reading the thermometers can be done much faster
+      use acquisition_rate to force a slower sample rate (default 4 samples per second)
         
     '''
 
     def __init__(self,
+                 acquisition_rate=None,
                  broadcast_buffer=None,
                  setpoint=None,
                  PID_interval=None,
@@ -86,6 +93,11 @@ class MCP9808:
                  Kd=None,
                  verbosity=0
                  ):
+        if acquisition_rate is None:
+            self.acquisition_rate = 4
+        else:
+            self.acquisition_rate = acquisition_rate
+            
         if broadcast_buffer is None:
             self.broadcast_buffer_npts = 128
         else:
@@ -253,11 +265,17 @@ class MCP9808:
         logmsg_list = ['entering temperature broadcast loop',
                        'setpoint: %.2fK' % self.setpoint_temperature,
                        'sample buffer size: %i' % self.broadcast_buffer_npts,
-                       'PID buffer size: %i' % PID_npts
+                       'PID buffer size: %i' % PID_npts,
+                       'acquistion rate: %.2f samples per second' % self.acquisition_rate
                        ]
         self.log('\n   '.join(logmsg_list),verbosity=0)
 
+        previous_sample_tstamp = dt.datetime.utcnow().timestamp()
+        next_sample_tstamp = dt.datetime.utcnow().timestamp()
         while True:
+            now_tstamp = dt.datetime.utcnow().timestamp()
+            if now_tstamp<next_sample_tstamp: continue
+            
             try:
                 temperatures = self.read_temperatures()        
             except KeyboardInterrupt:
@@ -274,6 +292,7 @@ class MCP9808:
                 continue
             else:
                 trycount = 0
+                next_sample_tstamp = dt.datetime.utcnow().timestamp() + 1/self.acquisition_rate
 
             # add temperatures to the buffer
             broadcast_temperature_buffer[broadcast_buffer_idx,:] = temperatures
