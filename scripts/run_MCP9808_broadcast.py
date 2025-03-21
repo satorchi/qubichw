@@ -16,7 +16,7 @@ from qubichw.read_MCP9808_thermometer import MCP9808
 
 
 verbosity = 0
-acquisiton_rate = None
+acquisition_rate = None
 broadcast_buffer = None
 setpoint = None
 PID_interval = None
