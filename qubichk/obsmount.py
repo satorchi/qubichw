@@ -265,7 +265,7 @@ class obsmount:
             self.error = 'TIMEOUT'
         except:
             self.subscribed[port] = False
-            self.error = make_errormsg('SOCKET ERROR')
+            self.error = make_errmsg('SOCKET ERROR')
 
         if self.error is None: return True
 
@@ -320,7 +320,7 @@ class obsmount:
             return self.return_with_error(retval)
         except:
             self.subscribed[port] = False
-            retval['error'] = error = make_errormsg('could not get az,el data')
+            retval['error'] = error = make_errmsg('could not get az,el data')
             return self.return_with_error(retval)
 
                             
@@ -356,7 +356,7 @@ class obsmount:
                     data[key] = eval(col[idx])
                 except:
                     retval['data'] = data
-                    retval['error'] = error = make_errormsg('could not interpret data: %s' % str(col[idx]))
+                    retval['error'] = error = make_errmsg('could not interpret data: %s' % str(col[idx]))
                     return self.return_with_error(retval)
                 
             retval[data['AXIS']].append(data)
