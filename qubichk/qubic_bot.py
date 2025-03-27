@@ -27,7 +27,8 @@ from satorchipy.datefunctions import str2dt
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 from qubichk.hk_verify import check_compressors,check_diskspace
 
-from qubichk.send_telegram import telegram_datafile,get_botId,get_TelegramAddresses, get_alarm_recipients
+from qubichk.send_telegram import get_botId,get_TelegramAddresses, get_alarm_recipients
+from qubichk.utilities import get_fullpath
 from qubichk.ups import get_ups_info
 #from qubichk.platform import get_position
 from qubichk.utilities import shellcommand
@@ -1250,7 +1251,7 @@ class qubic_bot :
             msg = 'Hi %s,\n' % user
             
         if self.chat_id not in alarm_recipients:
-            alarm_recipients_file = telegram_datafile('telegram-alarm-recipients')
+            alarm_recipients_file = get_fullpath('telegram-alarm-recipients')
             if alarm_recipients_file is None:
                 msg = 'ERROR! Could not find the alarm recipients list.'
                 self._send_message(msg)
@@ -1278,7 +1279,7 @@ class qubic_bot :
         user = ''
 
         if self.chat_id in alarm_recipients:
-            alarm_recipients_file = telegram_datafile('telegram-alarm-recipients')
+            alarm_recipients_file = get_fullpath('telegram-alarm-recipients')
             if alarm_recipients_file is None:
                 msg = 'ERROR! Could not find the alarm recipients list.'
                 self._send_message(msg)

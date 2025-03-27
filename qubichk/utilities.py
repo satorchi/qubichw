@@ -139,6 +139,9 @@ def read_conf_file(filename):
     for line in lines:
         if len(line)==0: continue
         if line[0]=='#': continue
+        # remove comments
+        line = line.strip().split('#')[0].strip()
+        if len(line)==0: continue
 
         if line[0]=='[':
               section = line.strip().replace('[','').replace(']','').lower()
@@ -148,10 +151,8 @@ def read_conf_file(filename):
 
         if section not in config.keys():
               config[section] = []
-
-        # remove comments
-        val = line.strip().split('#')[0].strip()
-        config[section].append(val)
+        
+        config[section].append(line)
 
     return config
               
