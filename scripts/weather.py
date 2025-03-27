@@ -18,10 +18,11 @@ from qubichk.utilities import shellcommand
 
 server0 = '45.224.140.42:8989'
 server1 = '192.168.88.98'
-server2 = '192.168.88.13'
+server2 = '192.168.88.13' # inside weather 2025-03-27 19:53:16
 server3 = '192.168.88.14'
 server4 = '192.168.88.20'
-server5 = '192.168.88.18' # inside weather 2025-03-26 15:50:23
+server5 = '192.168.88.18' # inside weather 2025-03-26 15:50:23, now outside (see above)
+inside_server = server2
 def parseargs(argv):
     '''
     parse the command line arguments
@@ -97,7 +98,7 @@ def get_weather(options):
     if options['verbosity']>1:
         print('getting weather conditions from server: %s' % options['server'])
     
-    if options['server']==server5: return get_inside_weather(options)
+    if options['server']==inside_server: return get_inside_weather(options)
 
     return get_outside_weather(options)
 
