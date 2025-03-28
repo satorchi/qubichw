@@ -75,9 +75,14 @@ def get_hwp_info():
         return retval
     
     msg = msg_rcv.decode()
-    pos_str = msg.split('direction')[0].split()[1]
-    dir_str = msg.split('direction:')[1].split(',')[0].strip()
-    motor_str = msg.split(',')[-1].strip()
+    if msg.find('motor not running')>0:
+        motor_str = 'motor not running'
+        pos_str = msg.split('motor')[0].split()[1]
+        dir_str = 'STOPPED'
+    else:        
+        pos_str = msg.split('direction')[0].split()[1]
+        dir_str = msg.split('direction:')[1].split(',')[0].strip()
+        motor_str = msg.split(',')[-1].strip()
 
     retval['pos'] = pos_str
     retval['dir'] = dir_str
@@ -86,7 +91,7 @@ def get_hwp_info():
         retval['ok'] = True
     else:
         retval['ok'] = False
-        retval['error_message'] = 'motor not running'
+        retval['error_message'] = motor_str
         
 
     msg = 'HWP POS=%s, direction=%s, motor state=%s' % (pos_str,dir_str,motor_str)
