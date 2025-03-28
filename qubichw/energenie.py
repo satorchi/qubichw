@@ -61,10 +61,10 @@ class energenie:
         valid_names = socketinfo.keys()
         self.ok = False
         self.name = name
+        self.manager = None
 
         if name not in valid_names:
             self.log('invalid Energenie identifier: %s' % name)
-            self.manager = None
             return
 
         self.socket = socketinfo[name]

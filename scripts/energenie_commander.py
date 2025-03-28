@@ -51,6 +51,12 @@ def parseargs():
                     parms['name'] = pbname
                     parms['device'] = devname
 
+        # if the Energenie powerbar identifier is given, then the only valid command is "status"
+        if arg in socketinfo.keys():
+            parms['name'] = arg
+            parms['device'] = 'all'
+            parms['cmd'] = 'status'
+            
     if 'name' in parms.keys()\
        and 'device' in parms.keys()\
        and 'cmd' in parms.keys():
