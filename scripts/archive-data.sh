@@ -18,7 +18,8 @@ FRIDGESCRIPTS_DIR=/home/qubic/data/temperature
 QS_DIR=pi@cam2:/qs2 
 #QS_DIR=/qs # 2021-11-30 11:52:06 back to samba mount on qubic-central
 
-HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
+#HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
+HWP_DIR=pi@hwp:/home/pi/hwpctl
 WEATHER_DIR=weather:TECMES
 ARCHIVE_DIR=/archive
 echo "`date +%Y-%m-%dT%H:%M:%S` starting archiving" >> $ARCHIVE_DIR/archive_log.txt
