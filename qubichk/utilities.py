@@ -200,8 +200,9 @@ def get_myip():
     get the IP address of the local machine
     '''
     cmd = '/sbin/ip addr show up scope global'
-    
     out,err = shellcommand(cmd)
+
+    addr = None
 
     lines = out.split('\n')
     for line in lines:
@@ -210,8 +211,11 @@ def get_myip():
 
         fulladdr = line.split()[1]
         addr = fulladdr.split('/')[0]
-        return addr
 
-    return None
+        # return preferentially with the QUBIC housekeeping network address
+        if addr.find('192.168.2.')==0:
+            return addr
+
+    return addr
 
 
