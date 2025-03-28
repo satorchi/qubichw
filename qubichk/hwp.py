@@ -13,10 +13,11 @@ Half Wave Plate methods for housekeeping acquisition
 HWP control software by Carlos Reyes
 '''
 import socket,re
-from qubichk.utilities import ping,shellcommand
+from qubichk.utilities import ping,shellcommand,get_myip
 
 QC_IP = "192.168.2.1"
 HWP_IP = "192.168.2.100"
+MY_IP = get_myip()
 LISTEN_PORT = 5455
 
 
@@ -58,7 +59,7 @@ def get_hwp_info():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(1)
     try:
-        s.bind((QC_IP, LISTEN_PORT))
+        s.bind((MY_IP, LISTEN_PORT))
         msg_ack = "cmd received"
         msg_bytes = msg_ack.encode()
         msg_rcv, addr = s.recvfrom(1024)
