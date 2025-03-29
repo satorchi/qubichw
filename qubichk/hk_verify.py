@@ -108,7 +108,7 @@ def check_power(verbosity=1):
             states = powerbar.get_socket_states()
             retval['ok'] = retval['ok'] and states['ok']
             if not states['ok']:
-                errmsg_list.append('%s powerbar socket states are UNKNOWN' % powerbar)
+                errmsg_list.append('%s powerbar socket states are UNKNOWN' % pb_id)
         
             
         for socknum in powerbar.socket.keys():
