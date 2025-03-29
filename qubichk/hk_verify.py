@@ -66,12 +66,17 @@ def check_network(verbosity=1):
                 if not powerbar.ok:
                     msg += ' Calsource power bar is unreachable'
                     retval['ok'] = False
+                    errmsg_list.append('calsource power bar is unreachable')                    
                 else:
                     states = powerbar.get_socket_states()                
-                    if states is not None:
+                    if states['ok']:
                         modulator_state = states[powerbar.devicesocket['modulator']]
                         if not modulator_state:
-                            msg += ' OK. Calsource is OFF'
+                            msg += ' OK. calsource is OFF'
+                    else:
+                        msg += ' calsource state is UNKNOWN'
+                        retval['ok'] = False
+                        errmsg_list.append('calsource state is UNKNOWN')
             else:
                 retval['ok'] = False
             errmsg_list.append(msg)
@@ -98,9 +103,12 @@ def check_power(verbosity=1):
         
         if not powerbar.ok:
             retval['ok'] = False
+            errmsg_list.append('Problem connecting to powerbar: %s' % powerbar)
         else:
             states = powerbar.get_socket_states()
             retval['ok'] = retval['ok'] and states['ok']
+            if not states['ok']:
+                errmsg_list.append('%s powerbar socket states are UNKNOWN' % powerbar)
         
             
         for socknum in powerbar.socket.keys():
