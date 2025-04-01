@@ -62,9 +62,12 @@ class energenie:
         self.ok = False
         self.name = name
         self.manager = None
+        self.error_message = None
 
         if name not in valid_names:
-            self.log('invalid Energenie identifier: %s' % name)
+            msg = 'invalid Energenie identifier: %s' % name
+            self.log(msg)
+            self.error_message = msg
             return
 
         self.socket = socketinfo[name]
@@ -77,6 +80,7 @@ class energenie:
             if not pingresult['ok']:
                 msg = 'ERROR: PiGPS is UNREACHABLE'
                 self.log(msg,verbosity=1)
+                self.error_message = msg
                 return
             which_cmd = 'ssh pigps which %s' % energenie_app
             app_cmd = 'ssh pigps %s' % energenie_app
@@ -114,6 +118,7 @@ class energenie:
         out,err = shellcommand(verify_cmd)
         if out=='':
             error_message = '%s application not found.' % self.manager
+            self.error_message = error_message
             msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % error_message
             self.log(msg,verbosity=1)
             return False
@@ -142,7 +147,10 @@ class energenie:
 
         snum = socketinfo[pbname]['serial']
         if snum not in device_index.keys():
-            self.log('ERROR! Energenie power bar not connected: %s with serial number %s' % (pbname,snum))
+            msg = 'Energenie power bar not connected: %s with serial number %s' % (pbname,snum)
+            self.log('ERROR! %s' % msg)
+            self.ok = False
+            self.error_message = msg
             return None
         
         dev_idx = device_index[snum]
@@ -187,6 +195,8 @@ class energenie:
             states['ok'] = False
             msg = 'ERROR! %s\n-->Please check USB connection' % states['error_message']
             self.log(msg,verbosity=1)
+            self.ok = False
+            self.error_message = states['error_message']
             return states
    
 

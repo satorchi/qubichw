@@ -64,9 +64,9 @@ def check_network(verbosity=1):
             if machine=='modulator':
                 powerbar = energenie('calsource')
                 if not powerbar.ok:
-                    msg += ' Calsource power bar is unreachable'
+                    msg += ' %s' % powerbar.error_message
                     retval['ok'] = False
-                    errmsg_list.append('calsource power bar is unreachable')                    
+                    errmsg_list.append(powerbar.error_message)                    
                 else:
                     states = powerbar.get_socket_states()                
                     if states['ok']:
@@ -103,7 +103,7 @@ def check_power(verbosity=1):
         
         if not powerbar.ok:
             retval['ok'] = False
-            errmsg_list.append('Problem connecting to powerbar: %s' % powerbar)
+            errmsg_list.append(powerbar.error_message)
         else:
             states = powerbar.get_socket_states()
             retval['ok'] = retval['ok'] and states['ok']
