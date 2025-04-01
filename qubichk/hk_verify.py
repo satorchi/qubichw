@@ -115,7 +115,7 @@ def check_power(verbosity=1):
             if not isinstance(socknum,int): continue # skip serial number
             
             subsys = powerbar.socket[socknum]
-            if socknum not in states.keys():
+            if (not states['ok']) or (socknum not in states.keys()):
                 state = False
                 retval[subsys] = 'UNKNOWN'
             else:
@@ -126,6 +126,10 @@ def check_power(verbosity=1):
                     retval[subsys] = 'OFF'
             msg = '%s is %s' % (subsys,state)
             msg_list.append(msg)
+
+            if not states['ok']:
+                errmsg_list.append(msg)
+                continue
             
             # under normal operation, the RaspberryPi bridge for Opal Kelly should be OFF
             if subsys.find('Kelly')>=0:                
