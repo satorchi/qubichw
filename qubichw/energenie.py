@@ -59,7 +59,7 @@ class energenie:
             hostname,err = shellcommand('hostname')
 
         valid_names = socketinfo.keys()
-        self.ok = False
+        self.ok = None
         self.name = name
         self.manager = None
         self.error_message = None
@@ -67,6 +67,7 @@ class energenie:
         if name not in valid_names:
             msg = 'invalid Energenie identifier: %s' % name
             self.log(msg)
+            self.ok = False
             self.error_message = msg
             return
 
@@ -81,12 +82,15 @@ class energenie:
                 msg = 'ERROR: PiGPS is UNREACHABLE'
                 self.log(msg,verbosity=1)
                 self.error_message = msg
+                self.ok = False
                 return
             which_cmd = 'ssh pigps which %s' % energenie_app
             app_cmd = 'ssh pigps %s' % energenie_app
 
             
-        if not self.verify_app(which_cmd): return
+        if not self.verify_app(which_cmd):
+            self.ok = False
+            return
         self.manager = self.get_manager(name,app_cmd)
         
         # reverse look-up
@@ -121,6 +125,7 @@ class energenie:
             self.error_message = error_message
             msg = 'ERROR! %s\n--> Please install the application at http://sispmctl.sourceforge.net' % error_message
             self.log(msg,verbosity=1)
+            self.ok = False
             return False
         return True
                 
@@ -132,6 +137,7 @@ class energenie:
 
         if pbname not in socketinfo.keys():
             self.log('ERROR! unknown Energenie power bar: %s' % pbname,verbosity=1)
+            self.ok = False
             return None
         
         cmd = '%s -s' % manager
