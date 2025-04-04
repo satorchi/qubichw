@@ -142,6 +142,7 @@ class compressor:
         retval['msg'] = ''
         retval['value'] = None
         retval['online'] = False
+        retval['communication error'] = False
 
         if not self.ok():
             retval['status'] = False
@@ -157,6 +158,7 @@ class compressor:
             retval['msg'] = 'ERROR!  Compressor %i: Could not send command to device.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             retval['value'] = None
+            retval['communication error'] = True
             return retval
 
         try:
@@ -166,6 +168,7 @@ class compressor:
             retval['msg'] = 'ERROR!  Compressor %i: Could not get reply from device.' % self.compressor_num
             retval['status_message'] = self.status_message(retval)
             retval['value'] = None
+            retval['communication error'] = True
             return retval
             
         try:
