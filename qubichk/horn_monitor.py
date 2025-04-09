@@ -330,10 +330,14 @@ class horn_monitor:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.8)
-        msg='%s %i\r\nswread %i\r\n' % (cmd,horn,horn)
+        msg='%s %i\r\n' % (cmd,horn,horn)
         s.sendto(msg.encode(),(IP_HORN,1700))
+        time.sleep(0.5)
+        response = s.recvfrom(1024)
+        response_msg = response[0].decode()
+        print(response_msg)
         s.close()
-        return
+        return response_msg
 
     def open_horn(self,horn):
         '''
@@ -346,6 +350,12 @@ class horn_monitor:
         command a switch to close
         '''
         return self.send_command('close',horn)
+
+    def get_state(self,horn):
+        '''
+        get the current state of the horn switch
+        '''
+        return self.send_command('swread',horn)
 
     def recent_files(self):
         '''
