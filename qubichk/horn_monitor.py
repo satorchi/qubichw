@@ -330,7 +330,7 @@ class horn_monitor:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.8)
-        msg='%s %i\r\n' % (cmd,horn,horn)
+        msg='%s %i\r\n' % (cmd,horn)
         s.sendto(msg.encode(),(IP_HORN,1700))
         time.sleep(0.5)
         response = s.recvfrom(1024)
