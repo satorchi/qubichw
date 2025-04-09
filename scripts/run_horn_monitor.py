@@ -14,9 +14,14 @@ run the horn switch monitor
 import sys
 from qubichk.horn_monitor import horn_monitor
 
-plot_type = 'x'
-if len(sys.argv)>1 and sys.argv[1].lower()=='ascii':
-    plot_type = 'ascii'
+plot_type = None
+for arg in sys.argv:
+    if arg.lower()=='ascii':
+        plot_type = 'ascii'
+        continue
+    if arg.lower()=='x':
+        plot_type = 'x'
+        continue
 
 mon = horn_monitor(plot_type=plot_type)
 mon.listen_to_horns()
