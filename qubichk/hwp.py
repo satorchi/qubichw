@@ -59,7 +59,7 @@ def get_hwp_info():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(1)
     try:
-        s.bind((QC_IP, LISTEN_PORT))
+        s.bind((MY_IP, LISTEN_PORT))
         msg_ack = "cmd received"
         msg_bytes = msg_ack.encode()
         msg_rcv, addr = s.recvfrom(1024)

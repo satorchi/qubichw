@@ -9,8 +9,24 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           permitted by law.
 
 receive the inductance data from the horn switches, and plot
+
+see document by Andrea Passerini:  Switch Controller Commands.pdf
+
+valid commands:
+
+Close
+Open
+List
+Map
+SwMeas
+SwRead
+SwWrite
+SwStat
+SwSetStat
+SwSetThr
+DispUpd
+ClearErr
 '''
-from __future__ import division, print_function
 import os,sys,time,struct,socket
 import datetime as dt
 from glob import glob
@@ -20,6 +36,10 @@ from astropy.io import fits
 import gnuplotlib as gp
 
 from satorchipy.datefunctions import str2dt
+from qubichk.utilities import known_hosts, get_myip
+
+IP_HORN = known_hosts['horn']
+LISTENER = get_myip()
 
 class horn_monitor:
     '''
@@ -34,9 +54,14 @@ class horn_monitor:
     
     interrupt_flag_file = '%s/__STOP_MONITORING_HORNS__' % homedir
 
-    def __init__(self,plot_type='x',timeout=None):
+    def __init__(self,plot_type=None,timeout=None):
         '''
         initialize the horn_monitor object
+
+        plot_type:
+           'x'     : plot a separate window
+           'ascii' : plot using ascii characters only with gnuplot
+           None    : do not plot, just save the data
         '''
         
         if os.path.isfile(self.interrupt_flag_file):
@@ -70,19 +95,19 @@ class horn_monitor:
         double_horn_change_time = dt.timedelta(seconds=1)
     
         # setup the plot
-        self.setup_horn_plot()
+        if self.plot_type is not None: self.setup_horn_plot()
     
         # setup the socket
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.settimeout(self.timeout)
-        self.s.bind(('',37000))
+        self.s.bind((LISTENER,37000))
         self.s.listen(1)
 
         print('waiting for horn stuff')
         try:
             self.client, addr = self.s.accept()
-            print('got client')
+            print('got client: %s:%i' % (self.client,addr))
         except KeyboardInterrupt:
             print('interrupted with ctrl-c')
             return
@@ -112,9 +137,10 @@ class horn_monitor:
             #############################################
 
             #### plot ###################################
-            delta = now - previous
-            if delta > double_horn_change_time: self.reset_horn_plot()    
-            self.plot_horn_action()
+            if self.plot_type is not None:
+                delta = now - previous
+                if delta > double_horn_change_time: self.reset_horn_plot()    
+                self.plot_horn_action()
             #############################################
 
             counter += 1
@@ -201,7 +227,7 @@ class horn_monitor:
         print('setting up plot window')
         plt.ion()
         self.fig = plt.figure(figsize=(9,6))
-        self.fig.canvas.set_window_title('plt: horn switch inductor profile')
+        self.fig.canvas.manager.set_window_title('plt: horn switch inductor profile')
         self.fig.add_axes((0.1,0.1,0.85,0.8))
         self.ax = self.fig.axes[0]
         self.fig.suptitle('Horn switch inductor profile')
@@ -296,21 +322,30 @@ class horn_monitor:
         return outfile
 
 
-    ### does this work?
-    def send_to_horns(self,horn):
+    def send_command(self,horn,cmd):
         '''
-        command the horn to open/close
-        ... this is under development!!
+        send a command to a horn switch
         '''
 
-        s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(0.2)
-        s.bind(('192.168.2.1',1700))
-        msg='close %i\r\nswread %i\r\n' % (horn,horn)
-        s.sendto(msg.encode(), (receiver, 1700))
+        s.settimeout(0.8)
+        msg='%s %i\r\nswread %i\r\n' % (cmd,horn,horn)
+        s.sendto(msg.encode(),(IP_HORN,1700))
+        s.close()
         return
 
+    def open_horn(self,horn):
+        '''
+        command a switch to open
+        '''
+        return self.send_command('open',horn)
+
+    def close_horn(self,horn):
+        '''
+        command a switch to close
+        '''
+        return self.send_command('close',horn)
 
     def recent_files(self):
         '''

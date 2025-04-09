@@ -19,6 +19,7 @@ known_hosts['calsource']     = "192.168.2.5"
 known_hosts['pigps']         = "192.168.2.17"
 known_hosts['redpitaya']     = "192.168.2.21"
 known_hosts['groundgps']     = "192.168.2.22"
+known_hosts['horn']          = "192.168.2.9"
 
 def get_fullpath(filename=None):
     '''
