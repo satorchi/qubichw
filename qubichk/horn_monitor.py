@@ -107,7 +107,7 @@ class horn_monitor:
         print('waiting for horn stuff')
         try:
             self.client, addr = self.s.accept()
-            print('got client: %s:%i' % (self.client,addr))
+            print('got client: %s %s' % (self.client,addr))
         except KeyboardInterrupt:
             print('interrupted with ctrl-c')
             return
@@ -322,7 +322,7 @@ class horn_monitor:
         return outfile
 
 
-    def send_command(self,horn,cmd):
+    def send_command(self,cmd,horn):
         '''
         send a command to a horn switch
         '''
