@@ -107,11 +107,12 @@ class horn_monitor:
         print('waiting for horn stuff')
         try:
             self.client, addr = self.s.accept()
-            print('got client: %s' % (addr))
         except KeyboardInterrupt:
             print('interrupted with ctrl-c')
             return
 
+        print('got client: %s:%i' % addr)
+        
         subcounter = 0
         counter = 0
         print('going into loop. Ctrl-C to interrupt.')
