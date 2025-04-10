@@ -107,7 +107,7 @@ class horn_monitor:
         print('waiting for horn stuff')
         try:
             self.client, addr = self.s.accept()
-            print('got client: %s %s' % (self.client,addr))
+            print('got client: %s' % (addr))
         except KeyboardInterrupt:
             print('interrupted with ctrl-c')
             return
@@ -126,7 +126,7 @@ class horn_monitor:
             try:
                 retval = self.next_action()
             except KeyboardInterrupt:
-                print('interrupted with ctrl-c')
+                print('listen-loop interrupted with ctrl-c')
                 break
 
             if retval=='KeyboardInterrupt': break
@@ -169,11 +169,11 @@ class horn_monitor:
         '''
         self.init_data()
 
-        print('waiting for horn action...')
+        print('\nwaiting for horn action...')
         try:
             id_packet = self.client.recv(8)
         except KeyboardInterrupt:
-            print('interrupted with ctrl-c')
+            print('action interrupted with ctrl-c')
             return 'KeyboardInterrupt'
         except socket.error:
             print('ignoring socket error')
