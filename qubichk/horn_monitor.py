@@ -322,16 +322,15 @@ class horn_monitor:
         print('saved file: %s' % outfile)
         return outfile
 
-
-    def send_command(self,cmd,horn):
+    def send_command(self,cmd):
         '''
-        send a command to a horn switch
+        send a command to the horn switch controller
         '''
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.8)
-        msg='%s %i\r\n' % (cmd,horn)
+        msg='%s\r\n' % cmd
         s.sendto(msg.encode(),(IP_HORN,1700))
         time.sleep(0.5)
         response = s.recvfrom(1024)
@@ -340,23 +339,36 @@ class horn_monitor:
         s.close()
         return response_msg
 
+    def send_horn_command(self,cmd,horn):
+        '''
+        send a command to a specific horn
+        '''
+        full_cmd = '%s %i' % (cmd,horn)
+        return self.send_command(full_cmd)
+
     def open_horn(self,horn):
         '''
         command a switch to open
         '''
-        return self.send_command('open',horn)
+        return self.send_horn_command('open',horn)
+
+    def open_all(self):
+        '''
+        send the command to open all horns
+        '''
+        return self.send_command('open')
 
     def close_horn(self,horn):
         '''
         command a switch to close
         '''
-        return self.send_command('close',horn)
+        return self.send_horn_command('close',horn)
 
     def get_state(self,horn):
         '''
         get the current state of the horn switch
         '''
-        return self.send_command('swread',horn)
+        return self.send_horn_command('swread',horn)
 
     def recent_files(self):
         '''
