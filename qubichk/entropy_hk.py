@@ -21,18 +21,18 @@ class entropy_hk :
         '''initialize an instance of entropy_hk
         '''
 
-        self.MAX_MSGLEN=4096
-        self.MECH_CLOSED=190000 # position of switch closed
-        self.MECH_OPEN=0 # position of switch full open
-        self.mech_idx=None
-        self.verbosity=0
+        self.MAX_MSGLEN = 4096
+        self.MECH_CLOSED = 190000 # position of switch closed
+        self.MECH_OPEN = 0 # position of switch full open
+        self.mech_idx = None
+        self.verbosity = 0
         
         if hostname is None:
-            self.hostname='majortom'
+            self.hostname = 'majortom'
         else:
-            self.hostname=hostname
+            self.hostname = hostname
 
-        self.connected=False
+        self.connected = False
         self.init_socket()
         self.get_device_list()
         self.get_startTime()
@@ -53,9 +53,9 @@ class entropy_hk :
     def log(self,msg):
         '''messages to log file and to screen
         '''
-        now=dt.datetime.utcnow()
-        logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h=open('hk_entropy.log','a')
+        now = utcnow()
+        logmsg = '%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
+        h = open('hk_entropy.log','a')
         h.write(logmsg+'\n')
         h.close()
         print(logmsg)
@@ -65,9 +65,9 @@ class entropy_hk :
         '''label for each channel
         copied Tue 04 Dec 2018 10:36:26 CET
         '''
-        label={}
-        label['AVS47_1']=[]
-        label['AVS47_2']=[]
+        label = {}
+        label['AVS47_1'] = []
+        label['AVS47_2'] = []
         
         label['AVS47_1'].append('Touch')
         label['AVS47_1'].append('1K stage')
@@ -85,7 +85,7 @@ class entropy_hk :
         label['AVS47_2'].append('UNUSED')
         label['AVS47_2'].append('UNUSED')
         label['AVS47_2'].append('UNUSED')
-        self.label=label
+        self.label = label
         return label
     
     def debugmsg(self,msg):
@@ -97,17 +97,17 @@ class entropy_hk :
     def init_socket(self):
         '''initialize the connection to the Entropy machine
         '''
-        self.socket=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2)
         try:
             self.socket.connect((self.hostname,2002))
             self.socket.settimeout(0.2)
-            a=self.socket.recv(self.MAX_MSGLEN)
+            a = self.socket.recv(self.MAX_MSGLEN)
             self.debugmsg(a.decode())
-            self.connected=True
+            self.connected = True
         except:
             self.log('Unable to connect to Major Tom!')
-            self.connected=False
+            self.connected = False
         return None
 
     def sendreceive(self,cmd):
@@ -144,14 +144,14 @@ class entropy_hk :
         '''get the start time for logging temperatures
         all temperature times are given as an offset from this time
         '''
-        a=self.sendreceive('dateTime AppStart\n')
+        a = self.sendreceive('dateTime AppStart\n')
         if a is None:return None
 
         # time is given in localtime of the APCBRAIN2 Windows computer (CET or CEST)
-        self.startTime=str2dt(a) 
+        self.startTime = str2dt(a) 
 
         # assume the Windows computer is on the same time as qubic-central (this computer)
-        tzone = int(( dt.datetime.utcnow() - dt.datetime.now() ).total_seconds())
+        tzone = int(( utcnow() - dt.datetime.now() ).total_seconds())
         self.startTime += dt.timedelta(seconds = tzone) # convert to UT
         self.log('Logging start time: %s' % self.startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT'))
         return self.startTime
@@ -159,21 +159,21 @@ class entropy_hk :
     def get_device_list(self):
         '''get the valid device names
         '''
-        devlist_txt=self.sendreceive('deviceList\n')
+        devlist_txt = self.sendreceive('deviceList\n')
         if devlist_txt is None:return None
-        lines=devlist_txt.split('\n')
-        devlist=[]
-        idx=0
-        self.mech_idx=None
+        lines = devlist_txt.split('\n')
+        devlist = []
+        idx = 0
+        self.mech_idx = None
         for line in lines:
             if line[0:3]==' - ':
-                dev=line[3:].strip()
+                dev = line[3:].strip()
                 devlist.append(dev)
-                match=re.match('MHS|[Mm]ech',dev)
+                match = re.match('MHS|[Mm]ech',dev)
                 if match:
-                    self.mech_idx=idx
+                    self.mech_idx = idx
                 idx+=1
-        self.devlist=devlist
+        self.devlist = devlist
         self.log(devlist)
         return devlist
 
@@ -208,30 +208,30 @@ class entropy_hk :
             self.log('Please enter a valid device!')
             return self.print_device_list()
 
-        if ch is None:ch=0
+        if ch is None:ch = 0
 
-        cmd='device %s %s? %i\n' % (dev,meastype,ch)
-        a=self.sendreceive(cmd)
+        cmd = 'device %s %s? %i\n' % (dev,meastype,ch)
+        a = self.sendreceive(cmd)
        
         if a is None:return None,None
 
         if a.find('no valid reading')>=0:
             return None,None
  
-        cols=a.strip().replace(',','').split()
+        cols = a.strip().replace(',','').split()
         try:
-            reading=float(cols[0])
+            reading = float(cols[0])
         except:
             self.debugmsg("Couldn't read %s: %s" % (meastype,str(cols)))
-            reading=None
+            reading = None
 
         try:
-            tstamp_entropy=int(cols[1])
-            msec=self.startTime.strftime('%f')[0:3]
-            tstamp=int('%s%s' % (self.startTime.strftime('%s'),msec)) + tstamp_entropy
+            tstamp_entropy = int(cols[1])
+            msec = self.startTime.strftime('%f')[0:3]
+            tstamp = int('%s%s' % (self.startTime.strftime('%s'),msec)) + tstamp_entropy
         except:
             self.debugmsg("Couldn't read timestamp: %s" % cols)
-            tstamp=None
+            tstamp = None
 
         return (tstamp,reading)
 
@@ -249,18 +249,18 @@ class entropy_hk :
             self.log('Please enter which heat switch, 1 or 2')
             return None
 
-        cmd='device %s absolute? %i\n' % (self.devlist[self.mech_idx],ch)
-        a=self.sendreceive(cmd)
+        cmd = 'device %s absolute? %i\n' % (self.devlist[self.mech_idx],ch)
+        a = self.sendreceive(cmd)
         if a is None:return None
 
         self.debugmsg(a.strip())
-        cols=a.strip().replace(',','').split()
+        cols = a.strip().replace(',','').split()
         
         try:
-            pos=int(cols[0])
+            pos = int(cols[0])
         except:
             self.debugmsg("Couldn't read position: %s" % cols)
-            pos=None
+            pos = None
 
         return pos
         
@@ -276,8 +276,8 @@ class entropy_hk :
             self.log('Please enter which heat switch, 1 or 2')
             return None
 
-        if command is None:command='stop'
-        command=command.lower()
+        if command is None:command = 'stop'
+        command = command.lower()
         if command not in ['open','close','stop']:
             self.log('ERROR! Please enter a valid command (open/close/stop)')
             return None
@@ -286,9 +286,9 @@ class entropy_hk :
             if steps is None:
                 self.log('Please enter a number of steps')
                 return None
-            cmd='device %s %s %i %i\n' % (self.devlist[self.mech_idx],command,ch,steps)
+            cmd = 'device %s %s %i %i\n' % (self.devlist[self.mech_idx],command,ch,steps)
         else:
-            cmd='device %s %i stop\n' % (self.devlist[self.mech_idx],ch)
+            cmd = 'device %s %i stop\n' % (self.devlist[self.mech_idx],ch)
         
         self.socket.send(cmd.encode())
         return True
@@ -298,8 +298,8 @@ class entropy_hk :
         '''
         if steps is None:
             # find the number of steps necessary to open completely
-            pos=self.mech_get_position(ch)
-            steps=pos-self.MECH_OPEN            
+            pos = self.mech_get_position(ch)
+            steps = pos-self.MECH_OPEN            
         return self.mech_command(ch,steps,command='open')
 
     def mech_close(self,ch=None,steps=None):
@@ -307,8 +307,8 @@ class entropy_hk :
         '''
         if steps is None:
             # find the number of steps necessary to close completely
-            pos=self.mech_get_position(ch)
-            steps=self.MECH_CLOSED - pos
+            pos = self.mech_get_position(ch)
+            steps = self.MECH_CLOSED - pos
         return self.mech_command(ch,steps,command='close')
 
     def mech_stop(self,ch=None):
@@ -320,25 +320,25 @@ class entropy_hk :
         '''get the actual log time from the offset time
         offset time is given in milliseconds
         '''
-        logtime_unix=float(self.startTime.strftime('%s.%f')) + 1e-3*timestamp
-        logtime=dt.datetime.fromtimestamp(logtime_unix)
+        logtime_unix = float(self.startTime.strftime('%s.%f')) + 1e-3*timestamp
+        logtime = dt.datetime.fromtimestamp(logtime_unix)
         return logtime
     
         
     def wait_for_position(self,ch,position,timeout=300):
         '''wait for the mechanism to reach its position
         '''
-        tolerance=1000
-        now=dt.datetime.utcnow()
-        endtime=now+dt.timedelta(seconds=timeout)
-        delta=100000
+        tolerance = 1000
+        now = utcnow()
+        endtime = now+dt.timedelta(seconds=timeout)
+        delta = 100000
 
         while delta>tolerance and now<endtime:
-            current_position=self.mech_get_position(ch)
-            delta=abs(current_position - position)
+            current_position = self.mech_get_position(ch)
+            delta = abs(current_position - position)
             if delta>tolerance:
                 time.sleep(1)
-            now=dt.datetime.utcnow()
+            now = utcnow()
 
         return
     
