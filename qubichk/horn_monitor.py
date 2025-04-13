@@ -195,10 +195,8 @@ class horn_monitor:
             print('ignoring some kind of error')
             return 'UnknownError'
 
-        
-        print('length of id_packet: %i' % len(id_packet))
-        print('id_packet: 0x%04X' % int(id_packet))
 
+        print('length of id_packet: %i' % len(id_packet))
         if len(id_packet)<8:
             print('ERROR! id_packet is too small')
             return 'UnpackError'
