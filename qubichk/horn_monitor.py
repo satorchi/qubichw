@@ -84,6 +84,13 @@ class horn_monitor:
         self.header['HORN_ID'] = None
         self.header['IS_GOOD'] = None
         self.header['CHANNEL'] = None
+        self.header['cl_val'] = None
+        self.header['op_val'] = None
+        self.header['cl_thrl'] = None
+        self.header['cl_thrh'] = None
+        self.header['op_thrl'] = None
+        self.header['op_thrh'] = None
+        self.header['status'] = None
         return
 
 
@@ -131,6 +138,7 @@ class horn_monitor:
                 break
 
             if retval=='KeyboardInterrupt': break
+            if retval=='UnpackError': continue
             
             now = dt.datetime.utcnow()
             tstamp = float(now.strftime('%s.%f'))
@@ -185,8 +193,11 @@ class horn_monitor:
 
         
         print('length of id_packet: %i' % len(id_packet))
-        print('id_packet type: %s' % type(id_packet))
-        print('id_packet: %s' % id_packet.decode())
+        print('id_packet: 0x%04X' % id_packet.decode())
+
+        if len(id_packet)<8:
+            print('ERROR! id_packet is too small')
+            return 'UnpackError'
                 
         nbytes_bin = id_packet[0:4]
         horn_id_bin = id_packet[4:6]
@@ -200,23 +211,24 @@ class horn_monitor:
         if len(chan_bin)==1:
             self.header['CHANNEL'] = struct.unpack('>B',chan_bin)[0]
         
-        if len(nbytes_bin)==4:
-            nbytes = struct.unpack('>L',nbytes_bin)[0]
+        nbytes = struct.unpack('>L',nbytes_bin)[0]
             
-            print('trying to get %i bytes' % nbytes)
-            dat_bin = []
-            for idx in range(nbytes):
-                byte = self.client.recv(1)
-                dat_bin.append(byte)
-            dat_bin = np.array(dat_bin)
-            nbytes = len(dat_bin)
-            print('data received is %i bytes' % nbytes)
-            npts = nbytes//4
-            fmt = '>%iL' % npts
-            print('unpacking data array of %i elements' % npts)
-            self.dat = np.array(struct.unpack(fmt,dat_bin))            
-            return 'NormalReturn'
-        return 'UnpackError'
+        print('trying to get %i bytes' % nbytes)
+        dat_bin = []
+        for idx in range(nbytes):
+            byte = self.client.recv(1)
+            dat_bin.append(byte)
+        dat_bin = np.array(dat_bin)
+        nbytes = len(dat_bin)
+        print('data received is %i bytes' % nbytes)
+        npts = nbytes//4
+        fmt = '>%iL' % npts
+        print('unpacking data array of %i elements' % npts)
+        self.dat = np.array(struct.unpack(fmt,dat_bin))
+
+        # get status of the switch that just reported an action
+        
+        return 'NormalReturn'
 
 
     def setup_horn_plot(self):
@@ -334,7 +346,7 @@ class horn_monitor:
         s.sendto(msg.encode(),(IP_HORN,1700))
         time.sleep(0.5)
         response = s.recvfrom(1024)
-        response_msg = response[0].decode()
+        response_msg = response[0].decode().strip()
         print(response_msg)
         s.close()
         return response_msg
@@ -368,7 +380,9 @@ class horn_monitor:
         '''
         get the current state of the horn switch
         '''
-        return self.send_horn_command('swread',horn)
+        response = self.send_horn_command('swread',horn)
+        
+        return response
 
     def recent_files(self):
         '''
