@@ -407,7 +407,7 @@ class horn_monitor:
             val = val_cols[-1]
 
             if val_type in self.keyword_translate.keys():
-                key = self.keyword_translation[val_type]
+                key = self.keyword_translate[val_type]
             else:
                 key = val_type
             retval[key] = val
