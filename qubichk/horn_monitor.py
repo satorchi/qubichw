@@ -11,6 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 receive the inductance data from the horn switches, and plot
 
 see document by Andrea Passerini:  Switch Controller Commands.pdf
+note that the return values from the command SWMEAS are not as described in the document
 
 valid commands:
 
@@ -84,13 +85,16 @@ class horn_monitor:
         self.header['HORN_ID'] = None
         self.header['IS_GOOD'] = None
         self.header['CHANNEL'] = None
-        self.header['cl_val'] = None
-        self.header['op_val'] = None
-        self.header['cl_thrl'] = None
-        self.header['cl_thrh'] = None
-        self.header['op_thrl'] = None
-        self.header['op_thrh'] = None
-        self.header['status'] = None
+        self.header['CLOSEVAL'] = None
+        self.header['OPENVAL'] = None
+        self.header['THRSHOLD'] = None
+        self.header['STATUS'] = None
+
+        self.keyword_translate = {}
+        self.keyword_translate['CV'] = 'CLOSEVAL'
+        self.keyword_translate['OV'] = 'OPENVAL'
+        self.keyword_translate['THR'] = 'THRSHOLD'
+        self.keyword_translate['STATUS'] = 'STATUS'
         return
 
 
@@ -227,7 +231,12 @@ class horn_monitor:
         self.dat = np.array(struct.unpack(fmt,dat_bin))
 
         # get status of the switch that just reported an action
-        
+        status = self.get_state(self.header['HORN_ID'])
+        if status['SWITCH'] != self.header['HORN_ID']:
+            print('ERROR!  did not get the data for the correct switch: %s != %s' % (status['SWITCH'],self.header['HORN_ID']))
+        for key in status.keys():
+            self.header[key] = status[key]
+            
         return 'NormalReturn'
 
 
@@ -381,9 +390,45 @@ class horn_monitor:
         get the current state of the horn switch
         '''
         response = self.send_horn_command('swread',horn)
-        
-        return response
 
+        retval = {}        
+        sections = response.split(':')
+        hornid_str = sections[0].split('#')[-1]
+        try:
+            hornid = eval(hornid_str)
+        except:
+            print('ERROR on get_state! Invalid hornid: %s' % hornid_str)
+            hornid = hornid_str
+
+        retval['SWITCH'] = hornid
+
+        val_sections = sections[-1].split(';')
+        for val_str in val_sections:
+            val_cols = val_str.split('=')
+            val_type = val_cols[0].upper()
+            val = val_cols[-1]
+
+            if val_type in self.keyword_translate.keys():
+                key = self.keyword_translation[val_type]
+            else:
+                key = val_type
+            retval[key] = val
+                        
+        return retval
+
+    def reset_display(self):
+        '''
+        send the reset display command to the controller
+        '''
+        return self.send_command('DispUpd')
+
+
+    def clear_error(self):
+        '''
+        send the clear error bits command
+        '''
+        return self.send_command('ClearErr')
+    
     def recent_files(self):
         '''
         find the most recent saved event
