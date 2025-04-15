@@ -18,11 +18,13 @@ from qubichk.utilities import shellcommand
 
 server0 = '45.224.140.42:8989'
 server1 = '192.168.88.98'
-server2 = '192.168.88.13' # inside weather 2025-03-27 19:53:16
+server2 = '192.168.88.13'  # inside weather 2025-03-27 19:53:16
 server3 = '192.168.88.14'
 server4 = '192.168.88.20'
-server5 = '192.168.88.18' # inside weather 2025-03-26 15:50:23, now outside (see above)
-inside_server = server2
+server5 = '192.168.88.18'  # inside weather 2025-03-26 15:50:23, now outside (see above)
+server6 = '192.168.88.107' # inside weather 2025-04-15 13:50:39
+inside_server = server6
+outside_server = server5
 def parseargs(argv):
     '''
     parse the command line arguments
@@ -33,6 +35,7 @@ def parseargs(argv):
     options['period'] = None # sampling period in seconds (if None, print once and exit)
     options['server'] = None
     options['username'] = 'wstation01'
+    options['server-type'] = 'outside'
     options['verbosity'] = 0
 
     for arg in argv:
@@ -67,6 +70,9 @@ def parseargs(argv):
             options['verbosity'] = eval(arg.split('=')[1])
             continue
 
+        if arg.find('--server-type=')==0:
+            options['server-type'] = arg.split('=')[-1]
+
     if options['server'] is None:
         options['server'] = choose_server()
         
@@ -87,8 +93,8 @@ def choose_server():
             break
         
     if ip is None: return server0
-    if ip.find('192.168.88.')==0: return server4
-    if ip.find('192.168.2.')==0: return server4
+    if ip.find('192.168.88.')==0: return outside_server
+    if ip.find('192.168.2.')==0: return outside_server
     return server0
 
 def get_weather(options):
@@ -97,7 +103,9 @@ def get_weather(options):
     '''
     if options['verbosity']>1:
         print('getting weather conditions from server: %s' % options['server'])
-    
+
+    if options['server-type']=='inside': return get_inside_weather(options)
+    if options['server-type']=='outside': return get_outside_weather(options)
     if options['server']==inside_server: return get_inside_weather(options)
 
     return get_outside_weather(options)
