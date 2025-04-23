@@ -14,6 +14,7 @@ FILES="/etc/fstab\
  /etc/lilo.conf\
  /etc/resolv.conf\
  /etc/dhcpd.conf\
+ /etc/ntp.conf\
  /etc/rc.d/rc.local\
  /etc/hosts\
  /etc/udev/rules.d/*.rules\
