@@ -10,7 +10,8 @@
 #
 # backup the configuration files on qubic-central
 
-FILES="/etc/lilo.conf\
+FILES="/etc/fstab\
+ /etc/lilo.conf\
  /etc/resolv.conf\
  /etc/dhcpd.conf\
  /etc/rc.d/rc.local\
