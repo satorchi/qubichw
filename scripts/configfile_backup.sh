@@ -20,6 +20,7 @@ FILES="/etc/fstab\
  /etc/udev/rules.d/*.rules\
  /usr/local/sbin/firewall.sh\
  /home/qubic/.local/share/qubic/*\
+ /home/qubic/.ssh/authorized_keys\
  /usr/local/ups/etc/*.conf\
  /home/qubic/qubic.crontab\
  /home/satorchi/satorchi.crontab\
