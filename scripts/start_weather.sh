@@ -26,7 +26,7 @@ if ! ps auxw | grep "/usr/local/bin/weather.py" | grep inside_weather | grep -v 
     screen -X -S inside_weather quit
     echo "Starting a new screen and launching the indoor weather logger"
     cd $HOME/data/temperature/broadcast
-    screen -S inside_weather -d -m /usr/local/bin/weather.py --server-type='inside' --log --period=3 --logfile=$HOME/data/temperature/broadcast/inside_weather.txt --server=192.168.88.107
+    screen -S inside_weather -d -m /usr/local/bin/weather.py --server-type='inside' --log --period=3 --logfile=$HOME/data/temperature/broadcast/inside_weather.txt --server=192.168.88.13
 else
     echo "inside weather logger already running"
 fi
