@@ -85,6 +85,7 @@ for exec_dir in exec_dir_list:
         break
     
 scripts = ['scripts/calsource_commander.py',
+           'scripts/cf_commander.py',
            'scripts/calsource_set_frequency.py',
            'scripts/calsource_step_frequency.py',
            'scripts/run_calibration_source.py',
