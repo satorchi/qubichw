@@ -15,8 +15,10 @@ FRIDGESCRIPTS_DIR=/home/qubic/data/temperature
 
 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
 # 2022-02-23 17:36:24 back to using the raspberry pi as a bridge to QubicStudio
-QS_DIR=pi@cam2:/qs2 
+#QS_DIR=pi@cam2:/qs2 
 #QS_DIR=/qs # 2021-11-30 11:52:06 back to samba mount on qubic-central
+# 2025-05-14 18:55:52:  new QubicStudio computer
+QS_DIR=pi@qsbridge:/qs3 
 
 #HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
 HWP_DIR=pi@hwp:/home/pi/hwpctl
