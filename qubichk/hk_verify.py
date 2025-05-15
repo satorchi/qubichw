@@ -409,7 +409,8 @@ def check_calsource(verbosity=1):
     retval['error_message'] = ''
     start_command = {}
     start_command['calsource_commander.py'] = 'start_calsource_manager.sh'
-    start_command['read_calsource.py'] = 'start_calsource_acq.sh'
+    # 2025-05-15 15:22:01 calsource is no longer controlled and read by PiGPS
+    #start_command['read_calsource.py'] = 'start_calsource_acq.sh'
     start_command['gpsd'] = 'gpsd'
     start_command['ntpd'] = 'ntpd'
     start_command['read_usbthermometer.py'] = 'start_usbthermometer_acq.sh'
