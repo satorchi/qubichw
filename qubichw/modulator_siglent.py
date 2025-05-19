@@ -290,7 +290,7 @@ class siglent:
             time.sleep(0.5)
 
         # restore output state or reset output state as required
-        if (output is None and output_state=='ON') or output.upper()=='ON':
+        if (output is None and output_state=='ON') or (output is not None and output.upper()=='ON'):
             self.set_output_on(channel)
 
         return True
