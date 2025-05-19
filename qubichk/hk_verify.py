@@ -398,17 +398,17 @@ def check_temps(verbosity=1):
         retval['message'] = 'housekeeping values ... ERROR!'
     return retval
 
-def check_calsource(verbosity=1):
+def check_gps(verbosity=1):
     '''
-    check that the calibration source manager is running on PiGPS
-    check that the calibration source broadcaster is running on PiGPS
+    check that the carbon fibre manager is running on PiGPS
+    check that the calibration source broadcaster is running on PiGPS (not anymore: 2025-05-15 15:22:01)
     check that the cryostat shell temperature broadcaster is running on PiGPS
     '''
     retval = {}
     retval['ok'] = True
     retval['error_message'] = ''
     start_command = {}
-    start_command['calsource_commander.py'] = 'start_calsource_manager.sh'
+    start_command['cf_commander.py'] = 'start_cf_manager.sh'
     # 2025-05-15 15:22:01 calsource is no longer controlled and read by PiGPS
     #start_command['read_calsource.py'] = 'start_calsource_acq.sh'
     start_command['gpsd'] = 'gpsd'
@@ -522,7 +522,7 @@ def hk_ok(verbosity=1):
     retval['network'] = check_network(verbosity=verbosity)
     retval['mounts'] = check_mounts(verbosity=verbosity)
     retval['diskspace'] = check_diskspace(verbosity=verbosity)
-    retval['calsource'] = check_calsource(verbosity=verbosity)
+    retval['calsource'] = check_gps(verbosity=verbosity)
     retval['hwp'] = check_hwp(verbosity=verbosity)
     retval['servers'] = check_servers(verbosity=verbosity)
     retval['temps'] = check_temps(verbosity=verbosity)
