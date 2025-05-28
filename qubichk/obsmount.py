@@ -143,6 +143,16 @@ class obsmount:
     default_chunksize = 131072
     verbosity = 1
     testmode = False
+
+    elmin = 50 # minimum permitted elevation
+    elmax = 70 # maximum permitted elevation
+    azmin = 0  # minimum permitted azimuth
+    azmax = 15 # maximum permitted azimuth
+    azstep = 5 # default step size for azimuth movement for skydips
+
+    pos_margin = 0.1 # default margin of precision for exiting the wait_for_arrival loop
+    maxwait = 120 # default maximum wait time in seconds for wait_for_arrival loop
+
     
     def __init__(self):
         '''
@@ -522,4 +532,118 @@ class obsmount:
         '''
         cmd_el = el - self.el_zero_offset
         return self.send_command('EL %f' % cmd_el)
+
+    
+    def wait_for_arrival(self,az=None,el=None,maxwait=None):
+        '''
+        wait for telescope to get into requested position
+        '''
+        tstart = dt.datetime.now().timestamp()
+        if maxwait is None: maxwait = self.maxwait
+
+        az_final = az
+        el_final = el
+
+        if (az_final is None) and (el_final is None):
+            print('Please specify one of az or el with option az=<value> or el=<value>')
+            return
+
+        if az_final is not None:
+            key = 'AZ'
+            val_final = az_final
+        else:
+            key = 'EL'
+            val_final = el_final
+
+        time.sleep(2)
+        azel = self.get_azel()
+        
+        while not azel['ok']:
+            time.sleep(2)
+            now = dt.datetime.now().timestamp()
+            azel = self.get_azel()
+            if (now-tstart)>maxwait:
+                print('Error! Could not get AZ,EL position.')
+                return False
+        
+        val = azel[key]
+
+        while np.abs(val-val_final)>pos_margin:
+            time.sleep(2)
+            now = dt.datetime.now().timestamp()
+            if (now-tstart)>maxwait:
+                print('Maximum wait time')
+                return False
+        
+            azel = self.get_azel()
+            if not azel['ok']:
+                time.sleep(2)
+                continue
+
+            now_str = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print('%s - AZ,EL = %.2f %.2f' % (now_str, azel['AZ'],azel['EL']))
+
+            val = azel[key]
+
+        return True
+        
+    
+    def do_skydip_sequence(self,azstep=None):
+        '''
+        do the sky dip movements
+        '''
+        if azstep is None: azstep = self.azstep
+    
+        start_tstamp = dt.datetime.now().timestamp()
+
+        self.goto_az(azmin)
+        azok = wait_for_arrival(az=azmin)
+        if not azok:
+            print('ERROR! Did not successfully get to starting azimuth position')
+            return False
+
+        self.goto_el(elmin)
+        elok = wait_for_arrival(el=elmin)
+        if not elok:
+            print('ERROR! Did not successfully get to starting elevation position')
+            return False
+
+        azel = self.get_azel()
+        while not azel['ok']:
+            time.sleep(2)
+            azel = self.get_azel()
+            now = dt.datetime.now().timestamp()
+            if (now-start_tstamp)>10:
+                print('ERROR! Could not get current position.')
+                return False
+        
+        
+        az = azel['AZ']
+        el = azel['EL']
+
+
+        for azlimit in [azmax, azmin]:
+        
+            while np.abs(az-azlimit)>pos_margin:
+                self.goto_el(elmax)
+                time.sleep(1) # wait before next command
+                elok = wait_for_arrival(el=elmax)
+                if not elok:
+                    print('ERROR! Did not successfully get to starting elevation position')
+                    return False
             
+
+                self.goto_el(elmin)
+                azok = wait_for_arrival(el=elmin)
+                if not azok:
+                    print('ERROR! Did not successfully get to starting azimuth position')
+                    return False
+
+                az += azstep
+                self.goto_az(az)
+                wait_for_arrival(az=az)
+
+            azstep = -azstep
+
+        return True
+    
