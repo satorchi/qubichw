@@ -568,7 +568,7 @@ class obsmount:
         
         val = azel[key]
 
-        while np.abs(val-val_final)>pos_margin:
+        while np.abs(val-val_final)>self.pos_margin:
             time.sleep(2)
             now = dt.datetime.now().timestamp()
             if (now-tstart)>maxwait:
@@ -624,7 +624,7 @@ class obsmount:
 
         for azlimit in [self.azmax, self.azmin]:
         
-            while np.abs(az-azlimit)>pos_margin:
+            while np.abs(az-azlimit)>self.pos_margin:
                 self.goto_el(elmax)
                 time.sleep(1) # wait before next command
                 elok = self.wait_for_arrival(el=elmax)
