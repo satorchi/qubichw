@@ -596,14 +596,14 @@ class obsmount:
     
         start_tstamp = dt.datetime.now().timestamp()
 
-        self.goto_az(azmin)
-        azok = wait_for_arrival(az=azmin)
+        self.goto_az(self.azmin)
+        azok = wait_for_arrival(az=self.azmin)
         if not azok:
             print('ERROR! Did not successfully get to starting azimuth position')
             return False
 
-        self.goto_el(elmin)
-        elok = wait_for_arrival(el=elmin)
+        self.goto_el(self.elmin)
+        elok = wait_for_arrival(el=self.elmin)
         if not elok:
             print('ERROR! Did not successfully get to starting elevation position')
             return False
@@ -622,7 +622,7 @@ class obsmount:
         el = azel['EL']
 
 
-        for azlimit in [azmax, azmin]:
+        for azlimit in [self.azmax, self.azmin]:
         
             while np.abs(az-azlimit)>pos_margin:
                 self.goto_el(elmax)
