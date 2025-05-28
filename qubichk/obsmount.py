@@ -625,16 +625,16 @@ class obsmount:
         for azlimit in [self.azmax, self.azmin]:
         
             while np.abs(az-azlimit)>self.pos_margin:
-                self.goto_el(elmax)
+                self.goto_el(self.elmax)
                 time.sleep(1) # wait before next command
-                elok = self.wait_for_arrival(el=elmax)
+                elok = self.wait_for_arrival(el=self.elmax)
                 if not elok:
                     print('ERROR! Did not successfully get to starting elevation position')
                     return False
             
 
-                self.goto_el(elmin)
-                azok = self.wait_for_arrival(el=elmin)
+                self.goto_el(self.elmin)
+                azok = self.wait_for_arrival(el=self.elmin)
                 if not azok:
                     print('ERROR! Did not successfully get to starting azimuth position')
                     return False
