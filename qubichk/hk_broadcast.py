@@ -19,7 +19,7 @@ from qubichk.powersupply import PowerSupply, PowerSupplies, known_supplies
 from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
-from qubichk.utilities import shellcommand
+from qubichk.utilities import shellcommand, known_hosts, get_myip
 from qubichk.obsmount import obsmount
 from qubichk.usbthermometer_hk import usbthermometer_hk
 
@@ -31,13 +31,14 @@ class hk_broadcast :
 
     def __init__(self,verbosity=1):
         self.BROADCAST_PORT = 4005
-        self.RECEIVER = '<broadcast>'      # server broadcasts
-        self.RECEIVER = '134.158.187.21'   # server sends only to QubicStudio
-        self.RECEIVER = '134.158.187.224'   # server sends only to QubicStudio
-        #self.RECEIVER = '134.158.187.0/24' # server broadcasts to APC subnet (syntax no good)
-        self.RECEIVER = '192.168.2.8' # QubicStudio on the QUBIC private network
-        self.LISTENER = ''          # client listens on ethernet device (usually eth0)
-        self.LISTENER = '127.0.0.1' # client listens on localhost
+        # self.RECEIVER = '<broadcast>'      # server broadcasts
+        # self.RECEIVER = '134.158.187.21'   # server sends only to QubicStudio
+        # self.RECEIVER = '134.158.187.224'  # server sends only to QubicStudio
+        # self.RECEIVER = '134.158.187.0/24' # server broadcasts to APC subnet (syntax no good)
+        self.RECEIVER = known_hosts['qubic-studio'] # QubicStudio on the QUBIC private network
+        # self.LISTENER = ''          # client listens on ethernet device (usually eth0)
+        # self.LISTENER = '127.0.0.1' # client listens on localhost
+        self.LISTENER = get_myip()  # client listens on the appropriate network
         # self.sampling_period = 0.0 # sampling period faster while we have az,el here (2023-04-18 11:25:28)
         self.sampling_period = 0.4 # zero sampling period is too fast for obsmount
         self.nENTROPY_TEMPERATURE = 8
