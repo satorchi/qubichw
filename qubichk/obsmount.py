@@ -494,10 +494,10 @@ class obsmount:
         ans = self.get_azel()
         if not ans['ok']:
             print('AZ,EL = ERROR: %s' % ans['error'])
-            return
+            return False
 
         print('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']))
-        return
+        return True
 
 
     def get_position():
