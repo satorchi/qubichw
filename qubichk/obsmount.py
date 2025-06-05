@@ -98,7 +98,7 @@ on rocketchat from Manuel Platino: The most precise measurement of the az from o
 import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
-from qubichk.utilities import make_errmsg
+from qubichk.utilities import make_errmsg, known_hosts
 
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
@@ -112,6 +112,8 @@ class obsmount:
     mount_ip = '192.168.2.103'
     listen_port = 4546
     command_port = 4545
+    qubicstudio_port = 4003 # port for receiving data from the red platform
+    qubicstudio_ip = known_hosts['qubic-studio']
     el_zero_offset = 50 - 2.049
     az_zero_offset = 168.5
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
@@ -151,7 +153,7 @@ class obsmount:
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.1 # default margin of precision for exiting the wait_for_arrival loop
-    maxwait = 120 # default maximum wait time in seconds for wait_for_arrival loop
+    maxwait = 180 # default maximum wait time in seconds for wait_for_arrival loop
 
     
     def __init__(self):
@@ -420,8 +422,12 @@ class obsmount:
 
     def dump_data(self,data):
         '''
-        write all data to binary data file
+        write all data to binary data file, and broadcast to QubicStudio
         '''
+
+        # s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        
         for axis in ['AZ','EL']:
             npts = len(data[axis])
             rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(npts))
