@@ -166,7 +166,10 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/start_MCP9808_broadcast.sh',
            'scripts/run_heater_manager.py',
            'scripts/start_heater_manager.sh',
-           'scripts/do_skydip_sequence.py'
+           'scripts/do_skydip_sequence.py',
+           'scripts/goto_pos.py',
+           'scripts/goto_az',
+           'scripts/goto_el'
            ]
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
