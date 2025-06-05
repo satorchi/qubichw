@@ -25,7 +25,7 @@ for idx,arg in enumerate(sys.argv):
     try:
         pos = eval(arg)
     except:
-        continue
+        pass
 
     if arg.lower().find('ignore-limit')>=0:
         ignore_limit = True
