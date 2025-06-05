@@ -11,7 +11,19 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 show the current position of the observation mount
 '''
+import time
+import datetime as dt
 from qubichk.obsmount import obsmount
 
 mount = obsmount()
-mount.show_azel()
+maxwait = 16
+tstart = dt.datetime.now().timestamp()
+ans = mount.show_azel()
+while not ans:
+    time.sleep(2)
+    ans = mount.show_azel()
+    now = dt.datetime.now().timestamp()
+    delta = now - tstart
+    if delta>maxwait: break
+
+    
