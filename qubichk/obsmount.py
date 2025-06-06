@@ -149,7 +149,7 @@ class obsmount:
     elmin = 50 # minimum permitted elevation
     elmax = 70 # maximum permitted elevation
     azmin = 0  # minimum permitted azimuth
-    azmax = 15 # maximum permitted azimuth
+    azmax = 25 # maximum permitted azimuth (changed to 25 on 2025-06-06 15:51:25 UT)
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.1 # default margin of precision for exiting the wait_for_arrival loop
