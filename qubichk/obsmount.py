@@ -539,6 +539,19 @@ class obsmount:
         cmd_el = el - self.el_zero_offset
         return self.send_command('EL %f' % cmd_el)
 
+    def stop(self):
+        '''
+        send command to stop movement
+        '''
+        return self.send_command('STOP')
+
+    def abort(self):
+        '''
+        send command to abort current command
+        '''
+        return self.send_command('ABORT')
+    
+
     
     def wait_for_arrival(self,az=None,el=None,maxwait=None):
         '''
