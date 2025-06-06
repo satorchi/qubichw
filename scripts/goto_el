@@ -9,6 +9,6 @@
 #           permitted by law.
 #
 # go to the given elevation
-goto_pos.py el $1
+goto_pos.py el $@
 
 

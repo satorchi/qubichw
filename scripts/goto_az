@@ -10,4 +10,4 @@
 #
 # go to the given azimuth
 
-goto_pos.py az $1
+goto_pos.py az $@
