@@ -253,6 +253,7 @@ class PowerSupply :
             return False
 
         cmd=cmd % supplyno
+        self.log('Sending command: %s' % cmd,verbosity=3)
 
         try:
             self.s.flush() 
