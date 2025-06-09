@@ -21,6 +21,11 @@ known_hosts['redpitaya']     = "192.168.2.21"
 known_hosts['groundgps']     = "192.168.2.22"
 known_hosts['horn']          = "192.168.2.9"
 
+date_logfmt = '%Y-%m-%d %H:%M:%S UT'
+
+hk_dir = '/home/qubic/data/temperature/broadcast'
+fridge_dir = '/home/qubic/data/temperature'
+
 def get_fullpath(filename=None):
     '''
     get the full path to the desired file
