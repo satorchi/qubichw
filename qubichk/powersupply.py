@@ -656,7 +656,7 @@ class PowerSupplies :
             ret=p.runCommands(command)
 
         # switch off the output of all supplies if "OFF" is commanded without specifying a power supply
-        if  command['serialno'] is None and command['ONOFF'] == 'OFF':
+        if  command['serialno'] is None and command['ONOFF'] == 0:
             self.off()
         
         return ret
