@@ -253,7 +253,7 @@ class PowerSupply :
             return False
 
         cmd=cmd % supplyno
-        self.log('Sending command: %s' % cmd,verbosity=3)
+        self.log('Sending command to %s: %s' % (self.supplyname,cmd.strip()),verbosity=3)
 
         try:
             self.s.flush() 
