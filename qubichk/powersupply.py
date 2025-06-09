@@ -655,8 +655,8 @@ class PowerSupplies :
             p=self.supplylist[idx]
             ret=p.runCommands(command)
 
-        # switch off the output of all supplies if "OFF" is the only command
-        if len(command.keys())==1 and list(command.keys())[0]=='ONOFF' and command['ONOFF'] == 'OFF':
+        # switch off the output of all supplies if "OFF" is commanded without specifying a power supply
+        if  command['serialno'] is None and command['ONOFF'] == 'OFF':
             self.off()
         
         return ret
