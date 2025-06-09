@@ -528,7 +528,7 @@ class PowerSupplies :
         '''
         self.log('switching offline all power supplies',verbosity=1)
         for p in self.supplylist:
-            for idx in p.nsupplies:
+            for idx in range(p.nsupplies):
                 subsupply_str = str(idx+1)
                 p.OutputOff(supply=subsupply_str)
         return
