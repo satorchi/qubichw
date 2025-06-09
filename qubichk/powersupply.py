@@ -521,7 +521,16 @@ class PowerSupplies :
         self.supplylist=supplylist
         self.userlabel_left_list=userlabel_left_list
         self.userlabel_right_list=userlabel_right_list
-        return 
+        return
+
+    def off(self):
+        ''' switch offline all power supplies
+        '''
+        for p in self.suppylist:
+            for idx in p.nsupplies:
+                subsupply_str = str(idx+1)
+                p.OutputOff(supply=subsupply_str)
+        return
 
     def parseargs(self,argv):
         '''parse the command line arguments 
@@ -643,6 +652,10 @@ class PowerSupplies :
             if not quiet: self.log('applying commands on supply %s: %s' % (self.supplylist[idx].supplyname,label),verbosity=2)
             p=self.supplylist[idx]
             ret=p.runCommands(command)
+
+        # switch off the output of all supplies if "OFF" is the only command
+        if len(command.keys())==1 and list(command.keys())[0]=='ONOFF' and command['ONOFF'] == 'OFF':
+            self.off()
         
         return ret
     
