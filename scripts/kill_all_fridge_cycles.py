@@ -19,7 +19,7 @@ import re
 out,err = shellcommand('ps axo pid,args')
 pids_list = out.split('\n')
 for pid_desc in pids_list:
-    match = re.search('\<python.* cycle_.*fridge.*py\>',pid_desc)
+    match = re.search('python.*cycle_.*fridge.*py',pid_desc)
     if not match: continue
 
     pid = pid_desc.split()[0]
