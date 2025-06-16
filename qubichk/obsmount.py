@@ -94,6 +94,17 @@ raw elevation:  2.049 is 50 degrees elevation
 azimuth offset
 on rocketchat from Manuel Platino: The most precise measurement of the az from outside is between 168° and 169°
 
+2025-06-13 16:55:50
+measured position with Total Station
+elog: https://elog-qubic.in2p3.fr/demo/1226
+
+0 on the mount is 11 deg 36 mins 39 seconds
+this is 11.610833333333334
+so az_zero_offset = 180 - 11.610833333333334 = 168.38916666666665
+compare with the value from 2023-05-23 of 168.5
+
+
+
 '''
 import os,sys,socket,time,re
 import datetime as dt
@@ -115,7 +126,7 @@ class obsmount:
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
     el_zero_offset = 50 - 2.049
-    az_zero_offset = 168.5
+    az_zero_offset = 180 - (11 + 36/60 + 39/3600) # 2025-06-13 16:55:50
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
                  'AXIS',
