@@ -12,6 +12,10 @@ utilities used by various modules in qubichk/hw especially hk_verify
 '''
 import sys,os,subprocess,re,struct
 
+# QUBIC position from PiGPS (antenna on the mount)
+qubic_latitude = -(24 + 11.2002/60)
+qubic_longitude = -(66 + 28.7039/60)
+
 known_hosts = {}
 known_hosts['qubic-central'] = "192.168.2.1"
 known_hosts['qubic-studio']  = "192.168.2.113"
