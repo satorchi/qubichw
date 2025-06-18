@@ -25,6 +25,8 @@ server5 = '192.168.88.18'  # inside weather 2025-03-26 15:50:23, now outside (se
 server6 = '192.168.88.107' # inside weather 2025-04-15 13:50:39
 inside_server = server6
 outside_server = server5
+
+weather_log_values = ['temperature','humidity','pressure','windspeed','winddir']
 def parseargs(argv):
     '''
     parse the command line arguments
@@ -299,7 +301,12 @@ def show_weather(values,options):
         tstamp = values['date'].timestamp()
     else:
         tstamp = dt.datetime.utcnow().timestamp()
-    line = '%f %f %f\n' % (tstamp,values['temperature'],values['humidity'])
+
+    line_list = ['%f' % tstamp]
+    for key in weather_log_values:
+        line_list.append('%f' % values[key])
+    line = ' '.join(line_list)
+    line += '\n'
     if options['log']:
         h = open(options['logfile'],'a')
         h.write(line)
