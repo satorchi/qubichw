@@ -103,6 +103,11 @@ this is 11.610833333333334
 so az_zero_offset = 180 - 11.610833333333334 = 168.38916666666665
 compare with the value from 2023-05-23 of 168.5
 
+2025-06-18 19:22:52
+moving the encoder so that we can point to the moon
+encoder now reads: 177.3612 which corresponds to the zero from before
+so when the encoder says 177.3612, we are really pointing at 168.3892
+new offset:  168.3892 - 177.3612 = -8.9720
 
 
 '''
@@ -126,7 +131,8 @@ class obsmount:
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
     el_zero_offset = 50 - 2.049
-    az_zero_offset = 180 - (11 + 36/60 + 39/3600) # 2025-06-13 16:55:50
+    az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
+    position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
                  'AXIS',
@@ -440,12 +446,13 @@ class obsmount:
         # s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         
         for axis in ['AZ','EL']:
+            offset = self.position_offset[axis]
             npts = len(data[axis])
             rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(npts))
             for idx in range(npts):
                 rec[idx].STX = 0xAA
                 rec[idx].TIMESTAMP = data[axis][idx]['TIMESTAMP']
-                rec.VALUE = data[axis][idx]['ACT_POSITION']
+                rec.VALUE = data[axis][idx]['ACT_POSITION'] + offset
 
             filename = '%s%s%s.dat' % (hk_dir,os.sep,axis)
             h = open(filename,'ab')
@@ -474,7 +481,7 @@ class obsmount:
             errmsg.append('no azimuth data')
             errlevel += 1
         else:
-            retval['AZ'] = ans['AZ'][-1]['ACT_POSITION']
+            retval['AZ'] = ans['AZ'][-1]['ACT_POSITION'] + self.az_zero_offset
             retval['AZ TIMESTAMP'] = ans['AZ'][-1]['TIMESTAMP']
 
 
