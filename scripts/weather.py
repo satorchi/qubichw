@@ -304,7 +304,7 @@ def show_weather(values,options):
 
     line_list = ['%f' % tstamp]
     for key in weather_log_values:
-        line_list.append('%f' % values[key])
+        if key in values.keys(): line_list.append('%f' % values[key])
     line = ' '.join(line_list)
     line += '\n'
     if options['log']:
