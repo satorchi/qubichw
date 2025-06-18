@@ -179,7 +179,7 @@ def read_weather_csv(weather_file):
 
     for line in lines:
         col = line.split(',')
-        for idx,key in enumerate(weather_keys):
+        for idx,key in enumerate(weather_csv_keys):
             if key=='date':
                 weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y') + utoffset)
                 continue
