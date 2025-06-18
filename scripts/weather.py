@@ -196,9 +196,9 @@ def get_weather_csv(options):
     '''
     values = {}
     values['ok'] = False
-    values['temperature'] = None
-    values['humidity'] = None
     values['message'] = 'No info'
+    for key in weather_csv_keys:
+        values[key] = None
 
     if options['server'] is None:
         server = choose_server()
@@ -219,7 +219,7 @@ def get_weather_csv(options):
     for key in ['ok','message']:
         values[key] = weather_data[key]
 
-    for key in ['date','temperature','humidity']:
+    for key in weather_csv_keys:
         values[key] = weather_data[key][-1]
     
 
