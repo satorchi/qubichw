@@ -130,7 +130,7 @@ class obsmount:
     command_port = 4545
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
-    el_zero_offset = 50 - 2.049
+    el_zero_offset = 50 - 2.049 
     az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
     position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
@@ -546,13 +546,15 @@ class obsmount:
     def goto_az(self,az):
         '''
         send command to move to the given azimuth
+        we correct for the encoder azimuth offset
         '''
-        return self.send_command('AZ %f' % az)
+        cmd_az = az - self.az_zero_offset
+        return self.send_command('AZ %f' % cmd_az)
 
     def goto_el(self,el):
         '''
         send command to move to the given elevation
-        we correct for the elevation offset
+        we correct for the encoder elevation offset
         '''
         cmd_el = el - self.el_zero_offset
         return self.send_command('EL %f' % cmd_el)
