@@ -27,6 +27,7 @@ inside_server = server6
 outside_server = server5
 
 weather_log_values = ['temperature','humidity','pressure','windspeed','winddir']
+weather_csv_keys = ['date','temperature','humidity','battery','pressure','windspeed','winddir','radiation','rain']
 def parseargs(argv):
     '''
     parse the command line arguments
@@ -160,7 +161,6 @@ def read_weather_csv(weather_file):
     '''
     read the CSV file from the weather station
     '''
-    weather_keys = ['date','temperature','humidity','battery','pressure','windspeed','winddir','radiation','rain']
     utoffset = dt.timedelta(hours=3) # weather station data is in ART
     
     if not os.path.isfile(weather_file):
@@ -174,7 +174,7 @@ def read_weather_csv(weather_file):
     del(lines[-1])
 
     weather_data = {}
-    for key in weather_keys:
+    for key in weather_csv_keys:
         weather_data[key] = []
 
     for line in lines:
