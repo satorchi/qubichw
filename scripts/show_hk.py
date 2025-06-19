@@ -166,7 +166,28 @@ def read_weather(site='outside'):
     label = 'relative humidity'
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
     lines.append(line)
+
+    if len(vals)<4:
+        return tstamps,lines
+
+    tstamps.append(tstamp)
+    val_str = '%.2f kPa' % (vals[3]/10)
+    label = 'air pressure'
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
+    lines.append(line)
     
+    tstamps.append(tstamp)
+    val_str = '%.2f km/hr' % vals[4]
+    label = 'wind speed'
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
+    lines.append(line)
+
+    tstamps.append(tstamp)
+    val_str = '%.2f deg' % vals[5]
+    label = 'wind direction'
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), rootname)
+    lines.append(line)
+
     return tstamps,lines
 
 def read_ups():
