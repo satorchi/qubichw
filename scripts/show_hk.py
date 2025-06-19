@@ -278,12 +278,18 @@ if retval is not None:
 
 # read the cryostat shell temperature
 basename = 'CRYOSTAT.txt'
+labelkey = basename.replace('.txt','')
 F = '%s%s%s' % (hk_dir,os.sep,basename)
 if os.path.isfile(F):
     retval = read_lastline(F)
     if retval is not None:
-        tstamps.append(retval[0])
-        lines.append(retval[1])
+        tstamp = retval[0]
+        tstamps.append(tstamp)
+        date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+        val_str = '%.2f K' % retval[1]
+        label = 'cryostat shell'
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        lines.append(line)
         
 
 
