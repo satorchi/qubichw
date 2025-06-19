@@ -281,10 +281,9 @@ basename = 'CRYOSTAT.txt'
 F = '%s%s%s' % (hk_dir,os.sep,basename)
 if os.path.isfile(F):
     retval = read_lastline(F)
-    print('********* DEBUG ************** >>> %s' % retval)
     if retval is not None:
-        tstamps += retval[0]
-        lines += retval[1]
+        tstamps.append(retval[0])
+        lines.append(retval[1])
         
 
 
