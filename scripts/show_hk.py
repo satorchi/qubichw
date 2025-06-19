@@ -37,7 +37,8 @@ exclude_files = ['TEMPERATURE_RAW.txt',
                  'compressor2_log.txt',
                  'ups_log.txt',
                  'weather.txt',
-                 'inside_weather.txt']
+                 'inside_weather.txt',
+                 'CRYOSTAT.txt']
 touchname = 'AVS47_1_ch0.txt'
 
 def read_labels():
@@ -274,6 +275,17 @@ retval = read_weather('inside')
 if retval is not None:
     tstamps += retval[0]
     lines += retval[1]
+
+# read the cryostat shell temperature
+basename = 'CRYOSTAT.txt'
+F = '%s%s%s' % (hk_dir,os.sep,basename)
+if os.path.isfile(F):
+    retval = read_lastline(F)
+    if retval is not None:
+        tstamps += retval[0]
+        lines += retval[1]
+        
+
 
 # read the UPS status
 retval = read_ups()
