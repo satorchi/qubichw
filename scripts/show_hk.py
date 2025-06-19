@@ -290,6 +290,7 @@ if os.path.isfile(F):
         label = 'cryostat shell'
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
         lines.append(line)
+        print('******** DEBUG *****>>> %s' % line)
         
 
 
