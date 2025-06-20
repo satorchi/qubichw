@@ -20,10 +20,11 @@ from termcolor import colored
 from satorchipy.datefunctions import str2dt
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
+year_str = dt.datetime.now().strftime('%Y')
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
-if not os.path.isdir(hk_dir):
-    hk_dir = '/home/steve/data/2022/hk'
+if not os.path.isdir(hk_dir):    
+    hk_dir = '/home/steve/data/%s/hk' % year_str
 
 if not os.path.isdir(hk_dir):
     print('could not find Housekeeping data directory')
