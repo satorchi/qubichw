@@ -12,9 +12,10 @@ utilities used by various modules in qubichk/hw especially hk_verify
 '''
 import sys,os,subprocess,re,struct
 
-# QUBIC position from PiGPS (antenna on the mount)
+# QUBIC position from PiGPS (antenna on the mount): https://elog-qubic.in2p3.fr/demo/1234
 qubic_latitude = -(24 + 11.2002/60)
 qubic_longitude = -(66 + 28.7039/60)
+qubic_altitude = 4830.3
 
 known_hosts = {}
 known_hosts['qubic-central'] = "192.168.2.1"
