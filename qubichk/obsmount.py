@@ -518,7 +518,7 @@ class obsmount:
         return True
 
 
-    def get_position():
+    def get_position(self):
         '''
         for compatibility with platform.py for the red mount
         '''
