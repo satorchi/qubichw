@@ -171,7 +171,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/goto_pos.py',
            'scripts/goto_az',
            'scripts/goto_el',
-           'scripts/kill_all_fridge_cycles.py'
+           'scripts/kill_all_fridge_cycles.py',
+           'scripts/send_telegram_to_subscribers.py'
            ]
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
