@@ -49,7 +49,7 @@ def make_command_startstopFLL(self,asicNum,onOff):
     cmd_bytes = bytearray(cmd_bytes_list)
     return cmd_bytes
     
-def send_command_startFLL(self,asicNum):
+def send_startFLL(self,asicNum):
     '''
     start the bolometer feedback regulations
     '''
@@ -58,7 +58,7 @@ def send_command_startFLL(self,asicNum):
     
     return ack
 
-def send_command_stopFLL(self,asicNum):
+def send_stopFLL(self,asicNum):
     '''
     stop the bolometer feedback regulations
     '''

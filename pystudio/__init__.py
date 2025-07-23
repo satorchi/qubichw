@@ -85,8 +85,8 @@ class pystudio:
 
     from .frontend import\
         make_command_startstopFLL,\
-        send_command_startFLL,\
-        send_command_stopFLL
+        send_startFLL,\
+        send_stopFLL
     
 
     
