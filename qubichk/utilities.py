@@ -230,3 +230,12 @@ def get_myip():
     return addr
 
 
+def bytes2str(somebytes):
+    '''
+    make a nice print string of a byte array
+    '''
+    bytes_list = []
+    for b in somebytes:
+        bytes_list.append('0x%02X' % b)
+    bytes_str = ' '.join(bytes_list)
+    return bytes_str
