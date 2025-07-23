@@ -42,7 +42,7 @@ with open('README.md') as f:
 setup(install_requires=['numpy'],
       name=DISTNAME,
       version=VERSION,
-      packages=['qubichw','qubichk'],
+      packages=['qubichw','qubichk','pystudio'],
       package_data={'qubichw': ['data/*'], 'qubichk': ['data/*']},
       zip_safe=False,
       author=AUTHOR,

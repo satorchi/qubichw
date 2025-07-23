@@ -1,0 +1,132 @@
+'''
+$Id: communication.py
+$auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
+$created: Wed 23 Jul 2025 15:29:12 CEST
+$license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
+
+          This is free software: you are free to change and
+          redistribute it.  There is NO WARRANTY, to the extent
+          permitted by law.
+
+general utilities for communicating with the dispatcher
+'''
+import socket
+from qubichk.utilities import known_hosts, bytes2str
+
+QS_IP = known_hosts['qubic-studio']
+
+def interpret_communication(self,com_bytes):
+    '''
+    interpret the communicated bytes
+    '''
+    print('BYTES: %s' % bytes2str(com_bytes))
+    
+    if len(com_bytes)<13:
+        print('Error! Command is too small: %i bytes' % len(com_bytes))
+        return          
+
+    if com_bytes[0]!=0x55:
+        print('Error!  Incorrect STX: 0x%02X' % cmb_bytes[0])
+        return
+
+    counter = (com_bytes[1]<<8) + com_bytes[2]
+    print('COUNTER: 0x%04X = %i' % (counter,counter))
+
+    cmd_size = (com_bytes[3]<<24) + (com_bytes[4]<<16) + (com_bytes[5]<<8) + com_bytes[6]
+    print('CMD_SIZE: 0x%08X = %i' % (cmd_size,cmd_size))
+    last_idx = 7 + cmd_size
+    print('TOTAL BYTES: %i' % len(com_bytes))
+    print('LAST INDEX: %i' % last_idx)
+    if last_idx!=(len(com_bytes)-1):
+        print('Error! Given size does not match!')
+    if last_idx>=len(com_bytes):
+        print('Error! Given size is larger than the communication length: %i > %i' % (last_idx+1,len(com_bytes)))
+    else:
+        print('final byte (EOT): 0x%02X' % com_bytes[last_idx])
+
+    cmd_id = com_bytes[7]
+    print('CMD_ID: 0x%02X' % cmd_id)
+
+    sub_id = (com_bytes[8]<<8) + com_bytes[9]
+    print('SUBCMD_ID: 0x%04X' % sub_id)
+
+    
+    cmd = bytearray(com_bytes[10:-1])
+    cmd_str = cmd.decode('iso-8859-1')
+    print('COMMAND: %s\nCOMMAND: %s' % (bytes2str(cmd),cmd_str))
+
+    
+    eot = com_bytes[-1]
+    if eot!=0xaa:
+        print('Error!  Incorrect End of Transmission: 0x%02X' % eot)
+        return
+
+    return
+    
+
+def print_acknowledgement(self,ack):
+    '''
+    print to screen the acknowledgement
+    '''
+    print('vvv COMMUNICATION WITH DISPATCHER ACKNOWLEDGEMENT vvv')
+    self.interpret_communication(ack)
+    print('^^^ COMMUNICATION WITH DISPATCHER ACKNOWLEDGED ^^^^^^')
+    return
+
+def subscribe_dispatcher(self):
+    '''
+    open a connection to the dispatcher
+    '''
+    self.dispatcher_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    self.dispatcher_socket.settimeout(0.6)
+    self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
+    ack = self.dispatcher_socket.recv(1024)
+    print_acknowledgement(ack)
+    
+    return self.dispatcher_socket
+
+def unsubscribe(self):
+    '''
+    close connection to the dispatcher
+    '''
+    self.dispatcher_socket.close()
+    return
+
+def send_command(self,cmd_bytes):
+    '''
+    send command to the QubicStudio Dispatcher
+    '''
+
+    if self.dispatcher_socket is None:
+        self.dispatcher_socket = subscribe_dispatcher()
+
+    self.dispatcher_socket.send(cmd_bytes)
+    ack = None
+    try:
+        ack = self.dispatcher_socket.recv(1024)
+    except:
+        print('ERROR!  No acknowledgement from dispatcher')
+    else:
+        print_acknowledgement(ack)
+    
+    return ack
+
+def make_preamble(self,TC_ID,commandID,command_length):
+    '''
+    make the command preamble which is used for every command
+    '''
+    self.command_counter += 1
+
+    cmd_bytes_list = [self.DISPATCHER_STX,
+                      (self.command_counter & 0xFF00)>>8,
+                      (self.command_counter & 0x00FF),
+                      (command_length & 0xFF000000)>>24,
+                      (command_length & 0x00FF0000)>>16,
+                      (command_length & 0x0000FF00)>>8,
+                      (command_length & 0x000000FF),
+                      TC_ID,
+                      (commandID & 0xFF00)>>8,
+                      (commandID & 0x00FF)]
+    return cmd_bytes_list
+
+    
