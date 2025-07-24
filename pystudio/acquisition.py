@@ -17,12 +17,12 @@ def make_backupsID(self):
     make a 16-bit id number for the acquisition
     '''
     backups_ID = 0xFFFF & int(utcnow().timestamp())
+    # override backups_ID... maybe it has to be something special?
+    backups_ID = 1
+
     backups_ID_MSB = (0xFF00 & backups_ID) >> 8
     backups_ID_LSB = (0x00FF & backups_ID)
 
-    # override backups_ID... maybe it has to be something special?
-    backups_ID_MSB = 0
-    backups_ID_LSB = 0
     
     print('backupsID: 0x%04x = %i' % (backups_ID,backups_ID))
     return backups_ID_MSB, backups_ID_LSB
