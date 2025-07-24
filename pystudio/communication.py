@@ -93,6 +93,10 @@ def unsubscribe(self):
     '''
     close connection to the dispatcher
     '''
+    if self.dispatcher_socket is None:
+        print('Unsubscribe is not necessary: Not connected')
+        return
+    print('Unsubscribing')
     self.dispatcher_socket.close()
     self.dispatcher_socket = None
     return
@@ -105,7 +109,8 @@ def send_command(self,cmd_bytes):
     if self.dispatcher_socket is None:
         self.dispatcher_socket = self.subscribe_dispatcher()
 
-    self.dispatcher_socket.send(cmd_bytes)
+    nbytes_sent = self.dispatcher_socket.send(cmd_bytes)
+    print('sent %i bytes' % nbytes_sent)
     ack = None
     try:
         ack = self.dispatcher_socket.recv(1024)
