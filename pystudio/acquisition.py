@@ -18,7 +18,7 @@ def make_backupsID(self):
     '''
     backups_ID = 0xFFFF & int(utcnow().timestamp())
     # override backups_ID... maybe it has to be something special?
-    backups_ID = 1
+    backups_ID = 0xd428 # this worked once
 
     backups_ID_MSB = (0xFF00 & backups_ID) >> 8
     backups_ID_LSB = (0x00FF & backups_ID)
