@@ -85,7 +85,7 @@ def subscribe_dispatcher(self):
     self.dispatcher_socket.settimeout(0.6)
     self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
     ack = self.dispatcher_socket.recv(1024)
-    self.print_acknowledgement(ack)
+    self.print_acknowledgement(ack,'subscribe')
     
     return self.dispatcher_socket
 

@@ -19,8 +19,12 @@ def make_backupsID(self):
     backups_ID = 0xFFFF & int(utcnow().timestamp())
     backups_ID_MSB = (0xFF00 & backups_ID) >> 8
     backups_ID_LSB = (0x00FF & backups_ID)
-    print('backupsID: 0x%04x = %i' % (backups_ID,backups_ID))
 
+    # override backups_ID... maybe it has to be something special?
+    backups_ID_MSB = 0
+    backups_ID_LSB = 0
+    
+    print('backupsID: 0x%04x = %i' % (backups_ID,backups_ID))
     return backups_ID_MSB, backups_ID_LSB
 
 def make_command_startAcquisition(self,session_name=None,comment=None):
