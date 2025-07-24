@@ -64,14 +64,18 @@ def interpret_communication(self,com_bytes):
     return
     
 
-def print_acknowledgement(self,ack):
+def print_acknowledgement(self,ack,comment=''):
     '''
     print to screen the acknowledgement
     '''
-    print('vvv COMMUNICATION WITH DISPATCHER ACKNOWLEDGEMENT vvv')
+    msg = ' COMMUNICATION WITH DISPATCHER ACKNOWLEDGEMENT: %s ' % comment
+    msg_len = len(msg) + 40
+    msg = msg.center(msg_len,'v')
+    print(msg)
     self.interpret_communication(ack)
-    print('^^^ COMMUNICATION WITH DISPATCHER ACKNOWLEDGED ^^^^^^')
-    return
+    msg = ' COMMUNICATION WITH DISPATCHER ACKNOWLEDGED: %s ' % comment
+    msg = msg.center(msg_len,'^')
+    print(msg)
 
 def subscribe_dispatcher(self):
     '''
