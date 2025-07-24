@@ -90,6 +90,7 @@ def unsubscribe(self):
     close connection to the dispatcher
     '''
     self.dispatcher_socket.close()
+    self.dispatcher_socket = None
     return
 
 def send_command(self,cmd_bytes):
@@ -98,7 +99,7 @@ def send_command(self,cmd_bytes):
     '''
 
     if self.dispatcher_socket is None:
-        self.dispatcher_socket = subscribe_dispatcher()
+        self.dispatcher_socket = self.subscribe_dispatcher()
 
     self.dispatcher_socket.send(cmd_bytes)
     ack = None
@@ -111,7 +112,7 @@ def send_command(self,cmd_bytes):
     
     return ack
 
-def make_preamble(self,TC_ID,commandID,command_length):
+def make_preamble(self,command_length):
     '''
     make the command preamble which is used for every command
     '''
@@ -123,10 +124,19 @@ def make_preamble(self,TC_ID,commandID,command_length):
                       (command_length & 0xFF000000)>>24,
                       (command_length & 0x00FF0000)>>16,
                       (command_length & 0x0000FF00)>>8,
-                      (command_length & 0x000000FF),
-                      TC_ID,
-                      (commandID & 0xFF00)>>8,
-                      (commandID & 0x00FF)]
+                      (command_length & 0x000000FF)]
     return cmd_bytes_list
+
+
+def make_communication_packet(self,cmd_bytes_list):
+    '''
+    make the full communication with all the necessary protocols
+    '''
+    command_length = len(cmd_bytes_list)
+    preamble_list = self.make_preamble(command_length)
+    comms_packet_list = preamble_list + cmd_bytes_list
+    comms_packet_list.append(self.END_COMMUNICATION)
+    comms_packet = bytearray(comms_packet_list)
+    return comms_packet
 
     

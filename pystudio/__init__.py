@@ -52,6 +52,7 @@ class pystudio:
     __object_type__ = 'pystudio'
 
     DISPATCHER_STX = 0x55
+    END_COMMUNICATION = 0xAA
     SEND_TC_TO_SUBSYS_ID = 0xC0
     CUSTOM_TC_ID = 0xD0
     INTERN_TC_ID = 0xD1
@@ -74,7 +75,8 @@ class pystudio:
         subscribe_dispatcher,\
         unsubscribe,\
         send_command,\
-        make_preamble
+        make_preamble,\
+        make_communication_packet
 
     from .acquisition import\
         make_backupsID,\

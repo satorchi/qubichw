@@ -44,19 +44,15 @@ def make_command_startAcquisition(self,session_name=None,comment=None):
 
     self.backupsID = self.make_backupsID()
     
-
-    # command length includes the ID, the subID, the backups ID, the session_name, and the comment
-    command_length = 1 + 2 + 2 + len(session_name_b) + len(comment_b)
-
-    cmd_bytes_list = self.make_preamble(self.INTERN_TC_ID,self.START_ACQUISITION_COMMAND,command_length)
-    cmd_bytes_list.append(self.backupsID[0])
-    cmd_bytes_list.append(self.backupsID[1])
+    cmd_bytes_list = [self.INTERN_TC_ID,
+                      (self.START_ACQUISITION_COMMAND & 0xFF00)>>8,
+                      (self.START_ACQUISITION_COMMAND & 0x00FF),
+                      self.backupsID[0],
+                      self.backupsID[1]]
     cmd_bytes_list += list(session_name_b)
     cmd_bytes_list += list(comment_b)
-    cmd_bytes_list.append(0xAA) # EOT
 
-    cmd_bytes = bytearray(cmd_bytes_list)
-    return cmd_bytes
+    return self.make_communication_packet(cmd_bytes_list)
 
 def send_startAcquisition(self,session_name=None,comment=None):
     '''
@@ -71,23 +67,22 @@ def make_command_stopAcquisition(self):
     '''
     make the command to stop a running acquisition
 
-    backupsID class variable.  It is a tuple with byte-MSB and byte-LSB
+    0x55 0x00 0x00 0x00 0x00 0x00 0x05 0xD1  0x00 0x05 backupId_MSB backupId_LSB 0xAA
+    STX  CN        SIZE                ID    DATA                                EOT
+
+    backupsID is a class variable.  It is a tuple with byte-MSB and byte-LSB
     '''
 
     if self.backupsID is None:
         print('ERROR! There is no running acquisition to stop.  Cannot make the stop command.')
         return 0
     
-    # command length includes the ID, the subID, the backups ID
-    command_length = 1 + 2 + 2
-
-    cmd_bytes_list = self.make_preamble(self.INTERN_TC_ID,self.STOP_ACQUISITION_COMMAND,command_length)
-    cmd_bytes_list.append(self.backupsID[0])
-    cmd_bytes_list.append(self.backupsID[1])
-    cmd_bytes_list.append(0xAA) # EOT
-
-    cmd_bytes = bytearray(cmd_bytes_list)
-    return cmd_bytes
+    cmd_bytes_list = [self.INTERN_TC_ID,
+                      (self.STOP_ACQUISITION_COMMAND & 0xFF00)>>8,
+                      (self.STOP_ACQUISITION_COMMAND & 0x00FF),
+                      self.backupsID[0],
+                      self.backupsID[1]]
+    return self.make_communication_packet(cmd_bytes_list)
 
 def send_stopAcquisition(self):
     '''

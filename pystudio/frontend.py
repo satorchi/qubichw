@@ -16,24 +16,9 @@ def make_command_startstopFLL(self,asicNum,onOff):
     make the command to start or stop the FLL
     '''
 
-    self.command_counter += 1
-    cmd_bytes_list = []
-
-    cmd_bytes_list.append(self.DISPATCHER_STX)
-    cmd_bytes_list.append( (self.MULTINETQUICMANAGER_ID & 0xFF00) >>8)
-    cmd_bytes_list.append( (self.MULTINETQUICMANAGER_ID & 0x00FF) )
-    cmd_bytes_list.append(0)
-    cmd_bytes_list.append(0)
-    cmd_bytes_list.append(0)
-    cmd_bytes_list.append(0)
-
-    cmd_bytes_list.append(self.SEND_TC_TO_SUBSYS_ID)
-    cmd_bytes_list.append(self.MULTINETQUICMANAGER_ACTIVATEPID_ID)
-
-    command_length = 11
-    cmd_bytes_list.append(command_length >> 8)
-    cmd_bytes_list.append(command_length)
-
+    cmd_bytes_list = [self.SEND_TC_TO_SUBSYS_ID,
+                      self.MULTINETQUICMANAGER_ID,
+                      self.MULTINETQUICMANAGER_ACTIVATEPID_ID]
     cmd_bytes_list.append( (asicNum & 0xFF0000) >> 16 )
     cmd_bytes_list.append( (asicNum & 0x00FF00) >> 8 ) 
     cmd_bytes_list.append( (asicNum & 0x0000FF) )
@@ -46,8 +31,7 @@ def make_command_startstopFLL(self,asicNum,onOff):
     cmd_bytes_list.append(0xfa)
     cmd_bytes_list.append(0xda)
 
-    cmd_bytes = bytearray(cmd_bytes_list)
-    return cmd_bytes
+    return self.make_communication_packet(cmd_bytes_list)
     
 def send_startFLL(self,asicNum):
     '''
