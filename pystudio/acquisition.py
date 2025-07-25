@@ -18,7 +18,7 @@ def make_backupsID(self):
     '''
     # backups_ID = 0xFFFF & int(utcnow().timestamp())
     # override backups_ID... maybe it has to be something special?
-    # backups_ID = 0xd428 # this worked once 2025-07-23_12.58.09
+    # backups_ID = 0xd428 # this seemed to work once 2025-07-23_12.58.09 but the logbook says it was 0xdb9d
     backups_ID = 0x0003 # in the dispatcher logbook, we see only 0x0003 or 0x00FF
 
     backups_ID_MSB = (0xFF00 & backups_ID) >> 8
