@@ -98,6 +98,7 @@ def unsubscribe(self):
         return
     print('Unsubscribing')
     self.dispatcher_socket.close()
+    del(self.dispatcher_socket)
     self.dispatcher_socket = None
     return
 
