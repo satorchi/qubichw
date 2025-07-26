@@ -109,6 +109,12 @@ encoder now reads: 177.3612 which corresponds to the zero from before
 so when the encoder says 177.3612, we are really pointing at 168.3892
 new offset:  168.3892 - 177.3612 = -8.9720
 
+2025-07-25
+WhatsApp from Cristian Rodriguez:
+  It's currently at full south, and the encoder in AZ shows = 160,402°
+actually, it's the Housekeeping which reports 160.402 which already includes the old offset
+new offset: 180 - 160.402 - old_offset = 28.57
+
 
 '''
 import os,sys,socket,time,re
@@ -131,7 +137,8 @@ class obsmount:
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
     el_zero_offset = 50 - 2.049 
-    az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
+    # az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
+    az_zero_offset = 28.57 # see above: 2025-07-25
     position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
