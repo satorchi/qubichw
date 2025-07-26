@@ -88,7 +88,12 @@ class pystudio:
     from .frontend import\
         make_command_startstopFLL,\
         send_startFLL,\
-        send_stopFLL
+        send_stopFLL,\
+        Voffset2ADU,\
+        amplitude2ADU,\
+        make_frontend_preamble,\
+        make_frontend_suffix,\
+        make_command_TESDAC_SINUS
     
 
     
