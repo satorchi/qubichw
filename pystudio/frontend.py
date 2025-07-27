@@ -18,11 +18,11 @@ def Voffset2ADU(self,Voffset):
     '''
 
     if ((Voffset >0) and (Voffset <=9)):
-	ADUfloat = Voffset /2.8156e-4 - 1
+        ADUfloat = Voffset/2.8156e-4 - 1
     else:
-	ADUfloat = 65536 + (Voffset /2.8156e-4)
+        ADUfloat = 65536 + (Voffset/2.8156e-4)
 
-    ADU = round(ADUflaot)
+    ADU = round(ADUfloat)
     return ADU
 
 def amplitude2ADU(self,amplitude):
@@ -32,9 +32,9 @@ def amplitude2ADU(self,amplitude):
     '''
 
     if ((amplitude >0) and (amplitude <=9)):
-	ADUfloat = amplitude /0.001125 - 1
+        ADUfloat = amplitude /0.001125 - 1
     else:
-	ADUfloat = 65536 + (amplitude /0.001125)
+        ADUfloat = 65536 + (amplitude /0.001125)
     ADU = round(ADUfloat)
     return ADU
 
