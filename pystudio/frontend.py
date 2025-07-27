@@ -105,7 +105,7 @@ def make_command_TESDAC_SINUS(self,amplitude,Voffset,undersampling,increment):
     cmd_bytes_list.append( ((undersampling & 0xFF00) >> 8)) 
     cmd_bytes_list.append( ((undersampling & 0x00FF)))
     cmd_bytes_list.append( ((increment & 0xFF)))
-    cmd_bytes_list.append((char)0x00)
+    cmd_bytes_list.append(0x00)
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
 
     return self.make_communication_packet(cmd_bytes_list)
