@@ -38,7 +38,7 @@ def amplitude2ADU(self,amplitude):
     ADU = round(ADUfloat)
     return ADU
 
-def make_frontend_preamble(self,subsysID1,subsysID2):
+def make_frontend_preamble(self,asicNum,subsysID1,subsysID2):
     '''
     make the first bytes of a frontend command
     '''
@@ -66,7 +66,7 @@ def make_command_startstopFLL(self,asicNum,onOff):
     '''
     make the command to start or stop the FLL
     '''
-    cmd_bytes_list = self.make_frontend_preamble(self.MULTINETQUICMANAGER_ACTIVATEPID_ID,0x14)
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_ACTIVATEPID_ID,0x14)
     cmd_bytes_list.append( (onOff & 0xFF00) >> 8 ) 
     cmd_bytes_list.append( (onOff & 0x00FF) )
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
@@ -91,13 +91,13 @@ def send_stopFLL(self,asicNum):
     
     return ack
 
-def make_command_TESDAC_SINUS(self,amplitude,Voffset,undersampling,increment):
+def make_command_TESDAC_SINUS(self,asicNum,amplitude,Voffset,undersampling,increment):
     '''
     make the command to configure sine modulation on the TES bias
     '''
     amplitudeADU = self.amplitude2ADU(amplitude)
     VoffsetADU = self.Voffset2ADU(Voffset)
-    cmd_bytes_list = self.make_frontend_preamble(self.MULTINETQUICMANAGER_SETTESDAC_SINUS_ID,0x42)
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETTESDAC_SINUS_ID,0x42)
     cmd_bytes_list.append( ((offsetADU & 0xFF00) >> 8)) 
     cmd_bytes_list.append( ((offsetADU & 0x00FF)))
     cmd_bytes_list.append( ((amplitudeADU & 0xFF00) >> 8)) 
