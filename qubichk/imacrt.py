@@ -25,7 +25,7 @@ class iMACRT:
             self.imacrtIP = known_hosts['mmr3']
         else:
             self.imacrtIP = known_hosts['mgc3']
-        self.imacrt_port = 12000 + eval(imacrtIP.split('.')[-1])
+        self.imacrt_port = 12000 + eval(self.imacrtIP.split('.')[-1])
         return
         
     def init_socket(self):
