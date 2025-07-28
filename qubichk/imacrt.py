@@ -18,7 +18,7 @@ import socket
 from qubichk.utilities import known_hosts
 
 class iMACRT:
-    def __init__(device='mgc'):
+    def __init__(self,device='mgc'):
         self.sock = None
         
         if device.upper().find('MMR')==0:
