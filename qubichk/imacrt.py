@@ -103,7 +103,7 @@ class iMACRT:
         ans_str = self.send_command(cmd)
         try:
             ans = eval(ans_str)
-            print('MGC setpoint: %0.4f K')
+            print('MGC setpoint: %0.4f K' % ans)
         except:
             ans = ans_str
             print('MGC setpoint: %s' % ans)
@@ -117,6 +117,21 @@ class iMACRT:
         cmd = 'MGC3SET 2 %f' % setpt
         return self.send_command(cmd,get_reply=False)
 
+    def get_mgc_measurement(self):
+        '''
+        get the current measurement for the TES bath temperature
+        '''
+        cmd = 'MGC3GET 3'
+        
+        ans_str = self.send_command(cmd)
+        try:
+            ans = eval(ans_str)
+            print('MGC measurement: %0.4f K' % ans)
+        except:
+            ans = ans_str
+            print('MGC measurement: %s' % ans)
+            
+        return ans
 
     
 
