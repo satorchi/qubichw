@@ -103,7 +103,7 @@ class iMACRT:
         ans_str = self.send_command(cmd)
         try:
             ans = eval(ans_str)
-            print('MGC setpoint: %0.4f K'
+            print('MGC setpoint: %0.4f K')
         except:
             ans = ans_str
             print('MGC setpoint: %s' % ans)
