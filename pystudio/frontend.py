@@ -73,7 +73,8 @@ def make_frontend_preamble(self,asicNum_list,subsysID1,subsysID2):
     
     cmd_bytes_list = [self.SEND_TC_TO_SUBSYS_ID,
                       self.MULTINETQUICMANAGER_ID,
-                      subsysID1]
+                      (subsysID1 & 0xFF00) >> 8,
+                      (subsysID1 & 0x00FF)]
     cmd_bytes_list.append( (qsAsicNum & 0xFF0000) >> 16 )
     cmd_bytes_list.append( (qsAsicNum & 0x00FF00) >> 8 ) 
     cmd_bytes_list.append( (qsAsicNum & 0x0000FF) )
