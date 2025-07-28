@@ -139,6 +139,14 @@ def make_command_TESDAC_SINUS(self,asicNum,amplitude,Voffset,undersampling,incre
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
 
     return self.make_communication_packet(cmd_bytes_list)
+
+def send_TESDAC_SINUS(self,asicNum,amplitude,Voffset,undersampling,increment):
+    '''
+    send the command to configure sine modulation on the TES bias
+    '''
+    cmd_bytes = self.make_command_TESDAC_SINUS(asicNum,amplitude,Voffset,undersampling,increment)
+    ack = self.send_command(cmd_bytes)
+    return ack
     
 def make_command_TESDAC_CONTINUOUS(self,asicNum,Voffset):
     '''
@@ -152,3 +160,10 @@ def make_command_TESDAC_CONTINUOUS(self,asicNum,Voffset):
 
     return self.make_communication_packet(cmd_bytes_list)
     
+def send_TESDAC_CONTINUOUS(self,asicNum,Voffset):
+    '''
+    send the command to configure constant TES bias voltage
+    '''
+    cmd_bytes = self.make_command_TESDAC_CONTINUOUS(asicNum,Voffset)
+    ack = self.send_command(cmd_bytes)
+    return ack

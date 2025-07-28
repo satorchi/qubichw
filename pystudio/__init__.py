@@ -96,7 +96,9 @@ class pystudio:
         make_frontend_preamble,\
         make_frontend_suffix,\
         make_command_TESDAC_SINUS,\
-        make_command_TESDAC_CONTINUOUS
+        send_TESDAC_SINUS,\
+        make_command_TESDAC_CONTINUOUS,\
+        send_TESDAC_CONTINUOUS
     
 
     
