@@ -15,7 +15,7 @@ from qubichk.utilities import known_hosts, bytes2str
 
 QS_IP = known_hosts['qubic-studio']
 
-def interpret_communication(self,com_bytes):
+def interpret_communication(self,com_bytes,print_command_string=False):
     '''
     interpret the communicated bytes
     '''
@@ -52,9 +52,10 @@ def interpret_communication(self,com_bytes):
 
     
     cmd = bytearray(com_bytes[10:-1])
-    cmd_str = cmd.decode('iso-8859-1')
-    print('COMMAND: %s\nCOMMAND: %s' % (bytes2str(cmd),cmd_str))
-
+    print('COMMAND: %s' % (bytes2str(cmd)))
+    if print_command_string:
+        cmd_str = cmd.decode('iso-8859-1')
+        print('COMMAND: %s' % cmd_str)
     
     eot = com_bytes[-1]
     if eot!=0xaa:
