@@ -26,7 +26,7 @@ def interpret_communication(self,com_bytes):
         return          
 
     if com_bytes[0]!=0x55:
-        print('Error!  Incorrect STX: 0x%02X' % cmb_bytes[0])
+        print('Error!  Incorrect STX: 0x%02X' % cmd_bytes[0])
         return
 
     counter = (com_bytes[1]<<8) + com_bytes[2]
