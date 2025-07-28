@@ -59,6 +59,7 @@ class pystudio:
 
     MULTINETQUICMANAGER_ID = 2
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
+    MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
     
     START_ACQUISITION_COMMAND = 4
     STOP_ACQUISITION_COMMAND = 5
@@ -86,6 +87,7 @@ class pystudio:
         send_stopAcquisition
 
     from .frontend import\
+        asic_qsnumber,\
         make_command_startstopFLL,\
         send_startFLL,\
         send_stopFLL,\
@@ -93,7 +95,8 @@ class pystudio:
         amplitude2ADU,\
         make_frontend_preamble,\
         make_frontend_suffix,\
-        make_command_TESDAC_SINUS
+        make_command_TESDAC_SINUS,\
+        make_command_TESDAC_CONTINUOUS
     
 
     

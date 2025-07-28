@@ -11,43 +11,72 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 setup commands to the dispatcher related to setting up the bolometers
 '''
 
+
+def asic_qsnumber(self,asicNum):
+    '''
+    ASIC bit number
+
+    note: 2025-07-28 10:38:27
+
+    AsicNum in QubicStudio is not the same as what is used in the user interface
+    there is bitmasking possible so that the command can be sent to multiple ASICs
+    for example give asicNum = '1' | '2' and it will send to both 1 and 2.
+    that means that the asicNum is actually a bit place in a 24 bit word
+    asic 1 is bit 8
+    asic 2 is bit 9
+    I'm not sure why it's not bit 0 and bit 1, but there you go
+    presumeably, when we have the full instrument, the 16 ASICs will go from bit-8 to bit-23 inclusive
+    '''
+    bitplace = asicNum + 7
+    qsAsicNum = 2**bitplace
+    return qsAsicNum
+
 def Voffset2ADU(self,Voffset):
     '''
     convert the bias offset in Volts to ADU
-    taken from Qubic_Pack.dscript
+    transfer function taken from the Transfer Function Editor on QubicStudio
+    file: parametersTF.dispatcher
+    function=288.58e-6x + 0.0
     '''
 
-    if ((Voffset >0) and (Voffset <=9)):
-        ADUfloat = Voffset/2.8156e-4 - 1
-    else:
-        ADUfloat = 65536 + (Voffset/2.8156e-4)
-
+    ADUfloat = Voffset/288.58e-6
     ADU = round(ADUfloat)
     return ADU
 
 def amplitude2ADU(self,amplitude):
     '''
     convert the TES bias sine amplitude to ADU
-    taken from Qubic_Pack.dscript
+
+    transfer function taken from the Transfer Function Editor on QubicStudio
+    file: parametersTF.dispatcher
+    function=1.15432e-3x + 0.0
     '''
 
-    if ((amplitude >0) and (amplitude <=9)):
-        ADUfloat = amplitude /0.001125 - 1
-    else:
-        ADUfloat = 65536 + (amplitude /0.001125)
+    ADUfloat = amplitude/1.15432e-3
     ADU = round(ADUfloat)
     return ADU
 
-def make_frontend_preamble(self,asicNum,subsysID1,subsysID2):
+def make_frontend_preamble(self,asicNum_list,subsysID1,subsysID2):
     '''
     make the first bytes of a frontend command
+
+    we can configure any number of ASICs the same way.  
+    If the asicNum argument is a list, then make a bitmask for all the requested ASICs
     '''
+    if isinstance(asicNum_list,list):
+        qsAsicNum = 0
+        for asicNum in asicNum_list:
+            qsAsicNum = (qsAsicNum | self.asic_qsnumber(asicNum))
+    else:
+        asicNum = asicNum_list
+        qsAsicNum = self.asic_qsnumber(asicNum)
+    
     cmd_bytes_list = [self.SEND_TC_TO_SUBSYS_ID,
                       self.MULTINETQUICMANAGER_ID,
                       subsysID1]
-    cmd_bytes_list.append( (asicNum & 0xFF0000) >> 16 )
-    cmd_bytes_list.append( (asicNum & 0x00FF00) >> 8 ) 
-    cmd_bytes_list.append( (asicNum & 0x0000FF) )
+    cmd_bytes_list.append( (qsAsicNum & 0xFF0000) >> 16 )
+    cmd_bytes_list.append( (qsAsicNum & 0x00FF00) >> 8 ) 
+    cmd_bytes_list.append( (qsAsicNum & 0x0000FF) )
     cmd_bytes_list.append(0xaa)
     cmd_bytes_list.append(0x55)
     cmd_bytes_list.append(subsysID2)
@@ -98,14 +127,26 @@ def make_command_TESDAC_SINUS(self,asicNum,amplitude,Voffset,undersampling,incre
     amplitudeADU = self.amplitude2ADU(amplitude)
     VoffsetADU = self.Voffset2ADU(Voffset)
     cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETTESDAC_SINUS_ID,0x42)
-    cmd_bytes_list.append( ((offsetADU & 0xFF00) >> 8)) 
-    cmd_bytes_list.append( ((offsetADU & 0x00FF)))
+    cmd_bytes_list.append( ((VoffsetADU & 0xFF00) >> 8)) 
+    cmd_bytes_list.append( ((VoffsetADU & 0x00FF)))
     cmd_bytes_list.append( ((amplitudeADU & 0xFF00) >> 8)) 
     cmd_bytes_list.append( ((amplitudeADU & 0x00FF)))
     cmd_bytes_list.append( ((undersampling & 0xFF00) >> 8)) 
     cmd_bytes_list.append( ((undersampling & 0x00FF)))
     cmd_bytes_list.append( ((increment & 0xFF)))
     cmd_bytes_list.append(0x00)
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+
+    return self.make_communication_packet(cmd_bytes_list)
+    
+def make_command_TESDAC_CONTINUOUS(self,asicNum,Voffset):
+    '''
+    make the command to configure constant TES bias voltage
+    '''
+    VoffsetADU = self.Voffset2ADU(Voffset)
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETTESDAC_SINUS_ID,0x40)
+    cmd_bytes_list.append( ((VoffsetADU & 0xFF00) >> 8)) 
+    cmd_bytes_list.append( ((VoffsetADU & 0x00FF)))
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
 
     return self.make_communication_packet(cmd_bytes_list)
