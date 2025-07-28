@@ -25,6 +25,8 @@ known_hosts['pigps']         = "192.168.2.17"
 known_hosts['redpitaya']     = "192.168.2.21"
 known_hosts['groundgps']     = "192.168.2.22"
 known_hosts['horn']          = "192.168.2.9"
+known_hosts['mgc3']          = "192.168.2.214"
+known_hosts['mmr3']          = "192.168.2.213"
 
 date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 
