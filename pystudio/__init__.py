@@ -60,6 +60,8 @@ class pystudio:
     MULTINETQUICMANAGER_ID = 2
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
     MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
+
+    MULTINETQUICMANAGER_GETSTATUS_CMD_NUMBER = 22
     
     START_ACQUISITION_COMMAND = 4
     STOP_ACQUISITION_COMMAND = 5
@@ -98,7 +100,9 @@ class pystudio:
         make_command_TESDAC_SINUS,\
         send_TESDAC_SINUS,\
         make_command_TESDAC_CONTINUOUS,\
-        send_TESDAC_CONTINUOUS
+        send_TESDAC_CONTINUOUS,\
+        make_command_get_frontend_status,\
+        get_frontend_status
     
 
     

@@ -167,3 +167,19 @@ def send_TESDAC_CONTINUOUS(self,asicNum,Voffset):
     cmd_bytes = self.make_command_TESDAC_CONTINUOUS(asicNum,Voffset)
     ack = self.send_command(cmd_bytes)
     return ack
+
+def make_command_get_frontend_status(self,asicNum):
+    '''
+    make the command to query the dispatcher for the current values of all parameters
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_GETSTATUS_CMD_NUMBER,0x0E)
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def get_frontend_status(self,asicNum):
+    '''
+    query the dispatcher for the current settings
+    '''
+    cmd_bytes = self.make_command_get_frontend_status(asicNum)
+    ack = self.send_command(cmd_bytes)
+    return ack
