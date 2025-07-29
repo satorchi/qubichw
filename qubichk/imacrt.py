@@ -40,6 +40,19 @@ class iMACRT:
         self.sock = sock
         return sock
 
+    def disconnect(self):
+        '''
+        disconnect socket so that the port is free
+        '''
+        if self.sock is None:
+            print('already disconnected')
+            return None
+
+        self.sock.close()
+        del(self.sock)
+        self.sock = None
+        return None
+
     def send_command(self,cmd,get_reply=True):
         '''
         send a command to the iMACRT device
@@ -114,6 +127,9 @@ class iMACRT:
         '''
         set the temperature set point for the TES bath temperature
         '''
+        if setpt>0.44:
+            print('ERROR!  Requested temperature is too high: %.3f K' % setpt)
+            return None
         cmd = 'MGC3SET 2 %f' % setpt
         return self.send_command(cmd,get_reply=False)
 
