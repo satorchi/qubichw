@@ -115,6 +115,16 @@ WhatsApp from Cristian Rodriguez:
 actually, it's the Housekeeping which reports 160.402 which already includes the old offset
 new offset: 180 - 160.402 + old_offset = 10.6259666
 
+2025-07-29
+we moved the northern limit switch so we can do the moon scan
+after a "DOHOMING" the system reset the encoder value!
+we did this a few times, so...
+now 19.143 is full east which includes the current offset of 10.626 degrees (see above)
+new offset: 90 - 19.143 + 10.626 = 81.483
+
+the encoder position is 8.517033 when we are full east (90 degrees)
+new offset: 90 - 8.517 = 81.483
+
 
 '''
 import os,sys,socket,time,re
@@ -138,7 +148,8 @@ class obsmount:
     qubicstudio_ip = known_hosts['qubic-studio']
     el_zero_offset = 50 - 2.049 
     # az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
-    az_zero_offset =  10.6259666 # see above: 2025-07-25
+    # az_zero_offset =  10.6259666 # see above: 2025-07-25
+    az_zero_offset = 81.483 # see above: 2025-07-29
     position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
