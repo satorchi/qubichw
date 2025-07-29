@@ -64,6 +64,7 @@ def send_startAcquisition(self,session_name=None,comment=None):
     send the command to start an acquisition
     '''
     cmd_bytes = self.make_command_startAcquisition(session_name=session_name,comment=comment)
+    print('%s - Starting Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     ack = self.send_command(cmd_bytes)
     
     return ack
@@ -99,6 +100,7 @@ def send_stopAcquisition(self):
         return 0
 
     cmd_bytes = self.make_command_stopAcquisition()
+    print('%s - Stopping Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     ack = self.send_command(cmd_bytes)
     self.backupsID = None
     return ack

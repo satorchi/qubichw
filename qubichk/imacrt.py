@@ -64,7 +64,9 @@ class iMACRT:
         cmd_b = full_cmd.encode()
         nbytes_sent = self.sock.sendto(cmd_b,(self.imacrtIP,self.imacrt_port))
 
-        if not get_reply: return None
+        
+        if not get_reply and nbytes_sent>0:
+            return True
         
         try:
             ans_b = self.sock.recv(1024)
