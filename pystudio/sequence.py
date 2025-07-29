@@ -17,13 +17,18 @@ from qubichk.imacrt import iMACRT
 
 #####################################
 # defaults
-default_value = {}
-default_value['asicNum'] = [1,2] # both ASICs
-default_value['Voffset'] = 5.5 # Volts
-default_value['amplitude'] = 7.0 # Volts
-default_value['undersampling'] = 1000
-default_value['increment'] = 1
-default_value['duration'] = 120 # seconds
+default_setting = {}
+default_setting['asicNum'] = [1,2] # both ASICs
+default_setting['Voffset'] = 5.5 # Volts
+default_setting['amplitude'] = 7.0 # Volts
+default_setting['undersampling'] = 1000
+default_setting['increment'] = 1
+default_setting['duration'] = 120 # seconds
+    elmin = 50 # minimum permitted elevation
+    elmax = 70 # maximum permitted elevation
+    azmin = 0  # minimum permitted azimuth
+    azmax = 25 # maximum permitted azimuth (changed to 25 on 2025-06-06 15:51:25 UT)
+    azstep = 5 # default step size for azimuth movement for skydips
 
 def set_bath_temperature(self,Tbath,timeout=30,precision=0.003):
     '''
@@ -72,12 +77,12 @@ def do_IV_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersamplin
 
     #####################################
     # defaults
-    if asicNum is None: asicNum = default_value['asicNum']
-    if Voffset is None: Voffset = default_value['Voffset']
-    if amplitude is None: amplitude = default_value['amplitude']
-    if undersampling is None: undersampling = default_value['undersampling']
-    if increment is None: increment = default_value['increment']
-    if duration is None: duration = default_value['duration']
+    if asicNum is None: asicNum = default_setting['asicNum']
+    if Voffset is None: Voffset = default_setting['Voffset']
+    if amplitude is None: amplitude = default_setting['amplitude']
+    if undersampling is None: undersampling = default_setting['undersampling']
+    if increment is None: increment = default_setting['increment']
+    if duration is None: duration = default_setting['duration']
 
     #####################################
     # make sure the bias does not go out of acceptable range
@@ -143,18 +148,30 @@ def do_NEP_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersampli
     
     #####################################
     # defaults
-    if asicNum is None: asicNum = default_value['asicNum']
-    if Voffset is None: Voffset = default_value['Voffset']
-    if amplitude is None: amplitude = default_value['amplitude']
-    if undersampling is None: undersampling = default_value['undersampling']
-    if increment is None: increment = default_value['increment']
-    if duration is None: duration = default_value['duration']
+    if asicNum is None: asicNum = default_setting['asicNum']
+    if Voffset is None: Voffset = default_setting['Voffset']
+    if amplitude is None: amplitude = default_setting['amplitude']
+    if undersampling is None: undersampling = default_setting['undersampling']
+    if increment is None: increment = default_setting['increment']
+    if duration is None: duration = default_setting['duration']
 
     Tbath_list = [0.420,0.380,0.360,0.340,0.330,0.320,0.310]
     for Tbath in Tbath_list:
         self.do_IV_measurement(asicNum,Voffset,amplitude,undersampling,increment,Tbath,duration)
 
     print('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    return
+
+def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None):
+    '''
+    do the skydip sequence
+    '''
+    return
+
+def do_scan(self):
+    '''
+    do a scan
+    '''
     return
 
 
