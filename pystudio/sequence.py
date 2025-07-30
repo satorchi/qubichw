@@ -127,7 +127,7 @@ def do_IV_measurement(self,
     ack = self.send_stopFLL(asicNum)
 
     # configure sine curve bias
-    ack = self.send_TESDAC_SINUS(self,asicNum,amplitude,Voffset,undersampling,increment)
+    ack = self.send_TESDAC_SINUS(asicNum,amplitude,Voffset,undersampling,increment)
 
     # start all regulations
     ack = self.send_startFLL(asicNum)
@@ -221,7 +221,7 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     ack = self.send_stopFLL(asicNum)
 
     # configure continuous bias
-    ack = self.send_TESDAC_CONTINUOUS(self,asicNum,Voffset)
+    ack = self.send_TESDAC_CONTINUOUS(asicNum,Voffset)
 
     # start all regulations
     ack = self.send_startFLL(asicNum)
