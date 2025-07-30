@@ -71,6 +71,7 @@ class pystudio:
     dispatcher_socket = None
     backupsID = None
     command_counter = 0
+    chunksize = 2**20
 
     from .communication import\
         interpret_communication,\

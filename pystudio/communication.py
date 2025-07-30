@@ -85,7 +85,7 @@ def subscribe_dispatcher(self):
     self.dispatcher_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.dispatcher_socket.settimeout(0.6)
     self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
-    ack = self.dispatcher_socket.recv(1024)
+    ack = self.dispatcher_socket.recv(self.chunksize)
     self.print_acknowledgement(ack,'subscribe')
     
     return self.dispatcher_socket
@@ -115,7 +115,7 @@ def send_command(self,cmd_bytes):
     print('sent %i bytes' % nbytes_sent)
     ack = None
     try:
-        ack = self.dispatcher_socket.recv(1024)
+        ack = self.dispatcher_socket.recv(self.chunksize)
     except:
         print('ERROR!  No acknowledgement from dispatcher')
     else:
