@@ -232,10 +232,12 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
 
     # run the Sky Dip sequency from obsmount
     mount.do_skydip_sequence(azstep)
+    mount.disconnect()
 
     # stop the acquisition
     ack = self.send_stopAcquisition()
 
+    
     print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
