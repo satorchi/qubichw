@@ -107,7 +107,7 @@ class pystudio:
     from .sequence import\
         do_IV_measurement,\
         do_NEP_measurement,\
-        do_sky_dip,\
+        do_skydip,\
         do_scan
     
 

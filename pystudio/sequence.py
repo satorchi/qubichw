@@ -14,6 +14,7 @@ import time
 import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
+from qubichk.obsmount import obsmount
 
 #####################################
 # defaults
@@ -24,11 +25,11 @@ default_setting['amplitude'] = 7.0 # Volts
 default_setting['undersampling'] = 1000
 default_setting['increment'] = 1
 default_setting['duration'] = 120 # seconds
-    elmin = 50 # minimum permitted elevation
-    elmax = 70 # maximum permitted elevation
-    azmin = 0  # minimum permitted azimuth
-    azmax = 25 # maximum permitted azimuth (changed to 25 on 2025-06-06 15:51:25 UT)
-    azstep = 5 # default step size for azimuth movement for skydips
+default_setting['elmin'] = 50 # minimum permitted elevation
+default_setting['elmax'] = 70 # maximum permitted elevation
+default_setting['azmin'] = 0  # minimum permitted azimuth
+default_setting['azmax'] = 25 # maximum permitted azimuth (changed to 25 on 2025-06-06 15:51:25 UT)
+default_setting['azstep'] = 5 # default step size for azimuth movement for skydips
 
 def set_bath_temperature(self,Tbath,timeout=30,precision=0.003):
     '''
@@ -180,10 +181,62 @@ def do_NEP_measurement(self,
     print('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
-def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None):
+def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
     '''
     do the skydip sequence
     '''
+    mount = obsmount()
+    
+    #####################################
+    # defaults    
+    if comment is None: comment = 'Sky Dip sequence sent by pystudio'
+    if Voffset is None: Voffset = default_setting['Voffset']
+    asicNum = default_setting['asicNum']
+    
+    if azstep is None: azstep = mount.azstep
+    if azmin is None:
+        azmin = mount.azmin
+    else:
+        mount.azmin = azmin
+        
+    if azmax is None:
+        azmax = mount.azmax
+    else:
+        mount.azmax = azmax
+        
+    if elmin is None:
+        elmin = mount.elmin
+    else:
+        mount.elmin = elmin
+        
+    if elmax is None:
+        elmax = mount.elmax
+    else:
+        mount.elmax = elmax
+
+    #####################################
+    # configure the bolometers
+
+    # stop all regulations
+    ack = self.send_stopFLL(asicNum)
+
+    # configure continuous bias
+    ack = self.send_TESDAC_CONTINUOUS(self,asicNum,Voffset)
+
+    # start all regulations
+    ack = self.send_startFLL(asicNum)
+
+    # start recording data
+    dataset_name = 'SkyDip'
+    ack = self.send_startAcquisition(dataset_name,comment)
+
+    # run the Sky Dip sequency from obsmount
+    mount.do_skydip_sequence(azstep)
+
+    # stop the acquisition
+    ack = self.send_stopAcquisition()
+
+    print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
 def do_scan(self):
