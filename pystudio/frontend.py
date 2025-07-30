@@ -194,9 +194,9 @@ def make_command_FeedbackRelay(self,asicNum,FLLrelay):
     cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETFEEDBACKRELAY_ID,0x30)
     cmd_bytes_list.append(0x00)
     if FLLrelay<100:
-        cmd_bytes_list.append(0x01)
+        cmd_bytes_list.append(0x00)
     else:
-        cmd_bytes_list.append(0x02)
+        cmd_bytes_list.append(0x01)
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
     return self.make_communication_packet(cmd_bytes_list)
 
