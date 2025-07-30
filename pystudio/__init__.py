@@ -59,10 +59,12 @@ class pystudio:
 
     MULTINETQUICMANAGER_ID = 2
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
+    MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID = 23
     MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
 
     MULTINETQUICMANAGER_GETSTATUS_ID = 14
     MULTINETQUICMANAGER_SETFEEDBACKRELAY_ID = 61
+    MULTINETQUICMANAGER_SETAPLITUDE_ID = 63 # this is a guess
     
     START_ACQUISITION_COMMAND = 4
     STOP_ACQUISITION_COMMAND = 5
@@ -106,7 +108,9 @@ class pystudio:
         make_command_get_frontend_status,\
         get_frontend_status,\
         make_command_FeedbackRelay,\
-        send_FeedbackRelay
+        send_FeedbackRelay,\
+        make_command_Aplitude,\
+        send_Aplitude
 
     from .sequence import\
         set_bath_temperature,\

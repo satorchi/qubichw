@@ -153,7 +153,7 @@ def make_command_TESDAC_CONTINUOUS(self,asicNum,Voffset):
     make the command to configure constant TES bias voltage
     '''
     VoffsetADU = self.Voffset2ADU(Voffset)
-    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETTESDAC_SINUS_ID,0x40)
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID,0x40)
     cmd_bytes_list.append( ((VoffsetADU & 0xFF00) >> 8)) 
     cmd_bytes_list.append( ((VoffsetADU & 0x00FF)))
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
@@ -207,3 +207,42 @@ def send_FeedbackRelay(self,asicNum,FLLrelay):
     cmd_bytes = self.make_command_FeedbackRelay(asicNum,FLLrelay)
     ack = self.send_command(cmd_bytes)
     return ack
+
+def make_command_Aplitude(self,asicNum,aplitude):
+    '''
+    set the so-called "Aplitude"
+    It's a mulitplier for the TOD
+    It should be 180 when the Feedback Relay is 10kOhm
+            and 1800 when the Feedback Relay is 100kOhm
+
+    QubicStudio does not mask the ASIC number in the usual way for this (see above method asic_qsnumber)
+    Instead, there is only "Send to all" possible, and the ASIC is set to 0x0000FF (I would have guessed it should be 0xFFFF00)
+
+
+    the Aplitude is set directly from the input integer.  There is no transfer function. (see file parametersTF.dispatcher)
+    
+    example output from the dispatcher logbook:
+
+    sets Aplitude to 180:
+     SetModulationAmplitude (size=11):00 00 FF AA 55 32 00 00 B4 FA DA
+
+    sets Aplitude to 1800
+     SetModulationAmplitude (size=11):00 00 FF AA 55 32 00 07 08 FA DA
+    '''
+    aplitudeADU = round(aplitude)
+
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETAPLITUDE_ID,0x32)
+    cmd_bytes_list.append( ((aplitudeADU & 0xFF00) >> 8)) 
+    cmd_bytes_list.append( ((aplitudeADU & 0x00FF)))
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+
+    return self.make_communication_packet(cmd_bytes_list)    
+
+def send_Aplitude(self,asicNum,aplitude):
+    '''
+    send the command to set the Aplitude
+    '''
+    cmd_bytes = self.make_command_ModulationAmplitude(asicNum,aplitude)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
