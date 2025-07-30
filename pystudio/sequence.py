@@ -31,7 +31,7 @@ default_setting['azmin'] = 0  # minimum permitted azimuth
 default_setting['azmax'] = 25 # maximum permitted azimuth (changed to 25 on 2025-06-06 15:51:25 UT)
 default_setting['azstep'] = 5 # default step size for azimuth movement for skydips
 
-def set_bath_temperature(self,Tbath,timeout=30,precision=0.003):
+def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     '''
     set the iMACRT PID for the desired temperature and wait until it reaches the temperature
     '''
