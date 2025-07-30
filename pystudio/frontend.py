@@ -217,7 +217,7 @@ def make_command_Aplitude(self,asicNum,aplitude):
 
     QubicStudio does not mask the ASIC number in the usual way for this (see above method asic_qsnumber)
     Instead, there is only "Send to all" possible, and the ASIC is set to 0x0000FF (I would have guessed it should be 0xFFFF00)
-
+    In fact, the usual ASIC masking works as above.  (tested 2025-07-30 15:28:01)
 
     the Aplitude is set directly from the input integer.  There is no transfer function. (see file parametersTF.dispatcher)
     
