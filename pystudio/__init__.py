@@ -105,6 +105,7 @@ class pystudio:
         get_frontend_status
 
     from .sequence import\
+        set_bath_temperature,\
         do_IV_measurement,\
         do_NEP_measurement,\
         do_skydip,\
