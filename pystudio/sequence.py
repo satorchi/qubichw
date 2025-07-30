@@ -149,6 +149,9 @@ def do_IV_measurement(self,
     # stop the acquisition
     ack = self.send_stopAcquisition()
 
+    # stop the FLL
+    ack = self.send_stopFLL(asicNum)
+
     print('%s - IV measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
@@ -237,6 +240,8 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     # stop the acquisition
     ack = self.send_stopAcquisition()
 
+    # stop the FLL
+    ack = self.send_stopFLL(asicNum)
     
     print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
