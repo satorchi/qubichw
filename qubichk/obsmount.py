@@ -125,6 +125,9 @@ new offset: 90 - 19.143 + 10.626 = 81.483
 the encoder position is 8.517033 when we are full east (90 degrees)
 new offset: 90 - 8.517 = 81.483
 
+2025-07-30
+readjustment again for the end limits.
+new offset: 60.713
 
 '''
 import os,sys,socket,time,re
@@ -149,7 +152,8 @@ class obsmount:
     el_zero_offset = 50 - 2.049 
     # az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
     # az_zero_offset =  10.6259666 # see above: 2025-07-25
-    az_zero_offset = 81.483 # see above: 2025-07-29
+    # az_zero_offset = 81.483 # see above: 2025-07-29
+    az_zero_offset = 60.713 # see above: 2025-07-30
     position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
