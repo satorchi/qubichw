@@ -337,6 +337,17 @@ class obsmount:
 
         return self.subscribed[port]
 
+    def disconnect(self):
+        '''
+        disconnect the ports
+        '''
+        for port in ['data','command']:
+            if not self.subscribed[port]: continue
+            self.sock[port].close()
+            self.sock[port] = None
+            self.subscribed[port] = False
+        return None
+
     def read_data(self,chunksize=None):
         '''
         once we're subscribed, we can listen for the data
