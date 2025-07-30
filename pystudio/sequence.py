@@ -126,6 +126,12 @@ def do_IV_measurement(self,
     # stop all regulations
     ack = self.send_stopFLL(asicNum)
 
+    # set feedback relay for I-V measurement
+    ack = self.send_FeedbackRelay(asicNum,10)
+
+    # set Aplitude corresponding to 10kOhm feedback relay
+    ack = self.send_Aplitude(asicNum,180)
+
     # configure sine curve bias
     ack = self.send_TESDAC_SINUS(asicNum,amplitude,Voffset,undersampling,increment)
 
