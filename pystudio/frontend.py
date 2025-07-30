@@ -242,7 +242,7 @@ def send_Aplitude(self,asicNum,aplitude):
     '''
     send the command to set the Aplitude
     '''
-    cmd_bytes = self.make_command_ModulationAmplitude(asicNum,aplitude)
+    cmd_bytes = self.make_command_Aplitude(asicNum,aplitude)
     ack = self.send_command(cmd_bytes)
     return ack
 
