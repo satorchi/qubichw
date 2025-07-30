@@ -140,7 +140,7 @@ def do_IV_measurement(self,
     if Tmeas=='':
         dataset_name = 'IV'
     else:
-        dataset_name = 'IV_.0fmK' % (1000*Tmeas)
+        dataset_name = 'IV_.%0fmK' % (1000*Tmeas)
     ack = self.send_startAcquisition(dataset_name,comment)
 
     # wait for measurement
