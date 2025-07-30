@@ -172,7 +172,7 @@ def make_command_get_frontend_status(self,asicNum):
     '''
     make the command to query the dispatcher for the current values of all parameters
     '''
-    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_GETSTATUS_CMD_NUMBER,0x0E)
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_GETSTATUS_ID,0x0E)
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
     return self.make_communication_packet(cmd_bytes_list)
 
@@ -181,5 +181,29 @@ def get_frontend_status(self,asicNum):
     query the dispatcher for the current settings
     '''
     cmd_bytes = self.make_command_get_frontend_status(asicNum)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_FeedbackRelay(self,asicNum,FLLrelay):
+    '''
+    make the command to set the FLL relay resistance
+
+    There are only two possibilities for the FLL relay:  10kOhm or 100kOhm
+    '''
+
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETFEEDBACKRELAY_ID,0x30)
+    cmd_bytes_list.append(0x00)
+    if FLLrelay<100:
+        cmd_bytes_list.append(0x01)
+    else:
+        cmd_bytes_list.append(0x02)
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_FeedbackRelay(self,asicNum,FLLrelay):
+    '''
+    send the command to set the FLL relay resistance
+    '''
+    cmd_bytes = self.make_command_FeedbackRelay(asicNum,FLLrelay)
     ack = self.send_command(cmd_bytes)
     return ack

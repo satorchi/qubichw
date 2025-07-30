@@ -61,7 +61,8 @@ class pystudio:
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
     MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
 
-    MULTINETQUICMANAGER_GETSTATUS_CMD_NUMBER = 22
+    MULTINETQUICMANAGER_GETSTATUS_ID = 14
+    MULTINETQUICMANAGER_SETFEEDBACKRELAY_ID = 61
     
     START_ACQUISITION_COMMAND = 4
     STOP_ACQUISITION_COMMAND = 5
@@ -103,7 +104,9 @@ class pystudio:
         make_command_TESDAC_CONTINUOUS,\
         send_TESDAC_CONTINUOUS,\
         make_command_get_frontend_status,\
-        get_frontend_status
+        get_frontend_status,\
+        make_command_FeedbackRelay,\
+        send_FeedbackRelay
 
     from .sequence import\
         set_bath_temperature,\
