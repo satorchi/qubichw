@@ -63,6 +63,7 @@ def send_startAcquisition(self,session_name=None,comment=None):
     '''
     send the command to start an acquisition
     '''
+    if comment is None: comment = "sent by pystudio"
     cmd_bytes = self.make_command_startAcquisition(session_name=session_name,comment=comment)
     print('%s - Starting Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     ack = self.send_command(cmd_bytes)

@@ -70,7 +70,15 @@ def set_bath_temperature(self,Tbath,timeout=30,precision=0.003):
 
     
 
-def do_IV_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersampling=None,increment=None,Tbath=None,duration=None):
+def do_IV_measurement(self,
+                      asicNum=None,
+                      Voffset=None,
+                      amplitude=None,
+                      undersampling=None,
+                      increment=None,
+                      Tbath=None,
+                      duration=None,
+                      comment=None):
     '''
     run the sequence to measure the I-V curve
     '''
@@ -83,6 +91,8 @@ def do_IV_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersamplin
     if undersampling is None: undersampling = default_setting['undersampling']
     if increment is None: increment = default_setting['increment']
     if duration is None: duration = default_setting['duration']
+    if comment is None: comment = 'I-V measurement sent by pystudio'
+
 
     #####################################
     # make sure the bias does not go out of acceptable range
@@ -130,7 +140,7 @@ def do_IV_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersamplin
         dataset_name = 'IV'
     else:
         dataset_name = 'IV_.0fmK' % (1000*Tmeas)
-    ack = self.send_startAcquisition(dataset_name)
+    ack = self.send_startAcquisition(dataset_name,comment)
 
     # wait for measurement
     time.sleep(duration)
@@ -141,7 +151,14 @@ def do_IV_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersamplin
     print('%s - IV measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
-def do_NEP_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersampling=None,increment=None,duration=None):
+def do_NEP_measurement(self,
+                       asicNum=None,
+                       Voffset=None,
+                       amplitude=None,
+                       undersampling=None,
+                       increment=None,
+                       duration=None,
+                       comment=None):
     '''
     do multiple IV measurements at different temperatures for the NEP analysis
     '''
@@ -154,10 +171,11 @@ def do_NEP_measurement(self,asicNum=None,Voffset=None,amplitude=None,undersampli
     if undersampling is None: undersampling = default_setting['undersampling']
     if increment is None: increment = default_setting['increment']
     if duration is None: duration = default_setting['duration']
+    if comment is None: comment = 'NEP sequence sent by pystudio'
 
     Tbath_list = [0.420,0.380,0.360,0.340,0.330,0.320,0.310]
     for Tbath in Tbath_list:
-        self.do_IV_measurement(asicNum,Voffset,amplitude,undersampling,increment,Tbath,duration)
+        self.do_IV_measurement(asicNum,Voffset,amplitude,undersampling,increment,Tbath,duration,comment)
 
     print('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
