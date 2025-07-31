@@ -246,3 +246,4 @@ def send_Aplitude(self,asicNum,aplitude):
     ack = self.send_command(cmd_bytes)
     return ack
 
+    

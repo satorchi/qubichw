@@ -256,6 +256,30 @@ def end_observation(self):
     print('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
+def park_frontend(self):
+    '''
+    set the frontend into "parking" mode
+    '''
+    asicNum = default_setting['asicNum']
+    # stop all regulations
+    ack = self.send_stopFLL(asicNum)
+
+    # set feedback relay for normal observation measurement
+    ack = self.send_FeedbackRelay(asicNum,100)
+
+    # set Aplitude corresponding to 100kOhm feedback relay
+    ack = self.send_Aplitude(asicNum,1800)
+
+    # configure sine curve bias
+    amplitude = 1
+    Voffset = 8
+    undersampling = 1000
+    increment = 1
+    ack = self.send_TESDAC_SINUS(asicNum,amplitude,Voffset,undersampling,increment)
+
+    print('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    return
+
 def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
     '''
     do the skydip sequence

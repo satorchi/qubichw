@@ -118,6 +118,7 @@ class pystudio:
         do_NEP_measurement,\
         start_observation,\
         end_observation,\
+        park_frontend,\
         do_skydip,\
         do_scan
     
