@@ -198,7 +198,7 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     # defaults
     if title is None: title = 'observation'
     if comment is None: comment = 'observation sent by pystudio'
-    if Voffset is None: Voffset = default_setting['Voffset']
+    if Voffset is None: Voffset = 3.0
     asicNum = default_setting['asicNum']
 
     #####################################
