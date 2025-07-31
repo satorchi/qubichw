@@ -603,8 +603,26 @@ class obsmount:
         send command to abort current command
         '''
         return self.send_command('ABORT')
-    
 
+    def do_homing(self):
+        '''
+        send command to do the homing (go to the limit switch)
+        '''
+        return self.send_command('DOHOMING')
+
+    def set_az_speed(self,speed):
+        '''
+        send command to set the azimuth speed
+        '''
+        cmd = 'AZS %i' % round(speed)
+        return self.send_command(cmd)
+    
+    def set_el_speed(self,speed):
+        '''
+        send command to set the elevation speed
+        '''
+        cmd = 'ELS %i' % round(speed)
+        return self.send_command(cmd)
     
     def wait_for_arrival(self,az=None,el=None,maxwait=None):
         '''
