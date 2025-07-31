@@ -190,7 +190,7 @@ def do_NEP_measurement(self,
     print('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
-def start_observation(self,Voffset=None,title=None,comment=None):
+def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     '''
     setup the frontend for observing and start the acquisition
     '''
@@ -201,6 +201,28 @@ def start_observation(self,Voffset=None,title=None,comment=None):
     if Voffset is None: Voffset = default_setting['Voffset']
     asicNum = default_setting['asicNum']
 
+    #####################################
+    # check for desired bath temperature
+    #  maybe this is too much error checking, and too easily aborted
+
+    # get current temperature
+    mgc = iMACRT(device='mgc')
+    Tmeas = mgc.get_mgc_measurement()
+    if Tmeas=='':
+        print('ERROR! Could not get temperature from MGC3.  aborting')
+        return None
+    
+    print('Tbath is currently: %.3f mK' % (Tmeas*1000))
+    
+    if Tbath is None:
+        print('WARNING!  TES bath temperature not specified. Using current temperature')
+        Tbath = Tmeas
+    Tbath_ok = self.set_bath_temperature(Tbath)
+
+    if not Tbath_ok:
+        print("Tbath temperature not reached.  aborting.")
+        return None
+    
     #####################################
     # configure the bolometers
 

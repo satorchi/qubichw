@@ -116,6 +116,7 @@ class pystudio:
         set_bath_temperature,\
         do_IV_measurement,\
         do_NEP_measurement,\
+        start_observation,\
         do_skydip,\
         do_scan
     
