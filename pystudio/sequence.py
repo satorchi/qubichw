@@ -190,6 +190,41 @@ def do_NEP_measurement(self,
     print('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
+def start_observation(self,Voffset=None,title=None,comment=None):
+    '''
+    setup the frontend for observing and start the acquisition
+    '''
+    #####################################
+    # defaults
+    if title is None: title = 'observation'
+    if comment is None: comment = 'observation sent by pystudio'
+    if Voffset is None: Voffset = default_setting['Voffset']
+    asicNum = default_setting['asicNum']
+
+    #####################################
+    # configure the bolometers
+
+    # stop all regulations
+    ack = self.send_stopFLL(asicNum)
+
+    # set feedback relay for normal measurement
+    ack = self.send_FeedbackRelay(asicNum,100)
+
+    # set Aplitude corresponding to 100kOhm feedback relay
+    ack = self.send_Aplitude(asicNum,1800)
+
+    # configure continuous bias
+    ack = self.send_TESDAC_CONTINUOUS(asicNum,Voffset)
+
+    # start all regulations
+    ack = self.send_startFLL(asicNum)
+
+    # start recording data
+    ack = self.send_startAcquisition(title,comment)
+   
+    print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
+    return
+
 def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
     '''
     do the skydip sequence
@@ -200,8 +235,8 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     # defaults    
     if comment is None: comment = 'Sky Dip sequence sent by pystudio'
     if Voffset is None: Voffset = default_setting['Voffset']
-    asicNum = default_setting['asicNum']
-    
+    dataset_name = 'SkyDip'
+
     if azstep is None: azstep = mount.azstep
     if azmin is None:
         azmin = mount.azmin
@@ -223,21 +258,10 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     else:
         mount.elmax = elmax
 
+    
     #####################################
-    # configure the bolometers
-
-    # stop all regulations
-    ack = self.send_stopFLL(asicNum)
-
-    # configure continuous bias
-    ack = self.send_TESDAC_CONTINUOUS(asicNum,Voffset)
-
-    # start all regulations
-    ack = self.send_startFLL(asicNum)
-
-    # start recording data
-    dataset_name = 'SkyDip'
-    ack = self.send_startAcquisition(dataset_name,comment)
+    # setup and start the acquisition
+    self.start_observation(Voffset,dataset_name,comment)
 
     # run the Sky Dip sequency from obsmount
     mount.do_skydip_sequence(azstep)
@@ -251,6 +275,7 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     
     print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
+
 
 def do_scan(self):
     '''
