@@ -247,3 +247,20 @@ def send_Aplitude(self,asicNum,aplitude):
     return ack
 
     
+def make_command_Spol(self,asicNum,Spol):
+    '''
+    make the command to set the SQUID bias
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICSPOL_ID,0x00)
+    cmd_bytes_list.append( ((Spol & 0xF0) >> 4))
+    cmd_bytes_list.append( ((Spol & 0x0F) << 4) |  0x04)
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_Spol(self,asicNum,Spol):
+    '''
+    send the command to set SQUID bias
+    '''
+    cmd_bytes = self.make_command_Spol(asicNum,Spol)
+    ack = self.send_command(cmd_bytes)
+    return ack
