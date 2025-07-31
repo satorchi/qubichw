@@ -96,9 +96,10 @@ def send_stopAcquisition(self):
     send the command to stop an acquisition
     '''
 
+    # even if we haven't started an acquisition, send the stop anyway
     if self.backupsID is None:
-        print('ERROR! There is no running acquisition to stop.')
-        return 0
+        print('WARNING! It seems there is no running acquisition to stop.')
+        self.backupsID = self.make_backupsID()
 
     cmd_bytes = self.make_command_stopAcquisition()
     print('%s - Stopping Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
