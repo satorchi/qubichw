@@ -247,6 +247,15 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return
 
+def end_observation(self):
+    '''
+    stop acquisition and stop regulations
+    '''
+    ack = self.send_stopAcquisition()
+    ack = self.send_stopFLL()
+    print('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    return
+
 def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
     '''
     do the skydip sequence

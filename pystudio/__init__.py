@@ -117,6 +117,7 @@ class pystudio:
         do_IV_measurement,\
         do_NEP_measurement,\
         start_observation,\
+        end_observation,\
         do_skydip,\
         do_scan
     
