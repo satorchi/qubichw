@@ -283,6 +283,11 @@ def park_frontend(self):
     increment = 1
     ack = self.send_TESDAC_SINUS(asicNum,amplitude,Voffset,undersampling,increment)
 
+    # switch off the temperature feedback loop
+    mgc = iMACRT(device='mgc')
+    ans = mgc.set_mgc_pid(0)
+    mgc.disconnect()
+    
     print('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
