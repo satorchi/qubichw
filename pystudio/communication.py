@@ -19,12 +19,8 @@ def interpret_communication(self,com_bytes,print_command_string=False):
     '''
     interpret the communicated bytes
     '''
-    print('BYTES: %s' % bytes2str(com_bytes))
+    print('BYTES:\n%s' % bytes2str(com_bytes).replace('0xAA 0x55','0xAA\n0x55'))
     
-    if len(com_bytes)<13:
-        print('Error! Command is too small: %i bytes' % len(com_bytes))
-        return          
-
     if com_bytes[0]!=0x55:
         print('Error!  Incorrect STX: 0x%02X' % com_bytes[0])
         return
@@ -137,6 +133,17 @@ def make_preamble(self,command_length):
                       (command_length & 0x0000FF00)>>8,
                       (command_length & 0x000000FF)]
     return cmd_bytes_list
+
+def make_request_preamble(self):
+    '''
+    make the command preamble to request the current settings
+    '''
+
+    cmd_bytes_list = [self.CONF_DISPATCHER_TC_ID]
+
+
+    
+    return
 
 
 def make_communication_packet(self,cmd_bytes_list):
