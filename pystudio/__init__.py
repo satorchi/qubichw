@@ -48,14 +48,22 @@ see in QubicStudio source code: TVirtualCommandEncode.cpp, QDispatcherTCByteArra
 
 '''
 class pystudio:
-    verbosity = 1 # class variable.  You can change this before instantiating an object
+
+    # class variables.  You can change these before instantiating an object
+    verbosity = 1 
     __object_type__ = 'pystudio'
 
+    # dispatcher byte codes
     DISPATCHER_STX = 0x55
     END_COMMUNICATION = 0xAA
     SEND_TC_TO_SUBSYS_ID = 0xC0
     CUSTOM_TC_ID = 0xD0
     INTERN_TC_ID = 0xD1
+
+    # for requesting info
+    CONF_DISPATCHER_TC_ID = 0xB0
+    ONE_SHOT = 0x80000000
+    PARAMETER_FREQUENCY = 0x40000000
 
     MULTINETQUICMANAGER_ID = 2
     MULTINETQUICMANAGER_GETSTATUS_ID = 14
@@ -112,9 +120,12 @@ class pystudio:
         make_command_Aplitude,\
         send_Aplitude,\
         make_command_Spol,\
-        send_Spol
+        send_Spol,\
+        make_command_Apol,\
+        send_Apol
 
     from .sequence import\
+        get_default_setting,\
         set_bath_temperature,\
         do_IV_measurement,\
         do_NEP_measurement,\
