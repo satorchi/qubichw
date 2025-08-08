@@ -54,14 +54,15 @@ class pystudio:
     __object_type__ = 'pystudio'
 
     # dispatcher byte codes
-    DISPATCHER_STX = 0x55
-    END_COMMUNICATION = 0xAA
+    DISPATCHER_STX = 0x55 # start transmission
+    DISPATCHER_ETX = 0xAA # end transmission
     SEND_TC_TO_SUBSYS_ID = 0xC0
     CUSTOM_TC_ID = 0xD0
     INTERN_TC_ID = 0xD1
 
     # for requesting info
     CONF_DISPATCHER_TC_ID = 0xB0
+    TF_MASK =  0x007FFFFF
     ONE_SHOT = 0x80000000
     PARAMETER_FREQUENCY = 0x40000000
 
@@ -91,6 +92,8 @@ class pystudio:
         unsubscribe,\
         send_command,\
         make_preamble,\
+        make_command_request,\
+        send_request,\
         make_communication_packet
 
     from .acquisition import\
@@ -134,6 +137,14 @@ class pystudio:
         park_frontend,\
         do_skydip,\
         do_scan
+
+    from .tparameterstable import assign_parameterstable
+
+    def __init__(self):
+        self.assign_parameterstable()
+        return
+    
+    
     
 
     

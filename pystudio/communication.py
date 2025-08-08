@@ -134,17 +134,6 @@ def make_preamble(self,command_length):
                       (command_length & 0x000000FF)]
     return cmd_bytes_list
 
-def make_request_preamble(self):
-    '''
-    make the command preamble to request the current settings
-    '''
-
-    cmd_bytes_list = [self.CONF_DISPATCHER_TC_ID]
-
-
-    
-    return
-
 
 def make_communication_packet(self,cmd_bytes_list):
     '''
@@ -153,8 +142,53 @@ def make_communication_packet(self,cmd_bytes_list):
     command_length = len(cmd_bytes_list)
     preamble_list = self.make_preamble(command_length)
     comms_packet_list = preamble_list + cmd_bytes_list
-    comms_packet_list.append(self.END_COMMUNICATION)
+    comms_packet_list.append(self.DISPATCHER_ETX)
     comms_packet = bytearray(comms_packet_list)
     return comms_packet
 
+def make_command_request(self,reqNum=None):
+    '''
+    make the command to request the current settings
+
+    The dispatcher permits options to select which parameters, but we will just ask for all of them
+
+    reqNum : request number... I'm not sure what this is.
+
+    '''
+    parameterNum = 0xFFFFFFFF
+    mode = parameterNum & self.TF_MASK # on enleve le bit TF si l'utilisateur s'amuse a le mettre !! (comment from Wilfried)
+    mode = mode | self.ONE_SHOT
+    sample_rate = 0 # sample rate if we are not using "one shot" (presumeably)
+    parameterList = [self.NETQUIC_HeaderTM_ASIC_ID,
+                     self.ASIC_Spol_ID,
+                     self.QUBIC_TESDAC_Shape_ID]
+    if reqNum is None: reqNum = 1 # a guess
     
+    cmd_bytes_list = [self.CONF_DISPATCHER_TC_ID]
+    cmd_bytes_list.append(reqNum)
+    cmd_bytes_list.append((len(parameterList) & 0xFF00)>>8)
+    cmd_bytes_list.append( len(parameterList) & 0x00FF)
+    cmd_bytes_list.append((mode & 0xFF000000)>>24)
+    cmd_bytes_list.append((mode & 0x00FF0000)>>16)
+    cmd_bytes_list.append((mode & 0x0000FF00)>>8 )
+    cmd_bytes_list.append( mode & 0x000000FF     )
+    cmd_bytes_list.append((sample_rate & 0xFF00)>>8)
+    cmd_bytes_list.append( sample_rate & 0x00FF)
+
+
+    for parm in parameterList:
+        cmd_bytes_list.append((parm & 0xFF0000) >> 16)
+        cmd_bytes_list.append((parm & 0x00FF00) >> 8)
+        cmd_bytes_list.append((parm & 0x0000FF))
+    
+    cmd_bytes = self.make_communication_packet(cmd_bytes_list)
+    
+    return cmd_bytes
+
+def send_request(self,reqNum=None):
+    '''
+    send a request to the dispatcher to return all parameters
+    '''
+    cmd_bytes = self.make_command_request(reqNum)
+    return send_command(cmd_bytes)
+
