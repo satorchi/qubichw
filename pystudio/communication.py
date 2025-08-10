@@ -161,7 +161,9 @@ def make_command_request(self,reqNum=None):
     sample_rate = 0 # sample rate if we are not using "one shot" (presumeably)
     parameterList = [self.NETQUIC_HeaderTM_ASIC_ID,
                      self.ASIC_Spol_ID,
-                     self.QUBIC_TESDAC_Shape_ID]
+                     self.QUBIC_TESDAC_Shape_ID,
+                     self.QUBIC_TESDAC_Offset_ID,
+                     self.QUBIC_TESDAC_Amplitude_ID]
     if reqNum is None: reqNum = 1 # a guess
     
     cmd_bytes_list = [self.CONF_DISPATCHER_TC_ID]
