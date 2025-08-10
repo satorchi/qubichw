@@ -190,5 +190,5 @@ def send_request(self,reqNum=None):
     send a request to the dispatcher to return all parameters
     '''
     cmd_bytes = self.make_command_request(reqNum)
-    return send_command(cmd_bytes)
+    return self.send_command(cmd_bytes)
 
