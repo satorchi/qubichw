@@ -196,7 +196,12 @@ def make_command_request(self,reqNum=None,parameterList=None):
                          'ASIC_Spol_ID',
                          'QUBIC_TESDAC_Shape_ID',
                          'QUBIC_TESDAC_Offset_ID',
-                         'QUBIC_TESDAC_Amplitude_ID'
+                         'QUBIC_TESDAC_Amplitude_ID',
+                         'QUBIC_Rfb_ID',
+                         'QUBIC_FLL_State_ID',
+                         'QUBIC_FLL_P_ID',
+                         'QUBIC_FLL_I_ID',
+                         'QUBIC_FLL_D_ID'
                          ]
 
     parameterCodeList = []

@@ -11,23 +11,35 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 do the sky dip sequence:  up and down elevation at different azimuth
 
-this script uses the default values
-you can change these with:
-mount.do_skydip_sequence(azstep=5)
+the script without arguments will use the default values
+you can change parameters on the command line:
 
-or by changing class variables before running do_skydip_sequence()
-for example:
-
-mount = obsmount()
-mount.elmin = 50
-mount.elmax = 70
-mount.azmin = 0
-mount.azmax = 15
-mount.azstep = 5
+For example:
+do_skydip_sequence.py azstep=5 azmin=61 azmax=115
 
 '''
-from qubichk.obsmount import obsmount
+from satorchipy.utilities import parseargs
+from pystudio import pystudio
 
-mount = obsmount()
-mount.do_skydip_sequence()
+parameterList = ['azstep',
+                 'azmin',
+                 'azmax',
+                 'elmin',
+                 'elmax',
+                 'Voffset',
+                 'comment']
+options = parseargs(sys.argv,parameterList=parameterList)
 
+dispatcher = pystudio()
+ack = dispatcher.subscribe_dispatcher()
+ack = dispatcher.do_skydip_sequence(azstep=options['azstep'],
+                                    azmin=options['azmin'],
+                                    azmax=options['azmax'],
+                                    elmin=options['elmin'],
+                                    elmax=options['elmax'],
+                                    Voffset=options['Voffset'],
+                                    Tbath=options['Tbath'],
+                                    comment=options['comment']
+                                   )
+
+ack = dispatcher.unsubscribe()

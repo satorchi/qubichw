@@ -439,7 +439,7 @@ def park_frontend(self):
     print('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
-def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
+def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
     '''
     do the skydip sequence
     '''
@@ -448,7 +448,6 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     #####################################
     # defaults    
     if comment is None: comment = 'Sky Dip sequence sent by pystudio'
-    if Voffset is None: Voffset = default_setting['Voffset']
     dataset_name = 'SkyDip'
 
     if azstep is None: azstep = mount.azstep
@@ -475,7 +474,7 @@ def do_skydip(self,Voffset=None,azstep=None,azmin=None,azmax=None,elmin=None,elm
     
     #####################################
     # setup and start the acquisition
-    self.start_observation(Voffset,dataset_name,comment)
+    self.start_observation(Voffset,Tbath,dataset_name,comment)
 
     # run the Sky Dip sequency from obsmount
     mount.do_skydip_sequence(azstep)
