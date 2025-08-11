@@ -19,6 +19,7 @@ For example:
 
 do_NEP_sequence.py Voffset=5.5 amplitude=3
 '''
+import sys
 from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
@@ -28,16 +29,16 @@ parameterList = ['Voffset',
                  'increment',
                  'duration',
                  'comment']
-options = parseargs(sys.argv,parameterList=parameterList)
+options = parseargs(sys.argv,expected_args=parameterList)
 
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()
-ack = dispatcher.do_SQUID_measurement(Voffset=options['Voffset'],
-                                    amplitude=options['amplitude'],
-                                    undersampling=options['undersampling'],
-                                    increment=options['increment'],
-                                    duration=options['duration'],
-                                    comment=options['comment']
-                                    )
+ack = dispatcher.do_SQUID_optimization(Voffset=options['Voffset'],
+                                       amplitude=options['amplitude'],
+                                       undersampling=options['undersampling'],
+                                       increment=options['increment'],
+                                       duration=options['duration'],
+                                       comment=options['comment']
+                                       )
 
 ack = dispatcher.unsubscribe()

@@ -20,6 +20,7 @@ For example:
 do_IV_sequence.py Tbath=0.325
 
 '''
+import sys
 from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
@@ -30,7 +31,7 @@ parameterList = ['Voffset',
                  'Tbath',
                  'duration',
                  'comment']
-options = parseargs(sys.argv,parameterList=parameterList)
+options = parseargs(sys.argv,expected_args=parameterList)
 
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()

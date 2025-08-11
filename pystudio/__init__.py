@@ -133,6 +133,8 @@ class pystudio:
         set_bath_temperature,\
         do_IV_measurement,\
         do_NEP_measurement,\
+        do_SQUID_optimization,\
+        do_skydip,\
         start_observation,\
         end_observation,\
         park_frontend,\

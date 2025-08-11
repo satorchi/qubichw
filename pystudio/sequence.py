@@ -94,16 +94,14 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     # get current temperature
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
-    if Tmeas=='':
+    if Tmeas is None or Tmeas=='':
         print('Could not get temperature from MGC3.')
+        return None
     else:
         print('Tbath is currently: %.3f mK' % (Tmeas*1000))
 
     
     ans = mgc.set_mgc_setpoint(Tbath)
-    if ans is None:
-        print('ERROR!  Could not set bath temperature: %.3f K' % Tbath)
-        return None
     time.sleep(0.2)
     ans = mgc.set_mgc_pid(1)
 
@@ -199,7 +197,7 @@ def do_IV_measurement(self,
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
     mgc.disconnect()
-    if Tmeas=='':
+    if Tmeas is None or Tmeas=='':
         dataset_name = 'IV'
     else:
         dataset_name = 'IV_%.0fmK' % (1000*Tmeas)
@@ -231,12 +229,12 @@ def do_NEP_measurement(self,
     
     #####################################
     # defaults
-    if asicNum is None: asicNum = default_setting['asicNum']
-    if Voffset is None: Voffset = default_setting['Voffset']
-    if amplitude is None: amplitude = default_setting['amplitude']
-    if undersampling is None: undersampling = default_setting['undersampling']
-    if increment is None: increment = default_setting['increment']
-    if duration is None: duration = default_setting['duration']
+    if asicNum is None: asicNum = self.get_default_setting('asicNum',measurement='I-V')
+    if Voffset is None: Voffset = self.get_default_setting('Voffset',measurement='I-V')
+    if amplitude is None: amplitude = self.get_default_setting('amplitude',measurement='I-V')
+    if undersampling is None: undersampling = self.get_default_setting('undersampling',measurement='I-V')
+    if increment is None: increment = self.get_default_setting('increment',measurement='I-V')
+    if duration is None: duration = self.get_default_setting('duration',measurement='I-V')
     if comment is None: comment = 'NEP sequence sent by pystudio'
 
     Tbath_list = [0.420,0.380,0.360,0.340,0.330,0.320,0.310]
@@ -362,7 +360,7 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     # get current temperature
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
-    if Tmeas=='':
+    if Tmeas is None or Tmeas=='':
         print('ERROR! Could not get temperature from MGC3.  aborting')
         return None
     
