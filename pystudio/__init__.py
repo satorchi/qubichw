@@ -90,6 +90,7 @@ class pystudio:
         print_acknowledgement,\
         subscribe_dispatcher,\
         unsubscribe,\
+        get_data,\
         send_command,\
         make_preamble,\
         make_command_request,\
