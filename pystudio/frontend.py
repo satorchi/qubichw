@@ -43,6 +43,13 @@ def Voffset2ADU(self,Voffset):
     ADU = round(ADUfloat)
     return ADU
 
+def ADU2Voffset(self,ADU):
+    '''
+    convert the bias offset ADU returned by dispatcher to Volts
+    '''
+    Voffset = 288.58e-6*ADU
+    return Voffset
+
 def amplitude2ADU(self,amplitude):
     '''
     convert the TES bias sine amplitude to ADU
@@ -55,6 +62,13 @@ def amplitude2ADU(self,amplitude):
     ADUfloat = amplitude/1.15432e-3
     ADU = round(ADUfloat)
     return ADU
+
+def ADU2amplitude(self,ADU):
+    '''
+    convert the TES bias sine amplitude from ADU to Volts
+    '''
+    amplitude = ADU*1.15432e-3
+    return amplitude
 
 def make_frontend_preamble(self,asicNum_list,subsysID1,subsysID2):
     '''

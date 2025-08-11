@@ -110,7 +110,9 @@ class pystudio:
         send_startFLL,\
         send_stopFLL,\
         Voffset2ADU,\
+        ADU2Voffset,\
         amplitude2ADU,\
+        ADU2amplitude,\
         make_frontend_preamble,\
         make_frontend_suffix,\
         make_command_TESDAC_SINUS,\

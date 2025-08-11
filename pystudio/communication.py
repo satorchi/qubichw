@@ -15,7 +15,7 @@ from qubichk.utilities import known_hosts, bytes2str
 
 QS_IP = known_hosts['qubic-studio']
 
-def interpret_communication(self,com_bytes,print_command_string=False):
+def interpret_communication(self,com_bytes,print_command_string=False, parameterList=None):
     '''
     interpret the communicated bytes
     '''
@@ -58,7 +58,32 @@ def interpret_communication(self,com_bytes,print_command_string=False):
         print('Error!  Incorrect End of Transmission: 0x%02X' % eot)
         return
 
-    return
+    if parameterList is None: return
+
+    idx = 7
+    parameter_idx = 0
+    while idx<=last_idx-4:
+        val = (com_bytes[idx]<<24) + (com_bytes[idx+1]<<16) + (com_bytes[idx+2]<<8) + com_bytes[idx+3]
+        phys_val = None
+        if parameter_idx<len(parameterList):
+            parm_name = parameterList[parameter_idx]
+        else:
+            parm_name = 'UNKNOWN parameter'
+
+        if parm_name=='QUBIC_TESDAC_Offset_ID':
+            phys_val = self.ADU2Voffset(val)
+        if parm_name=='QUBIC_TESDAC_Amplitude_ID':
+            phys_val = self.ADU2amplitude(val)
+
+        if phys_val is None:
+            print('%32s 0x%08X = %10i' % (parm_name,val,val))
+        else:
+            print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
+
+        parameter_idx += 1
+        idx += 4
+
+    return 
     
 
 def print_acknowledgement(self,ack,comment=''):
@@ -192,18 +217,8 @@ def make_command_request(self,reqNum=None,parameterList=None):
 
     '''
     if parameterList is None:
-        parameterList = ['NETQUIC_HeaderTM_ASIC_ID',
-                         'ASIC_Spol_ID',
-                         'QUBIC_TESDAC_Shape_ID',
-                         'QUBIC_TESDAC_Offset_ID',
-                         'QUBIC_TESDAC_Amplitude_ID',
-                         'QUBIC_Rfb_ID',
-                         'QUBIC_FLL_State_ID',
-                         'QUBIC_FLL_P_ID',
-                         'QUBIC_FLL_I_ID',
-                         'QUBIC_FLL_D_ID'
-                         ]
-
+        parameterList = self.default_parameterList
+        
     parameterCodeList = []
     for parm in parameterList:
         parameterCodeList.append(self.parameterstable[parm])
@@ -239,13 +254,18 @@ def send_request(self,reqNum=None,parameterList=None):
     '''
     send a request to the dispatcher to return all parameters
     '''
+    if parameterList is None:
+        parameterList = self.default_parameterList
     cmd_bytes = self.make_command_request(reqNum,parameterList)
 
     # send the request
     ack = self.send_command(cmd_bytes)
 
     # then read the data
+    time.sleep(0.1)
     ack = self.get_data()
+    self.interpret_communication(ack,parameter_request=parameterList)
     return ack
 
 
+    
