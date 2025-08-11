@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 general utilities for communicating with the dispatcher
 '''
-import socket
+import socket,time
 from qubichk.utilities import known_hosts, bytes2str
 
 QS_IP = known_hosts['qubic-studio']
@@ -139,16 +139,20 @@ def send_command(self,cmd_bytes):
     if self.dispatcher_socket is None:
         self.dispatcher_socket = self.subscribe_dispatcher()
 
-    nbytes_sent = self.dispatcher_socket.send(cmd_bytes)
-    print('sent %i bytes' % nbytes_sent)
-    ack = None
     try:
-        ack = self.dispatcher_socket.recv(self.chunksize)
+        nbytes_sent = self.dispatcher_socket.send(cmd_bytes)
     except:
-        print('ERROR!  No acknowledgement from dispatcher')
-    else:
-        self.print_acknowledgement(ack)
+        print('ERROR! Could not send to dispatcher.')
+        return None
     
+    print('sent %i bytes' % nbytes_sent)
+    time.sleep(0.1)
+    ack = self.get_data()
+    if ack is None:
+        print('ERROR!  No acknowledgement from dispatcher')
+        return None
+    
+    self.print_acknowledgement(ack)
     return ack
 
 def make_preamble(self,command_length):
@@ -178,7 +182,7 @@ def make_communication_packet(self,cmd_bytes_list):
     comms_packet = bytearray(comms_packet_list)
     return comms_packet
 
-def make_command_request(self,reqNum=None):
+def make_command_request(self,reqNum=None,parameterList=None):
     '''
     make the command to request the current settings
 
@@ -187,15 +191,22 @@ def make_command_request(self,reqNum=None):
     reqNum : request number... I'm not sure what this is.
 
     '''
+    if parameterList is None:
+        parameterList = ['NETQUIC_HeaderTM_ASIC_ID',
+                         'ASIC_Spol_ID',
+                         'QUBIC_TESDAC_Shape_ID',
+                         'QUBIC_TESDAC_Offset_ID',
+                         'QUBIC_TESDAC_Amplitude_ID'
+                         ]
+
+    parameterCodeList = []
+    for parm in parameterList:
+        parameterCodeList.append(self.parameterstable[parm])
+    
     parameterNum = 0xFFFFFFFF
     mode = parameterNum & self.TF_MASK # on enleve le bit TF si l'utilisateur s'amuse a le mettre !! (comment from Wilfried)
     mode = mode | self.ONE_SHOT
     sample_rate = 0 # sample rate if we are not using "one shot" (presumeably)
-    parameterList = [self.NETQUIC_HeaderTM_ASIC_ID,
-                     self.ASIC_Spol_ID,
-                     self.QUBIC_TESDAC_Shape_ID,
-                     self.QUBIC_TESDAC_Offset_ID,
-                     self.QUBIC_TESDAC_Amplitude_ID]
     if reqNum is None: reqNum = 1 # a guess
     
     cmd_bytes_list = [self.CONF_DISPATCHER_TC_ID]
@@ -219,10 +230,17 @@ def make_command_request(self,reqNum=None):
     
     return cmd_bytes
 
-def send_request(self,reqNum=None):
+def send_request(self,reqNum=None,parameterList=None):
     '''
     send a request to the dispatcher to return all parameters
     '''
-    cmd_bytes = self.make_command_request(reqNum)
-    return self.send_command(cmd_bytes)
+    cmd_bytes = self.make_command_request(reqNum,parameterList)
+
+    # send the request
+    ack = self.send_command(cmd_bytes)
+
+    # then read the data
+    ack = self.get_data()
+    return ack
+
 
