@@ -479,10 +479,7 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     mount.disconnect()
 
     # stop the acquisition
-    ack = self.send_stopAcquisition()
-
-    # stop the FLL
-    ack = self.send_stopFLL(asicNum)
+    ack = self.end_observation()
     
     print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return

@@ -96,6 +96,8 @@ def make_command_startstopFLL(self,asicNum,onOff):
     '''
     make the command to start or stop the FLL
     '''
+    if asicNum is None:
+        asicNum = self.get_default_setting('asicNum')
     cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_ACTIVATEPID_ID,0x14)
     cmd_bytes_list.append( (onOff & 0xFF00) >> 8 ) 
     cmd_bytes_list.append( (onOff & 0x00FF) )
@@ -103,7 +105,7 @@ def make_command_startstopFLL(self,asicNum,onOff):
 
     return self.make_communication_packet(cmd_bytes_list)
     
-def send_startFLL(self,asicNum):
+def send_startFLL(self,asicNum=None):
     '''
     start the bolometer feedback regulations
     '''
@@ -112,7 +114,7 @@ def send_startFLL(self,asicNum):
     
     return ack
 
-def send_stopFLL(self,asicNum):
+def send_stopFLL(self,asicNum=None):
     '''
     stop the bolometer feedback regulations
     '''

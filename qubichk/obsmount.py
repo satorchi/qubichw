@@ -686,7 +686,10 @@ class obsmount:
     
         start_tstamp = dt.datetime.now().timestamp()
 
-        self.goto_az(self.azmin)
+        ack = self.goto_az(self.azmin)
+        if not ack['ok']:
+            return False
+        
         azok = self.wait_for_arrival(az=self.azmin)
         if not azok:
             print('ERROR! Did not successfully get to starting azimuth position')
