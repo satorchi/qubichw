@@ -80,11 +80,24 @@ def subscribe_dispatcher(self):
     '''
     self.dispatcher_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.dispatcher_socket.settimeout(0.6)
-    self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
-    ack = self.dispatcher_socket.recv(self.chunksize)
+
+    try:
+        self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
+    except:
+        print('ERROR! Could not subscribe to dispatcher.')
+        self.dispatcher_socket = None
+        return None
+    
+    try:
+        ack = self.dispatcher_socket.recv(self.chunksize)
+    except:
+        print('ERROR!  NO ACKNOWLEDGEMENT for subscription.')
+        return None
+              
+        
     self.print_acknowledgement(ack,'subscribe')
     
-    return self.dispatcher_socket
+    return ack
 
 def unsubscribe(self):
     '''
@@ -98,6 +111,25 @@ def unsubscribe(self):
     del(self.dispatcher_socket)
     self.dispatcher_socket = None
     return
+
+def get_data(self):
+    '''
+    get whatever the dispatcher is sending us
+    '''
+    if self.dispatcher_socket is None:
+        ack = self.subscribe_dispatcher()
+
+    if self.dispatcher_socket is None:
+        return None
+
+    try:
+        ack = self.dispatcher_socket.recv(self.chunksize)
+    except:
+        print('No data')
+        return None
+    
+    return ack
+    
 
 def send_command(self,cmd_bytes):
     '''
