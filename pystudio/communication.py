@@ -226,10 +226,10 @@ def make_command_request(self,reqNum=None,parameterList=None):
     cmd_bytes_list.append( sample_rate & 0x00FF)
 
 
-    for parm in parameterList:
-        cmd_bytes_list.append((parm & 0xFF0000) >> 16)
-        cmd_bytes_list.append((parm & 0x00FF00) >> 8)
-        cmd_bytes_list.append((parm & 0x0000FF))
+    for parmcode in parameterCodeList:
+        cmd_bytes_list.append((parmcode & 0xFF0000) >> 16)
+        cmd_bytes_list.append((parmcode & 0x00FF00) >> 8)
+        cmd_bytes_list.append((parmcode & 0x0000FF))
     
     cmd_bytes = self.make_communication_packet(cmd_bytes_list)
     
