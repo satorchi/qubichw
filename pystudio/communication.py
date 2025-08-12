@@ -21,6 +21,12 @@ def interpret_communication(self,com_bytes,print_command_string=False, parameter
     '''
     retval = {}
     retval['ERROR'] = []
+
+    if com_bytes is None:
+        msg = 'No bytes to interpret.'
+        retval['ERROR'].append(msg)
+        print('ERROR! '+msg)
+        return retval
     
     if verbose: print('BYTES:\n%s' % bytes2str(com_bytes).replace('0xAA 0x55','0xAA\n0x55'))
     retval['bytes'] = com_bytes
