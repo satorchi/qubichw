@@ -88,7 +88,7 @@ def interpret_communication(self,com_bytes,print_command_string=False, parameter
 
     idx = 7
     parameter_idx = 0
-    while idx<=last_idx-4:
+    while idx<=len(com_bytes)-4:
         val = (com_bytes[idx]<<24) + (com_bytes[idx+1]<<16) + (com_bytes[idx+2]<<8) + com_bytes[idx+3]
         phys_val = None
         if parameter_idx<len(parameterList):
