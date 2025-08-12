@@ -15,50 +15,70 @@ from qubichk.utilities import known_hosts, bytes2str
 
 QS_IP = known_hosts['qubic-studio']
 
-def interpret_communication(self,com_bytes,print_command_string=False, parameterList=None):
+def interpret_communication(self,com_bytes,print_command_string=False, parameterList=None,verbose=True):
     '''
     interpret the communicated bytes
     '''
-    print('BYTES:\n%s' % bytes2str(com_bytes).replace('0xAA 0x55','0xAA\n0x55'))
+    retval = {}
+    retval['ERROR'] = []
+    
+    if verbose: print('BYTES:\n%s' % bytes2str(com_bytes).replace('0xAA 0x55','0xAA\n0x55'))
+    retval['bytes'] = com_bytes
+    retval['communication size'] = len(com_bytes)
     
     if com_bytes[0]!=0x55:
-        print('Error!  Incorrect STX: 0x%02X' % com_bytes[0])
-        return
+        msg = 'Incorrect STX: 0x%02X' % com_bytes[0]
+        retval['ERROR'].append(msg)
+        print('ERROR! '+msg)
+        return retval
 
     counter = (com_bytes[1]<<8) + com_bytes[2]
-    print('COUNTER: 0x%04X = %i' % (counter,counter))
+    retval['counter'] = counter
+    if verbose: print('COUNTER: 0x%04X = %i' % (counter,counter))
 
     cmd_size = (com_bytes[3]<<24) + (com_bytes[4]<<16) + (com_bytes[5]<<8) + com_bytes[6]
-    print('CMD_SIZE: 0x%08X = %i' % (cmd_size,cmd_size))
+    retval['command size'] = cmd_size
+    if verbose: print('CMD_SIZE: 0x%08X = %i' % (cmd_size,cmd_size))
     last_idx = 7 + cmd_size
-    print('TOTAL BYTES: %i' % len(com_bytes))
-    print('LAST INDEX: %i' % last_idx)
+    retval['last index'] = last_idx
+    if verbose:
+        print('TOTAL BYTES: %i' % len(com_bytes))
+        print('LAST INDEX: %i' % last_idx)
     if last_idx!=(len(com_bytes)-1):
-        print('Error! Given size does not match!')
+        msg = 'Given size does not match!'
+        retval['ERROR'].append(msg)
+        print('ERROR! '+msg)
     if last_idx>=len(com_bytes):
-        print('Error! Given size is larger than the communication length: %i > %i' % (last_idx+1,len(com_bytes)))
+        msg = 'Given size is larger than the communication length: %i > %i' % (last_idx+1,len(com_bytes))
+        retval['ERROR'].append(msg)
+        print('ERROR! '+msg)
     else:
-        print('final byte (EOT): 0x%02X' % com_bytes[last_idx])
+        if verbose: print('final byte (EOT): 0x%02X' % com_bytes[last_idx])
 
     cmd_id = com_bytes[7]
-    print('CMD_ID: 0x%02X' % cmd_id)
+    retval['command ID'] = cmd_id
+    if verbose: print('CMD_ID: 0x%02X' % cmd_id)
 
     sub_id = (com_bytes[8]<<8) + com_bytes[9]
-    print('SUBCMD_ID: 0x%04X' % sub_id)
+    retval['command subID'] = sub_id
+    if verbose: print('SUBCMD_ID: 0x%04X' % sub_id)
 
     
     cmd = bytearray(com_bytes[10:-1])
-    print('COMMAND: %s' % (bytes2str(cmd)))
+    retval['communication body'] = cmd
+    if verbose: print('COMMAND: %s' % (bytes2str(cmd)))
     if print_command_string:
         cmd_str = cmd.decode('iso-8859-1')
         print('COMMAND: %s' % cmd_str)
     
     eot = com_bytes[-1]
     if eot!=0xaa:
-        print('Error!  Incorrect End of Transmission: 0x%02X' % eot)
-        return
+        msg = 'Incorrect End of Transmission: 0x%02X' % eot
+        retval['ERROR'].append(msg)
+        print('ERROR! '+msg)
+        return retval
 
-    if parameterList is None: return
+    if parameterList is None: return retval
 
     idx = 7
     parameter_idx = 0
@@ -68,7 +88,7 @@ def interpret_communication(self,com_bytes,print_command_string=False, parameter
         if parameter_idx<len(parameterList):
             parm_name = parameterList[parameter_idx]
         else:
-            parm_name = 'UNKNOWN parameter'
+            parm_name = 'UNKNOWN parameter %i' % parameter_idx
 
         if parm_name=='QUBIC_TESDAC_Offset_ID':
             phys_val = self.ADU2Voffset(val)
@@ -77,13 +97,16 @@ def interpret_communication(self,com_bytes,print_command_string=False, parameter
 
         if phys_val is None:
             print('%32s 0x%08X = %10i' % (parm_name,val,val))
+            retval[parm_name] = val
         else:
             print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
+            retval[parm_name] = (val,phys_val)
+
 
         parameter_idx += 1
         idx += 4
 
-    return 
+    return retval
     
 
 def print_acknowledgement(self,ack,comment=''):
