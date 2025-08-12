@@ -36,7 +36,6 @@ def interpret_communication(self,com_bytes,print_command_string=False, parameter
         msg = 'Incorrect STX: 0x%02X' % com_bytes[0]
         retval['ERROR'].append(msg)
         print('ERROR! '+msg)
-        return retval
 
     counter = (com_bytes[1]<<8) + com_bytes[2]
     retval['counter'] = counter
