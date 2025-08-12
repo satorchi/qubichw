@@ -296,7 +296,7 @@ def send_request(self,reqNum=None,parameterList=None):
     if ack is None:
         return vals
     
-    vals = self.interpret_communication(ack2,parameterList=parameterList,verbose=False)
+    vals = self.interpret_communication(ack,parameterList=parameterList,verbose=False)
     return vals
 
 
