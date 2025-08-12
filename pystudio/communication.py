@@ -288,11 +288,12 @@ def send_request(self,reqNum=None,parameterList=None):
 
     # send the request
     ack = self.send_command(cmd_bytes)
+    self.interpret_communication(ack,parameterList=parameterList,verbose=False)
 
     # then read the data
     time.sleep(0.1)
     ack = self.get_data()
-    self.interpret_communication(ack,parameterList=parameterList)
+    self.interpret_communication(ack,parameterList=parameterList,verbose=False)
     return ack
 
 
