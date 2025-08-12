@@ -288,7 +288,7 @@ def send_request(self,reqNum=None,parameterList=None):
 
     # send the request
     ack1 = self.send_command(cmd_bytes)
-    self.interpret_communication(ack,parameterList=parameterList,verbose=False)
+    self.interpret_communication(ack1,parameterList=parameterList,verbose=False)
 
     # then read the data
     time.sleep(0.1)
