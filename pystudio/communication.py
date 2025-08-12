@@ -287,14 +287,17 @@ def send_request(self,reqNum=None,parameterList=None):
     cmd_bytes = self.make_command_request(reqNum,parameterList)
 
     # send the request
-    ack = self.send_command(cmd_bytes)
+    ack1 = self.send_command(cmd_bytes)
     self.interpret_communication(ack,parameterList=parameterList,verbose=False)
 
     # then read the data
     time.sleep(0.1)
-    ack = self.get_data()
-    self.interpret_communication(ack,parameterList=parameterList,verbose=False)
-    return ack
+    ack2 = self.get_data()
+    if ack2 is None:
+        return ack1
+    
+    self.interpret_communication(ack2,parameterList=parameterList,verbose=False)
+    return ack2
 
 
     
