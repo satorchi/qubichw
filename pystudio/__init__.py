@@ -86,6 +86,7 @@ class pystudio:
     chunksize = 2**20
 
     from .communication import\
+        interpret_packet,\
         interpret_communication,\
         print_acknowledgement,\
         subscribe_dispatcher,\
@@ -145,8 +146,11 @@ class pystudio:
 
     from .tparameterstable import assign_parameterstable
 
+    from .dispatcher_id import assign_dispatcher_IDs
+
     def __init__(self):
         self.assign_parameterstable()
+        self.assign_dispatcher_IDs()
         return
     
     

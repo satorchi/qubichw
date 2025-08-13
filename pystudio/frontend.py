@@ -77,6 +77,9 @@ def make_frontend_preamble(self,asicNum_list,subsysID1,subsysID2):
     we can configure any number of ASICs the same way.  
     If the asicNum argument is a list, then make a bitmask for all the requested ASICs
     '''
+    if asicNum_list is None:
+        asicNum_list = self.get_default_setting('asicNum')
+        
     if isinstance(asicNum_list,list):
         qsAsicNum = 0
         for asicNum in asicNum_list:
@@ -186,7 +189,7 @@ def send_TESDAC_CONTINUOUS(self,asicNum,Voffset):
 
 def make_command_get_frontend_status(self,asicNum):
     '''
-    make the command to query the dispatcher for the current values of all parameters
+    make the command to query the dispatcher for the status (this is not the details of all the parameters)
     '''
     cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_GETSTATUS_ID,0x0E)
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
