@@ -19,7 +19,9 @@ def assign_dispatcher_IDs(self):
     self.dispatcher_ID['CUSTOM_TC_ID'] = 0xD0
     self.dispatcher_ID['INTERN_TC_ID'] = 0xD1
     self.dispatcher_ID['CONF_DISPATCHER_TC_ID'] = 0xB0
-
+    self.dispatcher_ID['DISPATCHER_ACK_TM_ID'] = 0xBB
+    self.dispatcher_ID['DISPATCHER_PARAM_REQUEST_TM_ID'] = 0xBC
+    
     # reverse lookup
     self.dispatcher_IDname = {}
     for key in self.dispatcher_ID.keys():

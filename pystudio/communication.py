@@ -20,6 +20,9 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
     interpret an individual packet
     called in a loop from interpret_communication
     '''
+    if parameterList is None:
+        parameterList = list(self.parameterstable.keys())
+    
     packet_info = {}
     packet_info['ERROR'] = []    
 
@@ -37,7 +40,7 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
     pkt_size = (chunk[packet_start_idx+3]<<24) + (chunk[packet_start_idx+4]<<16) + (chunk[packet_start_idx+5]<<8) + chunk[packet_start_idx+6]
     packet_info['packet size'] = pkt_size
     if verbose: print('PKT_SIZE: 0x%08X = %i' % (pkt_size,pkt_size))
-    packet_end_idx = 7 + pkt_size
+    packet_end_idx = packet_start_idx + 7 + pkt_size
     packet_info['last index'] = packet_end_idx
     
     if packet_end_idx>=len(chunk):
@@ -77,9 +80,13 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
         print('COMMAND: %s' % cmd_str)
     
 
-    if parameterList is None: return packet_info
+    if packet_info['command name']!='DISPATCHER_PARAM_REQUEST_TM_ID':
+        return packet_info
 
-    idx = packet_start_idx + 8 # after the dispatcher_ID (command ID)
+    # interpret the response giving the parameter values
+    packet_info['TM code'] = (chunk[packet_start_idx+8]<<8) + (chunk[packet_start_idx+1])
+    
+    idx = packet_start_idx + 10 # after the dispatcher_ID and 2-bytes response ID
     parameter_idx = 0
     while idx<=packet_end_idx-4:
         val = (chunk[idx]<<24) + (chunk[idx+1]<<16) + (chunk[idx+2]<<8) + chunk[idx+3]
@@ -105,7 +112,12 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
         parameter_idx += 1
         idx += 4
 
-    
+    if (idx-packet_end_idx)>4:
+        msg = 'Extra bytes: %i' % (idx-packet_end_idx-4)
+        packet_info['ERROR'].append(msg)
+        print('ERROR! '+msg)
+        packet_info['extra bytes'] = chunk[idx-packet_end_idx-4:packet_end_idx]
+
     return packet_info
 
 def interpret_communication(self,chunk,print_command_string=False, parameterList=None,verbose=True):
