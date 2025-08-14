@@ -345,3 +345,21 @@ def send_NSample(self,asicNum,nsamples):
     ack = self.send_command(cmd_bytes)
     return ack
     
+def make_command_AsicInit(self,asicNum):
+    '''
+    make the command to send "ASIC Init"
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICINIB_ID,0x10)
+    cmd_bytes_list.append(0x00)
+    cmd_bytes_list.append(0x01)
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)    
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_AsicInit(self,asicNum):
+    '''
+    send the ASIC Init command
+    '''
+    cmd_bytes = self.make_command_AsicInit()
+    ack = self.send_command(cmd_bytes)
+    return ack
+    

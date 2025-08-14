@@ -74,6 +74,7 @@ class pystudio:
     MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID = 23
     MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
     MULTINETQUICMANAGER_SETASICSPOL_ID = 52
+    MULTINETQUICMANAGER_SETASICINIB_ID = 60
     MULTINETQUICMANAGER_SETFEEDBACKRELAY_ID = 61
     MULTINETQUICMANAGER_SETAPLITUDE_ID = 63 # this is a guess.  In fact, these secondary ID's don't seem to be used
     
@@ -135,7 +136,9 @@ class pystudio:
         make_command_RawMask,\
         send_RawMask,\
         make_command_NSample,\
-        send_NSample
+        send_NSample,\
+        make_command_AsicInit,\
+        send_AsicInit
 
     from .sequence import\
         get_default_setting,\
