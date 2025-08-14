@@ -380,3 +380,43 @@ def send_AsicInit(self,asicNum):
     ack = self.send_command(cmd_bytes)
     return ack
     
+def make_command_Vicm(self,asicNum,Vicm):
+    '''
+    make the command to set the Vicm... I don't know what this is
+    '''
+    
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICVICM_ID,0x00)
+    # the following looks very weird to me... ask Wilfried (see tvirtualcommandencode.cpp)
+    cmd_bytes_list.append( (Vicm & 0xF0) >> 4 )
+    cmd_bytes_list.append( ((Vicm & 0x0F) << 4) |  0x02 )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_Vicm(self,asicNum,Vicm):
+    '''
+    send the Vicm
+    '''
+    cmd_bytes = self.make_command_Vicm(asicNum,Vicm)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_Vocm(self,asicNum,Vocm):
+    '''
+    make the command to set the Vocm... I don't know what this is
+    '''
+    
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICVOCM_ID,0x00)
+    # the following looks very weird to me... ask Wilfried (see tvirtualcommandencode.cpp)
+    cmd_bytes_list.append( (Vocm & 0xF0) >> 4 )
+    cmd_bytes_list.append( ((Vocm & 0x0F) << 4) |  0x03 )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_Vocm(self,asicNum,Vocm):
+    '''
+    send the Vocm
+    '''
+    cmd_bytes = self.make_command_Vocm(asicNum,Vocm)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
