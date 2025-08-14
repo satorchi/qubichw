@@ -67,6 +67,7 @@ class pystudio:
     PARAMETER_FREQUENCY = 0x40000000
 
     MULTINETQUICMANAGER_ID = 2
+    MULTINETQUICMANAGER_SETMASK_ID = 3
     MULTINETQUICMANAGER_GETSTATUS_ID = 14
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
     MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID = 23
@@ -129,7 +130,9 @@ class pystudio:
         make_command_Spol,\
         send_Spol,\
         make_command_Apol,\
-        send_Apol
+        send_Apol,\
+        make_command_RawMask,\
+        send_RawMask
 
     from .sequence import\
         get_default_setting,\

@@ -301,3 +301,27 @@ def send_Apol(self,asicNum,Apol):
     cmd_bytes = self.make_command_Spol(asicNum,Apol)
     ack = self.send_command(cmd_bytes)
     return ack
+
+def make_command_RawMask(self,asicNum,rawmask):
+    '''
+    set the raw mask
+
+    the raw mask is an array of size 125, each represents a byte
+    when all the bytes are concatenated together we get a bitmask of 1000 bits
+    samples are masked out for bits that are 1 (it's sort of an anti-mask)
+    
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETMASK_ID,0x03)
+    for bytemask in rawmask:
+        cmd_bytes_list.append( (bytemask & 0xFF) )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)    
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_RawMask(self,asicNum,rawmask):
+    '''
+    send the raw mask configuration
+    '''
+    cmd_bytes = self.make_command_RawMask(asicNum,rawmask)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
