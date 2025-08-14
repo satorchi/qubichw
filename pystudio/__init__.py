@@ -68,6 +68,7 @@ class pystudio:
 
     MULTINETQUICMANAGER_ID = 2
     MULTINETQUICMANAGER_SETMASK_ID = 3
+    MULTINETQUICMANAGER_SETNSAMPLE_ID = 5
     MULTINETQUICMANAGER_GETSTATUS_ID = 14
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
     MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID = 23
@@ -132,7 +133,9 @@ class pystudio:
         make_command_Apol,\
         send_Apol,\
         make_command_RawMask,\
-        send_RawMask
+        send_RawMask,\
+        make_command_NSample,\
+        send_NSample
 
     from .sequence import\
         get_default_setting,\

@@ -325,3 +325,23 @@ def send_RawMask(self,asicNum,rawmask):
     ack = self.send_command(cmd_bytes)
     return ack
 
+def make_command_NSample(self,asicNum,nsamples):
+    '''
+    make the command to set the number of samples in the pre-integration
+    raw samples are binned by this amount, slowing down the data rate
+    usually, we choose nsamples=100
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETNSAMPLE_ID,0x05)
+    cmd_bytes_list.append( (nsamples & 0xFF00) >> 8 )
+    cmd_bytes_list.append( (nsamples & 0x00FF)      )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)    
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_NSample(self,asicNum,nsamples):
+    '''
+    send the command to set the number of samples
+    '''
+    cmd_bytes = self.make_command_NSample(asicNum,nsamples)
+    ack = self.send_command(cmd_bytes)
+    return ack
+    
