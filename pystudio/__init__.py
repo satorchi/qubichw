@@ -117,6 +117,8 @@ class pystudio:
         ADU2Voffset,\
         amplitude2ADU,\
         ADU2amplitude,\
+        offsetDACvalue2ADU,\
+        ADU2offsetDACvalue,\
         make_frontend_preamble,\
         make_frontend_suffix,\
         make_command_TESDAC_SINUS,\

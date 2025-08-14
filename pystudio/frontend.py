@@ -70,6 +70,23 @@ def ADU2amplitude(self,ADU):
     amplitude = ADU*1.15432e-3
     return amplitude
 
+def offsetDACvalue2ADU(self,offsetDACvalue):
+    '''
+    convert the TES offset DAC value to ADU
+    see parameterTF.dispatcher
+    '''
+    ADUfloat = offsetDACvalue/1.4215e-4
+    ADU = round(ADUfloat)
+    return ADU
+
+def ADU2offsetDACvalue(self,ADU):
+    '''
+    convert an ADU value to the offsetDACvalue
+    '''
+    offsetDACvalue = ADU*1.4215e-4
+    return offsetDACvalue
+    
+
 def make_frontend_preamble(self,asicNum_list,subsysID1,subsysID2):
     '''
     make the first bytes of a frontend command
