@@ -166,17 +166,25 @@ def init_frontend(self,
     # special case for Spol and DAC offsets which are different for each ASIC
     if isinstance(asicNum,list):
         for asic in asicNum:
-            if Spol is None: Spol = self.get_default_setting('Spol',asic=asic)
-            ack = self.send_Spol(asic,Spol)
-            Spol = None
-            if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asic)
-            ack = self.send_offsetTable(asic,offsetTable)
-            offsetTable = None
+            if Spol is None:
+                ack = self.send_Spol(asic,self.get_default_setting('Spol',asic=asic))
+            else:
+                ack =self.send_Spol(asic,Spol)
+                
+            if offsetTable is None:
+                ack = self.send_offsetTable(asic,self.get_default_setting('offsetTable',asic=asic))
+            else:
+                ack = self.send_offsetTable(asic,offsetTable)
     else:
-        if Spol is None: Spol = self.get_default_setting('Spol',asic=asicNum)
-        ack = self.send_Spol(asicNum,Spol)
-        if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asicNum)
-        ack = self.send_offsetTable(asicNum,offsetTable)
+        if Spol is None: 
+            ack = self.send_Spol(asicNum,self.get_default_setting('Spol',asic=asicNum))
+        else:
+            ack = self.send_Spol(asicNum,Spol)
+            
+        if offsetTable is None:
+            ack = self.send_offsetTable(asicNum,self.get_default_setting('offsetTable',asic=asicNum))
+        else:
+            ack = self.send_offsetTable(asicNum,offsetTable)
     
     ack = self.send_Vicm(asicNum, Vicm)
     ack = self.send_Vocm(asicNum, Vocm)
