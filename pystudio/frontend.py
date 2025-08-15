@@ -507,7 +507,7 @@ def send_setColumn(self,asicNum,column):
     '''
     send the select set the column
     '''
-    cmd_bytes = self.make_command_lastRow(asicNum,lastrow)
+    cmd_bytes = self.make_command_setColumn(asicNum,column)
     ack = self.send_command(cmd_bytes)
     return ack
 
