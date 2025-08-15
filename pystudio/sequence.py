@@ -168,10 +168,10 @@ def init_frontend(self,
         for asic in asicNum:
             if Spol is None: Spol = self.get_default_setting('Spol',asic=asic)
             ack = self.send_Spol(asic,Spol)
-            if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asicKey)
+            if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asic)
             ack = self.send_offsetTable(asic,offsetTable)
     else:
-        if Spol is None: Spol = self.get_default_setting('Spol',asic=asicKey)
+        if Spol is None: Spol = self.get_default_setting('Spol',asic=asic)
         ack = self.send_Spol(asic,Spol)
         if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asic)
         ack = self.send_offsetTable(asic,offsetTable)
