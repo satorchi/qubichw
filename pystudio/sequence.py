@@ -36,6 +36,7 @@ default_setting['startRow'] = 0
 default_setting['lastRow'] = 31
 default_setting['column'] = 3
 default_setting['feedbackTable'] = np.zeros(128,dtype=float)
+default_setting['PID'] = (0,40,0)
     
 default_setting['elmin'] = 50 # minimum permitted elevation
 default_setting['elmax'] = 70 # maximum permitted elevation
@@ -125,7 +126,8 @@ def init_frontend(self,
                   FeedbackRelay=None,
                   Aplitude=None,
                   offsetTable=None,
-                  feedbackTable=None
+                  feedbackTable=None,
+                  PID=None
                   ):
     '''
     initialize the readout ASICs.
@@ -150,26 +152,29 @@ def init_frontend(self,
     if FeedbackRelay is None: FeedbackRelay = self.get_default_setting('FeedbackRelay',measurement='observation')
     if Aplitude is None: Aplitude = self.get_default_setting('Aplitude',measurement='observation')
     if feedbackTable is None: feedbackTable = self.get_default_setting('feedbackTable')
+    if PID is None: PID = self.get_default_setting('PID')
 
+    # configure the frontend
     ack = self.send_NSample(AsicNum,nsamples)
     time.sleep(0.5)
     ack = self.send_AcqMode(AsicNum,0)
     time.sleep(0.5)
     ack = self.send_Apol(AsicNum, 7)
 
-    # special case for Spol which is different for each ASIC
-    if Spol is None:
-        if isinstance(asicNum,list):
-            for asic in asicNum:
-                asicKey = 'ASIC %i' % asic
-                Spol = self.get_default_setting('Spol',asic=asicKey)
-                ack = self.send_Spol(asic,Spol)
-        else:
-            asicKey = 'ASIC %i' % asicNum
-            Spol = self.get_default_setting('Spol',asic=asicKey)
+    # special case for Spol and DAC offsets which are different for each ASIC
+    if isinstance(asicNum,list):
+        for asic in asicNum:
+            asicKey = 'ASIC %i' % asic
+            if Spol is None: Spol = self.get_default_setting('Spol',asic=asicKey)
             ack = self.send_Spol(asic,Spol)
+            if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asicKey)
+            ack = self.send_offsetTable(asic,offsetTable)
     else:
-        ack =self.send_Spol(asicNum,Spol)            
+        asicKey = 'ASIC %i' % asicNum
+        if Spol is None: Spol = self.get_default_setting('Spol',asic=asicKey)
+        ack = self.send_Spol(asic,Spol)
+        if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asicKey)
+        ack = self.send_offsetTable(asic,offsetTable)
     
     ack = self.send_Vicm(AsicNum, 3)
     ack = self.send_Vocm(AsicNum, 3)
@@ -189,10 +194,9 @@ def init_frontend(self,
     time.sleep(0.5)
     ack = self.send_SetFeedbackRelay(asicNum,FeedbackRelay)
     time.sleep(0.5)
-    ack = self.send_Aplitude(Aplitude)
-    # set DAC offsets...
+    ack = self.send_Aplitude(asicNum,Aplitude)
 
-    
+    ack = self.send_configurePID(asicNum,PID[0],PID[1],PID[2])
     ack = self.send_AsicInit(AsicNum)    
         
     return
