@@ -183,7 +183,7 @@ def init_frontend(self,
     ack = self.send_setColumn(asicNum,column)
     ack = self.send_CycleRawMode(asicNum, CycleRawMode)
     time.sleep(0.5)
-    ack = self.send_RawMask(asicNum,rawmask)
+    ack = self.send_RawMask(asicNum,RawMask)
     ack = self.send_AsicInit(asicNum)
     time.sleep(0.5)
     ack = self.send_AsicConf(asicNum,2,3)
