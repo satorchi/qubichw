@@ -157,11 +157,11 @@ def init_frontend(self,
     if PID is None: PID = self.get_default_setting('PID')
 
     # configure the frontend
-    ack = self.send_NSample(AsicNum,nsamples)
+    ack = self.send_NSample(asicNum,nsamples)
     time.sleep(0.5)
-    ack = self.send_AcqMode(AsicNum,0)
+    ack = self.send_AcqMode(asicNum,0)
     time.sleep(0.5)
-    ack = self.send_Apol(AsicNum, 7)
+    ack = self.send_Apol(asicNum, 7)
 
     # special case for Spol and DAC offsets which are different for each ASIC
     if isinstance(asicNum,list):
@@ -178,28 +178,28 @@ def init_frontend(self,
         if offsetTable is None: offsetTable = self.get_default_setting('offsetTable',asic=asicKey)
         ack = self.send_offsetTable(asic,offsetTable)
     
-    ack = self.send_Vicm(AsicNum, 3)
-    ack = self.send_Vocm(AsicNum, 3)
-    ack = self.send_lastRow(AsicNum,31)
-    ack = self.send_startRow(AsicNum,0)
-    ack = self.send_Column(AsicNum,3)
-    ack = self.send_CycleRawMode(AsicNum, CycleRawMode)
+    ack = self.send_Vicm(asicNum, 3)
+    ack = self.send_Vocm(asicNum, 3)
+    ack = self.send_lastRow(asicNum,31)
+    ack = self.send_startRow(asicNum,0)
+    ack = self.send_Column(asicNum,3)
+    ack = self.send_CycleRawMode(asicNum, CycleRawMode)
     time.sleep(0.5)
-    ack = self.send_RawMask(AsicNum,rawmask)
-    ack = self.send_AsicInit(AsicNum)
+    ack = self.send_RawMask(asicNum,rawmask)
+    ack = self.send_AsicInit(asicNum)
     time.sleep(0.5)
-    ack = self.send_AsicConf(AsicNum,2,3)
+    ack = self.send_AsicConf(asicNum,2,3)
     time.sleep(0.5)
-    ack = self.send_AsicConf(AsicNum,2,0)
+    ack = self.send_AsicConf(asicNum,2,0)
     time.sleep(0.5)
-    ack = self.send_AsicInit(AsicNum)
+    ack = self.send_AsicInit(asicNum)
     time.sleep(0.5)
     ack = self.send_SetFeedbackRelay(asicNum,FeedbackRelay)
     time.sleep(0.5)
     ack = self.send_Aplitude(asicNum,Aplitude)
 
     ack = self.send_configurePID(asicNum,PID[0],PID[1],PID[2])
-    ack = self.send_AsicInit(AsicNum)    
+    ack = self.send_AsicInit(asicNum)    
         
     return
                   
