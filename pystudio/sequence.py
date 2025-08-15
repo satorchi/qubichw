@@ -161,7 +161,7 @@ def init_frontend(self,
     time.sleep(0.5)
     ack = self.send_AcqMode(asicNum,0)
     time.sleep(0.5)
-    ack = self.send_Apol(asicNum, 7)
+    ack = self.send_Apol(asicNum, Apol)
 
     # special case for Spol and DAC offsets which are different for each ASIC
     if isinstance(asicNum,list):

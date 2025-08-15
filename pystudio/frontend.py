@@ -334,7 +334,7 @@ def send_Apol(self,asicNum,Apol):
     '''
     send the command to set SQUID amplitude
     '''
-    cmd_bytes = self.make_command_Spol(asicNum,Apol)
+    cmd_bytes = self.make_command_Apol(asicNum,Apol)
     ack = self.send_command(cmd_bytes)
     return ack
 
