@@ -189,7 +189,8 @@ class pystudio:
         end_observation,\
         park_frontend,\
         do_skydip,\
-        do_scan
+        do_scan,\
+        init_frontend
 
     from .tparameterstable import assign_parameterstable
 
