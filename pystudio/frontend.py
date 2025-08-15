@@ -586,3 +586,26 @@ def send_feedbackTable(self,asicNum,feedbackTable):
     cmd_bytes = self.make_command_feedbackTable(asicNum,feedbackTable)
     ack = self.send_command(cmd_bytes)
     return ack
+
+def make_command_configurePID(self,asicNum,P,I,D):
+    '''
+    make the command to configure the feedback proportional-integral-derivative feedback loop
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_CONFIGUREPID_ID,0x13)
+    cmd_bytes_list.append( (P & 0xFF00) >> 8 )
+    cmd_bytes_list.append( (P & 0x00FF)      )
+    cmd_bytes_list.append( (I & 0xFF00) >> 8 ) 
+    cmd_bytes_list.append( (I & 0x00FF)      )
+    cmd_bytes_list.append( (D & 0xFF00) >> 8 ) 
+    cmd_bytes_list.append( (D & 0x00FF)      )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_configurePID(self,asicNum,P,I,D):
+    '''
+    send the DAC feedback offsets
+    '''
+    cmd_bytes = self.make_command_configurePID(asicNum,P,I,D)
+    ack = self.send_command(cmd_bytes)
+    return ack
+

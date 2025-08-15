@@ -75,6 +75,7 @@ class pystudio:
     MULTINETQUICMANAGER_SETASICCONF_ID = 13
     MULTINETQUICMANAGER_GETSTATUS_ID = 14
     MULTINETQUICMANAGER_SETOFFSETTABLE_ID = 20
+    MULTINETQUICMANAGER_CONFIGUREPID_ID = 21
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
     MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID = 23
     MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
@@ -172,7 +173,9 @@ class pystudio:
         make_command_offsetTable,\
         send_offsetTable,\
         make_command_feedbackTable,\
-        send_feedbackTable
+        send_feedbackTable,\
+        make_command_configurePID,\
+        send_configurePID
 
 
     from .sequence import\
