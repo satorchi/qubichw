@@ -395,7 +395,7 @@ def send_AsicInit(self,asicNum):
     '''
     send the ASIC Init command
     '''
-    cmd_bytes = self.make_command_AsicInit()
+    cmd_bytes = self.make_command_AsicInit(asicNum)
     ack = self.send_command(cmd_bytes)
     return ack
     
