@@ -192,7 +192,7 @@ def init_frontend(self,
     time.sleep(0.5)
     ack = self.send_AsicInit(asicNum)
     time.sleep(0.5)
-    ack = self.send_SetFeedbackRelay(asicNum,FeedbackRelay)
+    ack = self.send_FeedbackRelay(asicNum,FeedbackRelay)
     time.sleep(0.5)
     ack = self.send_Aplitude(asicNum,Aplitude)
 
