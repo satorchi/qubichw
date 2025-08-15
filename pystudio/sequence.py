@@ -198,7 +198,8 @@ def init_frontend(self,
 
     ack = self.send_configurePID(asicNum,PID[0],PID[1],PID[2])
     ack = self.send_AsicInit(asicNum)    
-        
+
+    ack = self.park_frontend()
     return
                   
 
