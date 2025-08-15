@@ -70,11 +70,13 @@ default_setting['ASIC 2']['Spol'] = 12
 
 default_setting['ASIC 1']['offsetTable'] = np.zeros(128,dtype=float)
 default_setting['ASIC 2']['offsetTable'] = np.zeros(128,dtype=float)
-for group_idx in range(32):
-    start_idx = group_idx*4
-    end_idx = start_idx + 4
-    default_setting['ASIC 1']['offsetTable'][start_idx:end_idx] = [1.29,0.75,0.8,-0.2]
-    default_setting['ASIC 2']['offsetTable'][start_idx:end_idx] = [0.45,0.8,-0.2,-0.2]
+squid_group1 = [1.29,0.75,0.8,-0.2]
+squid_group2 = [0.45,0.8,-0.2,-0.2]
+for group_idx in range(4):
+    start_idx = group_idx*32
+    end_idx = start_idx + 32
+    default_setting['ASIC 1']['offsetTable'][start_idx:end_idx] = squid_group1[group_idx]
+    default_setting['ASIC 2']['offsetTable'][start_idx:end_idx] = squid_group2[group_idx]
 
 
 def get_default_setting(self,parm=None,asic=None,measurement=None):

@@ -42,7 +42,7 @@ def Voffset2ADU(self,Voffset):
     ADUfloat = np.abs(Voffset)/288.58e-6
     ADU = round(ADUfloat)
     if Voffset<0:
-        return (ADU | 2**15)
+        return (0xFFFF - ADU) # I don't think this is the standard way to do signed int.  It should be (0x8000 | ADU)
     return ADU
 
 def ADU2Voffset(self,ADU):
@@ -80,7 +80,7 @@ def offsetDACvalue2ADU(self,offsetDACvalue):
     ADUfloat = np.abs(offsetDACvalue)/1.4215e-4
     ADU = round(ADUfloat)
     if offsetDACvalue<0:
-        return (ADU | 2**15)
+        return (0xFFFF - ADU) # I don't think this is the standard way to do signed int.  It should be (0x8000 | ADU)
     return ADU
 
 def ADU2offsetDACvalue(self,ADU):
