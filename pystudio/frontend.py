@@ -326,7 +326,7 @@ def make_command_Apol(self,asicNum,Apol):
     '''
     cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICAPOL_ID,0x00)
     cmd_bytes_list.append( ((Apol & 0xF0) >> 4))
-    cmd_bytes_list.append( ((Apol & 0x0F) << 4) |  0x04)
+    cmd_bytes_list.append( ((Apol & 0x0F) << 4) |  0x01)
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
     return self.make_communication_packet(cmd_bytes_list)
 
