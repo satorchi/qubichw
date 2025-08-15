@@ -20,10 +20,23 @@ from qubichk.obsmount import obsmount
 # defaults
 default_setting = {}
 default_setting['asicNum'] = [1,2] # both ASICs
+default_setting['AcqMode'] = 0
 default_setting['undersampling'] = 1000
 default_setting['increment'] = 1
 default_setting['Apol'] = 7
-
+default_setting['RawMask'] = np.zeros(125,dtype=int)
+default_setting['RawMask'][0] = 0xFF # 1-8
+default_setting['RawMask'][6] = 0x3F # 51-56
+default_setting['RawMask'][7] = 0xC0 # 57-58
+default_setting['nsamples'] = 100
+default_setting['CycleRawMode'] = 0xFFFF
+default_setting['Vicm'] = 3
+default_setting['Vocm'] = 3
+default_setting['startRow'] = 0
+default_setting['lastRow'] = 31
+default_setting['column'] = 3
+default_setting['feedbackTable'] = np.zeros(128,dtype=float)
+    
 default_setting['elmin'] = 50 # minimum permitted elevation
 default_setting['elmax'] = 70 # maximum permitted elevation
 default_setting['azmin'] = 61  # minimum permitted azimuth
@@ -53,6 +66,15 @@ default_setting['ASIC 2'] = {}
 
 default_setting['ASIC 1']['Spol'] = 10
 default_setting['ASIC 2']['Spol'] = 12
+
+default_setting['ASIC 1']['offsetTable'] = np.zeros(128,dtype=float)
+default_setting['ASIC 2']['offsetTable'] = np.zeros(128,dtype=float)
+for group_idx in range(32):
+    start_idx = group_idx*4
+    end_idx = start_idx + 4
+    default_setting['ASIC 1']['offsetTable'][start_idx:end_idx] = [1.29,0.75,0.8,-0.2]
+    default_setting['ASIC 2']['offsetTable'][start_idx:end_idx] = [0.45,0.8,-0.2,-0.2]
+
 
 def get_default_setting(self,parm=None,asic=None,measurement=None):
     '''
@@ -85,7 +107,96 @@ def get_default_setting(self,parm=None,asic=None,measurement=None):
         return None
 
     return default_setting[asicKey][parm]
+
+
+def init_frontend(self,
+                  asicNum=None,
+                  nsamples=None,
+                  AcqMode=None,
+                  Apol=None,
+                  Spol=None,
+                  Vicm=None,
+                  Vocm=None,
+                  startRow=None,
+                  lastRow=None,
+                  column=None,
+                  CycleRawMode=None,
+                  RawMask=None,
+                  FeedbackRelay=None,
+                  Aplitude=None,
+                  offsetTable=None,
+                  feedbackTable=None
+                  ):
+    '''
+    initialize the readout ASICs.
+    This is done immediately after power up and flashing the fpga
+    see:  https://qubic.in2p3.fr/wiki/TD/Starting#toc-4
+
+    translated from Michel's javascript:  Asics_init.dscript
+    '''
+
+    # set the defaults if not given explicitly
+    if asicNum is None: asicNum = self.get_default_setting('asicNum')
+    if nsamples is None: nsamples = self.get_default_setting('nsamples')
+    if AcqMode is None: AcqMode = self.get_default_setting('AcqMode')
+    if Apol is None: Apol = self.get_default_setting('Apol')
+    if Vicm is None: Vicm = self.get_default_setting('Vicm')
+    if Vocm is None: Vocm = self.get_default_setting('Vocm')
+    if startRow is None: startRow = self.get_default_setting('startRow')
+    if lastRow is None: lastRow = self.get_default_setting('lastRow')
+    if column is None: column = self.get_default_setting('column')
+    if CycleRawMode is None: CycleRawMode = self.get_default_setting('CycleRawMode')
+    if RawMask is None: RawMask = self.get_default_setting('RawMask')
+    if FeedbackRelay is None: FeedbackRelay = self.get_default_setting('FeedbackRelay',measurement='observation')
+    if Aplitude is None: Aplitude = self.get_default_setting('Aplitude',measurement='observation')
+    if feedbackTable is None: feedbackTable = self.get_default_setting('feedbackTable')
+
+    ack = self.send_NSample(AsicNum,nsamples)
+    time.sleep(0.5)
+    ack = self.send_AcqMode(AsicNum,0)
+    time.sleep(0.5)
+    ack = self.send_Apol(AsicNum, 7)
+
+    # special case for Spol which is different for each ASIC
+    if Spol is None:
+        if isinstance(asicNum,list):
+            for asic in asicNum:
+                asicKey = 'ASIC %i' % asic
+                Spol = self.get_default_setting('Spol',asic=asicKey)
+                ack = self.send_Spol(asic,Spol)
+        else:
+            asicKey = 'ASIC %i' % asicNum
+            Spol = self.get_default_setting('Spol',asic=asicKey)
+            ack = self.send_Spol(asic,Spol)
+    else:
+        ack =self.send_Spol(asicNum,Spol)            
+    
+    ack = self.send_Vicm(AsicNum, 3)
+    ack = self.send_Vocm(AsicNum, 3)
+    ack = self.send_lastRow(AsicNum,31)
+    ack = self.send_startRow(AsicNum,0)
+    ack = self.send_Column(AsicNum,3)
+    ack = self.send_CycleRawMode(AsicNum, CycleRawMode)
+    time.sleep(0.5)
+    ack = self.send_RawMask(AsicNum,rawmask)
+    ack = self.send_AsicInit(AsicNum)
+    time.sleep(0.5)
+    ack = self.send_AsicConf(AsicNum,2,3)
+    time.sleep(0.5)
+    ack = self.send_AsicConf(AsicNum,2,0)
+    time.sleep(0.5)
+    ack = self.send_AsicInit(AsicNum)
+    time.sleep(0.5)
+    ack = self.send_SetFeedbackRelay(asicNum,FeedbackRelay)
+    time.sleep(0.5)
+    ack = self.send_Aplitude(Aplitude)
+    # set DAC offsets...
+
+    
+    ack = self.send_AsicInit(AsicNum)    
         
+    return
+                  
 
 def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     '''

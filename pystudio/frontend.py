@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 setup commands to the dispatcher related to setting up the bolometers
 '''
-
+import numpy as np
 
 def asic_qsnumber(self,asicNum):
     '''
@@ -39,8 +39,10 @@ def Voffset2ADU(self,Voffset):
     function=288.58e-6x + 0.0
     '''
 
-    ADUfloat = Voffset/288.58e-6
+    ADUfloat = np.abs(Voffset)/288.58e-6
     ADU = round(ADUfloat)
+    if Voffset<0:
+        return (ADU | 2**15)
     return ADU
 
 def ADU2Voffset(self,ADU):
@@ -75,8 +77,10 @@ def offsetDACvalue2ADU(self,offsetDACvalue):
     convert the TES offset DAC value to ADU
     see parameterTF.dispatcher
     '''
-    ADUfloat = offsetDACvalue/1.4215e-4
+    ADUfloat = np.abs(offsetDACvalue)/1.4215e-4
     ADU = round(ADUfloat)
+    if offsetDACvalue<0:
+        return (ADU | 2**15)
     return ADU
 
 def ADU2offsetDACvalue(self,ADU):
@@ -85,7 +89,22 @@ def ADU2offsetDACvalue(self,ADU):
     '''
     offsetDACvalue = ADU*1.4215e-4
     return offsetDACvalue
-    
+
+def feedbackDACvalue2ADU(self,feedbackDACvalue):
+    '''
+    convert the TES offset DAC value to ADU
+    see parameterTF.dispatcher
+    '''
+    ADUfloat = feedbackDACvalue/284.3e-6
+    ADU = round(ADUfloat)
+    return ADU
+
+def ADU2feedbackDACvalue(self,ADU):
+    '''
+    convert an ADU value to the feedbackDACvalue
+    '''
+    feedbackDACvalue = ADU*284.3e-6
+    return feedbackDACvalue
 
 def make_frontend_preamble(self,asicNum_list,subsysID1,subsysID2):
     '''
@@ -420,3 +439,150 @@ def send_Vocm(self,asicNum,Vocm):
     ack = self.send_command(cmd_bytes)
     return ack
 
+def make_command_AcqMode(self,asicNum,mode):
+    '''
+    make the command to set the acquisition mode
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETACQMODE_ID,0x09)
+    cmd_bytes_list.append( (mode & 0xFF00) >> 8)
+    cmd_bytes_list.append( (mode & 0x00FF)     )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_AcqMode(self,asicNum,mode):
+    '''
+    send the Acquisition Mode
+    '''
+    cmd_bytes = self.make_command_AcqMode(asicNum,mode)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_startRow(self,asicNum,startrow):
+    '''
+    make the command to select the start row
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICSELSTARTROW_ID,0x00)
+    cmd_bytes_list.append(  (startrow & 0xF0) >> 4           )
+    cmd_bytes_list.append( ((startrow & 0x0F) << 4 ) |  0x06 )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_startRow(self,asicNum,startrow):
+    '''
+    send the select row command
+    '''
+    cmd_bytes = self.make_command_startRow(asicNum,startrow)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_lastRow(self,asicNum,lastrow):
+    '''
+    make the command to select the last row
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICSELLASTROW_ID,0x00)
+    cmd_bytes_list.append(  (lastrow & 0xF0) >> 4           )
+    cmd_bytes_list.append( ((lastrow & 0x0F) << 4 ) |  0x07 )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_lastRow(self,asicNum,lastrow):
+    '''
+    send the select row command
+    '''
+    cmd_bytes = self.make_command_lastRow(asicNum,lastrow)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_setColumn(self,asicNum,column):
+    '''
+    make the command to set the column
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICSETCOLUMN_ID,0x00)
+    cmd_bytes_list.append(0x00)
+    cmd_bytes_list.append( ((column & 0xF) << 4) |  0x05 )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_setColumn(self,asicNum,column):
+    '''
+    send the select set the column
+    '''
+    cmd_bytes = self.make_command_lastRow(asicNum,lastrow)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_CycleRawMode(self,asicNum,undersampling):
+    '''
+    make the command to set mode to Cycle Raw Mode (must give undersampling)
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETCYCLERAWMODE_ID,0x0B)
+    cmd_bytes_list.append( (undersampling & 0xFF00) >> 8)
+    cmd_bytes_list.append( (undersampling & 0x00FF)     )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_CycleRawMode(self,asicNum,undersampling):
+    '''
+    send the command to set the Cycle Raw Mode
+    '''
+    cmd_bytes = self.make_command_CycleRawMode(asicNum,undersampling)
+    ack = self.send_command(cmd_bytes)
+    return ack
+
+def make_command_AsicConf(self,asicNum,signalID,state):
+    '''
+    make the command to configure the ASIC
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETASICCONF_ID,0x0D)
+    cmd_bytes_list.append( (signalID & 0xFF) )
+    cmd_bytes_list.append( (state & 0xFF   ) )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_AsicConf(self,asicNum,signalID,state):
+    '''
+    send the command to configure the ASIC
+    '''
+    cmd_bytes = self.make_command_AsicConf(asicNum,signalID,state)
+    ack = self.send_command(cmd_bytes)
+    return ack
+    
+def make_command_offsetTable(self,asicNum,offsetTable):
+    '''
+    make the command to configure the DAC offsets
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETOFFSETTABLE_ID,0x22)
+    for val in offsetTable:
+        ADU = self.offsetDACvalue2ADU(val)
+        cmd_bytes_list.append( (ADU & 0xFF00) >> 8 )
+        cmd_bytes_list.append( (ADU & 0x00FF)      )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_offsetTable(self,asicNum,offsetTable):
+    '''
+    send the DAC offsets
+    '''
+    cmd_bytes = self.make_command_offsetTable(asicNum,offsetTable)
+    ack = self.send_command(cmd_bytes)
+    return ack
+    
+def make_command_feedbackTable(self,asicNum,feedbackTable):
+    '''
+    make the command to configure the DAC feedback offsets
+    '''
+    cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETFEEDBACKTABLE_ID,0x22)
+    for val in feedbackTable:
+        ADU = self.feedbackDACvalue2ADU(val)
+        cmd_bytes_list.append( (ADU & 0xFF00) >> 8 )
+        cmd_bytes_list.append( (ADU & 0x00FF)      )
+    cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
+    return self.make_communication_packet(cmd_bytes_list)
+
+def send_feedbackTable(self,asicNum,feedbackTable):
+    '''
+    send the DAC feedback offsets
+    '''
+    cmd_bytes = self.make_command_feedbackTable(asicNum,feedbackTable)
+    ack = self.send_command(cmd_bytes)
+    return ack

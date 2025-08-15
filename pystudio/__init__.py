@@ -67,15 +67,23 @@ class pystudio:
     PARAMETER_FREQUENCY = 0x40000000
 
     MULTINETQUICMANAGER_ID = 2
+    MULTINETQUICMANAGER_SETFEEDBACKTABLE_ID = 1
     MULTINETQUICMANAGER_SETMASK_ID = 3
     MULTINETQUICMANAGER_SETNSAMPLE_ID = 5
+    MULTINETQUICMANAGER_SETACQMODE_ID = 9
+    MULTINETQUICMANAGER_SETCYCLERAWMODE_ID = 11
+    MULTINETQUICMANAGER_SETASICCONF_ID = 13
     MULTINETQUICMANAGER_GETSTATUS_ID = 14
+    MULTINETQUICMANAGER_SETOFFSETTABLE_ID = 20
     MULTINETQUICMANAGER_ACTIVATEPID_ID = 22
     MULTINETQUICMANAGER_SETTESDAC_CONTINUE_ID = 23
     MULTINETQUICMANAGER_SETTESDAC_SINUS_ID = 25
     MULTINETQUICMANAGER_SETASICSPOL_ID = 52
     MULTINETQUICMANAGER_SETASICVICM_ID = 53
     MULTINETQUICMANAGER_SETASICVOCM_ID = 54
+    MULTINETQUICMANAGER_SETASICSETCOLUMN_ID = 55
+    MULTINETQUICMANAGER_SETASICSELSTARTROW_ID = 56
+    MULTINETQUICMANAGER_SETASICSELLASTROW_ID = 57
     MULTINETQUICMANAGER_SETASICINIB_ID = 60
     MULTINETQUICMANAGER_SETFEEDBACKRELAY_ID = 61
     MULTINETQUICMANAGER_SETAPLITUDE_ID = 63 # this is a guess.  In fact, these secondary ID's don't seem to be used
@@ -121,6 +129,8 @@ class pystudio:
         ADU2amplitude,\
         offsetDACvalue2ADU,\
         ADU2offsetDACvalue,\
+        feedbackDACvalue2ADU,\
+        ADU2feedbackDACvalue,\
         make_frontend_preamble,\
         make_frontend_suffix,\
         make_command_TESDAC_SINUS,\
@@ -146,7 +156,24 @@ class pystudio:
         make_command_Vicm,\
         send_Vicm,\
         make_command_Vocm,\
-        send_Vocm
+        send_Vocm,\
+        make_command_AcqMode,\
+        send_AcqMode,\
+        make_command_startRow,\
+        send_startRow,\
+        make_command_lastRow,\
+        send_lastRow,\
+        make_command_setColumn,\
+        send_setColumn,\
+        make_command_CycleRawMode,\
+        send_CycleRawMode,\
+        make_command_AsicConf,\
+        send_AsicConf,\
+        make_command_offsetTable,\
+        send_offsetTable,\
+        make_command_feedbackTable,\
+        send_feedbackTable
+
 
     from .sequence import\
         get_default_setting,\
