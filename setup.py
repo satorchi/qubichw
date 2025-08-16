@@ -125,7 +125,6 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/compressor2on',
            'scripts/compressor2off',
            'scripts/compressorstatus',
-           'scripts/compressorstatus.py',
            'scripts/compressor1reset',
            'scripts/compressor2reset',
            'scripts/compressor_log.py',
@@ -175,7 +174,8 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/do_skydip_sequence.py',
            'scripts/do_IV_sequence.py',
            'scripts/do_NEP_sequence.py',
-           'scripts/do_SQUID_sequence.py'
+           'scripts/do_SQUID_sequence.py',
+           'scripts/do_init_frontend.py'
            ]
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
