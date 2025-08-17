@@ -43,7 +43,7 @@ def get_ups_info():
         if len(col)<2: continue
     
         parm = col[0].strip()
-        val = col[1].strip()
+        val = col[1].strip().replace('%','')
         info[parm] = val
         
     if battery_key in info.keys():
