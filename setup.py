@@ -171,11 +171,11 @@ scripts = ['scripts/calsource_commander.py',
            'scripts/goto_el',
            'scripts/kill_all_fridge_cycles.py',
            'scripts/send_telegram_to_subscribers.py',
-           'scripts/do_skydip_sequence.py',
-           'scripts/do_IV_sequence.py',
-           'scripts/do_NEP_sequence.py',
-           'scripts/do_SQUID_sequence.py',
-           'scripts/do_init_frontend.py'
+           'pystudio/scripts/do_skydip_sequence.py',
+           'pystudio/scripts/do_IV_sequence.py',
+           'pystudio/scripts/do_NEP_sequence.py',
+           'pystudio/scripts/do_SQUID_sequence.py',
+           'pystudio/scripts/do_init_frontend.py'
            ]
 if len(sys.argv)>1 and sys.argv[1]=='install' and exec_dir_ok:
     print('installing executable scripts...')
