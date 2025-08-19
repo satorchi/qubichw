@@ -159,9 +159,9 @@ def init_frontend(self,
 
     # configure the frontend
     ack = self.send_NSample(asicNum,nsamples)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_AcqMode(asicNum,0)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_Apol(asicNum, Apol)
 
     # special case for Spol and DAC offsets which are different for each ASIC
@@ -193,18 +193,18 @@ def init_frontend(self,
     ack = self.send_startRow(asicNum,startRow)
     ack = self.send_setColumn(asicNum,column)
     ack = self.send_CycleRawMode(asicNum, CycleRawMode)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_RawMask(asicNum,RawMask)
     ack = self.send_AsicInit(asicNum)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_AsicConf(asicNum,2,3)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_AsicConf(asicNum,2,0)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_AsicInit(asicNum)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_FeedbackRelay(asicNum,FeedbackRelay)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ack = self.send_Aplitude(asicNum,Aplitude)
 
     ack = self.send_configurePID(asicNum,PID[0],PID[1],PID[2])
