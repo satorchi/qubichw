@@ -17,10 +17,10 @@ import sys,os
 from glob import glob
 import datetime as dt
 from termcolor import colored
-from satorchipy.datefunctions import str2dt
+from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
-year_str = dt.datetime.now().strftime('%Y')
+year_str = utcnow().strftime('%Y')
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 if not os.path.isdir(hk_dir):    
@@ -157,7 +157,7 @@ def read_weather(site='outside'):
 
     tstamp = vals[0]
     tstamps.append(tstamp)
-    date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+    date_str = utcfromtimestamp(tstamp).strftime(date_fmt)
     val_str = '%.1f C' % vals[1]
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), temp_label.center(20), rootname)
     lines.append(line)
@@ -312,7 +312,7 @@ def list_hk():
         if retval is not None:
             tstamp = retval[0]
             tstamps.append(tstamp)
-            date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+            date_str = utcfromtimestamp(tstamp).strftime(date_fmt)
             val_str = '%.2f K' % retval[1]
             label = 'cryostat shell'
             line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
@@ -342,8 +342,8 @@ def list_hk():
     # vals = get_position()
     # azel = vals[:2]
     # warn = vals[2:]
-    # tstamp = dt.datetime.utcnow().timestamp()
-    # date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+    # tstamp = utcnow().timestamp()
+    # date_str = utcfromtimestamp(tstamp).strftime(date_fmt)
     # for idx,val in enumerate(azel):
     #     if type(val)==str:
     #         val_str = val.center(7)
@@ -358,8 +358,8 @@ def list_hk():
 
     # next read the HWP position
     hwpinfo = get_hwp_info()
-    tstamp = dt.datetime.utcnow().timestamp()
-    date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+    tstamp = utcnow().timestamp()
+    date_str = utcfromtimestamp(tstamp).strftime(date_fmt)
     label = 'HWP Position'
     if hwpinfo['pos'] is None:
         hwppos_str = 'UNKNOWN'
@@ -393,7 +393,7 @@ def list_hk():
             retval = read_lastline(F)
             if retval is None: continue
             tstamp,val,onoff = retval
-            date = dt.datetime.utcfromtimestamp(tstamp)
+            date = utcfromtimestamp(tstamp)
             date_str = date.strftime(date_fmt)
 
             label = ''
@@ -442,7 +442,7 @@ def list_hk():
         if val=='inf': val=1e6
 
         try:
-            date = dt.datetime.utcfromtimestamp(tstamp)
+            date = utcfromtimestamp(tstamp)
             date_str = date.strftime(date_fmt)
         except:
             print('*** ERROR READING TIMESTAMP *** >>>%s<<<' % tstamp)
