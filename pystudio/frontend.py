@@ -514,10 +514,17 @@ def send_setColumn(self,asicNum,column):
 def make_command_CycleRawMode(self,asicNum,undersampling):
     '''
     make the command to set mode to Cycle Raw Mode (must give undersampling)
+    in Wilfried's code: tvirtualcommandencode.cpp, undersampling is a 16-bit integer (a bitmask?)
+    but in Michel's Asic_init.dscript, it should be a length 16 array of integer (bytes)
     '''
     cmd_bytes_list = self.make_frontend_preamble(asicNum,self.MULTINETQUICMANAGER_SETCYCLERAWMODE_ID,0x0B)
-    cmd_bytes_list.append( (undersampling & 0xFF00) >> 8)
-    cmd_bytes_list.append( (undersampling & 0x00FF)     )
+
+    if isinstance(undersampling,int):    
+        cmd_bytes_list.append( (undersampling & 0xFF00) >> 8)
+        cmd_bytes_list.append( (undersampling & 0x00FF)     )
+    else:
+        for val in undersampling:
+            cmd_bytes_list.append( val & 0x00FF )
     cmd_bytes_list = self.make_frontend_suffix(cmd_bytes_list)
     return self.make_communication_packet(cmd_bytes_list)
 
