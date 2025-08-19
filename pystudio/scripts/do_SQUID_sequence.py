@@ -31,14 +31,21 @@ parameterList = ['Voffset',
                  'comment']
 options = parseargs(sys.argv,expected_args=parameterList)
 
-dispatcher = pystudio()
-ack = dispatcher.subscribe_dispatcher()
-ack = dispatcher.do_SQUID_optimization(Voffset=options['Voffset'],
-                                       amplitude=options['amplitude'],
-                                       undersampling=options['undersampling'],
-                                       increment=options['increment'],
-                                       duration=options['duration'],
-                                       comment=options['comment']
-                                       )
+def cli():
+    dispatcher = pystudio()
+    ack = dispatcher.subscribe_dispatcher()
+    ack = dispatcher.do_SQUID_optimization(Voffset=options['Voffset'],
+                                           amplitude=options['amplitude'],
+                                           undersampling=options['undersampling'],
+                                           increment=options['increment'],
+                                           duration=options['duration'],
+                                           comment=options['comment']
+                                           )
 
-ack = dispatcher.unsubscribe()
+    ack = dispatcher.unsubscribe()
+    return
+
+if __name__ == '__main__':
+    cli()
+
+    

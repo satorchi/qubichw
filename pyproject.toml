@@ -1,6 +1,8 @@
 [build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
+# requires = ["hatchling >= 1.26"]
+# build-backend = "hatchling.build"
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "qubichw"
@@ -20,96 +22,107 @@ license = "GPL-3.0-or-later"
 [project.urls]
 Homepage = "https://github.com/satorchi/qubichw"
 
-[tool.hatch.build.targets.wheel]
+# These are bash scripts
+[tool.setuptools]
 packages = ["qubichk","qubichw","pystudio"]
-
-
-[project.scripts]
-"calsource_commander.py" = "qubichk.scripts:calsource_commander.py"
-"cf_commander.py" = "qubichk.scripts:cf_commander.py"
-"run_calibration_source.py" = "qubichk.scripts:run_calibration_source.py"
-"powersupply.py" = "qubichk:powersupply.py"
-"make_hk_fits.py" = "qubichk.scripts:make_hk_fits.py"
-"modulator_commander.py" = "qubichk.scripts:modulator_commander.py"
-"run_bot.py" = "qubichk.scripts:run_bot.py"
-"run_hkserver.py" = "qubichk.scripts:run_hkserver.py"
-"calsource2fits.py" = "qubichk.scripts:calsource2fits.py"
-"run_horn_monitor.py" = "qubichk.scripts:run_horn_monitor.py"
-"plot_hornswitch.py" = "qubichk.scripts:plot_hornswitch.py"
-"calsource_hourly_save.py" = "qubichk.scripts:calsource_hourly_save.py"
-"read_calsource.py" = "qubichw:read_calsource.py"
-"start_calsource_acq.sh" = "qubichk.scripts:start_calsource_acq.sh"
-"start_calsource_manager.sh" = "qubichk.scripts:start_calsource_manager.sh"
-"start_cf_manager.sh" = "qubichk.scripts:start_cf_manager.sh"
-"start_bot.sh" = "qubichk.scripts:start_bot.sh"
-"start_hkserver.sh" = "qubichk.scripts:start_hkserver.sh"
-"mmr_mes1.py" = "qubichk.scripts:mmr_mes1.py"
-"qubic_poweron" = "qubichk.scripts:qubic_poweron"
-"qubic_poweroff" = "qubichk.scripts:qubic_poweroff"
-"hwpon" = "qubichk.scripts:hwpon"
-"hwpoff" = "qubichk.scripts:hwpoff"
-"hornon" = "qubichk.scripts:hornon"
-"hornoff" = "qubichk.scripts:hornoff"
-"thermoson" = "qubichk.scripts:thermoson"
-"thermosoff" = "qubichk.scripts:thermosoff"
-"heaterson" = "qubichk.scripts:heaterson"
-"heatersoff" = "qubichk.scripts:heatersoff"
-"hk_ok.py" = "qubichk.scripts:hk_ok.py"
-"compressor_commander.py" = "qubichk.scripts:compressor_commander.py"
-"compressor1on" = "qubichk.scripts:compressor1on"
-"compressor1off" = "qubichk.scripts:compressor1off"
-"compressor2on" = "qubichk.scripts:compressor2on"
-"compressor2off" = "qubichk.scripts:compressor2off"
-"compressorstatus" = "qubichk.scripts:compressorstatus"
-"compressor1reset" = "qubichk.scripts:compressor1reset"
-"compressor2reset" = "qubichk.scripts:compressor2reset"
-"compressor_log.py" = "qubichk.scripts:compressor_log.py"
-"central_command.py" = "qubichk.scripts:central_command.py"
-"ups_alarm.py" = "qubichk.scripts:ups_alarm.py"
-"ups_log.py" = "qubichk.scripts:ups_log.py"
-"calsource_on" = "qubichk.scripts:calsource_on"
-"calsource_off" = "qubichk.scripts:calsource_off"
-"show_hk.py" = "qubichk.scripts:show_hk.py"
-"show_hk" = "qubichk.scripts:show_hk"
-"show_position.py" = "qubichk.scripts:show_position.py"
-"stop_mount.py" = "qubichk.scripts:stop_mount.py"
-"start_apctunnel.sh" = "qubichk.scripts:start_apctunnel.sh"
-"start_cctunnel.sh" = "qubichk.scripts:start_cctunnel.sh"
-"configfile_backup.sh" = "qubichk.scripts:configfile_backup.sh"
-"test_alarm.py" = "qubichk.scripts:test_alarm.py"
-"copydata" = "qubichk.scripts:copydata"
-"mount_entropy.sh" = "qubichk.scripts:mount_entropy.sh"
-"weather.py" = "qubichk.scripts:weather.py"
-"start_weather.sh" = "qubichk.scripts:start_weather.sh"
-"mech_openclose.py" = "qubichk.scripts:mech_openclose.py"
-"kellypi_on" = "qubichk.scripts:kellypi_on"
-"kellypi_off" = "qubichk.scripts:kellypi_off"
-"fpga_on" = "qubichk.scripts:fpga_on"
-"fpga_off" = "qubichk.scripts:fpga_off"
-"energenie_commander.py" = "qubichk.scripts:energenie_commander.py"
-"read_usbthermometer.py" = "qubichw:read_usbthermometer.py"
-"start_usbthermometer_acq.sh" = "qubichk.scripts:start_usbthermometer_acq.sh"
-"run_gps_acquisition.py" = "qubichk.scripts:run_gps_acquisition.py"
-"run_gps_broadcast.py" = "qubichk.scripts:run_gps_broadcast.py"
-"start_gps_acquisition.sh" = "qubichk.scripts:start_gps_acquisition.sh"
-"start_gps_broadcast.sh" = "qubichk.scripts:start_gps_broadcast.sh"
-"start_ups.sh" = "qubichk.scripts:start_ups.sh"
-"run_MCP9808_acquisition.py" = "qubichk.scripts:run_MCP9808_acquisition.py"
-"run_MCP9808_broadcast.py" = "qubichk.scripts:run_MCP9808_broadcast.py"
-"start_MCP9808_acquisition.sh" = "qubichk.scripts:start_MCP9808_acquisition.sh"
-"start_MCP9808_broadcast.sh" = "qubichk.scripts:start_MCP9808_broadcast.sh"
-"run_heater_manager.py" = "qubichk.scripts:run_heater_manager.py"
-"start_heater_manager.sh" = "qubichk.scripts:start_heater_manager.sh"
-"goto_pos.py" = "qubichk.scripts:goto_pos.py"
-"goto_az" = "qubichk.scripts:goto_az"
-"goto_el" = "qubichk.scripts:goto_el"
-"kill_all_fridge_cycles.py" = "qubichk.scripts:kill_all_fridge_cycles.py"
-"send_telegram_to_subscribers.py" = "qubichk.scripts:send_telegram_to_subscribers.py"
-"do_skydip_sequence" = "pystudio.scripts:do_skydip_sequence.py"
-"do_IV_sequence" = "pystudio.scripts:do_IV_sequence.py"
-"do_NEP_sequence" = "pystudio.scripts:do_NEP_sequence.py"
-"do_SQUID_sequence" = "pystudio.scripts:do_SQUID_sequence.py"
-"do_init_frontend" = "pystudio.scripts:do_init_frontend.py"
-"archive-data.sh" = "qubichk.scripts:archive_data.sh"
-"clean-hk.sh" = "qubichk.scripts:clean_hk.sh"
-"start_gpsd-ntpd.sh" = "qubichk.scripts:start_gpsd_ntpd.sh"
+script-files = ["qubichk/scripts/start_calsource_acq.sh",
+                "qubichk/scripts/start_calsource_manager.sh",
+                "qubichk/scripts/start_cf_manager.sh",
+                "qubichk/scripts/start_bot.sh",
+                "qubichk/scripts/start_hkserver.sh",
+                "qubichk/scripts/qubic_poweron",
+                "qubichk/scripts/qubic_poweroff",
+                "qubichk/scripts/hwpon",
+                "qubichk/scripts/hwpoff",
+                "qubichk/scripts/hornon",
+                "qubichk/scripts/hornoff",
+                "qubichk/scripts/thermoson",
+                "qubichk/scripts/thermosoff",
+                "qubichk/scripts/heaterson",
+                "qubichk/scripts/heatersoff",
+                "qubichk/scripts/compressor1on",
+                "qubichk/scripts/compressor1off",
+                "qubichk/scripts/compressor2on",
+                "qubichk/scripts/compressor2off",
+                "qubichk/scripts/compressorstatus",
+                "qubichk/scripts/compressor1reset",
+                "qubichk/scripts/compressor2reset",
+                "qubichk/scripts/calsource_commander.py",
+                "qubichk/scripts/cf_commander.py",
+                "qubichk/powersupply.py",
+                "qubichk/scripts/run_bot.py",
+                "qubichk/scripts/run_hkserver.py",
+                "qubichk/scripts/calsource2fits.py",
+                "qubichk/scripts/run_horn_monitor.py",
+                "qubichk/scripts/plot_hornswitch.py",
+                "qubichk/scripts/calsource_hourly_save.py",
+                "qubichw/read_calsource.py",
+                "qubichk/scripts/mmr_mes1.py",
+                "qubichk/scripts/hk_ok.py",
+                "qubichk/scripts/compressor_commander.py",
+                "qubichk/scripts/compressor_log.py",
+                "qubichk/scripts/central_command.py",
+                "qubichk/scripts/ups_alarm.py",
+                "qubichk/scripts/ups_log.py",
+                "qubichk/scripts/calsource_on",
+                "qubichk/scripts/calsource_off",
+                "qubichk/scripts/show_hk.py",
+                "qubichk/scripts/show_hk",
+                "qubichk/scripts/show_position.py",
+                "qubichk/scripts/stop_mount.py",
+                "qubichk/scripts/start_apctunnel.sh",
+                "qubichk/scripts/start_cctunnel.sh",
+                "qubichk/scripts/configfile_backup.sh",
+                "qubichk/scripts/test_alarm.py",
+                "qubichk/scripts/copydata",
+                "qubichk/scripts/mount_entropy.sh",
+                "qubichk/scripts/weather.py",
+                "qubichk/scripts/start_weather.sh",
+                "qubichk/scripts/mech_openclose.py",
+                "qubichk/scripts/kellypi_on",
+                "qubichk/scripts/kellypi_off",
+                "qubichk/scripts/fpga_on",
+                "qubichk/scripts/fpga_off",
+                "qubichk/scripts/energenie_commander.py",
+                "qubichw/read_usbthermometer.py",
+                "qubichk/scripts/start_usbthermometer_acq.sh",
+                "qubichk/scripts/run_gps_acquisition.py",
+                "qubichk/scripts/run_gps_broadcast.py",
+                "qubichk/scripts/start_gps_acquisition.sh",
+                "qubichk/scripts/start_gps_broadcast.sh",
+                "qubichk/scripts/start_ups.sh",
+                "qubichk/scripts/run_MCP9808_acquisition.py",
+                "qubichk/scripts/run_MCP9808_broadcast.py",
+                "qubichk/scripts/start_MCP9808_acquisition.sh",
+                "qubichk/scripts/start_MCP9808_broadcast.sh",
+                "qubichk/scripts/run_heater_manager.py",
+                "qubichk/scripts/start_heater_manager.sh",
+                "qubichk/scripts/goto_pos.py",
+                "qubichk/scripts/goto_az",
+                "qubichk/scripts/goto_el",
+                "qubichk/scripts/kill_all_fridge_cycles.py",
+                "qubichk/scripts/send_telegram_to_subscribers.py",
+                "pystudio/scripts/do_skydip_sequence.py",
+                "pystudio/scripts/do_IV_sequence.py",
+                "pystudio/scripts/do_NEP_sequence.py",
+                "pystudio/scripts/do_SQUID_sequence.py",
+                "pystudio/scripts/do_init_frontend.py",
+                "qubichk/scripts/archive-data.sh",
+                "qubichk/scripts/clean-hk.sh",
+                "qubichk/scripts/start_gpsd-ntpd.sh"]
+                
+# These are python executable scripts using hatch, but all the scripts have to be modified to have a "main" function like cli() or whatever
+# [project.scripts]
+# "calsource_commander.py" = "qubichk.scripts.calsource_commander:cli"
+# "cf_commander.py" = "qubichk.scripts.cf_commander:cli"
+# "powersupply.py" = "qubichk.powersupply:cli"
+# "run_bot.py" = "qubichk.scripts.run_bot:cli"
+# "run_hkserver.py" = "qubichk.scripts.run_hkserver:hkserver"
+# "calsource2fits.py" = "qubichk.scripts.calsource2fits:cli"
+# "compressor_commander.py" = "qubichk.scripts.compressor_commander:cli"
+# "show_hk.py" = "qubichk.scripts.show_hk:list_hk"
+# "show_hk" = "qubichk.scripts:show_hk"
+# "do_IV_sequence" = "pystudio.scripts.do_IV_sequence:cli"
+# "do_NEP_sequence" = "pystudio.scripts.do_NEP_sequence:cli"
+# "do_SQUID_sequence" = "pystudio.scripts.do_SQUID_sequence:cli"
+# "do_init_frontend" = "pystudio.scripts.do_init_frontend:cli"

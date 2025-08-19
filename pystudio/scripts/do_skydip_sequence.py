@@ -32,16 +32,22 @@ parameterList = ['azstep',
                  'comment']
 options = parseargs(sys.argv,expected_args=parameterList)
 
-dispatcher = pystudio()
-ack = dispatcher.subscribe_dispatcher()
-ack = dispatcher.do_skydip(azstep=options['azstep'],
-                           azmin=options['azmin'],
-                           azmax=options['azmax'],
-                           elmin=options['elmin'],
-                           elmax=options['elmax'],
-                           Voffset=options['Voffset'],
-                           Tbath=options['Tbath'],
-                           comment=options['comment']
-                           )
+def cli():
+    dispatcher = pystudio()
+    ack = dispatcher.subscribe_dispatcher()
+    ack = dispatcher.do_skydip(azstep=options['azstep'],
+                               azmin=options['azmin'],
+                               azmax=options['azmax'],
+                               elmin=options['elmin'],
+                               elmax=options['elmax'],
+                               Voffset=options['Voffset'],
+                               Tbath=options['Tbath'],
+                               comment=options['comment']
+                               )
 
-ack = dispatcher.unsubscribe()
+    ack = dispatcher.unsubscribe()
+    return
+
+if __name__ == '__main__':
+    cli()
+    

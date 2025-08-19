@@ -32,20 +32,26 @@ for idx,arg in enumerate(sys.argv):
             continue
 
 
-if msgfile is None:
-    print('Please enter the name of a text file with your message')
-    quit()
+def cli():
+    if msgfile is None:
+        print('Please enter the name of a text file with your message')
+        return None
 
-h = open(msgfile,'r')
-msg = h.read()
-h.close()
+    h = open(msgfile,'r')
+    msg = h.read()
+    h.close()
+
+
+    for chatid in alarm_recipients:
+        if chatid in known_users.keys():
+            fullmsg = 'Hi %s!' % known_users[chatid]
+        else:
+            fullmsg = 'Hi!'
+        fullmsg += '\n'+msg
+        send_telegram(fullmsg,chatid=chatid)
+    return
+
+if __name__ == '__main__':
+    cli()
+
     
-
-for chatid in alarm_recipients:
-    if chatid in known_users.keys():
-        fullmsg = 'Hi %s!' % known_users[chatid]
-    else:
-        fullmsg = 'Hi!'
-    fullmsg += '\n'+msg
-    send_telegram(fullmsg,chatid=chatid)
-

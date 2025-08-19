@@ -285,225 +285,235 @@ def read_compressor(compressor_num):
     return tstamps,lines
     
     
-
-# first look at the weather
-retval = read_weather('outside')
-if retval is None:
-    lines = []
-    tstamps = []
-else:
-    tstamps,lines = retval
-retval = read_weather('inside')
-if retval is not None:
-    tstamps += retval[0]
-    lines += retval[1]
-
-# read the cryostat shell temperature
-basename = 'CRYOSTAT.txt'
-labelkey = basename.replace('.txt','')
-F = '%s%s%s' % (hk_dir,os.sep,basename)
-if os.path.isfile(F):
-    retval = read_lastline(F)
+def list_hk():
+    '''
+    list all the latest housekeeping values on the screen
+    '''
+    
+    
+    # first look at the weather
+    retval = read_weather('outside')
+    if retval is None:
+        lines = []
+        tstamps = []
+    else:
+        tstamps,lines = retval
+        retval = read_weather('inside')
     if retval is not None:
-        tstamp = retval[0]
-        tstamps.append(tstamp)
-        date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
-        val_str = '%.2f K' % retval[1]
-        label = 'cryostat shell'
-        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        tstamps += retval[0]
+        lines += retval[1]
+
+    # read the cryostat shell temperature
+    basename = 'CRYOSTAT.txt'
+    labelkey = basename.replace('.txt','')
+    F = '%s%s%s' % (hk_dir,os.sep,basename)
+    if os.path.isfile(F):
+        retval = read_lastline(F)
+        if retval is not None:
+            tstamp = retval[0]
+            tstamps.append(tstamp)
+            date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+            val_str = '%.2f K' % retval[1]
+            label = 'cryostat shell'
+            line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+            lines.append(line)
+
+
+
+    # read the UPS status
+    retval = read_ups()
+    if retval is not None:
+        tstamps += retval[0]
+        lines += retval[1]
+
+    # read the compressor status    
+    retval = read_compressor(1)
+    if retval is not None:
+        tstamps += retval[0]
+        lines += retval[1]
+        retval = read_compressor(2)
+    if retval is not None:
+        tstamps += retval[0]
+        lines += retval[1]
+
+
+    # # read the platform position directly from socket
+    # labels = ['azimuth','elevation']
+    # vals = get_position()
+    # azel = vals[:2]
+    # warn = vals[2:]
+    # tstamp = dt.datetime.utcnow().timestamp()
+    # date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+    # for idx,val in enumerate(azel):
+    #     if type(val)==str:
+    #         val_str = val.center(7)
+    #     else:
+    #         val_str = '%7.2f degrees' % val
+    #     if warn[idx]:
+    #         val_str += ' ?'
+    #     label = labels[idx]
+    #     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
+    #     lines.append(line)
+    #     tstamps.append(tstamp)
+
+    # next read the HWP position
+    hwpinfo = get_hwp_info()
+    tstamp = dt.datetime.utcnow().timestamp()
+    date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
+    label = 'HWP Position'
+    if hwpinfo['pos'] is None:
+        hwppos_str = 'UNKNOWN'
+    else:
+        hwppos_str = hwpinfo['pos']
+        line = '%s %s %s' % (date_str, hwppos_str.rjust(20), label.center(20))
         lines.append(line)
-        
+        tstamps.append(tstamp)
 
 
-# read the UPS status
-retval = read_ups()
-if retval is not None:
-    tstamps += retval[0]
-    lines += retval[1]
+    # read latest values saved to HK files
+    labels = read_labels()
 
-# read the compressor status    
-retval = read_compressor(1)
-if retval is not None:
-    tstamps += retval[0]
-    lines += retval[1]
-retval = read_compressor(2)
-if retval is not None:
-    tstamps += retval[0]
-    lines += retval[1]
-
-    
-# # read the platform position directly from socket
-# labels = ['azimuth','elevation']
-# vals = get_position()
-# azel = vals[:2]
-# warn = vals[2:]
-# tstamp = dt.datetime.utcnow().timestamp()
-# date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
-# for idx,val in enumerate(azel):
-#     if type(val)==str:
-#         val_str = val.center(7)
-#     else:
-#         val_str = '%7.2f degrees' % val
-#     if warn[idx]:
-#         val_str += ' ?'
-#     label = labels[idx]
-#     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
-#     lines.append(line)
-#     tstamps.append(tstamp)
-
-# next read the HWP position
-hwpinfo = get_hwp_info()
-tstamp = dt.datetime.utcnow().timestamp()
-date_str = dt.datetime.utcfromtimestamp(tstamp).strftime(date_fmt)
-label = 'HWP Position'
-if hwpinfo['pos'] is None:
-    hwppos_str = 'UNKNOWN'
-else:
-    hwppos_str = hwpinfo['pos']
-line = '%s %s %s' % (date_str, hwppos_str.rjust(20), label.center(20))
-lines.append(line)
-tstamps.append(tstamp)
+    # find all the existing HK files
+    hk_files = glob(hk_dir+os.sep+'*.txt')
+    hk_files.sort()
 
 
-# read latest values saved to HK files
-labels = read_labels()
+    # treat the heaters first
+    heaterfiletypes = ['Amp','Volt']
+    heaterunits = {'Volt':'V', 'Amp': 'A'}
+    for idx in range(7):
+        counter = idx + 1
+        heatervals = {}
 
-# find all the existing HK files
-hk_files = glob(hk_dir+os.sep+'*.txt')
-hk_files.sort()
+        for filetype in heaterfiletypes:
+            basename = 'HEATER%i_%s.txt' % (counter,filetype)
+            F = '%s%s%s' % (hk_dir,os.sep,basename)
+            if not os.path.isfile(F): continue
+
+            retval = read_lastline(F)
+            if retval is None: continue
+            tstamp,val,onoff = retval
+            date = dt.datetime.utcfromtimestamp(tstamp)
+            date_str = date.strftime(date_fmt)
+
+            label = ''
+            labelkey = basename.replace('.txt','')
+            if labelkey in labels.keys():
+                label = labels[labelkey]
+
+            units = heaterunits[filetype]
+            if filetype=='Amp':
+                if onoff is not None and onoff=='OFF': continue # don't print the current if the powersupply is off
+                units = 'A'
+                val *= 0.001
+            else:
+                units = 'V'
+                heatervals[filetype] = val
+
+            R_str = None
+            if onoff is not None and onoff=='OFF':
+                units += ' OFF'
+            elif 'Volt' in heatervals.keys() and 'Amp' in heatervals.keys() and heatervals['Amp']!=0:
+                R = heatervals['Volt']/heatervals['Amp']
+                R_str = assign_val_string(R,'Ohm')
+            else:
+                R_str = None
 
 
-# treat the heaters first
-heaterfiletypes = ['Amp','Volt']
-heaterunits = {'Volt':'V', 'Amp': 'A'}
-for idx in range(7):
-    counter = idx + 1
-    heatervals = {}
+            val_str = assign_val_string(val,units)
+            line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+            tstamps.append(tstamp)
+            lines.append(line)
+            if R_str is not None:
+                line = '%s %s %s %s' % (date_str, R_str.rjust(20), label.center(20), labelkey)
+                tstamps.append(tstamp)
+                lines.append(line)
 
-    for filetype in heaterfiletypes:
-        basename = 'HEATER%i_%s.txt' % (counter,filetype)
-        F = '%s%s%s' % (hk_dir,os.sep,basename)
-        if not os.path.isfile(F): continue
-    
+
+    # do the rest of the HK files
+    for F in hk_files:
+        basename = os.path.basename(F)
+        if basename in exclude_files: continue
+        if basename.find('HEATER')==0: continue # already done, above
+
         retval = read_lastline(F)
         if retval is None: continue
         tstamp,val,onoff = retval
-        date = dt.datetime.utcfromtimestamp(tstamp)
-        date_str = date.strftime(date_fmt)
-    
+        if val=='inf': val=1e6
+
+        try:
+            date = dt.datetime.utcfromtimestamp(tstamp)
+            date_str = date.strftime(date_fmt)
+        except:
+            print('*** ERROR READING TIMESTAMP *** >>>%s<<<' % tstamp)
+            continue    
+        tstamps.append(tstamp)
+
         label = ''
         labelkey = basename.replace('.txt','')
         if labelkey in labels.keys():
             label = labels[labelkey]
 
-        units = heaterunits[filetype]
-        if filetype=='Amp':
-            if onoff is not None and onoff=='OFF': continue # don't print the current if the powersupply is off
-            units = 'A'
+
+        units = None
+        val_str = None
+        if basename==touchname:
+            units = 'Ohm'
+        elif basename.find('TEMPERATURE')==0 or basename.find('AVS')==0:
+            units = 'K'
+        elif basename.find('PRESSURE')==0:
+            units = 'bar'
             val *= 0.001
-        else:
+        elif basename.find('Volt')>0:
             units = 'V'
-        heatervals[filetype] = val
-
-        R_str = None
-        if onoff is not None and onoff=='OFF':
-            units += ' OFF'
-        elif 'Volt' in heatervals.keys() and 'Amp' in heatervals.keys() and heatervals['Amp']!=0:
-            R = heatervals['Volt']/heatervals['Amp']
-            R_str = assign_val_string(R,'Ohm')
+        elif basename.find('Amp')>0:
+            if onoff is not None and onoff=='OFF':
+                units = ''
+                val_str = 'OFF'
+            else:
+                units = 'A'
+                val *= 0.001
+        elif basename.find('MHS')==0:
+            units = 'steps'
+        elif basename.find('AZ')==0 or basename.find('EL')==0:
+            units = 'degrees'
         else:
-            R_str = None
-            
-
-        val_str = assign_val_string(val,units)
-        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
-        tstamps.append(tstamp)
-        lines.append(line)
-        if R_str is not None:
-            line = '%s %s %s %s' % (date_str, R_str.rjust(20), label.center(20), labelkey)
-            tstamps.append(tstamp)
-            lines.append(line)
-            
-    
-# do the rest of the HK files
-for F in hk_files:
-    basename = os.path.basename(F)
-    if basename in exclude_files: continue
-    if basename.find('HEATER')==0: continue # already done, above
-
-    retval = read_lastline(F)
-    if retval is None: continue
-    tstamp,val,onoff = retval
-    if val=='inf': val=1e6
-
-    try:
-        date = dt.datetime.utcfromtimestamp(tstamp)
-        date_str = date.strftime(date_fmt)
-    except:
-        print('*** ERROR READING TIMESTAMP *** >>>%s<<<' % tstamp)
-        continue    
-    tstamps.append(tstamp)
-
-    label = ''
-    labelkey = basename.replace('.txt','')
-    if labelkey in labels.keys():
-        label = labels[labelkey]
-
-
-    units = None
-    val_str = None
-    if basename==touchname:
-        units = 'Ohm'
-    elif basename.find('TEMPERATURE')==0 or basename.find('AVS')==0:
-        units = 'K'
-    elif basename.find('PRESSURE')==0:
-        units = 'bar'
-        val *= 0.001
-    elif basename.find('Volt')>0:
-        units = 'V'
-    elif basename.find('Amp')>0:
-        if onoff is not None and onoff=='OFF':
             units = ''
-            val_str = 'OFF'
-        else:
-            units = 'A'
-            val *= 0.001
-    elif basename.find('MHS')==0:
-        units = 'steps'
-    elif basename.find('AZ')==0 or basename.find('EL')==0:
-        units = 'degrees'
-    else:
-        units = ''
+
+        if units == 'steps':
+            val_str = '%10i %s' % (int(val), units)
+
+        if val_str is None:
+            val_str = assign_val_string(val,units)
+
+
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        lines.append(line)
+
+
+    latest = max(tstamps)
+    n_tstamps = len(tstamps)
+    for idx,line in enumerate(lines):
+        if idx>=n_tstamps: break
+        delta = latest - tstamps[idx]
+        limit_delta = 15
+        if line.find('ups')>0 or line.find('weather')>0 or line.find('compressor')>0:
+            limit_delta = 90
+        if delta>limit_delta\
+           or line.find('bad answer')>=0\
+           or line.find('?')>=0\
+           or line.find('LOW!')>=0\
+           or line.find('NO UPS')>=0\
+           or line.find('OFFLINE')>=0:
+            lines[idx] = colored(line,'red','on_white')
+
+
+    page = '\n'.join(lines)
+    print(page)
+
+    return
+
+if __name__ == '__main__':
+    list_hk()
     
-    if units == 'steps':
-        val_str = '%10i %s' % (int(val), units)
-        
-    if val_str is None:
-        val_str = assign_val_string(val,units)
-
-
-    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
-    lines.append(line)
-
-
-latest = max(tstamps)
-n_tstamps = len(tstamps)
-for idx,line in enumerate(lines):
-    if idx>=n_tstamps: break
-    delta = latest - tstamps[idx]
-    limit_delta = 15
-    if line.find('ups')>0 or line.find('weather')>0 or line.find('compressor')>0:
-        limit_delta = 90
-    if delta>limit_delta\
-       or line.find('bad answer')>=0\
-       or line.find('?')>=0\
-       or line.find('LOW!')>=0\
-       or line.find('NO UPS')>=0\
-       or line.find('OFFLINE')>=0:
-        lines[idx] = colored(line,'red','on_white')
-
-
-page = '\n'.join(lines)
-print(page)
-
 

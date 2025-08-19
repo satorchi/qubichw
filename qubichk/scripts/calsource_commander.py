@@ -36,7 +36,13 @@ for arg in sys.argv:
         verbosity = eval(arg.split('=')[-1])
         continue
 
-cli = calsource_configuration_manager(role=role, verbosity=verbosity)
 
+def cli():
+    cli = calsource_configuration_manager(role=role, verbosity=verbosity)
+    return
+
+if __name__ == '__main__':
+    cli()
+    
 
     

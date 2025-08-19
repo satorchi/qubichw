@@ -21,5 +21,10 @@ TESTMODE=False
 for arg in sys.argv:
     if arg=='--test':TESTMODE=True
 
-qb = qubic_bot(test=TESTMODE)
+def cli():
+    qb = qubic_bot(test=TESTMODE)
+
+if __name__ == '__main__':
+    cli()
+    
 

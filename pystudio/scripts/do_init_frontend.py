@@ -15,7 +15,7 @@ import sys
 from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
-# not that PID, if provided, should be given as a triplet
+# note that PID, if provided, should be given as a triplet
 parameterList = ['asicNum',
                  'nsamples',
                  'AcqMode',
@@ -36,25 +36,30 @@ parameterList = ['asicNum',
                  ]
 options = parseargs(sys.argv,expected_args=parameterList)
 
-dispatcher = pystudio()
-ack = dispatcher.subscribe_dispatcher()
-ack = dispatcher.init_frontend(asicNum=options['asicNum'],
-                               nsamples=options['nsamples'],
-                               AcqMode=options['AcqMode'],
-                               Apol=options['Apol'],
-                               Spol=options['Spol'],
-                               Vicm=options['Vicm'],
-                               Vocm=options['Vocm'],
-                               startRow=options['startRow'],
-                               lastRow=options['lastRow'],
-                               column=options['column'],
-                               CycleRawMode=options['CycleRawMode'],
-                               RawMask=options['RawMask'],
-                               FeedbackRelay=options['FeedbackRelay'],
-                               Aplitude=options['Aplitude'],
-                               offsetTable=options['offsetTable'],
-                               feedbackTable=options['feedbackTable'],
-                               PID=options['PID']
-                               )
-ack = dispatcher.unsubscribe()
+def cli():
+    dispatcher = pystudio()
+    ack = dispatcher.subscribe_dispatcher()
+    ack = dispatcher.init_frontend(asicNum=options['asicNum'],
+                                   nsamples=options['nsamples'],
+                                   AcqMode=options['AcqMode'],
+                                   Apol=options['Apol'],
+                                   Spol=options['Spol'],
+                                   Vicm=options['Vicm'],
+                                   Vocm=options['Vocm'],
+                                   startRow=options['startRow'],
+                                   lastRow=options['lastRow'],
+                                   column=options['column'],
+                                   CycleRawMode=options['CycleRawMode'],
+                                   RawMask=options['RawMask'],
+                                   FeedbackRelay=options['FeedbackRelay'],
+                                   Aplitude=options['Aplitude'],
+                                   offsetTable=options['offsetTable'],
+                                   feedbackTable=options['feedbackTable'],
+                                   PID=options['PID']
+                                   )
+    ack = dispatcher.unsubscribe()
+    return
 
+if __name__ == '__main__':
+    cli()
+    

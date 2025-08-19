@@ -736,8 +736,7 @@ known_supplies[5]=('431969',
                    'HEATER7')
 
 
-if __name__=='__main__':
-
+def cli():
     ps=PowerSupplies(verbosity=1)
     command=ps.parseargs(sys.argv)
     keep_going=not command['quit']
@@ -757,4 +756,7 @@ if __name__=='__main__':
         command = ps.parseargs(ans.split())
         keep_going = not command['quit']
         
+    
+if __name__=='__main__':
+    cli()
     

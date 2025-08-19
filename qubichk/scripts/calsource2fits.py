@@ -15,21 +15,26 @@ import os,sys
 
 from qubichk.copy_data import calsource2fits
 
-if len(sys.argv)<2:
-    print('usage: calsource2fits.py <filename>')
-    quit()
+def cli():
+    if len(sys.argv)<2:
+        print('usage: calsource2fits.py <filename>')
+        return
 
-f = sys.argv[1]
-if not os.path.isfile(f):
-    print('file not found: %s' % f)
-    quit()
-    
-rootname = f.replace('.dat','')
-fitsname = rootname+'.fits'
-if os.path.isfile(fitsname):
-    print('file already exists.  not overwriting %s' % fitsname)
-    quit()
-    
-calsource2fits(f)
+    f = sys.argv[1]
+    if not os.path.isfile(f):
+        print('file not found: %s' % f)
+        return
+
+    rootname = f.replace('.dat','')
+    fitsname = rootname+'.fits'
+    if os.path.isfile(fitsname):
+        print('file already exists.  not overwriting %s' % fitsname)
+        return
+
+    calsource2fits(f)
+    return
+
+if __name__ == '__main__':
+    cli()
 
         

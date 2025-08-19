@@ -55,12 +55,12 @@ def parseargs():
     return retval
 
 
-# main program
-if __name__=='__main__':
+# command line interface
+def cli():
     parms = parseargs()
     if parms is None: 
         usage()
-        quit()
+        return None
 
     c = compressor(int(parms['compressor']))
 
@@ -92,4 +92,11 @@ if __name__=='__main__':
     print('\nCompressor %s' % parms['compressor'])
     print(info['status_message'])
     print('\n')
+    return None
+
+# main
+if __name__=='__main__':
+    cli()
+
+    
     
