@@ -220,7 +220,7 @@ def read_ups():
     lines.append(line)
 
     
-    label = 'battery status'
+    label = 'battery.status'
     tstamps.append(tstamp)
     if vals[2].find(label.replace(' ','.'))<0:
         val_str = 'NO UPS INFO'
