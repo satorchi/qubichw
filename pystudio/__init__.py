@@ -50,7 +50,7 @@ see in QubicStudio source code: TVirtualCommandEncode.cpp, QDispatcherTCByteArra
 class pystudio:
 
     # class variables.  You can change these before instantiating an object
-    verbosity = 1 
+    verbosity = 0
     __object_type__ = 'pystudio'
 
     # dispatcher byte codes
@@ -62,6 +62,8 @@ class pystudio:
 
     # for requesting info
     CONF_DISPATCHER_TC_ID = 0xB0
+    DISPATCHER_ACK_TM_ID = 0xBB
+    DISPATCHER_PARAM_REQUEST_TM_ID = 0xBC
     TF_MASK =  0x007FFFFF
     ONE_SHOT = 0x80000000
     PARAMETER_FREQUENCY = 0x40000000

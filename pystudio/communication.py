@@ -15,7 +15,7 @@ from qubichk.utilities import known_hosts, bytes2str
 
 QS_IP = known_hosts['qubic-studio']
 
-def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,parameterList=None,verbose=False):
+def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,parameterList=None):
     '''
     interpret an individual packet
     called in a loop from interpret_communication
@@ -31,65 +31,94 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
     if stx!=self.DISPATCHER_STX:
         msg = 'Incorrect Start of Transmission: 0x%02X' % stx
         packet_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
         
     counter = (chunk[packet_start_idx+1]<<8) + chunk[packet_start_idx+2]
     packet_info['counter'] = counter
-    if verbose: print('COUNTER: 0x%04X = %i' % (counter,counter))
+    if self.verbosity>1: print('COUNTER: 0x%04X = %i' % (counter,counter))
 
     pkt_size = (chunk[packet_start_idx+3]<<24) + (chunk[packet_start_idx+4]<<16) + (chunk[packet_start_idx+5]<<8) + chunk[packet_start_idx+6]
     packet_info['packet size'] = pkt_size
-    if verbose: print('PKT_SIZE: 0x%08X = %i' % (pkt_size,pkt_size))
+    if self.verbosity>1: print('PKT_SIZE: 0x%08X = %i' % (pkt_size,pkt_size))
     packet_end_idx = packet_start_idx + 7 + pkt_size
     packet_info['last index'] = packet_end_idx
     
     if packet_end_idx>=len(chunk):
         msg = 'Given size is larger than the communication length: %i > %i' % (packet_end_idx+1,len(chunk))
         packet_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
         packet_end_idx = len(chunk)-1
     
     eot = chunk[packet_end_idx]
     packet_info['end transmission'] = eot
-    if verbose: print('final byte (EOT): 0x%02X' % eot)
+    if self.verbosity>1: print('final byte (EOT): 0x%02X' % eot)
     if eot!=self.DISPATCHER_ETX:
         msg = 'Incorrect End of Transmission: 0x%02X' % eot
         packet_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
 
     packet_bytes = chunk[packet_start_idx:packet_end_idx]
     packet_info['bytes'] = packet_bytes
 
-    cmd_id = chunk[packet_start_idx+7]
-    packet_info['command ID'] = cmd_id
-    if cmd_id in self.dispatcher_IDname.keys():
-        packet_info['command name'] = self.dispatcher_IDname[cmd_id]
-    else:
-        packet_info['command name'] = 'unknown dispatcher code'
-    if verbose: print('CMD_ID: 0x%02X %s' % (cmd_id,packet_info['command name']))
-
-    sub_id = (chunk[packet_start_idx+8]<<8) + chunk[packet_start_idx+9]
-    packet_info['command subID'] = sub_id
-    if verbose: print('SUBCMD_ID: 0x%04X' % sub_id)
-
-    cmd = chunk[packet_start_idx+10:packet_end_idx]
-    packet_info['communication body'] = cmd
-    if verbose: print('COMMAND: %s' % (bytes2str(cmd)))
-    if print_command_string:
-        cmd_str = cmd.decode('iso-8859-1')
-        print('COMMAND: %s' % cmd_str)
+    dispatcher_id = chunk[packet_start_idx+7]
+    packet_info['dispatcher ID'] = dispatcher_id
+    packet_info['dispatcher name'] = 'unknown dispatcher ID'
+    packet_info['command name'] = None
+    packet_info['command subID'] = None
+    if dispatcher_id in self.dispatcher_IDname.keys():
+        packet_info['dispatcher name'] = self.dispatcher_IDname[dispatcher_id]
+        body = chunk[packet_start_idx+9:packet_end_idx]
+        if self.verbosity>1: 
+            print('ID: 0x%02X %s' % (dispatcher_id,packet_info['dispatcher name']))
+    if dispatcher_id in self.command_ID.keys():
+        packet_info['command name'] = self.command_name[dispatcher_id]
+        sub_id = (chunk[packet_start_idx+8]<<8) + chunk[packet_start_idx+9]
+        packet_info['command subID'] = sub_id
+        body = chunk[packet_start_idx+10:packet_end_idx]
+        if self.verbosity>1:
+            print('CMD_ID: 0x%02X %s' % (dispatcher_id,packet_info['command name']))
+            print('SUBCMD_ID: 0x%04X' % sub_id)
+        if print_command_string and self.verbosity>0:
+            cmd_str = body.decode('iso-8859-1')
+            print('COMMAND: %s' % cmd_str)
+            
+    packet_info['communication body'] = body
+    if self.verbosity>1: print('BODY: %s' % (bytes2str(body)))
     
 
-    if packet_info['command name']!='DISPATCHER_PARAM_REQUEST_TM_ID':
+    if packet_info['dispatcher name']!='DISPATCHER_PARAM_REQUEST_TM_ID':
         return packet_info
 
     # interpret the response giving the parameter values
-    packet_info['TM code'] = (chunk[packet_start_idx+8]<<8) + (chunk[packet_start_idx+1])
+    # note that in this case, we are no longer interpreting a command.
+    # the TM byte code is found where the command subID would be in a command
+    TMcode = chunk[packet_start_idx+8]
+    packet_info['TM code'] = TMcode
+    if TMcode in self.dispatcher_IDname.keys():
+        TMname = self.dispatcher_IDname[TMcode]
+    else:
+        TMname = 'unknown TM name'
+    packet_info['TM name'] = TMname
     
-    idx = packet_start_idx + 10 # after the dispatcher_ID and 2-bytes response ID
+    idx = packet_start_idx + 9 # after the dispatcher_ID and 1-byte TM ID
+
+    # check if it's a string type response
+    if TMname=='DISP_LogbookFilename_ID':
+        if chunk[packet_end_idx]!=0:
+            msg = 'Incorrect end of string data: 0x%02X' % chunk[packet_end_idx]
+            if self.verbosity>1: print('ERROR! %s' % msg)
+            packet_info['ERROR'].append(msg)
+        txt_bytes = chunk[idx:packet_end_idx-1]
+        txt = txt_bytes.decode('iso-8859-1')
+        packet_info[TMname] = fname
+        return packet_info
+
+    # the parameter is a number, or series of numbers
+    # there's a weird reversal in byte-order, and also a repetition
+    # 2-byte numbers
     parameter_idx = 0
-    while idx<=packet_end_idx-4:
-        val = (chunk[idx]<<24) + (chunk[idx+1]<<16) + (chunk[idx+2]<<8) + chunk[idx+3]
+    while idx<=packet_end_idx-2:
+        val = (chunk[idx]) + (chunk[idx+1]<<8)
         phys_val = None
         if parameter_idx<len(parameterList):
             parm_name = parameterList[parameter_idx]
@@ -102,25 +131,25 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
             phys_val = self.ADU2amplitude(val)
 
         if phys_val is None:
-            if verbose: print('%32s 0x%08X = %10i' % (parm_name,val,val))
+            if self.verbosity>1: print('%32s 0x%08X = %10i' % (parm_name,val,val))
             packet_info[parm_name] = val
         else:
-            if verbose: print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
+            if self.verbosity>1: print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
             packet_info[parm_name] = (val,phys_val)
 
 
         parameter_idx += 1
-        idx += 4
+        idx += 2
 
-    if (idx-packet_end_idx)>4:
+    if (idx-packet_end_idx)>2:
         msg = 'Extra bytes: %i' % (idx-packet_end_idx-4)
         packet_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
         packet_info['extra bytes'] = chunk[idx-packet_end_idx-4:packet_end_idx]
 
     return packet_info
 
-def interpret_communication(self,chunk,print_command_string=False, parameterList=None,verbose=True):
+def interpret_communication(self,chunk,print_command_string=False, parameterList=None):
     '''
     interpret the communicated bytes
     '''
@@ -131,36 +160,36 @@ def interpret_communication(self,chunk,print_command_string=False, parameterList
     if chunk is None or len(chunk)==0:
         msg = 'No bytes to interpret.'
         chunk_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
         return chunk_info
     
     chunk_info['bytes'] = chunk
     chunk_info['communication size'] = len(chunk)
-    if verbose:
+    if self.verbosity>1:
         print('COMMUNICATION BYTES:\n%s' % bytes2str(chunk).replace('0xAA 0x55','0xAA\n0x55'))
         print('COMMUNICATION TOTAL BYTES: %i' % len(chunk))
 
     if chunk[0]!=self.DISPATCHER_STX:
         msg = 'Incorrect STX: 0x%02X (should be 0x%02X)' % (chunk[0],self.DISPATCHER_STX)
         chunk_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
 
     if chunk[-1]!=self.DISPATCHER_ETX:
         msg = 'Incorrect ETX: 0x%02X (should be 0x%02X)' % (chunk[-1],self.DISPATCHER_ETX)
         chunk_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
 
     if len(chunk)<7:
         msg = 'communication packet is too small: %i bytes' % len(chunk)
         chunk_info['ERROR'].append(msg)
-        print('ERROR! '+msg)
+        if self.verbosity>0: print('ERROR! '+msg)
         return chunk_info
     
     # there may be multiple packets in the given chunk
-    if verbose: print('\n'+' Looking at packets '.center(80,'*'))
+    if self.verbosity>1: print('\n'+' Looking at packets '.center(80,'*'))
     packet_start_idx = 0
     while packet_start_idx < len(chunk):
-        packet_info = self.interpret_packet(chunk,packet_start_idx,parameterList=parameterList,verbose=verbose,print_command_string=print_command_string)
+        packet_info = self.interpret_packet(chunk,packet_start_idx,parameterList=parameterList,print_command_string=print_command_string)
         packet_start_idx = packet_info['last index'] + 1
         chunk_info['packet list'].append(packet_info)
         
@@ -172,6 +201,7 @@ def print_acknowledgement(self,ack,comment=''):
     '''
     print to screen the acknowledgement
     '''
+    if self.verbosity<1: return
     msg = ' COMMUNICATION WITH DISPATCHER ACKNOWLEDGEMENT: %s ' % comment
     msg_len = len(msg) + 40
     msg = msg.center(msg_len,'v')
@@ -180,6 +210,7 @@ def print_acknowledgement(self,ack,comment=''):
     msg = ' COMMUNICATION WITH DISPATCHER ACKNOWLEDGED: %s ' % comment
     msg = msg.center(msg_len,'^')
     print(msg)
+    return
 
 def subscribe_dispatcher(self):
     '''
@@ -191,14 +222,14 @@ def subscribe_dispatcher(self):
     try:
         self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
     except:
-        print('ERROR! Could not subscribe to dispatcher.')
+        if self.verbosity>0: print('ERROR! Could not subscribe to dispatcher.')
         self.dispatcher_socket = None
         return None
     
     try:
         ack = self.dispatcher_socket.recv(self.chunksize)
     except:
-        print('ERROR!  NO ACKNOWLEDGEMENT for subscription.')
+        if self.verbosity>0: print('ERROR!  NO ACKNOWLEDGEMENT for subscription.')
         return None
               
         
@@ -249,14 +280,14 @@ def send_command(self,cmd_bytes):
     try:
         nbytes_sent = self.dispatcher_socket.send(cmd_bytes)
     except:
-        print('ERROR! Could not send to dispatcher.')
+        if self.verbosity>0: print('ERROR! Could not send to dispatcher.')
         return None
     
     print('sent %i bytes' % nbytes_sent)
     time.sleep(0.1)
     ack = self.get_data()
     if ack is None:
-        print('ERROR!  No acknowledgement from dispatcher')
+        if self.verbosity>0: print('ERROR!  No acknowledgement from dispatcher')
         return None
     
     self.print_acknowledgement(ack)
@@ -342,7 +373,7 @@ def send_request(self,reqNum=None,parameterList=None):
 
     # send the request
     ack = self.send_command(cmd_bytes)
-    vals = self.interpret_communication(ack,parameterList=parameterList,verbose=False)
+    vals = self.interpret_communication(ack,parameterList=parameterList)
 
     # then read the data
     time.sleep(0.1)
@@ -350,7 +381,7 @@ def send_request(self,reqNum=None,parameterList=None):
     if ack is None:
         return vals
     
-    vals = self.interpret_communication(ack,parameterList=parameterList,verbose=False)
+    vals = self.interpret_communication(ack,parameterList=parameterList)
     return vals
 
 
