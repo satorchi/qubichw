@@ -102,10 +102,10 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
             phys_val = self.ADU2amplitude(val)
 
         if phys_val is None:
-            print('%32s 0x%08X = %10i' % (parm_name,val,val))
+            if verbose: print('%32s 0x%08X = %10i' % (parm_name,val,val))
             packet_info[parm_name] = val
         else:
-            print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
+            if verbose: print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
             packet_info[parm_name] = (val,phys_val)
 
 

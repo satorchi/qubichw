@@ -98,7 +98,7 @@ class pystudio:
     dispatcher_socket = None
     backupsID = None
     command_counter = 0
-    chunksize = 2**20
+    chunksize = 2**24
 
     from .communication import\
         interpret_packet,\

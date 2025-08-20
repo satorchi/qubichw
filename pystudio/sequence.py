@@ -30,7 +30,8 @@ default_setting['RawMask'][6] = 0x3F # 51-56
 default_setting['RawMask'][7] = 0xC0 # 57-58
 default_setting['nsamples'] = 100
 # default_setting['CycleRawMode'] = 0xFFFF
-default_setting['CycleRawMode'] = 0xFF * np.ones(16,dtype=int)
+# default_setting['CycleRawMode'] = 0xFF * np.ones(16,dtype=int)
+default_setting['CycleRawMode'] = 1 # reverse engineering: 2025-08-20 11:37:51
 default_setting['Vicm'] = 3
 default_setting['Vocm'] = 3
 default_setting['startRow'] = 0
