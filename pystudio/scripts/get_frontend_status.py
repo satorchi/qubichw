@@ -17,8 +17,7 @@ from pystudio import pystudio
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()
 
-parm_list = ['ASIC_Spol_ID',
-             'ASIC_Apol_ID',
+parm_list = ['DISP_LogbookFilename_ID',
              'QUBIC_TESDAC_Shape_ID',
              'QUBIC_TESDAC_Offset_ID',
              'QUBIC_TESDAC_Amplitude_ID',
@@ -26,7 +25,9 @@ parm_list = ['ASIC_Spol_ID',
              'QUBIC_FLL_State_ID',
              'QUBIC_FLL_P_ID',
              'QUBIC_FLL_I_ID',
-             'QUBIC_FLL_D_ID'
+             'QUBIC_FLL_D_ID',
+             'ASIC_Spol_ID',
+             'ASIC_Apol_ID'
              ]
 
 for parm_name in parm_list:
@@ -49,6 +50,7 @@ for parm_name in parm_list:
 
     if vals[parm_name]['value'] is None:
         print('%s = %s' % (parm_name,vals[parm_name]['text']))
-    else:
-        print('%s = %s' % (parm_name,vals[parm_name]['value']))
+        continue
+    
+    print('%s = %s' % (parm_name,vals[parm_name]['value']))
     
