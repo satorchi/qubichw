@@ -43,7 +43,7 @@ for parm_name in parm_list:
         continue
 
     if parm_name.find('pol_ID')>0:
-        for idx in dispatcher.NASIC:
+        for idx in range(dispatcher.NASIC):
             print('%s ASIC %2i = %i' % (parm_name,(idx+1),vals[parm_name]['value'][idx]))
         continue
 
