@@ -15,8 +15,8 @@ def assign_parameterstable(self):
     assign the parameter codes
     '''
 
-    self.default_parameterList = ['NETQUIC_HeaderTM_ASIC_ID',
-                                  'ASIC_Spol_ID',
+    self.default_parameterList = ['ASIC_Spol_ID',
+                                  'ASIC_Apol_ID',
                                   'QUBIC_TESDAC_Shape_ID',
                                   'QUBIC_TESDAC_Offset_ID',
                                   'QUBIC_TESDAC_Amplitude_ID',

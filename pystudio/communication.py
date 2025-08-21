@@ -370,7 +370,7 @@ def send_request(self,reqNum=None,parameterList=None):
     '''
     if parameterList is None:
         parameterList = self.default_parameterList
-    cmd_bytes = self.make_command_request(reqNum,parameterList)
+    cmd_bytes = self.make_command_request(reqNum,parameterList=parameterList)
 
     # send the request
     ack = self.send_command(cmd_bytes)
