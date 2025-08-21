@@ -264,7 +264,7 @@ def get_data(self):
     try:
         ack = self.dispatcher_socket.recv(self.chunksize)
     except:
-        print('No data')
+        if self.verbosity>0: print('No data')
         return None
     
     return ack
@@ -284,7 +284,7 @@ def send_command(self,cmd_bytes):
         if self.verbosity>0: print('ERROR! Could not send to dispatcher.')
         return None
     
-    print('sent %i bytes' % nbytes_sent)
+    if self.verbosity>1: print('sent %i bytes' % nbytes_sent)
     time.sleep(0.1)
     ack = self.get_data()
     if ack is None:
