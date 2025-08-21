@@ -70,11 +70,7 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
             phys_val.append(self.TESDAC_SHAPES[shape_idx])
         
     values['physical'] = phys_val
-    if phys_val is not None: values['value'] = phys_val
-
-    
-    values['value'] = val_numbers
-    
+    if phys_val is not None: values['value'] = phys_val    
     return values
 
 def interpret_packet(self,chunk,packet_start_idx,print_command_string=False):

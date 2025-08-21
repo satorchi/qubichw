@@ -17,7 +17,8 @@ from pystudio import pystudio
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()
 
-parm_list = ['DISP_LogbookFilename_ID',
+parm_list = ['NETQUIC_HeaderTM_ASIC_ID',
+             'DISP_LogbookFilename_ID',
              'QUBIC_TESDAC_Shape_ID',
              'QUBIC_TESDAC_Offset_ID',
              'QUBIC_TESDAC_Amplitude_ID',
@@ -35,6 +36,8 @@ txt['common'] = []
 for idx in range(dispatcher.NASIC):
     key = 'ASIC %2i' % (idx+1)
     txt[key] = []
+
+
     
 for parm_name in parm_list:
     vals = dispatcher.send_request(parameterList=[parm_name])
