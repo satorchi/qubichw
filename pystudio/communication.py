@@ -23,17 +23,27 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     '''
 
     values = {}
-
-    # if the parameter is a number
-    # there's a weird reversal in byte-order, and also a repetition
-    # 2-byte numbers
-    val32 = parm_bytes[0] + (parm_bytes[1]<<8) + (parm_bytes[2]<<16) + (parm_bytes[3]<<24)
-    val16 = val32 & 0xFFFF
+    # if the parameter is a number, it's a number for each ASIC (16 possible ASICs)
+    # there's a weird reversal in byte-order if it's multibyte numbers
+    val_numbers = 0xBA*np.zeros(16, dtype=int)
+    if len(parm_bytes)==16:
+        val_numbers = np.array( np.frombuffer(parm_bytes,dtype=np.uint), dtype=int)
+    elif len(parm_bytes)==32:
+        for idx in range(16):
+            idx_low = 2*idx
+            val_numbers[idx] = parm_bytes[idx_low] + (parm_bytes[idx_low+1]<<8)
+    elif len(parm_bytes)==64:
+        for idx in range(16):
+            idx_low = 4*idx
+            val_numbers[idx] = parm_bytes[idx_low]\
+                + (parm_bytes[idx_low+1]<<8)\
+                + (parm_bytes[idx_low+2]<<16)\
+                + (parm_bytes[idx_low+3]<<24)
+            
+    
     phys_val = None
     txt = bytes2str(parm_bytes)
-    values['val32'] = val32
-    values['val16'] = val16
-    values['value'] = None
+    values['value'] = val_numbers
     values['physical'] = phys_val
     values['text'] = txt
     values['ERROR'] = []
@@ -44,32 +54,27 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
             msg = 'Incorrect end of string data: 0x%02X' % parm_bytes[-1]
             if self.verbosity>0: print('ERROR! %s' % msg)
             values['ERROR'].append(msg)
-        txt_bytes = parm_bytes[:-2]
+        txt_bytes = parm_bytes[:-1]
         txt = txt_bytes.decode('iso-8859-1')
         values['text'] = txt
         if self.verbosity>1: print('%s = %s' % (parm_name,txt))
         return values
 
-    if parm_name=='ASIC_Spol_ID' or parm_name=='ASIC_Apol_ID':
-        values['value'] = np.frombuffer(parm_bytes,dtype=np.uint8)
-        
     if parm_name=='QUBIC_TESDAC_Offset_ID':
-        phys_val = self.ADU2Voffset(val16)
+        phys_val = self.ADU2Voffset(val_numbers)
     if parm_name=='QUBIC_TESDAC_Amplitude_ID':
-        phys_val = self.ADU2amplitude(val16)
+        phys_val = self.ADU2amplitude(val_numbers)
+    if parm_name=='QUBIC_TESDAC_Shape_ID':
+        phys_val = []
+        for shape_idx in val_numbers:
+            phys_val.append(self.TESDAC_SHAPES[shape_idx])
+        
     values['physical'] = phys_val
-    values['value'] = phys_val
+    if phys_val is not None: values['value'] = phys_val
 
-    if parm_name.find('QUBIC_FLL_')==0:
-        values['value'] = val16
     
+    values['value'] = val_numbers
     
-    if self.verbosity>1:
-        msg = '%32s 0x%08X = %10i' % (parm_name,val32,val32)
-        if phys_val is not None:
-            msg += ' = %.2f' % phys_val
-        print(msg)
-
     return values
 
 def interpret_packet(self,chunk,packet_start_idx,print_command_string=False):

@@ -103,6 +103,7 @@ class pystudio:
     chunksize = 2**24
 
     NASIC = 2
+    TESDAC_SHAPES = ['SINUS','TRIANGLE','CONTINUOUS']
 
     from .communication import\
         interpret_parameter_TM,\

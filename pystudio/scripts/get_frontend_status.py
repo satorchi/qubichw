@@ -30,8 +30,16 @@ parm_list = ['DISP_LogbookFilename_ID',
              'ASIC_Apol_ID'
              ]
 
+txt = {}
+txt['common'] = []
+for idx in range(dispatcher.NASIC):
+    key = 'ASIC %2i' % (idx+1)
+    txt[key] = []
+    
 for parm_name in parm_list:
     vals = dispatcher.send_request(parameterList=[parm_name])
+
+    # save response for debugging
     fname = '%s_request.dat' % parm_name
     h = open(fname,'wb')
     h.write(vals['bytes'])
@@ -39,21 +47,49 @@ for parm_name in parm_list:
     
     if parm_name not in vals.keys(): continue
 
-    if parm_name.find('Offset')>0 or parm_name.find('Amplitude')>0:
-        print('%s = %.2f' % (parm_name,vals[parm_name]['physical']))
+    parm_vals = vals[parm_name]['value']
+    
+    if isinstance(parm_vals,str):
+        line = '%s = %s' % (parm_vals)
+        txt['common'].append(line)
         continue
 
-    if parm_name.find('pol_ID')>0:
-        if vals[parm_name]['value'] is None:
-            print('%s = %s' % (parm_name,vals[parm_name]['text']))
-        else:        
+    if isinstance(parm_vals,np.ndarray):
+        if parm_vals.dtype=='float':
             for idx in range(dispatcher.NASIC):
-                print('%s ASIC %2i = %i' % (parm_name,(idx+1),vals[parm_name]['value'][idx]))
+                val = parm_vals[idx]
+                key = 'ASIC %2i' % (idx+1)
+                line = '%s = %.2f' % (parm_name,val)
+                txt[key].append(line)
+            continue
+                
+        if parm_vals.dtype=='int':
+            for idx in range(dispatcher.NASIC):
+                val = parm_vals[idx]
+                key = 'ASIC %2i' % (idx+1)
+                line = '%s = %i' % (parm_name,val)
+                txt[key].append(line)
+            continue
+            
+    if parm_vals is None:
+        line = '%s = %s' % (parm_name,vals[parm_name]['text'])
+        txt['common'].append(line)
         continue
+    
+    line = '%s = %s' % parm_vals
+    txt['common'].append(line)
 
-    if vals[parm_name]['value'] is None:
-        print('%s = %s' % (parm_name,vals[parm_name]['text']))
-        continue
-    
-    print('%s = %s' % (parm_name,vals[parm_name]['value']))
-    
+line = ' QUBIC FRONTEND STATUS '.center(80,'*'))
+lines = [line]
+lines += txt['common']
+
+for idx in range(dispatcher.NASIC):
+    key = 'ASIC %2i' % (idx+1)
+    ttl = ' %s ' % key
+    line = '\n'+ttl.center(80,'*')
+    lines.append(line)
+    lines += txt[key]
+
+msg = '\n'.join(lines)
+print(msg)
+
