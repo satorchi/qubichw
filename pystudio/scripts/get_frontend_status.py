@@ -44,6 +44,10 @@ for parm_name in parm_list:
         continue
 
     if parm_name.find('pol_ID')>0:
+        if vals[parm_name]['value'] is None:
+            print('%s = %s' % (parm_name,vals[parm_name]['text']))
+            continue
+        
         for idx in range(dispatcher.NASIC):
             print('%s ASIC %2i = %i' % (parm_name,(idx+1),vals[parm_name]['value'][idx]))
         continue
