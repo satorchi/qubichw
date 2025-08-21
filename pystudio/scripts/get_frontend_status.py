@@ -42,11 +42,13 @@ for parm_name in parm_list:
         print('%s = %.2f' % (parm_name,vals[parm_name]['physical']))
         continue
 
-    if parm_name.find('Spol_ID')>0:
+    if parm_name.find('pol_ID')>0:
         for idx in range(dispatcher.NASIC):
             print('%s ASIC %2i = %i' % (parm_name,(idx+1),vals[parm_name]['value'][idx]))
         continue
 
-    print('%s = %s' % (parm_name,vals[parm_name]['text']))
-
+    if vals[parm_name]['value'] is None:
+        print('%s = %s' % (parm_name,vals[parm_name]['text']))
+    else:
+        print('%s = %s' % (parm_name,vals[parm_name]['value']))
     

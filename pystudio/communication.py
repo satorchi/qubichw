@@ -50,7 +50,7 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
         if self.verbosity>1: print('%s = %s' % (parm_name,txt))
         return values
 
-    if parm_name=='ASIC_Spol_ID' or parm_name=='ASIC_Spol_ID':
+    if parm_name=='ASIC_Spol_ID' or parm_name=='ASIC_Apol_ID':
         values['value'] = np.frombuffer(parm_bytes,dtype=np.uint8)
         
     if parm_name=='QUBIC_TESDAC_Offset_ID':
@@ -58,6 +58,11 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     if parm_name=='QUBIC_TESDAC_Amplitude_ID':
         phys_val = self.ADU2amplitude(val16)
     values['physical'] = phys_val
+    values['value'] = phys_val
+
+    if parm_name.find('QUBIC_FLL_')==0:
+        values['value'] = val16
+    
     
     if self.verbosity>1:
         msg = '%32s 0x%08X = %10i' % (parm_name,val32,val32)
