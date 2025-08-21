@@ -30,7 +30,7 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     val32 = parm_bytes[0] + (parm_bytes[1]<<8) + (parm_bytes[2]<<16) + (parm_bytes[3]<<24)
     val16 = val32 & 0xFFFF
     phys_val = None
-    txt = None
+    txt = bytes2str(parm_bytes)
     values['val32'] = val32
     values['val16'] = val16
     values['value'] = None
