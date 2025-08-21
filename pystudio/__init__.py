@@ -103,6 +103,7 @@ class pystudio:
     chunksize = 2**24
 
     from .communication import\
+        interpret_parameter_TM,\
         interpret_packet,\
         interpret_communication,\
         print_acknowledgement,\

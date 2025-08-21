@@ -15,14 +15,57 @@ from qubichk.utilities import known_hosts, bytes2str
 
 QS_IP = known_hosts['qubic-studio']
 
-def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,parameterList=None):
+def interpret_parameter_TM(self,parm_bytes,parm_name):
+    '''
+    interpret the body of the TM packet
+    this is called from interpret_communication()
+    '''
+
+    values = {}
+
+    # if the parameter is a number
+    # there's a weird reversal in byte-order, and also a repetition
+    # 2-byte numbers
+    val32 = parm_bytes[0] + (parm_bytes[1]<<8) + (parm_bytes[2]<<16) + (parm_bytes[3]<<24)
+    val16 = val32 & 0xFFFF
+    phys_val = None
+    txt = None
+    values['val32'] = val32
+    values['val16'] = val16
+    values['physical'] = phys_val
+    values['text'] = txt
+    values['ERROR'] = []
+    
+    # check if it's a string type response
+    if parm_name=='DISP_LogbookFilename_ID':
+        if parm_bytes[-1]!=0:
+            msg = 'Incorrect end of string data: 0x%02X' % parm_bytes[-1]
+            if self.verbosity>0: print('ERROR! %s' % msg)
+            values['ERROR'].append(msg)
+        txt_bytes = parm_bytes[:-2]
+        txt = txt_bytes.decode('iso-8859-1')
+        values['text'] = txt
+        return values
+
+    if parm_name=='QUBIC_TESDAC_Offset_ID':
+        phys_val = self.ADU2Voffset(val16)
+    if parm_name=='QUBIC_TESDAC_Amplitude_ID':
+        phys_val = self.ADU2amplitude(val16)
+    values['physical'] = phys_val
+    
+    if self.verbosity>1:
+        msg = '%32s 0x%08X = %10i' % (parm_name,val32,val32)
+        if phys_val is not None:
+            msg += ' = %.2f' % phys_val
+        print(msg)
+
+    return values
+
+def interpret_packet(self,chunk,packet_start_idx,print_command_string=False):
     '''
     interpret an individual packet
     called in a loop from interpret_communication
     '''
-    if parameterList is None:
-        parameterList = list(self.parameterstable.keys())
-    
     packet_info = {}
     packet_info['ERROR'] = []    
 
@@ -61,15 +104,25 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
     packet_info['bytes'] = packet_bytes
 
     dispatcher_id = chunk[packet_start_idx+7]
+    body = chunk[packet_start_idx+8:packet_end_idx]
     packet_info['dispatcher ID'] = dispatcher_id
     packet_info['dispatcher name'] = 'unknown dispatcher ID'
     packet_info['command name'] = None
     packet_info['command subID'] = None
     if dispatcher_id in self.dispatcher_IDname.keys():
+        TMcode = chunk[packet_start_idx+8]
+        packet_info['TM code'] = TMcode
+        if TMcode in self.dispatcher_IDname.keys(): # this is the wrong look up table
+            TMname = self.dispatcher_IDname[TMcode]
+        else:
+            TMname = 'unknown TM name'
+        packet_info['TM name'] = TMname
+        
         packet_info['dispatcher name'] = self.dispatcher_IDname[dispatcher_id]
         body = chunk[packet_start_idx+9:packet_end_idx]
         if self.verbosity>1: 
             print('ID: 0x%02X %s' % (dispatcher_id,packet_info['dispatcher name']))
+            
     if dispatcher_id in self.command_ID.keys():
         packet_info['command name'] = self.command_name[dispatcher_id]
         sub_id = (chunk[packet_start_idx+8]<<8) + chunk[packet_start_idx+9]
@@ -84,75 +137,16 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False,para
             
     packet_info['communication body'] = body
     if self.verbosity>1: print('BODY: %s' % (bytes2str(body)))
-    
-
-    if packet_info['dispatcher name']!='DISPATCHER_PARAM_REQUEST_TM_ID':
-        return packet_info
-
-    # interpret the response giving the parameter values
-    # note that in this case, we are no longer interpreting a command.
-    # the TM byte code is found where the command subID would be in a command
-    TMcode = chunk[packet_start_idx+8]
-    packet_info['TM code'] = TMcode
-    if TMcode in self.dispatcher_IDname.keys():
-        TMname = self.dispatcher_IDname[TMcode]
-    else:
-        TMname = 'unknown TM name'
-    packet_info['TM name'] = TMname
-    
-    idx = packet_start_idx + 9 # after the dispatcher_ID and 1-byte TM ID
-
-    # check if it's a string type response
-    if TMname=='DISP_LogbookFilename_ID':
-        if chunk[packet_end_idx]!=0:
-            msg = 'Incorrect end of string data: 0x%02X' % chunk[packet_end_idx]
-            if self.verbosity>1: print('ERROR! %s' % msg)
-            packet_info['ERROR'].append(msg)
-        txt_bytes = chunk[idx:packet_end_idx-1]
-        txt = txt_bytes.decode('iso-8859-1')
-        packet_info[TMname] = fname
-        return packet_info
-
-    # the parameter is a number, or series of numbers
-    # there's a weird reversal in byte-order, and also a repetition
-    # 2-byte numbers
-    parameter_idx = 0
-    while idx<=packet_end_idx-2:
-        val = (chunk[idx]) + (chunk[idx+1]<<8)
-        phys_val = None
-        if parameter_idx<len(parameterList):
-            parm_name = parameterList[parameter_idx]
-        else:
-            parm_name = 'UNKNOWN parameter %i' % parameter_idx
-
-        if parm_name=='QUBIC_TESDAC_Offset_ID':
-            phys_val = self.ADU2Voffset(val)
-        if parm_name=='QUBIC_TESDAC_Amplitude_ID':
-            phys_val = self.ADU2amplitude(val)
-
-        if phys_val is None:
-            if self.verbosity>1: print('%32s 0x%08X = %10i' % (parm_name,val,val))
-            packet_info[parm_name] = val
-        else:
-            if self.verbosity>1: print('%32s 0x%08X = %10i = %.2f V' % (parm_name,val,val,phys_val))
-            packet_info[parm_name] = (val,phys_val)
-
-
-        parameter_idx += 1
-        idx += 2
-
-    if (idx-packet_end_idx)>2:
-        msg = 'Extra bytes: %i' % (idx-packet_end_idx-4)
-        packet_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
-        packet_info['extra bytes'] = chunk[idx-packet_end_idx-4:packet_end_idx]
-
     return packet_info
+
 
 def interpret_communication(self,chunk,print_command_string=False, parameterList=None):
     '''
     interpret the communicated bytes
     '''
+    if parameterList is None:
+        parameterList = list(self.parameterstable.keys())
+    
     chunk_info = {}
     chunk_info['ERROR'] = []
     chunk_info['packet list'] = []
@@ -188,12 +182,19 @@ def interpret_communication(self,chunk,print_command_string=False, parameterList
     # there may be multiple packets in the given chunk
     if self.verbosity>1: print('\n'+' Looking at packets '.center(80,'*'))
     packet_start_idx = 0
+    parm_idx = 0
     while packet_start_idx < len(chunk):
-        packet_info = self.interpret_packet(chunk,packet_start_idx,parameterList=parameterList,print_command_string=print_command_string)
+        packet_info = self.interpret_packet(chunk,packet_start_idx,print_command_string=print_command_string)
         packet_start_idx = packet_info['last index'] + 1
         chunk_info['packet list'].append(packet_info)
-        
-
+        if packet_info['dispatcher name']=='DISPATCHER_PARAM_REQUEST_TM_ID':
+            if parm_idx>len(parameterList):
+                parm_name = 'Unknown parameter %i' % parm_idx
+            else:
+                parm_name = parameterList[parm_idx]
+            parm_vals = self.interpret_parameter_TM(packet_info['communication body'],parm_name)
+            chunk_info[parm_name] = parm_vals
+            parm_idx += 1
     return chunk_info
     
 
