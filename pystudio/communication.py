@@ -32,6 +32,7 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     txt = None
     values['val32'] = val32
     values['val16'] = val16
+    values['value'] = None
     values['physical'] = phys_val
     values['text'] = txt
     values['ERROR'] = []
@@ -45,8 +46,12 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
         txt_bytes = parm_bytes[:-2]
         txt = txt_bytes.decode('iso-8859-1')
         values['text'] = txt
+        if self.verbosity>1: print('%s = %s' % (parm_name,txt))
         return values
 
+    if parm_name=='ASIC_Spol_ID' or parm_name=='ASIC_Spol_ID':
+        values['value'] = np.frombuffer(parm_bytes,dtype=np.uint8)
+        
     if parm_name=='QUBIC_TESDAC_Offset_ID':
         phys_val = self.ADU2Voffset(val16)
     if parm_name=='QUBIC_TESDAC_Amplitude_ID':

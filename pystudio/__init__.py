@@ -102,6 +102,8 @@ class pystudio:
     command_counter = 0
     chunksize = 2**24
 
+    NASIC = 2
+
     from .communication import\
         interpret_parameter_TM,\
         interpret_packet,\

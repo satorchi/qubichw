@@ -42,6 +42,11 @@ for parm_name in parm_list:
         print('%s = %.2f' % (parm_name,vals[parm_name]['physical']))
         continue
 
+    if parm_name.find('pol_ID')>0:
+        for idx in dispatcher.NASIC:
+            print('%s ASIC %2i = %i' % (parm_name,(idx+1),vals[parm_name]['value'][idx]))
+        continue
+
     print('%s = %i' % (parm_name,vals[parm_name]['val16']))
 
     
