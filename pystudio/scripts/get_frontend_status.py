@@ -17,7 +17,7 @@ from pystudio import pystudio
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()
 
-parm_list = dispatcher.default_parameter_list
+parm_list = dispatcher.default_parameterList
 
 # do the full list to see what we've got.  THIS IS TEMPORARY
 # parm_list = list(dispatcher.parameterstable.keys())
