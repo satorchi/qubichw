@@ -17,12 +17,10 @@ from pystudio import pystudio
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()
 
-parm_list = ['NETQUIC_HeaderTM_ASIC_ID',
-             'DISP_LogbookFilename_ID',
+parm_list = ['DISP_LogbookFilename_ID',
              'QUBIC_TESDAC_Shape_ID',
              'QUBIC_TESDAC_Offset_ID',
              'QUBIC_TESDAC_Amplitude_ID',
-             'QUBIC_Rfb_ID',
              'QUBIC_FLL_State_ID',
              'QUBIC_FLL_P_ID',
              'QUBIC_FLL_I_ID',
@@ -30,7 +28,12 @@ parm_list = ['NETQUIC_HeaderTM_ASIC_ID',
              'ASIC_Spol_ID',
              'ASIC_Apol_ID',
              'ASIC_Vicm_ID',
-             'ASIC_Vocm_ID'
+             'ASIC_Vocm_ID',
+             'QUBIC_Nsample_ID',
+             'QUBIC_Nsamples_ID',
+             'QUBIC_rawMaskSamples_ID',
+             'QUBIC_relayStates_ID',
+             'QUBIC_Rfb_ID'
              ]
 
 def get_frontend_status():
@@ -82,6 +85,13 @@ def get_frontend_status():
                     line = '%s = %i' % (parm_name,val)
                     txt[key].append(line)
                 continue
+
+        if isinstance(parm_vals,list):
+            for idx,val in enumerate(parm_vals):
+                key = 'ASIC %2i' % (idx+1)
+                line = '%s = %s' % (parm_name,val)
+                txt[key].append(line)
+            continue
 
         if parm_vals is None:
             line = '%s = %s' % (parm_name,vals[parm_name]['text'])
