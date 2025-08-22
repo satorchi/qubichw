@@ -49,6 +49,8 @@ def get_frontend_status():
 
     txt['ERROR'] = []
 
+    # it seems the request only works for one parameter at a time,
+    # even though it seems to be built to return multiple parameters
     for parm_name in parm_list:
         vals = dispatcher.send_request(parameterList=[parm_name])
         if 'bytes' not in vals.keys():

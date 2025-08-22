@@ -70,6 +70,16 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
         phys_val = []
         for shape_idx in val_numbers:
             phys_val.append(self.TESDAC_SHAPES[shape_idx])
+    if parm_name=='QUBIC_relayStates_ID':
+        phys_val = []
+        for state_idx in val_numbers:
+            if state_idx in self.RELAY_STATES.keys():
+                phys_val.append(self.RELAY_STATES[state_idx])
+            else:
+                state_name = 'unknown relay state: %i' % state_idx
+                phys_val.append(state_name)
+        
+        
         
     values['physical'] = phys_val
     if phys_val is not None: values['value'] = phys_val    

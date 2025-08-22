@@ -104,6 +104,7 @@ class pystudio:
 
     NASIC = 2
     TESDAC_SHAPES = ['SINUS','TRIANGLE','CONTINUOUS']
+    RELAY_STATES = {0:'10kOhm', 2:'100kOhm'}
 
     from .communication import\
         interpret_parameter_TM,\
