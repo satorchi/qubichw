@@ -25,14 +25,14 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     values = {}
     # if the parameter is a number, it's a number for each ASIC (16 possible ASICs)
     # there's a weird reversal in byte-order if it's multibyte numbers
-    val_numbers = 0xBA*np.zeros(16, dtype=int)
-    if len(parm_bytes)==16:
-        val_numbers = np.array( np.frombuffer(parm_bytes,dtype=np.uint), dtype=int)
-    elif len(parm_bytes)==32:
+    val_numbers = np.array( np.frombuffer(parm_bytes,dtype=np.uint8), dtype=int)
+    if len(parm_bytes)==32:
+        val_numbers = np.zeros(16,dtype=int)
         for idx in range(16):
             idx_low = 2*idx
             val_numbers[idx] = parm_bytes[idx_low] + (parm_bytes[idx_low+1]<<8)
     elif len(parm_bytes)==64:
+        val_numbers = np.zeros(16,dtype=int)
         for idx in range(16):
             idx_low = 4*idx
             val_numbers[idx] = parm_bytes[idx_low]\
@@ -43,6 +43,7 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     
     phys_val = None
     txt = bytes2str(parm_bytes)
+    values['numbers'] = val_numbers
     values['value'] = val_numbers
     values['physical'] = phys_val
     values['text'] = txt

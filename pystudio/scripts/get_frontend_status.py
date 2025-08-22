@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 get the status of the frontend
 '''
-
+import numpy as np
 from pystudio import pystudio
 
 dispatcher = pystudio()
@@ -28,71 +28,90 @@ parm_list = ['NETQUIC_HeaderTM_ASIC_ID',
              'QUBIC_FLL_I_ID',
              'QUBIC_FLL_D_ID',
              'ASIC_Spol_ID',
-             'ASIC_Apol_ID'
+             'ASIC_Apol_ID',
+             'ASIC_Vicm_ID',
+             'ASIC_Vocm_ID'
              ]
 
-txt = {}
-txt['common'] = []
-for idx in range(dispatcher.NASIC):
-    key = 'ASIC %2i' % (idx+1)
-    txt[key] = []
-
-
+def get_frontend_status():
+    '''
+    build a nice text message containing the frontend status
+    '''
     
-for parm_name in parm_list:
-    vals = dispatcher.send_request(parameterList=[parm_name])
+    txt = {}
+    txt['common'] = []
+    for idx in range(16):
+        key = 'ASIC %2i' % (idx+1)
+        txt[key] = []
 
-    # save response for debugging
-    fname = '%s_request.dat' % parm_name
-    h = open(fname,'wb')
-    h.write(vals['bytes'])
-    h.close()
-    
-    if parm_name not in vals.keys(): continue
+    txt['ERROR'] = []
 
-    parm_vals = vals[parm_name]['value']
-    
-    if isinstance(parm_vals,str):
-        line = '%s = %s' % (parm_vals)
-        txt['common'].append(line)
-        continue
-
-    if isinstance(parm_vals,np.ndarray):
-        if parm_vals.dtype=='float':
-            for idx in range(dispatcher.NASIC):
-                val = parm_vals[idx]
-                key = 'ASIC %2i' % (idx+1)
-                line = '%s = %.2f' % (parm_name,val)
-                txt[key].append(line)
+    for parm_name in parm_list:
+        vals = dispatcher.send_request(parameterList=[parm_name])
+        if 'bytes' not in vals.keys():
+            txt['ERROR'].append(parm_name+'\n   ')
+            txt['ERROR'].append('\n   '.join(vals['ERROR']))
             continue
-                
-        if parm_vals.dtype=='int':
-            for idx in range(dispatcher.NASIC):
-                val = parm_vals[idx]
-                key = 'ASIC %2i' % (idx+1)
-                line = '%s = %i' % (parm_name,val)
-                txt[key].append(line)
+
+        # save response for debugging
+        fname = '%s_request.dat' % parm_name
+        h = open(fname,'wb')
+        h.write(vals['bytes'])
+        h.close()
+
+        if parm_name not in vals.keys(): continue
+
+        parm_vals = vals[parm_name]['value']
+
+        if isinstance(parm_vals,str):
+            line = '%s = %s' % (parm_name,parm_vals)
+            txt['common'].append(line)
             continue
-            
-    if parm_vals is None:
-        line = '%s = %s' % (parm_name,vals[parm_name]['text'])
+
+        if isinstance(parm_vals,np.ndarray):
+            if parm_vals.dtype=='float':
+                for idx,val in enumerate(parm_vals):
+                    key = 'ASIC %2i' % (idx+1)
+                    line = '%s = %.2f' % (parm_name,val)
+                    txt[key].append(line)
+                continue
+
+            if parm_vals.dtype=='int':
+                for idx,val in enumerate(parm_vals):
+                    key = 'ASIC %2i' % (idx+1)
+                    line = '%s = %i' % (parm_name,val)
+                    txt[key].append(line)
+                continue
+
+        if parm_vals is None:
+            line = '%s = %s' % (parm_name,vals[parm_name]['text'])
+            txt['common'].append(line)
+            continue
+
+        line = '%s = %s' % (parm_name,parm_vals)
         txt['common'].append(line)
-        continue
-    
-    line = '%s = %s' % parm_vals
-    txt['common'].append(line)
 
-line = ' QUBIC FRONTEND STATUS '.center(80,'*'))
-lines = [line]
-lines += txt['common']
+    line = ' QUBIC FRONTEND STATUS '.center(80,'*')
+    lines = [line]
+    lines += txt['common']
 
-for idx in range(dispatcher.NASIC):
-    key = 'ASIC %2i' % (idx+1)
-    ttl = ' %s ' % key
-    line = '\n'+ttl.center(80,'*')
-    lines.append(line)
-    lines += txt[key]
+    for idx in range(16):
+        key = 'ASIC %2i' % (idx+1)
+        if key not in txt.keys(): continue
+        if len(txt[key])==0: continue
+        
+        ttl = ' %s ' % key
+        line = '\n'+ttl.center(80,'*')
+        lines.append(line)
+        lines += txt[key]
 
-msg = '\n'.join(lines)
-print(msg)
+    if len(txt['ERROR'])>0:
+        lines.append('\n'+' ERROR! '.center(80,'*'))
+        lines += txt['ERROR']
+    msg = '\n'.join(lines)
+    return msg
+
+if __name__=='__main__':
+    msg = get_frontend_status()
+    print(msg)
 
