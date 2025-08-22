@@ -21,6 +21,7 @@ parm_list = ['DISP_LogbookFilename_ID',
              'QUBIC_TESDAC_Shape_ID',
              'QUBIC_TESDAC_Offset_ID',
              'QUBIC_TESDAC_Amplitude_ID',
+             'QUBIC_TESDAC_Sunder_ID',
              'QUBIC_FLL_State_ID',
              'QUBIC_FLL_P_ID',
              'QUBIC_FLL_I_ID',
@@ -32,9 +33,23 @@ parm_list = ['DISP_LogbookFilename_ID',
              'QUBIC_Nsample_ID',
              'QUBIC_Nsamples_ID',
              'QUBIC_rawMaskSamples_ID',
-             'QUBIC_relayStates_ID',
-             'QUBIC_Rfb_ID'
+             'QUBIC_relayStates_ID'
              ]
+
+# do the full list to see what we've got.  THIS IS TEMPORARY
+# parm_list = list(dispatcher.parameterstable.keys())
+
+# try to find Aplitude
+parm_list = ['PARAMETER_UNKNOWN_10551_ID',
+             'PARAMETER_UNKNOWN_10552_ID',
+             'PARAMETER_UNKNOWN_10553_ID',
+             'PARAMETER_UNKNOWN_10554_ID',
+             'PARAMETER_UNKNOWN_10555_ID',
+             'PARAMETER_UNKNOWN_10556_ID',
+             'PARAMETER_UNKNOWN_10557_ID',
+             'PARAMETER_UNKNOWN_10558_ID',
+             'PARAMETER_UNKNOWN_10559_ID',
+             'PARAMETER_UNKNOWN_10560_ID']
 
 def get_frontend_status():
     '''
@@ -74,6 +89,11 @@ def get_frontend_status():
             continue
 
         if isinstance(parm_vals,np.ndarray):
+            if len(parm_vals)>16:
+                line = '%s = %s' % (parm_name,parm_vals)
+                txt['common'].append(line)
+                continue
+            
             if parm_vals.dtype=='float':
                 for idx,val in enumerate(parm_vals):
                     key = 'ASIC %2i' % (idx+1)
@@ -89,6 +109,11 @@ def get_frontend_status():
                 continue
 
         if isinstance(parm_vals,list):
+            if len(parm_vals)>16:
+                line = '%s = %s' % (parm_name,parm_vals)
+                txt['common'].append(line)
+                continue
+        
             for idx,val in enumerate(parm_vals):
                 key = 'ASIC %2i' % (idx+1)
                 line = '%s = %s' % (parm_name,val)
@@ -107,7 +132,9 @@ def get_frontend_status():
     lines = [line]
     lines += txt['common']
 
-    for idx in range(16):
+    # we only print for 2 ASICs even though there is default data for 16 ASICs
+    # change this when we have the full instrument
+    for idx in range(dispatcher.NASIC):
         key = 'ASIC %2i' % (idx+1)
         if key not in txt.keys(): continue
         if len(txt[key])==0: continue

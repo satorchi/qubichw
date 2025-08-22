@@ -10583,4 +10583,15 @@ def assign_parameterstable(self):
     self.parameterstable['DISP_DecommuteIdErrorsNumber_ID'] = 10548
     self.parameterstable['DISP_DecommuteLastErrorFieldValue_ID'] = 10549
     self.parameterstable['DISP_DecommuteLastErrorDatation_ID'] = 10550
+    self.parameterstable['PARAMETER_UNKNOWN_10551_ID'] = 10551
+    self.parameterstable['PARAMETER_UNKNOWN_10552_ID'] = 10552
+    self.parameterstable['PARAMETER_UNKNOWN_10553_ID'] = 10553
+    self.parameterstable['PARAMETER_UNKNOWN_10554_ID'] = 10554
+    self.parameterstable['PARAMETER_UNKNOWN_10555_ID'] = 10555
+    self.parameterstable['PARAMETER_UNKNOWN_10556_ID'] = 10556
+    self.parameterstable['PARAMETER_UNKNOWN_10557_ID'] = 10557
+    self.parameterstable['PARAMETER_UNKNOWN_10558_ID'] = 10558
+    self.parameterstable['PARAMETER_UNKNOWN_10559_ID'] = 10559
+    self.parameterstable['PARAMETER_UNKNOWN_10560_ID'] = 10560
+
     return
