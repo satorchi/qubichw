@@ -19,7 +19,7 @@ def assign_parameterstable(self):
                                   'QUBIC_TESDAC_Shape_ID',
                                   'QUBIC_TESDAC_Offset_ID',
                                   'QUBIC_TESDAC_Amplitude_ID',
-                                  'QUBIC_Rfb_ID',
+                                  'QUBIC_relayStates_ID',
                                   'QUBIC_FLL_State_ID',
                                   'QUBIC_FLL_P_ID',
                                   'QUBIC_FLL_I_ID',

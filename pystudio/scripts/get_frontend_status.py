@@ -17,39 +17,22 @@ from pystudio import pystudio
 dispatcher = pystudio()
 ack = dispatcher.subscribe_dispatcher()
 
-parm_list = ['DISP_LogbookFilename_ID',
-             'QUBIC_TESDAC_Shape_ID',
-             'QUBIC_TESDAC_Offset_ID',
-             'QUBIC_TESDAC_Amplitude_ID',
-             'QUBIC_TESDAC_Sunder_ID',
-             'QUBIC_FLL_State_ID',
-             'QUBIC_FLL_P_ID',
-             'QUBIC_FLL_I_ID',
-             'QUBIC_FLL_D_ID',
-             'ASIC_Spol_ID',
-             'ASIC_Apol_ID',
-             'ASIC_Vicm_ID',
-             'ASIC_Vocm_ID',
-             'QUBIC_Nsample_ID',
-             'QUBIC_Nsamples_ID',
-             'QUBIC_rawMaskSamples_ID',
-             'QUBIC_relayStates_ID'
-             ]
+parm_list = dispatcher.default_parameter_list
 
 # do the full list to see what we've got.  THIS IS TEMPORARY
 # parm_list = list(dispatcher.parameterstable.keys())
 
-# try to find Aplitude
-parm_list = ['PARAMETER_UNKNOWN_10551_ID',
-             'PARAMETER_UNKNOWN_10552_ID',
-             'PARAMETER_UNKNOWN_10553_ID',
-             'PARAMETER_UNKNOWN_10554_ID',
-             'PARAMETER_UNKNOWN_10555_ID',
-             'PARAMETER_UNKNOWN_10556_ID',
-             'PARAMETER_UNKNOWN_10557_ID',
-             'PARAMETER_UNKNOWN_10558_ID',
-             'PARAMETER_UNKNOWN_10559_ID',
-             'PARAMETER_UNKNOWN_10560_ID']
+# # try to find Aplitude
+# parm_list = ['PARAMETER_UNKNOWN_10551_ID',
+#              'PARAMETER_UNKNOWN_10552_ID',
+#              'PARAMETER_UNKNOWN_10553_ID',
+#              'PARAMETER_UNKNOWN_10554_ID',
+#              'PARAMETER_UNKNOWN_10555_ID',
+#              'PARAMETER_UNKNOWN_10556_ID',
+#              'PARAMETER_UNKNOWN_10557_ID',
+#              'PARAMETER_UNKNOWN_10558_ID',
+#              'PARAMETER_UNKNOWN_10559_ID',
+#              'PARAMETER_UNKNOWN_10560_ID']
 
 def get_frontend_status():
     '''
