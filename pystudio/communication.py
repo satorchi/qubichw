@@ -58,6 +58,7 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
         txt_bytes = parm_bytes[:-1]
         txt = txt_bytes.decode('iso-8859-1')
         values['text'] = txt
+        values['value'] = txt
         if self.verbosity>1: print('%s = %s' % (parm_name,txt))
         return values
 
