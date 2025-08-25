@@ -15,6 +15,7 @@ import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
+from qubicpack.utilities import interpret_rawmask
 
 #####################################
 # defaults
@@ -612,6 +613,109 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
+
+def get_frontend_status(self,parameterList=None):
+    '''
+    build a nice text message containing the frontend status
+    '''
+
+    if parameterList is None:
+        parm_list = self.default_parameterList
+
+    txt = {}
+    txt['common'] = []
+    for idx in range(16):
+        key = 'ASIC %2i' % (idx+1)
+        txt[key] = []
+
+    txt['ERROR'] = []
+
+    # it seems the request only works for one parameter at a time,
+    # even though it seems to be built to return multiple parameters
+    for parm_name in parameterList:
+        vals = self.send_request(parameterList=[parm_name])
+        if 'bytes' not in vals.keys():
+            txt['ERROR'].append(parm_name+'\n   ')
+            txt['ERROR'].append('\n   '.join(vals['ERROR']))
+            continue
+
+        if self.verbosity>2:
+            # save response for debugging
+            fname = '%s_request.dat' % parm_name
+            h = open(fname,'wb')
+            h.write(vals['bytes'])
+            h.close()
+
+        if parm_name not in vals.keys(): continue
+
+        parm_vals = vals[parm_name]['value']
+
+        if isinstance(parm_vals,str):
+            line = '%s = %s' % (parm_name,parm_vals)
+            txt['common'].append(line)
+            continue
+
+        if isinstance(parm_vals,np.ndarray):
+            if len(parm_vals)>16:
+                line = '%s = %s' % (parm_name,parm_vals)
+                txt['common'].append(line)
+                continue
+            
+            if parm_vals.dtype=='float':
+                for idx,val in enumerate(parm_vals):
+                    key = 'ASIC %2i' % (idx+1)
+                    line = '%s = %.2f' % (parm_name,val)
+                    txt[key].append(line)
+                continue
+
+            if parm_vals.dtype=='int':
+                for idx,val in enumerate(parm_vals):
+                    key = 'ASIC %2i' % (idx+1)
+                    line = '%s = %i' % (parm_name,val)
+                    txt[key].append(line)
+                continue
+
+        if isinstance(parm_vals,list):
+            if len(parm_vals)>16:
+                line = '%s = %s' % (parm_name,parm_vals)
+                txt['common'].append(line)
+                continue
+        
+            for idx,val in enumerate(parm_vals):
+                key = 'ASIC %2i' % (idx+1)
+                line = '%s = %s' % (parm_name,val)
+                txt[key].append(line)
+            continue
+
+        if parm_vals is None:
+            line = '%s = %s' % (parm_name,vals[parm_name]['text'])
+            txt['common'].append(line)
+            continue
+
+        line = '%s = %s' % (parm_name,parm_vals)
+        txt['common'].append(line)
+
+    line = ' QUBIC FRONTEND STATUS '.center(80,'*')
+    lines = [line]
+    lines += txt['common']
+
+    # we only print for 2 ASICs even though there is default data for 16 ASICs
+    # change this when we have the full instrument
+    for idx in range(self.NASIC):
+        key = 'ASIC %2i' % (idx+1)
+        if key not in txt.keys(): continue
+        if len(txt[key])==0: continue
+        
+        ttl = ' %s ' % key
+        line = '\n'+ttl.center(80,'*')
+        lines.append(line)
+        lines += txt[key]
+
+    if len(txt['ERROR'])>0:
+        lines.append('\n'+' ERROR! '.center(80,'*'))
+        lines += txt['ERROR']
+    msg = '\n'.join(lines)
+    return msg
 
 def do_scan(self):
     '''

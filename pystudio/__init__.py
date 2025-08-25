@@ -198,7 +198,8 @@ class pystudio:
         park_frontend,\
         do_skydip,\
         do_scan,\
-        init_frontend
+        init_frontend,\
+        get_frontend_status
 
     from .tparameterstable import assign_parameterstable
 
