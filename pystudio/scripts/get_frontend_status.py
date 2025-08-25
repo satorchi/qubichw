@@ -34,7 +34,7 @@ from pystudio import pystudio
 
 # if the parameter list is given as an argument, interpet as a comma separated list
 parm_list = None
-if len(sys.argv)>0:
+if len(sys.argv)>1:
     parm_list = sys.argv[1].split(',')
 
 
