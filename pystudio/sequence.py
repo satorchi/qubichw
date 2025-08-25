@@ -620,7 +620,7 @@ def get_frontend_status(self,parameterList=None):
     '''
 
     if parameterList is None:
-        parm_list = self.default_parameterList
+        parameterList = self.default_parameterList
 
     txt = {}
     txt['common'] = []
