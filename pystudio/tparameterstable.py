@@ -27,7 +27,8 @@ def assign_parameterstable(self):
                                   'ASIC_Spol_ID',
                                   'ASIC_Apol_ID',
                                   'ASIC_Vicm_ID',
-                                  'ASIC_Vocm_ID'
+                                  'ASIC_Vocm_ID',
+                                  'QUBIC_Nsamples_ID'
                                   ]
 
     
