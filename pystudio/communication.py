@@ -63,6 +63,13 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
         if self.verbosity>1: print('%s = %s' % (parm_name,txt))
         return values
 
+    if parm_name=='DISP_BackupsState_ID':
+        backups_state = val_numbers[0]
+        if backups_state==1:
+            phys_val = 'ON:  acquisition is currently active'
+        else:
+            phys_val = 'OFF: acquisition not running'
+        
     if parm_name=='QUBIC_TESDAC_Offset_ID':
         phys_val = self.ADU2Voffset(val_numbers)
     if parm_name=='QUBIC_TESDAC_Amplitude_ID':
