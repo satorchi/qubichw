@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-$Id: get_frontend_status.py
+$Id: get_frontend_settings.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
 $created: Thu 21 Aug 2025 14:33:58 CEST
 $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
@@ -44,7 +44,7 @@ def cli():
     '''
     dispatcher = pystudio()
     ack = dispatcher.subscribe_dispatcher()
-    msg = dispatcher.get_frontend_status(parameterList=parm_list)
+    msg = dispatcher.get_frontend_settings(parameterList=parm_list)
     print(msg)
     dispatcher.unsubscribe()
     return

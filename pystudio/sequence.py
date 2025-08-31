@@ -614,9 +614,9 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     return
 
 
-def get_frontend_status(self,parameterList=None):
+def get_frontend_settings(self,parameterList=None):
     '''
-    build a nice text message containing the frontend status
+    build a nice text message containing the current frontend settings
     '''
 
     if parameterList is None:

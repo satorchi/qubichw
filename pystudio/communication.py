@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 general utilities for communicating with the dispatcher
 '''
-import socket,time
+import socket,time,re
 import numpy as np
 from qubichk.utilities import known_hosts, bytes2str
 
@@ -50,7 +50,8 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     values['ERROR'] = []
     
     # check if it's a string type response
-    if parm_name=='DISP_LogbookFilename_ID':
+    match = re.search('([Nn]ame|[Dd]irectory)',parm_name)
+    if match:
         if parm_bytes[-1]!=0:
             msg = 'Incorrect end of string data: 0x%02X' % parm_bytes[-1]
             if self.verbosity>0: print('ERROR! %s' % msg)

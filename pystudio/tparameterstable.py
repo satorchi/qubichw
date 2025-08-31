@@ -16,6 +16,8 @@ def assign_parameterstable(self):
     '''
 
     self.default_parameterList = ['DISP_LogbookFilename_ID',
+                                  'DISP_BackupSessionName_ID',
+                                  'DISP_BackupsState_ID',
                                   'QUBIC_TESDAC_Shape_ID',
                                   'QUBIC_TESDAC_Offset_ID',
                                   'QUBIC_TESDAC_Amplitude_ID',
@@ -67,10 +69,10 @@ def assign_parameterstable(self):
     self.parameterstable['QUBIC_TESDAC_Tinc_ID'] = 31
     self.parameterstable['QUBIC_TESDAC_Tper_ID'] = 32
     self.parameterstable['QUBIC_TESDAC_Tunder_ID'] = 33
-    self.parameterstable['QUBIC_TESDAC_Samp_ID'] = 34
+    self.parameterstable['QUBIC_TESDAC_Samp_ID'] = 37 # bug?
     self.parameterstable['QUBIC_TESDAC_Sinc_ID'] = 35
     self.parameterstable['QUBIC_TESDAC_Sunder_ID'] = 36
-    self.parameterstable['QUBIC_TESDAC_Amplitude_ID'] = 37
+    self.parameterstable['QUBIC_TESDAC_Amplitude_ID'] = 34 # bug?
     self.parameterstable['QUBIC_TESDAC_Freq_ID'] = 38
     self.parameterstable['QUBIC_RawMode_ID'] = 39
     self.parameterstable['QUBIC_FeedbackDACValues_ID'] = 40
