@@ -12,14 +12,14 @@
 # script to start the hk broadcasting
 # this is to be run on qubic-central
 # the following line should appear in crontab
-# */5 * * * * /usr/local/bin/start_hkserver.sh
+# */5 * * * * /home/qubic/.local/bin/start_hkserver.sh
 #
-if ! ps auxw | grep "/usr/local/bin/run_hkserver.py" | grep -v -e grep -e SCREEN; then  
+if ! ps auxw | grep "/home/qubic/.local/bin/run_hkserver.py" | grep -v -e grep -e SCREEN; then  
     echo "HK server not running";
     screen -X -S hkserver quit
     echo "Starting a new screen and launching the HK server"
     cd $HOME/data/temperature/broadcast
-    screen -S hkserver -d -m /usr/local/bin/run_hkserver.py
+    screen -S hkserver -d -m /home/qubic/.local/bin/run_hkserver.py
 else
     echo "HK server already running"
 fi

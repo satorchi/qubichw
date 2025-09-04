@@ -11,7 +11,7 @@
 # wrapper to log compressor status
 
 HK_DIR=/home/qubic/data/temperature/broadcast
-BIN_DIR=/usr/local/bin
+BIN_DIR=/home/qubic/.local/bin
 
 ${BIN_DIR}/compressor_commander.py 1 log >> ${HK_DIR}/compressor1_log.txt
 ${BIN_DIR}/compressor_commander.py 2 log >> ${HK_DIR}/compressor2_log.txt
