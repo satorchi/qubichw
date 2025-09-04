@@ -281,6 +281,18 @@ def read_compressor(compressor_num):
         val_str = '%.1f C' % val
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
     lines.append(line)
+
+    label_human = 'input helium pressure'
+    label = 'Pin'
+    col = vals[6]
+    tstamps.append(tstamp)
+    if col.find(label)<0:
+        val_str = 'NO COMPRESSOR INFO'
+    else:
+        val = eval(col.split('=')[-1])
+        val_str = '%.2f bar' % val
+    line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
+    lines.append(line)
     
     return tstamps,lines
     
