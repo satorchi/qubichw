@@ -293,6 +293,10 @@ class compressor:
             return retval
 
         retval['communication error'] = False
+
+        if retval['pressure (relative to ambient)']<5.8:
+            retval['msg'] = 'WARNING! Low pressure!'
+            
         return retval
 
     def get_status(self,retval):
@@ -318,6 +322,7 @@ class compressor:
             retval['status_message'] = self.status_message(retval)
             return retval
         
+        retval['communication error'] = False            
         errmsg_list = []
         for bit in self.statusbits.keys():
             bitstatus = (statbits & 2**bit) > 0
@@ -328,12 +333,13 @@ class compressor:
                 errmsg_list.append('ERROR! %s' % key)
             if (key=='Solenoid' or key=='System ON') and not bitstatus:
                 retval['status'] = False
-                errmsg_list.append('ERROR! Compressor %i: %s = %s' % (self.compressor_num,key,bitstatus))            
+                errmsg_list.append('ERROR! Compressor %i: %s = %s' % (self.compressor_num,key,bitstatus))
+
+        
                 
         if len(errmsg_list)>0:
             retval['msg'] = '\n'.join(errmsg_list)
 
-        retval['communication error'] = False            
         return retval
 
     def status(self):
