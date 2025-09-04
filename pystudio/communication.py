@@ -277,7 +277,7 @@ def unsubscribe(self):
     if self.dispatcher_socket is None:
         print('Unsubscribe is not necessary: Not connected')
         return
-    print('Unsubscribing')
+    if self.verbosity>0: print('Unsubscribing')
     self.dispatcher_socket.close()
     del(self.dispatcher_socket)
     self.dispatcher_socket = None
