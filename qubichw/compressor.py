@@ -284,7 +284,7 @@ class compressor:
             return retval
 
         try:
-            retval['pressure (relative to ambient)'] = '%.4f' % (float(val[1]) * psi_to_bar)
+            Pin = float(val[1]) * psi_to_bar
         except:
             retval['status'] = False
             retval['communication error'] = True
@@ -292,10 +292,12 @@ class compressor:
             retval['status_message'] = self.status_message(retval)
             return retval
 
+        retval['pressure (relative to ambient)'] = '%.4f' % Pin
         retval['communication error'] = False
 
-        if retval['pressure (relative to ambient)']<5.8:
+        if Pin<5.8:
             retval['msg'] = 'WARNING! Low pressure!'
+            retval['status'] = False
             
         return retval
 
