@@ -282,7 +282,7 @@ def read_compressor(compressor_num):
     line = '%s %s %s %s' % (date_str, val_str.rjust(20), label_human.center(20), rootname)
     lines.append(line)
 
-    label_human = 'input helium pressure'
+    label_human = 'input He pressure'
     label = 'Pin'
     col = vals[6]
     tstamps.append(tstamp)
