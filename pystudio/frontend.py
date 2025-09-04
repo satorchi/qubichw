@@ -610,7 +610,7 @@ def make_command_configurePID(self,asicNum,P,I,D):
 
 def send_configurePID(self,asicNum,P,I,D):
     '''
-    send the DAC feedback offsets
+    send the feedback Proportional, Integral, Derivative values
     '''
     cmd_bytes = self.make_command_configurePID(asicNum,P,I,D)
     ack = self.send_command(cmd_bytes)
