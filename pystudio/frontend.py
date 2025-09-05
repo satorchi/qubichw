@@ -41,15 +41,14 @@ def Voffset2ADU(self,Voffset):
 
     ADUfloat = np.abs(Voffset)/288.58e-6
     ADU = round(ADUfloat)
-    if Voffset<0:
-        return (0xFFFF - ADU) # I don't think this is the standard way to do signed int.  It should be (0x8000 | ADU)
     return ADU
 
 def ADU2Voffset(self,ADU):
     '''
     convert the bias offset ADU returned by dispatcher to Volts
     '''
-    Voffset = 288.58e-6*ADU
+    coeff = 288.58e-6
+    Voffset = coeff*ADU
     return Voffset
 
 def amplitude2ADU(self,amplitude):
@@ -87,7 +86,11 @@ def ADU2offsetDACvalue(self,ADU):
     '''
     convert an ADU value to the offsetDACvalue
     '''
-    offsetDACvalue = ADU*1.4215e-4
+    coeff = 1.4215e-4
+    if ADU>(0xFFFF//2):
+        offsetDACvalue = -coeff*(0xFFFF-ADU)
+    else:
+        offsetDACvalue = coeff*ADU
     return offsetDACvalue
 
 def feedbackDACvalue2ADU(self,feedbackDACvalue):
@@ -95,8 +98,11 @@ def feedbackDACvalue2ADU(self,feedbackDACvalue):
     convert the TES offset DAC value to ADU
     see parameterTF.dispatcher
     '''
-    ADUfloat = feedbackDACvalue/284.3e-6
+    coeff = 284.3e-6
+    ADUfloat = np.abs(feedbackDACvalue/coeff)
     ADU = round(ADUfloat)
+    if feedbackDACvalue<0:
+        return 0xFFFF - ADU
     return ADU
 
 def ADU2feedbackDACvalue(self,ADU):
