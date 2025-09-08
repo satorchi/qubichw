@@ -252,7 +252,25 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     print('Current bath temperature: %.3f mK' % (1000*Tmeas))
     return True
 
+
+def do_DACoffset_measurement(self,acqtime=30):
+    '''
+    run a short acquisition with DAC offsets set to zero
+    afterwards, this dataset is used to calculate the DACoffsetTable
+
+    we don't change the current settings except to put zeros in the DACoffsetTable
+    '''
+    dataset_name = 'DACoffsetMeasurement'
+    comment = 'sent by pystudio'
+    asicNum = [1,2]
+
+    offset_table = np.zeros(128,dtype=float)
+    ack = self.send_offsetTable(asicNum,offset_table)
     
+    ack = self.send_startAcquisition(dataset_name,comment)
+    time.sleep(acqtime)
+    ack = self.send_stopAcquisition()
+    return
 
 def do_IV_measurement(self,
                       asicNum=None,

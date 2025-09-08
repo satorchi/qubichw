@@ -189,6 +189,7 @@ class pystudio:
     from .sequence import\
         get_default_setting,\
         set_bath_temperature,\
+        do_DACoffset_measurement,\
         do_IV_measurement,\
         do_NEP_measurement,\
         do_SQUID_optimization,\
