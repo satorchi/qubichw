@@ -23,7 +23,7 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
-from satorchipy.datefunctions import str2dt
+from satorchipy.datefunctions import str2dt,utcnow, utcfromtimestamp
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
 from qubichk.hk_verify import check_compressors,check_diskspace
 
@@ -248,7 +248,7 @@ class qubic_bot :
         '''
         read temperatures from the Housekeeping broadcast
         '''
-        latest_date = dt.datetime.utcfromtimestamp(0)
+        latest_date = utcfromtimestamp(0)
         fmt_str = '\n%%%is:  %%7.3fK' % self.temperature_heading_maxlen
         answer = 'Temperatures:'
         for ch_idx in self.temperature_display_order:
@@ -270,7 +270,7 @@ class qubic_bot :
                     lastline = lines[-2]
                     cols = lastline.split()
                     tstamp = self.timestamp_factor*float(cols[0])
-                    reading_date = dt.datetime.utcfromtimestamp(tstamp)
+                    reading_date = utcfromtimestamp(tstamp)
                     if reading_date > latest_date:
                         latest_date = reading_date
                     reading = eval(cols[1])
@@ -299,7 +299,7 @@ class qubic_bot :
             cols = line.split()
             try:
                 tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.utcfromtimestamp(tstamp)
+                reading_date = utcfromtimestamp(tstamp)
                 reading = eval(cols[1])
                 t.append(reading_date)
                 v.append(reading)
@@ -342,7 +342,7 @@ class qubic_bot :
         '''
         read the status of the heaters (power supplies)
         '''
-        latest_date = dt.datetime.utcfromtimestamp(0)
+        latest_date = utcfromtimestamp(0)
         fmt_str = '\n%20s:  %7.3f %s %s'
         units = ['V','mA']
         answer = 'Heaters:'
@@ -362,7 +362,7 @@ class qubic_bot :
                 lastline = lines[-2]
                 cols = lastline.split()
                 tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.utcfromtimestamp(tstamp)
+                reading_date = utcfromtimestamp(tstamp)
                 if reading_date > latest_date:
                     latest_date = reading_date
                 reading = eval(cols[1])
@@ -446,7 +446,7 @@ class qubic_bot :
         t = np.array(t_volt)
         dates = []
         for idx,tstamp in enumerate(t):
-            dates.append(dt.datetime.utcfromtimestamp(tstamp))
+            dates.append(utcfromtimestamp(tstamp))
             p = power[idx]
             if p==-1:
                 v = volt[idx]
@@ -462,7 +462,7 @@ class qubic_bot :
         '''
         read the mechanical heat switch positions
         '''
-        latest_date = dt.datetime.utcfromtimestamp(0)
+        latest_date = utcfromtimestamp(0)
         fmt_str = '\n%7s:  %8i'
         answer = 'Mechanical Heat Switch Positions:\n'
         for idx in range(2):
@@ -477,7 +477,7 @@ class qubic_bot :
             lastline = lines[-2]
             cols = lastline.split()
             tstamp = self.timestamp_factor*float(cols[0])
-            reading_date = dt.datetime.utcfromtimestamp(tstamp)
+            reading_date = utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
             reading = eval(cols[1])
@@ -491,7 +491,7 @@ class qubic_bot :
         '''
         read the pressure
         '''
-        latest_date = dt.datetime.utcfromtimestamp(0)
+        latest_date = utcfromtimestamp(0)
         fmt_str = '\n%10s:  %10.3e mbar'
         answer = 'Pressure:\n'
 
@@ -510,7 +510,7 @@ class qubic_bot :
         lastline = lines[-2]
         cols = lastline.split()
         tstamp = self.timestamp_factor*float(cols[0])
-        reading_date = dt.datetime.utcfromtimestamp(tstamp)
+        reading_date = utcfromtimestamp(tstamp)
         if reading_date > latest_date:
             latest_date = reading_date
         reading = eval(cols[1])
@@ -539,7 +539,7 @@ class qubic_bot :
             cols = line.split()
             try:
                 tstamp = self.timestamp_factor*float(cols[0])
-                reading_date = dt.datetime.utcfromtimestamp(tstamp)
+                reading_date = utcfromtimestamp(tstamp)
                 reading = eval(cols[1])
                 t.append(reading_date)
                 v.append(reading)
@@ -683,7 +683,7 @@ class qubic_bot :
         tempdir=self.entropy_latest_temperature_dir()
         if tempdir is None:return tempdir
 
-        latest_date = dt.datetime.utcfromtimestamp(0)
+        latest_date = utcfromtimestamp(0)
     
         answer_list = []
         filelist=glob(tempdir+'/*')
@@ -724,7 +724,7 @@ class qubic_bot :
                 tempans='%s : %.4f Ohm' % (chan_str,val)        
 
             tstamp = 1e-3*eval(cols[0]) + tstart
-            reading_date = dt.datetime.utcfromtimestamp(tstamp)
+            reading_date = utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
 
@@ -792,7 +792,7 @@ class qubic_bot :
         if tstart>0:
             t+=tstart
             for tstamp in t:
-                tdate.append(dt.datetime.utcfromtimestamp(tstamp))
+                tdate.append(utcfromtimestamp(tstamp))
         else:
             tdate=t
 
@@ -1174,7 +1174,7 @@ class qubic_bot :
         tstamp0 = float(msg_list[0]) # when info was gathered by PiGPS
         tstamp1 = float(msg_list[1]) # when info was requested by bot
 
-        answer = 'Calsource configuration at %s\n' % dt.datetime.utcfromtimestamp(tstamp0).strftime('%Y-%m-%d %H:%M:%S')
+        answer = 'Calsource configuration at %s\n' % utcfromtimestamp(tstamp0).strftime('%Y-%m-%d %H:%M:%S')
         for item in msg_list[2:]:
     
             cols = item.split(':')
@@ -1334,7 +1334,7 @@ class qubic_bot :
         '''
         read the mount positions
         '''
-        latest_date = dt.datetime.utcfromtimestamp(0)
+        latest_date = utcfromtimestamp(0)
         fmt_str = '\n%9s:  %.3f degrees'
         answer = 'Pointing:\n'
         for basename in ['AZIMUTH','ELEVATION']:
@@ -1348,7 +1348,7 @@ class qubic_bot :
             lastline = lines[-2]
             cols = lastline.split()
             tstamp = self.timestamp_factor*float(cols[0])
-            reading_date = dt.datetime.utcfromtimestamp(tstamp)
+            reading_date = utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
             reading = eval(cols[1])
@@ -1437,7 +1437,7 @@ class qubic_bot :
         if len(cmd_list)>1:
             self._parseargs(cmd_list[1:])
 
-        now=dt.datetime.utcnow()
+        now = utcnow()
         user='unknown'
         known_users = get_TelegramAddresses()
         if self.chat_id in known_users.keys():user=known_users[self.chat_id]
