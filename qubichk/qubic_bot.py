@@ -88,6 +88,8 @@ class qubic_bot :
                          '/heaters': self.read_heaters,
                          '/pressure': self.read_pressure,
                          '/mech': self.read_mech,
+                         '/mhs': self.read_mech,
+                         '/touch': self.read_mech,
                          '/calsource': self.calsource,
                          '/photo': self.photo1,
                          '/photo2': self.photo2,
@@ -106,7 +108,10 @@ class qubic_bot :
                          '/ups': self.ups,
                          '/subscribe': self.subscribe,
                          '/unsubscribe':self.unsubscribe,
-                         '/position': self.position
+                         '/position': self.position,
+                         '/az': self.position,
+                         '/el': self.position,
+                         '/azel': self.position
                          }
 
 
@@ -464,9 +469,16 @@ class qubic_bot :
         '''
         latest_date = utcfromtimestamp(0)
         fmt_str = '\n%7s:  %8i'
-        answer = 'Mechanical Heat Switch Positions:\n'
-        for idx in range(2):
-            basename = 'MHS%i' % (idx+1)
+        answer = 'Mechanical Heat Switch Positions and Touch:\n'
+        basename_labels = {}
+        basename_labels['AVS47_1_ch0'] = 'Touch'
+        basename_labels['MHS1'] = 'MHS 1'
+        basename_labels['MHS2'] = 'MHS 2'
+        units = {}
+        units['AVS47_1_ch0'] = 'Ohm'
+        units['MHS1'] = 'steps'
+        units['MHS2'] = 'steps'
+        for basename in basename_labels.keys():
             fullname = '%s/%s.txt' % (self.hk_dir,basename)
             if not os.path.isfile(fullname):
                 continue
@@ -476,12 +488,29 @@ class qubic_bot :
             h.close()
             lastline = lines[-2]
             cols = lastline.split()
+            if len(cols)<2: continue
+            
             tstamp = self.timestamp_factor*float(cols[0])
             reading_date = utcfromtimestamp(tstamp)
             if reading_date > latest_date:
                 latest_date = reading_date
-            reading = eval(cols[1])
-            answer += fmt_str % (basename,reading)
+
+            if cols[1]=='inf':
+                reading = 'open'
+            else:
+                try:                
+                    reading = eval(cols[1])
+                except:
+                    reading = cols[1]
+                
+            lbl = basename_labels[basename]+':'
+            if isinstance(reading,str):
+                fmt_str = '%s  %10s %s\n'
+            elif units[basename]=='steps':
+                fmt_str = '%s  %10i %s\n'
+            else:
+                fmt_str = '%s  %10.4f %s\n'                
+            answer +=  fmt_str % (lbl.ljust(8),reading,units[basename])
 
         answer += '\n\nTime: %s' % latest_date.strftime(self.time_fmt)    
         self._send_message(answer)
