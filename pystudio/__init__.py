@@ -190,6 +190,7 @@ class pystudio:
         get_default_setting,\
         set_bath_temperature,\
         do_DACoffset_measurement,\
+        assign_saved_DACoffsetTables,\
         do_IV_measurement,\
         do_NEP_measurement,\
         do_SQUID_optimization,\

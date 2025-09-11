@@ -15,6 +15,7 @@ import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
+from qubichk.utilities import read_DACoffsetTables
 from qubicpack.utilities import interpret_rawmask
 
 #####################################
@@ -271,6 +272,17 @@ def do_DACoffset_measurement(self,acqtime=30):
     time.sleep(acqtime)
     ack = self.send_stopAcquisition()
     return
+
+def assign_saved_DACoffsetTables(self):
+    '''
+    assign the DAC offset table for each ASIC reading the table from file
+    the files are found by default in $HOME/.local/share/qubic
+    '''
+    offsetTables = read_DACoffsetTables()
+    for asic_num in offsetTables.keys():
+        ack = send_offsetTable(asic_num,offsetTables[asic_num])
+        
+    return ack
 
 def do_IV_measurement(self,
                       asicNum=None,

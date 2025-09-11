@@ -11,6 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 utilities used by various modules in qubichk/hw especially hk_verify
 '''
 import sys,os,subprocess,re,struct
+import numpy as np
 
 # QUBIC position from PiGPS (antenna on the mount): https://elog-qubic.in2p3.fr/demo/1234
 qubic_latitude = -(24 + 11.2002/60)
@@ -241,3 +242,51 @@ def bytes2str(somebytes):
         bytes_list.append('0x%02X' % b)
     bytes_str = ' '.join(bytes_list)
     return bytes_str
+
+def read_DACoffsetTables():
+    '''
+    read DAC offset table for ASICs
+    files are to be found in standard places, usually $HOME/.local/share/qubic
+    and are named DAC-Offset-Table_ASICnn.txt
+    '''
+    offsetTables = {}
+    for asic_idx in range(16):
+        asic_num = asic_idx + 1
+        offset_filename = 'DAC-Offset-Table_ASIC%02i.txt' % asic_num
+        offset_filename_fullpath = get_fullpath(offset_filename)
+        if offset_filename_fullpath is None: continue
+
+        h = open(offset_filename_fullpath,'r')
+        lines = h.read().split('\n')
+        h.close()
+
+        offsetTable = np.zeros(128,dtype=float)
+        table_idx = 0
+        for line in lines:
+            if line.find('#')==0: continue
+
+            if line.find('#')>0:
+                line = line.split('#')[0]
+
+            if len(line)==0: continue
+
+            try:
+                val = eval(line)
+            except:
+                val = line
+
+            if isinstance(val,str):
+                print('ERROR!  TES%03i - unable to interpret value: %s' % (table_idx+1,val))
+                val = 0.0
+
+            offsetTable[table_idx] = val
+            table_idx += 1
+        offsetTables[asic_num] = offsetTable
+
+    return offsetTables
+
+            
+
+            
+                
+                
