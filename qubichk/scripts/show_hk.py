@@ -100,7 +100,6 @@ def read_lastline(filename):
 
     col = lastline.split()
     if len(col)<2:
-        print('Unexpected string: %s' % lastline)
         return None
 
     val_list = []
@@ -199,7 +198,10 @@ def read_ups():
     rootname = basename.replace('.txt','')
     ups_file = '%s%s%s' % (hk_dir,os.sep,basename)
     vals = read_lastline(ups_file)
-    if vals is None: return None
+    if vals is None:
+        tstamps = [utcnow().timestamp()]
+        lines = ['NO UPS INFO']
+        return tstamps,lines
 
     lines = []
     tstamps = []
