@@ -20,6 +20,8 @@ from termcolor import colored
 from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
+from qubichk.utilities import get_fullpath
+
 year_str = utcnow().strftime('%Y')
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
@@ -61,8 +63,8 @@ def read_labels():
             labels[key] = val
         h.close()
 
-    heaterfile = os.environ['HOME']+os.sep+'powersupply.conf'
-    if not os.path.isfile(heaterfile): return labels
+    heaterfile = get_fullpath('powersupply.conf')
+    if heaterfile is None: return labels
 
     h = open(heaterfile,'r')
     lines = h.read().split('\n')
