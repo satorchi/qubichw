@@ -61,6 +61,8 @@ def read_labels():
             labels[key] = val
         h.close()
 
+    labels['PRESSURE1'] = 'pressure'
+
     heaterfile = os.environ['HOME']+os.sep+'powersupply.conf'
     if not os.path.isfile(heaterfile): return labels
 
