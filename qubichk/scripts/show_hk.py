@@ -50,8 +50,8 @@ def read_labels():
     '''
     labels = {}
     
-    labelfile = hk_dir+os.sep+'LABELS.txt'
-    if os.path.isfile(labelfile):
+    labelfile = get_fullpath('LABELS.txt')
+    if labelfile is not None:
         h = open(labelfile,'r')
         lines = h.read().split('\n')
         del(lines[-1])
