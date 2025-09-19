@@ -24,7 +24,7 @@ import re
 import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
-from qubichk.utilities import shellcommand
+from qubichk.utilities import shellcommand, get_fullpath
 
 class PowerSupply :
 
@@ -148,14 +148,9 @@ class PowerSupply :
         ''' read user supplied labels corresponding to HEATER1, HEATER2, etc
             this is called by identify_PowerSupply()
         '''
-        if 'HOME' in os.environ.keys():
-            homedir = os.environ['HOME']
-        else:
-            homedir = os.path.curdir
-        
-        configfile = homedir + os.sep + 'powersupply.conf'
-        if not os.path.isfile(configfile):
-            self.log('No user supplied configuration file: %s' % configfile,verbosity=0)
+        configfile = get_fullpath('powersupply.conf')
+        if configfile is None:
+            self.log('Could not find configuration file: powersupply.conf', verbosity=0)
             return
 
         self.log('Reading user supplied configuration file: %s' % configfile,verbosity=2)

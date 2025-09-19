@@ -48,8 +48,12 @@ def get_fullpath(filename=None):
     else:
         homedir = '/home/qubic'
     search_dirs.append('%s/.local/share/qubic' % homedir)
+    search_dirs.append(homedir)
     search_dirs.append('./')
     search_dirs.append('/home/qubic/.local/share/qubic')
+    search_dirs.append('/home/qubic/data/temperature/broadcast')
+    search_dirs.append('/home/qubic/data/temperature')
+    search_dirs.append('/home/qubic')
 
     for d in search_dirs:
         fullpath = '%s/%s' % (d,filename)
