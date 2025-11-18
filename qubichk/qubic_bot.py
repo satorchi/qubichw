@@ -757,6 +757,10 @@ class qubic_bot :
             if reading_date > latest_date:
                 latest_date = reading_date
 
+            nowdelta = utcnow() - reading_date
+            if nowdelta.total_seconds()>1799:
+                tempans += ' (OLD READING)'
+
             if tempans.find('MCST3601')<0:
                 answer_list.append('[%s]  %s' % (reading_date.strftime(self.time_fmt),tempans))
                 
