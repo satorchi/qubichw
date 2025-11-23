@@ -28,6 +28,7 @@ known_hosts['groundgps']     = "192.168.2.22"
 known_hosts['horn']          = "192.168.2.9"
 known_hosts['mgc3']          = "192.168.2.214"
 known_hosts['mmr3']          = "192.168.2.213"
+known_hosts['motorplc']      = "192.168.2.113"
 
 date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 
