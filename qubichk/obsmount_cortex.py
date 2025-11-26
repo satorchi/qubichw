@@ -1,7 +1,6 @@
-'''
-$Id: obsmount.py
+'''$Id: obsmount.py
 $auth: Steve Torchinsky <satorchi@apc.in2p3.fr>
-$created: Wed 26 Nov 2025 11:02:41 CET
+$created: Wed 07 Dec 2022 18:18:20 CET
 $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
           This is free software: you are free to change and
@@ -9,12 +8,126 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
           permitted by law.
 
 class to read/command the Observation mount motors
-now running the PLC instead of "motorcortex" on RaspberryPi
 
-see documentation from Luciano Ferreyro and Lucia Sucunza
-ANEXO-C_command_lists_PLC.pdf
-ANEXO-C_monitor_data_PLC.pdf
-QUBIC_Mount_General_documentation.pdf
+motor interface developed by Carlos Reyes and Luciano Ferreyro
+
+email from Carlos, 2022-12-07 17:25:40
+email from Carlos, 2023-05-15 05:46:57
+
+The data obtained after the subscribe method will be:
+
+DATA:TIMESTAMP:AXIS:ACT_VELOCITY:TARGET_VELOCITY:ACT_POSITION:TARGET_POSITION:ACT_TORQUE:IS_READY:IS_HOMED:AXIS_STATUSWORD:ERROR_CODE:WARNING_BITS:GLOBAL_DRIVER_STATE
+
+example:
+1682446097.96:AZ:0:0:1.0101177366738976:0.0:False:1:1
+
+DATA: keyword to separate data packages
+
+TIMESTAMP: seconds since 1970-01-01
+
+AXIS: AZ or EL
+
+ACT_VELOCITY: actual velocity (this is the actual value that KEB
+              driver calculates)
+
+TARGET_VELOCITY: target velocity that will be using while motor is
+                 running
+
+ACT_POSITION: actual position. This value is already converted via a
+              calibration constant and should be a float. 0 means that
+              the axis is near the lower limit switch and will be
+              touching the homing switch (not yet activating it).
+
+TARGET_POSITION: the last target position that was written into the
+                 KEB driver.
+
+ACT_TORQUE:
+
+IS_READY: this is a bit from the StatusWord of the KEB driver and
+          means that it is ready for operation (no exception was
+          raised)......maybe this is too obvious.
+
+IS_HOMED: this is a boolean variable from the program and not from the
+          StatusWord. The server app has no memory and the
+          HomingRoutine should be executed every time the system is
+          restarted. This decision was committed thinking about system
+          security.
+
+AXIS_STATUSWORD: 16bit StatusWord of the axis driver
+
+ERROR_CODE:
+
+WARNING_BITS:
+
+GLOBAL_DRIVER_STATE
+
+In order to subscribe to the update service you should send the "OK" message to
+the RPi to the 4546 port. After that you will start receiving messages with the
+above structure every 100ms.
+
+The IP for the rpi running the server is 192.168.2.103.  4545 is
+listening for commands but 4546 is listening for incoming subscribers.
+
+
+------------------ available commands --------------------------
+'AZ <n>' send to absolute azimuth position (see zero offset below)
+'EL <n>' send to absolute elevation position (see zero offset below)
+'DOHOMING' go home (absolute az 0, el 41.6 see below)
+'STOP' stop moving now 
+'ABORT' abort current command (and reset?)
+
+
+------------------ zero measurements --------------------------
+2023-04-14 17:20:29
+elevation commanded to 8.5 degrees is 50.1 degrees elevation
+
+2023-04-19 08:18:57
+raw elevation: 17.952062612098484 is 50 degrees elevation
+
+2023-04-26 13:39:49
+raw elevation:  10.58209685308984 is 50 degrees elevation
+
+2023-05-10 09:17:06
+raw elevation:  2.049 is 50 degrees elevation
+
+2023-05-23 18:26:00
+azimuth offset
+on rocketchat from Manuel Platino: The most precise measurement of the az from outside is between 168° and 169°
+
+2025-06-13 16:55:50
+measured position with Total Station
+elog: https://elog-qubic.in2p3.fr/demo/1226
+
+0 on the mount is 11 deg 36 mins 39 seconds
+this is 11.610833333333334
+so az_zero_offset = 180 - 11.610833333333334 = 168.38916666666665
+compare with the value from 2023-05-23 of 168.5
+
+2025-06-18 19:22:52
+moving the encoder so that we can point to the moon
+encoder now reads: 177.3612 which corresponds to the zero from before
+so when the encoder says 177.3612, we are really pointing at 168.3892
+new offset:  168.3892 - 177.3612 = -8.9720
+
+2025-07-25
+WhatsApp from Cristian Rodriguez:
+  It's currently at full south, and the encoder in AZ shows = 160,402°
+actually, it's the Housekeeping which reports 160.402 which already includes the old offset
+new offset: 180 - 160.402 + old_offset = 10.6259666
+
+2025-07-29
+we moved the northern limit switch so we can do the moon scan
+after a "DOHOMING" the system reset the encoder value!
+we did this a few times, so...
+now 19.143 is full east which includes the current offset of 10.626 degrees (see above)
+new offset: 90 - 19.143 + 10.626 = 81.483
+
+the encoder position is 8.517033 when we are full east (90 degrees)
+new offset: 90 - 8.517 = 81.483
+
+2025-07-30
+readjustment again for the end limits.
+new offset: 60.713
 
 '''
 import os,sys,socket,time,re
@@ -31,42 +144,44 @@ class obsmount:
     class to read to and command the observation mount
     '''
     
-    mount_ip = known_hosts['motorplc']
-    listen_port = 9180
-    command_port = 9000
+    mount_ip = '192.168.2.103'
+    listen_port = 4546
+    command_port = 4545
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
-    el_zero_offset = 50 - 2.049 # To Be Measured
-    az_zero_offset = 60.713 # To Be Measured
+    el_zero_offset = 50 - 2.049 
+    # az_zero_offset = (180 - (11 + 36/60 + 39/3600)) -  177.3612 # see above: 2025-06-13 and 2025-06-18
+    # az_zero_offset =  10.6259666 # see above: 2025-07-25
+    # az_zero_offset = 81.483 # see above: 2025-07-29
+    az_zero_offset = 60.713 # see above: 2025-07-30
     position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     data_keys = ['TIMESTAMP',
-                 'IS_ETHERCAT',
-                 'IS_SYNC',
-                 'IS_MAINT',
-                 'AXES_ASYNC_COUNT',
-                 'ACT_VEL',
-                 'ACT_VEL_B',
-                 'ACT_POS',
-                 'ACT_POS_B',
+                 'AXIS',
+                 'ACT_VELOCITY',
+                 'TARGET_VELOCITY',
+                 'ACT_POSITION',
+                 'TARGET_POSITION',
                  'ACT_TORQUE',
-                 'IS_ENABLED',
-                 'IS_HOMING',
-                 'IS_OPERATIVE',
-                 'IS_MOVING',
-                 'IS_OUTOFRANGE',
-                 'FAULT']
-
+                 'IS_READY',
+                 'IS_HOMED',
+                 'AXIS_STATUSWORD',
+                 'ERROR_CODE',
+                 'WARNING_BITS',
+                 'GLOBAL_DRIVER_STATE']
     nkeys = len(data_keys)
-    available_commands = ['ENA',    # enable
-                          'DIS',    # disable
-                          'START',  # start
-                          'STOP',   # stop
-                          'POS',    # go to position
-                          'VEL']    # set velocity
+    available_commands = ['AZ',       # move to azimuth
+                          'EL',       # move to elevation
+                          'ROT',      # move to rotation (bore-sight)
+                          'AZS',      # set azimuth speed
+                          'ELS',      # set elevation speed
+                          'DOHOMING', # go to home position
+                          'STOP',     # stop
+                          'ABORT',    # abort command.  motors will show an alert status
+                          'END'       # end connection (unsubscribe)
+                          ]
     wait = 0.0 # seconds to wait before next socket command
     default_chunksize = 131072
-    default_sampleperiod = 200 # sample period in milliseconds (Note: PLC default is 1000 msec)
     verbosity = 1
     testmode = False
 
@@ -112,7 +227,7 @@ class obsmount:
         return retval
 
 
-    def do_handshake(self,port='data',sampleperiod=None):
+    def do_handshake(self,port='data'):
         '''
         do the handshake with the server
         '''
@@ -120,10 +235,7 @@ class obsmount:
         retval['ok'] = False
         ack = 'NO ACK'
 
-        if sampleperiod is None: sampleperiod = self.default_sampleperiod
-
         if port=='command':
-            # this was the handshake with the Raspi... TO BE UPDATED
             self.printmsg('Getting acknowledgement from %s on %s port' % (self.mount_ip,port))
             try:
                 ack_bin = self.sock[port].recv(4)
@@ -145,33 +257,24 @@ class obsmount:
                 self.subscribed[port] = False
                 retval['error'] = 'Did not receive correct acknowledgement for %s port: %s' % (port,ack)
                 return self.return_with_error(retval)
+
             
-            time.sleep(self.wait)
-            self.printmsg('sending OK')
+        time.sleep(self.wait)
+        self.printmsg('sending OK')
 
-            try:
-                ans = self.sock[port].send('OK'.encode())
-            except socket.timeout:
-                self.subscribed[port] = False
-                self.error = 'HANDSHAKE TIMEOUT ON SEND'
-                retval['error'] = 'Timeout error for sending handshake to motor %s' % port
-                return self.return_with_error(retval)
-            except:
-                self.subscribed[port] = False
-                self.error = 'HANDSHAKE FAIL ON SEND'
-                retval['error'] = 'Failed to send handshake to motor %s' % port
-                return self.return_with_error(retval)
-            # end handshake for command port
-
-        else:
-            sampleperiod_str = '%i' % sampleperiod
-            try:
-                nbytes = self.sock[port].send(sampleperiod_str.encode())
-            except:
-                retval['error'] = 'Failed to send sampling period to PLC on port %s' % port
-                return self.return_with_error(retval)
-            time.sleep(self.wait)
-            # end handshake for data port
+        try:
+            ans = self.sock[port].send('OK'.encode())
+        except socket.timeout:
+            self.subscribed[port] = False
+            self.error = 'HANDSHAKE TIMEOUT ON SEND'
+            retval['error'] = 'Timeout error for sending handshake to motor %s' % port
+            return self.return_with_error(retval)
+        except:
+            self.subscribed[port] = False
+            self.error = 'HANDSHAKE FAIL ON SEND'
+            retval['error'] = 'Failed to send handshake to motor %s' % port
+            return self.return_with_error(retval)
+            
         
         retval['ok'] = True
         self.error = None
@@ -192,7 +295,7 @@ class obsmount:
         
         if port=='data':
             port_num = self.listen_port
-            socktype = socket.SOCK_DGRAM
+            socktype = socket.SOCK_STREAM
         else:
             port_num = self.command_port
             socktype = socket.SOCK_STREAM
@@ -200,20 +303,20 @@ class obsmount:
         self.printmsg('creating socket with type: %s' % socktype)
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
         self.sock[port].settimeout(1)
-        self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
         try:
+            self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
             self.sock[port].connect((self.mount_ip,port_num))
+            retval = self.do_handshake(port)
+            if not retval['ok']: return self.return_with_error(retval)
+            
+            self.subscribed[port] = True
+            self.error = None
         except socket.timeout:
             self.subscribed[port] = False
             self.error = 'TIMEOUT'
         except:
             self.subscribed[port] = False
             self.error = make_errmsg('SOCKET ERROR')
-        else:
-            retval = self.do_handshake(port)
-            if not retval['ok']: return self.return_with_error(retval)
-            self.subscribed[port] = True
-            self.error = None                      
 
         if self.error is None: return True
 
