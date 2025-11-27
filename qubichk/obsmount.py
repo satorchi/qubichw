@@ -20,6 +20,7 @@ QUBIC_Mount_General_documentation.pdf
 import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
+from satorchipy.datefunctions import utcnow
 from qubichk.utilities import make_errmsg, known_hosts
 
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
@@ -40,11 +41,14 @@ class obsmount:
     az_zero_offset = 60.713 # To Be Measured
     position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
-    data_keys = ['TIMESTAMP',
-                 'IS_ETHERCAT',
-                 'IS_SYNC',
-                 'IS_MAINT',
-                 'AXES_ASYNC_COUNT',
+    header_keys = ['TIMESTAMP',
+                   'IS_ETHERCAT',
+                   'IS_SYNC',
+                   'IS_MAINT',
+                   'AXES_ASYNC_COUNT']
+    n_header_keys = len(header_keys)
+
+    data_keys = ['AXIS',
                  'ACT_VEL',
                  'ACT_VEL_B',
                  'ACT_POS',
@@ -56,8 +60,14 @@ class obsmount:
                  'IS_MOVING',
                  'IS_OUTOFRANGE',
                  'FAULT']
+    n_data_keys = len(data_keys)
 
-    nkeys = len(data_keys)
+    axis_keys = ['AZ',
+                 'EL',
+                 'ROT',
+                 'TR']
+    n_axis_keys = len(axis_keys)
+
     available_commands = ['ENA',    # enable
                           'DIS',    # disable
                           'START',  # start
@@ -66,7 +76,7 @@ class obsmount:
                           'VEL']    # set velocity
     wait = 0.0 # seconds to wait before next socket command
     default_chunksize = 131072
-    default_sampleperiod = 200 # sample period in milliseconds (Note: PLC default is 1000 msec)
+    default_sampleperiod = 100 # sample period in milliseconds (Note: PLC default is 1000 msec)
     verbosity = 1
     testmode = False
 
@@ -99,7 +109,7 @@ class obsmount:
         '''
         if self.verbosity<1: return
         
-        date_str = dt.datetime.utcnow().strftime(self.datefmt)
+        date_str = utcnow().strftime(self.datefmt)
         print('%s | obsmount: %s' % (date_str,msg))
         return
 
@@ -260,7 +270,9 @@ class obsmount:
         retval = {}
         retval['ok'] = True
         retval['error'] = 'NONE'
-        retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
+        retval['CHUNK TIMESTAMP'] = utcnow().timestamp()
+        for key in self.axis_keys:
+            retval[key] = []
 
         # check that we are subscribed
         if not self.subscribed[port]:
@@ -270,7 +282,7 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
+        retval['TIMESTAMP'] = utcnow().timestamp()
         try:
             dat = self.sock[port].recv(chunksize)
         except socket.timeout:
@@ -290,37 +302,42 @@ class obsmount:
             self.subscribed[port] = False
             return self.return_with_error(retval)
         
-        dat_list = dat_str.split('DATA:')
-        if len(dat_list)<3:
+        dat_list = dat_str.split('\n')
+        if len(dat_list)<5:
             retval['error'] = 'partial data: %s' % dat_str
             return self.return_with_error(retval)
-        
-        # remove the first and last which could be partial
-        del(dat_list[0])
-        del(dat_list[-1])
 
-        retval['AZ'] = []
-        retval['EL'] = []
-
-        for line in dat_list:
+        axis = None
+        packet = {}
+        packet_list = []
+        for line in dat_list:            
             col = line.split(':')
-            
-            data = {}
-            for idx,key in enumerate(self.data_keys):
-                if key=='AXIS':
-                    data[key] = col[idx]
-                    continue
+            ncols = len(col)
+            if ncols==self.n_header_keys:
+                for idx,val_str in enumerate(col):
+                    key = self.header_keys[idx]
+                    try:
+                        packet[key] = eval(val_str)
+                    except:
+                        packet[key] = val_str
+                continue
 
-                try:
-                    data[key] = eval(col[idx])
-                except:
-                    retval['data'] = data
-                    retval['error'] = error = make_errmsg('could not interpret data: %s' % str(col[idx]))
-                    return self.return_with_error(retval)
+            if ncols==self.n_data_keys:
+                axis = col[0]
+                axis_data = []
+                for val_str in col[1:]:
+                    try:
+                        val = eval(val_str)
+                    except:
+                        val = val_str
+                    axis_data.append(val)
+
+            if axis=='TR':
+                packet_list.append(packet)
+                packet = {}
+                    
                 
-            retval[data['AXIS']].append(data)
-        
-            
+        retval['DATA'] = packet_list
         return retval
 
     def get_data(self,chunksize=None):
@@ -369,12 +386,8 @@ class obsmount:
 
     def dump_data(self,data):
         '''
-        write all data to binary data file, and broadcast to QubicStudio
+        write all data to binary data file
         '''
-
-        # s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        
         for axis in ['AZ','EL']:
             offset = self.position_offset[axis]
             npts = len(data[axis])
