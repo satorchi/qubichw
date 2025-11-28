@@ -429,7 +429,7 @@ class obsmount:
                 errmsg.append('no data for %s' % self.axis_fullname[axis])
                 errlevel += 1
             else:
-                retval[axis] = packet[axis]['ACT_POS'] + self.position_zero_offset[axis]
+                retval[axis] = packet[axis]['ACT_POS'] + self.position_offset[axis]
 
         if dump:
             try:
