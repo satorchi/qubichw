@@ -352,26 +352,6 @@ def list_hk():
         tstamps += retval[0]
         lines += retval[1]
 
-
-    # # read the platform position directly from socket
-    # labels = ['azimuth','elevation']
-    # vals = get_position()
-    # azel = vals[:2]
-    # warn = vals[2:]
-    # tstamp = utcnow().timestamp()
-    # date_str = utcfromtimestamp(tstamp).strftime(date_fmt)
-    # for idx,val in enumerate(azel):
-    #     if type(val)==str:
-    #         val_str = val.center(7)
-    #     else:
-    #         val_str = '%7.2f degrees' % val
-    #     if warn[idx]:
-    #         val_str += ' ?'
-    #     label = labels[idx]
-    #     line = '%s %s %s' % (date_str, val_str.rjust(20), label.center(20))
-    #     lines.append(line)
-    #     tstamps.append(tstamp)
-
     # next read the HWP position
     hwpinfo = get_hwp_info()
     tstamp = utcnow().timestamp()
@@ -446,8 +426,28 @@ def list_hk():
                 lines.append(line)
 
 
-    # do the rest of the HK files
+
+    # sort the rest of the files as we want
+    sorted_hk_files = []
+    pattern_list = ['AVS','TEMPERATURE','PRESSURE','MHS']
+    for pattern in pattern_list:
+        for F in hk_files:
+            basename = os.path.basename(F)
+            if basename.find(pattern)==0: sorted_hk_files.append(F)
+            
     for F in hk_files:
+        basename = os.path.basename(F)
+        add_it = True
+        for pattern in pattern_list:
+            if basename.find(pattern)==0:
+                add_it = False
+                break
+        if add_it:
+            sorted_hk_files.append(F)
+    
+        
+    # do the rest of the HK files
+    for F in sorted_hk_files:
         basename = os.path.basename(F)
         if basename in exclude_files: continue
         if basename.find('HEATER')==0: continue # already done, above
@@ -491,7 +491,7 @@ def list_hk():
                 val *= 0.001
         elif basename.find('MHS')==0:
             units = 'steps'
-        elif basename.find('AZ')==0 or basename.find('EL')==0:
+        elif basename.find('AZ')==0 or basename.find('EL')==0 or basename.find('RO')==0 or basename.find('TR')==0:
             units = 'degrees'
         else:
             units = ''
