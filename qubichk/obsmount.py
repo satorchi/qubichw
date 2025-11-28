@@ -396,7 +396,7 @@ class obsmount:
             offset = self.position_offset[axis]
             rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(1))
             rec.STX = 0xAA
-            rec.TIMESTAMP = packet[axis]['TIMESTAMP']
+            rec.TIMESTAMP = packet['TIMESTAMP']
             rec.VALUE = packet[axis]['ACT_POS'] + offset
 
             filename = '%s%s%s.dat' % (hk_dir,os.sep,axis)
