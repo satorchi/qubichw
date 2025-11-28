@@ -326,12 +326,10 @@ class hk_broadcast :
             self.log('ERROR! obsmount: %s' % ans['error'],verbosity=verbosity)
             return None
 
-        recname_lookup = {'AZ':'AZIMUTH','EL':'ELEVATION'}
-        tstamp_rx = ans['TIMESTAMP']
-        for key in recname_lookup.keys():
-            recname = recname_lookup[key]
+        tstamp_rx = ans['data']['CHUNK TIMESTAMP']
+        for recname in self.hk_azel.axis_keys:
             val = ans[key]
-            tstamp = ans['%s TIMESTAMP' % key]
+            tstamp = ans['TIMESTAMP']
             self.record[recname][0] = val
             self.log_hk(recname,tstamp,val,tstamp_rx)
 
