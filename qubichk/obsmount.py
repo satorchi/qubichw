@@ -329,7 +329,6 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        retval['TIMESTAMP'] = utcnow().timestamp()
         try:
             dat = self.sock[port].recv(chunksize)
         except socket.timeout:
@@ -438,8 +437,8 @@ class obsmount:
                 errmsg.append(make_errmsg('Could not dump data to file'))
                 errlevel += 1
             
+        retval['error'] = '\n'.join(errmsg)
         if errlevel >= 2:
-            retval['error'] = '\n'.join(errmsg)
             return self.return_with_error(retval)        
             
             
