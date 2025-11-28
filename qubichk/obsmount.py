@@ -37,9 +37,14 @@ class obsmount:
     command_port = 9000
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
-    el_zero_offset = 50 - 2.049 # To Be Measured
-    az_zero_offset = 60.713 # To Be Measured
-    position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset}
+    el_zero_offset = 50.0 # To Be Measured
+    az_zero_offset = 0.0  # To Be Measured
+    ro_zero_offset = 0.0  # To Be Measured
+    tr_zero_offset = 0.0  # To Be Measured
+    position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset, 'RO': ro_zero_offset, 'TR': tr_zero_offset}
+    axis_fullname = {'AZ': 'azimuth', 'EL': 'elevation', 'RO': 'boresight rotation', 'TR': 'Little Train'}
+    axis_keys = list(position_offset.keys())
+    n_axis_keys = len(axis_keys)
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
     header_keys = ['TIMESTAMP',
                    'IS_ETHERCAT',
@@ -62,11 +67,6 @@ class obsmount:
                  'FAULT']
     n_data_keys = len(data_keys)
 
-    axis_keys = ['AZ',
-                 'EL',
-                 'ROT',
-                 'TR']
-    n_axis_keys = len(axis_keys)
 
     available_commands = ['ENA',    # enable
                           'DIS',    # disable
@@ -392,7 +392,7 @@ class obsmount:
         '''
         write all data to binary data file
         '''
-        for axis in ['AZ','EL']:
+        for axis in ['AZ','EL','RO']:
             offset = self.position_offset[axis]
             rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(npts))
             rec.STX = 0xAA
@@ -423,29 +423,25 @@ class obsmount:
         errlevel = 0
         retval['TIMESTAMP'] = packet['TIMESTAMP']
         retval['data'] = ans
-        if len(packet['AZ'])==0:
-            errmsg.append('no azimuth data')
-            errlevel += 1
-        else:
-            retval['AZ'] = packet['AZ']['ACT_POS'] + self.az_zero_offset
 
-
-        if len(packet['EL'])==0:
-            errmsg.append('no elevation data')
-            errlevel += 1
-        else:                        
-            retval['EL'] = packet['EL'][-1]['ACT_POS'] + self.el_zero_offset
-
-        if errlevel >= 2:
-            retval['error'] = '\n'.join(errmsg)
-            return self.return_with_error(retval)        
+        for axis in self.axis_keys:
+            if len(packet[axis])==0:
+                errmsg.append('no data for %s' % self.axis_fullname[axis])
+                errlevel += 1
+            else:
+                retval[axis] = packet[axis]['ACT_POS'] + self.position_zero_offset[axis]
 
         if dump:
             try:
                 dump_ok = self.dump_data(packet)
             except:
-                retval['error'] = make_errmsg('Could not dump data to file')
-                return self.return_with_error(retval)            
+                errmsg.append(make_errmsg('Could not dump data to file'))
+                errlevel += 1
+            
+        if errlevel >= 2:
+            retval['error'] = '\n'.join(errmsg)
+            return self.return_with_error(retval)        
+            
             
         return retval
 
