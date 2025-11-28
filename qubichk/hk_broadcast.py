@@ -328,7 +328,7 @@ class hk_broadcast :
 
         tstamp_rx = ans['data']['CHUNK TIMESTAMP']
         for recname in self.hk_azel.axis_keys:
-            val = ans[key]
+            val = ans[recname]
             tstamp = ans['TIMESTAMP']
             self.record[recname][0] = val
             self.log_hk(recname,tstamp,val,tstamp_rx)
