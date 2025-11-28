@@ -392,9 +392,9 @@ class obsmount:
         '''
         write all data to binary data file
         '''
-        for axis in ['AZ','EL','RO']:
+        for axis in self.axis_keys:
             offset = self.position_offset[axis]
-            rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(npts))
+            rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(1))
             rec.STX = 0xAA
             rec.TIMESTAMP = packet[axis]['TIMESTAMP']
             rec.VALUE = packet[axis]['ACT_POS'] + offset
