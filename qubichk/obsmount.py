@@ -75,7 +75,7 @@ class obsmount:
                           'POS',    # go to position
                           'VEL']    # set velocity
     wait = 0.0 # seconds to wait before next socket command
-    default_chunksize = 131072
+    default_chunksize = 512 # motor PLC sends packets of approx 200 bytes each time
     default_sampleperiod = 100 # sample period in milliseconds (Note: PLC default is 1000 msec)
     verbosity = 1
     testmode = False
@@ -259,6 +259,53 @@ class obsmount:
             self.subscribed[port] = False
         return None
 
+    def interpret_chunk(self,dat,retval):
+        '''
+        interpret the data in the chunk
+        '''
+
+        dat_str = dat.decode()
+        if len(dat_str)==0:
+            retval['error'] = 'no bytes received'
+            self.subscribed[port] = False
+            return self.return_with_error(retval)
+        
+        dat_list = dat_str.split('\n')
+        if len(dat_list)<5:
+            retval['error'] = 'partial data: %s' % dat_str
+            return self.return_with_error(retval)
+
+        axis = None
+        packet = {}
+        for line in dat_list:            
+            col = line.split(':')
+            ncols = len(col)
+            if ncols==self.n_header_keys:
+                for idx,val_str in enumerate(col):
+                    key = self.header_keys[idx]
+                    try:
+                        packet[key] = eval(val_str)
+                    except:
+                        packet[key] = val_str
+                continue
+
+            if ncols==self.n_data_keys:
+                axis = col[0]
+                axis_data = {}
+                for subidx,val_str in enumerate(col[1:]):
+                    idx = subidx + 1
+                    key = self.data_keys[idx]
+                    try:
+                        val = eval(val_str)
+                    except:
+                        val = val_str
+                    axis_data[key] = val
+                packet[axis] = axis_data
+
+        packet['TIMESTAMP'] *= 0.001
+        retval['DATA'] = packet
+        return retval
+    
     def read_data(self,chunksize=None):
         '''
         once we're subscribed, we can listen for the data
@@ -295,50 +342,7 @@ class obsmount:
             return self.return_with_error(retval)
 
                             
-
-        dat_str = dat.decode()
-        if len(dat_str)==0:
-            retval['error'] = 'no bytes received'
-            self.subscribed[port] = False
-            return self.return_with_error(retval)
-        
-        dat_list = dat_str.split('\n')
-        if len(dat_list)<5:
-            retval['error'] = 'partial data: %s' % dat_str
-            return self.return_with_error(retval)
-
-        axis = None
-        packet = {}
-        packet_list = []
-        for line in dat_list:            
-            col = line.split(':')
-            ncols = len(col)
-            if ncols==self.n_header_keys:
-                for idx,val_str in enumerate(col):
-                    key = self.header_keys[idx]
-                    try:
-                        packet[key] = eval(val_str)
-                    except:
-                        packet[key] = val_str
-                continue
-
-            if ncols==self.n_data_keys:
-                axis = col[0]
-                axis_data = []
-                for val_str in col[1:]:
-                    try:
-                        val = eval(val_str)
-                    except:
-                        val = val_str
-                    axis_data.append(val)
-
-            if axis=='TR':
-                packet_list.append(packet)
-                packet = {}
-                    
-                
-        retval['DATA'] = packet_list
-        return retval
+        return self.interpret_chunk(dat,retval)
 
     def get_data(self,chunksize=None):
         '''
@@ -384,18 +388,16 @@ class obsmount:
 
         return retval
 
-    def dump_data(self,data):
+    def dump_data(self,packet):
         '''
         write all data to binary data file
         '''
         for axis in ['AZ','EL']:
             offset = self.position_offset[axis]
-            npts = len(data[axis])
             rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(npts))
-            for idx in range(npts):
-                rec[idx].STX = 0xAA
-                rec[idx].TIMESTAMP = data[axis][idx]['TIMESTAMP']
-                rec.VALUE = data[axis][idx]['ACT_POSITION'] + offset
+            rec.STX = 0xAA
+            rec.TIMESTAMP = packet[axis]['TIMESTAMP']
+            rec.VALUE = packet[axis]['ACT_POS'] + offset
 
             filename = '%s%s%s.dat' % (hk_dir,os.sep,axis)
             h = open(filename,'ab')
@@ -416,24 +418,23 @@ class obsmount:
         if not ans['ok']:
             return self.return_with_error(ans)
 
+        packet = ans['DATA']
         errmsg = []
         errlevel = 0
-        retval['TIMESTAMP'] = ans['TIMESTAMP']
+        retval['TIMESTAMP'] = packet['TIMESTAMP']
         retval['data'] = ans
-        if len(ans['AZ'])==0:
+        if len(packet['AZ'])==0:
             errmsg.append('no azimuth data')
             errlevel += 1
         else:
-            retval['AZ'] = ans['AZ'][-1]['ACT_POSITION'] + self.az_zero_offset
-            retval['AZ TIMESTAMP'] = ans['AZ'][-1]['TIMESTAMP']
+            retval['AZ'] = packet['AZ']['ACT_POS'] + self.az_zero_offset
 
 
-        if len(ans['EL'])==0:
+        if len(packet['EL'])==0:
             errmsg.append('no elevation data')
             errlevel += 1
         else:                        
-            retval['EL'] = ans['EL'][-1]['ACT_POSITION'] + self.el_zero_offset
-            retval['EL TIMESTAMP'] = ans['EL'][-1]['TIMESTAMP']
+            retval['EL'] = packet['EL'][-1]['ACT_POS'] + self.el_zero_offset
 
         if errlevel >= 2:
             retval['error'] = '\n'.join(errmsg)
@@ -441,7 +442,7 @@ class obsmount:
 
         if dump:
             try:
-                dump_ok = self.dump_data(ans)
+                dump_ok = self.dump_data(packet)
             except:
                 retval['error'] = make_errmsg('Could not dump data to file')
                 return self.return_with_error(retval)            
