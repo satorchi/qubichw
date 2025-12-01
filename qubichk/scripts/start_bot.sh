@@ -9,8 +9,8 @@
 #           redistribute it.  There is NO WARRANTY, to the extent
 #           permitted by law.
 #
-# script to start calibration source setup manager
-# this is to be run on QUBIC PiGPS
+# script to start the Telegram bot
+# this is to be run on qubic-central
 # the following line should appear in crontab
 # */5 * * * * $HOME/.local/bin/start_bot.sh
 #
