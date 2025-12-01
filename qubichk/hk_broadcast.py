@@ -316,7 +316,7 @@ class hk_broadcast :
         if self.hk_azel is None:
             self.hk_azel = obsmount()
 
-        ans = self.hk_azel.get_azel(dump=True)
+        ans = self.hk_azel.get_azel(dump=False) # fast data dumping is done separately by a dedicated client
         
         if not ans['ok']:
             if ans['error'].find('no azimuth data')>=0 or ans['error'].find('no elevation data')>=0:
