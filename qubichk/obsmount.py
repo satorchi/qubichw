@@ -424,7 +424,7 @@ class obsmount:
         retval['data'] = ans
 
         for axis in self.axis_keys:
-            if len(packet[axis])==0:
+            if axis not in packet.keys() or len(packet[axis])==0:
                 errmsg.append('no data for %s' % self.axis_fullname[axis])
                 errlevel += 1
             else:
