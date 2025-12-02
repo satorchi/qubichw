@@ -289,12 +289,15 @@ class obsmount:
                         packet[key] = val_str
                 continue
 
-            if ncols==self.n_data_keys:
+            if ncols>=self.n_data_keys:
                 axis = col[0]
                 axis_data = {}
                 for subidx,val_str in enumerate(col[1:]):
                     idx = subidx + 1
-                    key = self.data_keys[idx]
+                    if idx<len(self.data_keys):
+                        key = self.data_keys[idx]
+                    else:
+                        key = 'UNKNOWN%02i' % idx
                     try:
                         val = eval(val_str)
                     except:
