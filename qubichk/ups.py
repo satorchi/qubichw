@@ -19,7 +19,7 @@ def get_ups_info():
     '''
     get the UPS information
     '''
-    battery_key = 'battery.status'
+    battery_key = 'battery.charge'
     voltage_key = 'input.voltage'
 
     log_parms = [voltage_key,
