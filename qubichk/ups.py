@@ -32,7 +32,7 @@ def get_ups_info():
     info = {}
     alarm = False
     
-    cmd = 'upsc cyberpower'
+    cmd = 'upsc nutdev-usb1'
     full_output,err = shellcommand(cmd)
 
     brief_msg_list = []

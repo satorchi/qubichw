@@ -15,10 +15,10 @@
 # if the service is running, this script does nothing and exits quietly
 	  
 
-chk="$(ps axw|grep usbhid-ups|grep -v grep)"
+chk="$(ps axw|grep nutdrv_qx|grep -v grep)"
 if [ -z "$chk" ]
 then
-    /usr/local/ups/bin/usbhid-ups -s cyberpower -x port=/dev/cyberpower-usb
+    /usr/local/ups/bin/nutdrv_qx -a nutdev-usb1
     sleep 2
 fi
 
