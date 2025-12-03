@@ -37,7 +37,7 @@ class obsmount:
     command_port = 9000
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
-    el_zero_offset = 50.0 # To Be Measured
+    el_zero_offset = 40.0  # To Be Measured
     az_zero_offset = 0.0  # To Be Measured
     ro_zero_offset = 0.0  # To Be Measured
     tr_zero_offset = 0.0  # To Be Measured
@@ -46,6 +46,7 @@ class obsmount:
     axis_keys = list(position_offset.keys())
     n_axis_keys = len(axis_keys)
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
+    delimiter = ':'
     header_keys = ['TIMESTAMP',
                    'IS_ETHERCAT',
                    'IS_SYNC',
@@ -278,7 +279,7 @@ class obsmount:
         axis = None
         packet = {}
         for line in dat_list:            
-            col = line.split(':')
+            col = line.split(self.delimiter)
             ncols = len(col)
             if ncols==self.n_header_keys:
                 for idx,val_str in enumerate(col):
@@ -369,7 +370,13 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        cmd = cmd_str.split()[0].upper()
+        cmd_list = cmd_str.split(self.delimiter)
+        if len(cmd_list)<2:
+            retval['error'] = 'not enough arguments for command: %s' % cmd_str
+            return self.return_with_error(retval)
+
+        axis = cmd_list[0]
+        cmd = cmd_list[1]
         if cmd not in self.available_commands:
             retval['error'] = 'Invalid command: %s' % cmd
             return self.return_with_error(retval)
@@ -484,33 +491,67 @@ class obsmount:
         '''
         return self.subscribed[port]
 
+    def make_command_string(self,axis,cmd,val=None):
+        '''
+        make the command string
+        note that val is converted to string
+        '''
+        if val is None:
+            cmd_str = self.delimiter.join([axis.upper(),cmd.upper()])
+        else:
+            cmd_str = self.delimiter.join([axis.upper(),cmd.upper(),str(val)])
+        return cmd_str
+    
     def goto_az(self,az):
         '''
         send command to move to the given azimuth
         we correct for the encoder azimuth offset
         '''
-        cmd_az = az - self.az_zero_offset
-        return self.send_command('AZ %f' % cmd_az)
+        cmd_az = az - self.position_offset['AZ']
+        az_str = '%.1f' % cmd_az
+        cmd_str = self.make_command_string('AZ','POS',az_str)
+        return self.send_command(cmd_str)
 
     def goto_el(self,el):
         '''
         send command to move to the given elevation
         we correct for the encoder elevation offset
         '''
-        cmd_el = el - self.el_zero_offset
-        return self.send_command('EL %f' % cmd_el)
+        cmd_el = el - self.position_offset['EL']
+        el_str = '%.1f' % cmd_el
+        cmd_str = self.make_command_string('EL','POS',el_str)
+        return self.send_command(cmd_str)
 
+    def set_az_speed(self,speed):
+        '''
+        send command to set the azimuth speed
+        '''
+        speed_str = '%.1f' % speed
+        cmd_str = self.make_command_string('AZ','VEL',speed_str)
+        return self.send_command(cmd_str)
+    
+    def set_el_speed(self,speed):
+        '''
+        send command to set the elevation speed
+        '''
+        speed_str = '%.1f' % speed
+        cmd_str = self.make_command_string('EL','VEL',speed_str)
+        return self.send_command(cmd_str)
+    
     def stop(self):
         '''
-        send command to stop movement
+        send command to stop all movement
         '''
-        return self.send_command('STOP')
+        for axis in self.axis_keys:
+            cmd_str = self.make_command_str(axis,'STOP')
+            self.send_command(cmd_str)
+        return
 
     def abort(self):
         '''
         send command to abort current command
         '''
-        return self.send_command('ABORT')
+        return self.stop()
 
     def do_homing(self):
         '''
@@ -518,20 +559,24 @@ class obsmount:
         '''
         return self.send_command('DOHOMING')
 
-    def set_az_speed(self,speed):
+    def enable(self):
         '''
-        send command to set the azimuth speed
+        send command to enable all motors
         '''
-        cmd = 'AZS %i' % round(speed)
-        return self.send_command(cmd)
-    
-    def set_el_speed(self,speed):
+        for axis in self.axis_keys:
+            cmd_str = self.make_command_str(axis,'ENA')
+            self.send_command(cmd_str)
+        return
+        
+    def disable(self):
         '''
-        send command to set the elevation speed
+        send command to disable all motors
         '''
-        cmd = 'ELS %i' % round(speed)
-        return self.send_command(cmd)
-    
+        for axis in self.axis_keys:
+            cmd_str = self.make_command_str(axis,'DIS')
+            self.send_command(cmd_str)
+        return
+
     def wait_for_arrival(self,az=None,el=None,maxwait=None):
         '''
         wait for telescope to get into requested position
@@ -578,7 +623,7 @@ class obsmount:
                 time.sleep(2)
                 continue
 
-            now_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            now_str = utcnow().strftime(self.datefmt)
             print('%s - AZ,EL = %.2f %.2f' % (now_str, azel['AZ'],azel['EL']))
 
             val = azel[key]
