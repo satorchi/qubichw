@@ -259,7 +259,7 @@ class obsmount:
             self.subscribed[port] = False
         return None
 
-    def interpret_chunk(self,dat,retval):
+    def interpret_chunk(self,dat):
         '''
         interpret the data in the chunk
         '''
@@ -306,8 +306,7 @@ class obsmount:
                 packet[axis] = axis_data
 
         packet['TIMESTAMP'] *= 0.001
-        retval['DATA'] = packet
-        return retval
+        return packet
     
     def read_data(self,chunksize=None):
         '''
@@ -321,8 +320,7 @@ class obsmount:
         retval['ok'] = True
         retval['error'] = 'NONE'
         retval['CHUNK TIMESTAMP'] = utcnow().timestamp()
-        for key in self.axis_keys:
-            retval[key] = []
+        retval['DATA'] = None
 
         # check that we are subscribed
         if not self.subscribed[port]:
@@ -343,8 +341,9 @@ class obsmount:
             retval['error'] = error = make_errmsg('could not get az,el data')
             return self.return_with_error(retval)
 
-                            
-        return self.interpret_chunk(dat,retval)
+
+        retval['DATA'] = self.interpret_chunk(dat)
+        return retval
 
     def get_data(self,chunksize=None):
         '''
