@@ -396,18 +396,20 @@ class obsmount:
 
         return retval
 
-    def dump_data(self,packet):
+    def dump_data(self,packet,dump_dir=hk_dir):
         '''
         write all data to binary data file
+        dump to a specific location, if given
+        NOTE: in order to reduce overhead on dumping
+        NOTE: error checking for directory existence is NOT done here.  Give a valid directory!
         '''
+        rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(1))
+        rec.STX = 0xAA
+        rec.TIMESTAMP = packet['TIMESTAMP']
         for axis in self.axis_keys:
-            offset = self.position_offset[axis]
-            rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(1))
-            rec.STX = 0xAA
-            rec.TIMESTAMP = packet['TIMESTAMP']
+            offset = self.position_offset[axis]            
             rec.VALUE = packet[axis]['ACT_POS'] + offset
-
-            filename = '%s%s%s.dat' % (hk_dir,os.sep,axis)
+            filename = '%s.dat' % (os.sep.join([dump_dir,axis]))
             h = open(filename,'ab')
             h.write(rec)
             h.close()
