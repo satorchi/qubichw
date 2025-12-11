@@ -416,7 +416,7 @@ class obsmount:
             
         return True
     
-    def get_azel(self,dump=False,chunksize=None):
+    def get_azel(self,dump_dir=None,chunksize=None):
         '''
         get the azimuth and elevation and return it with a timestamp
         '''
@@ -441,7 +441,7 @@ class obsmount:
             else:
                 retval[axis] = packet[axis]['ACT_POS'] + self.position_offset[axis]
 
-        if dump:
+        if dump_dir is not None:
             try:
                 dump_ok = self.dump_data(packet)
             except:

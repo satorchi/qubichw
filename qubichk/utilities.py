@@ -290,7 +290,21 @@ def read_DACoffsetTables():
 
     return offsetTables
 
-            
+def verify_directory(dirname):
+    '''
+    verify if a directory exists and if not, try to create it
+    '''
+    if os.path.isdir(dirname): return dirname
+
+    
+    try:
+        os.makedirs(dirname)
+    except:
+        print('ERROR! Could not make directory: %s' % dirname)
+        return None
+
+    return dirname
+    
 
             
                 

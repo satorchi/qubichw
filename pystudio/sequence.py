@@ -15,7 +15,7 @@ import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
-from qubichk.utilities import read_DACoffsetTables
+from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory
 from qubicpack.utilities import interpret_rawmask
 
 #####################################
@@ -553,7 +553,41 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     ack = self.send_startFLL(asicNum)
 
     # start recording data
+    acq_start = utcnow()
     ack = self.send_startAcquisition(title,comment)
+
+    # get the assigned dataset name
+    parm_name = 'DISP_BackupSessionName_ID'
+    vals = self.send_request(parameterList=[parm_name])
+    if parm_name not in vals.keys():
+        dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
+        print('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
+    else    
+        dataset_name = vals[parm_name]['value']
+
+    # start dumping the azel data
+    day_str = acq_start.strftime('%Y-%m-%d')
+    dump_dir = os.sep.join([os.environ['HOME'],day_str,dataset_name,'Hks'])
+    dump_dir = verify_directory(dump_dir)
+    if dump_dir is None:
+        dump_dir = os.sep.join([os.environ['HOME'],'data'])
+        dump_dir = verify_directory(dump_dir)
+        
+    if dump_dir is None:
+        dump_dir = '/tmp'
+
+    if self.verbosity>2:        
+        print('Dumping in directory: %s' % dump_dir)
+        
+    cmd = 'start_mountplc_acquisition.sh %s' % dump_dir
+    out,err = shellcommand(cmd)
+    
+                  
+
+    
+        
+        
+    
    
     print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return

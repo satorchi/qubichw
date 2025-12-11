@@ -11,13 +11,19 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 read mount position data from the PLC and dump it to binary data file
 '''
+import sys,os
 from qubichk.obsmount import obsmount
 from qubichk.utilities import make_errmsg
+
+dump_dir = None
+for arg in sys.argv:
+    if os.path.isdir(arg):
+        dump_dir = arg
 
 mount = obsmount()
 keepgoing = True
 while keepgoing:
-    ans = mount.get_azel(dump=True)
+    ans = mount.get_azel(dump_dir=dump_dir)
     if not ans['ok']:
         errmsg = make_errmsg(ans['error'])
         print(errmsg)
