@@ -15,6 +15,7 @@ see documentation from Luciano Ferreyro and Lucia Sucunza
 ANEXO-C_command_lists_PLC.pdf
 ANEXO-C_monitor_data_PLC.pdf
 QUBIC_Mount_General_documentation.pdf
+email from Lucia: 2025-12-10, on elog: https://elog-qubic.in2p3.fr/demo/1294
 
 '''
 import os,sys,socket,time,re
@@ -55,17 +56,19 @@ class obsmount:
     n_header_keys = len(header_keys)
 
     data_keys = ['AXIS',
-                 'ACT_VEL',
-                 'ACT_VEL_B',
-                 'ACT_POS',
-                 'ACT_POS_B',
+                 'ACT_VEL_RES',
+                 'ACT_VEL_ENC',
+                 'ACT_POS_RES',
+                 'ACT_POS_ENC',
                  'ACT_TORQUE',
                  'IS_ENABLED',
                  'IS_HOMING',
+                 'IS_HOMINGSKIP',
                  'IS_OPERATIVE',
                  'IS_MOVING',
                  'IS_OUTOFRANGE',
                  'FAULT']
+    
     n_data_keys = len(data_keys)
 
 
