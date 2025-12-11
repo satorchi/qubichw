@@ -68,6 +68,7 @@ class obsmount:
                  'IS_MOVING',
                  'IS_OUTOFRANGE',
                  'FAULT']
+    position_key = 'ACT_POS_ENC'
     
     n_data_keys = len(data_keys)
 
@@ -411,7 +412,7 @@ class obsmount:
         rec.TIMESTAMP = packet['TIMESTAMP']
         for axis in self.axis_keys:
             offset = self.position_offset[axis]            
-            rec.VALUE = packet[axis]['ACT_POS'] + offset
+            rec.VALUE = packet[axis][self.position_key] + offset
             filename = '%s.dat' % (os.sep.join([dump_dir,axis]))
             h = open(filename,'ab')
             h.write(rec)
@@ -442,7 +443,7 @@ class obsmount:
                 errmsg.append('no data for %s' % self.axis_fullname[axis])
                 errlevel += 1
             else:
-                retval[axis] = packet[axis]['ACT_POS'] + self.position_offset[axis]
+                retval[axis] = packet[axis][self.position_key] + self.position_offset[axis]
 
         if dump_dir is not None:
             try:
