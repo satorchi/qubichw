@@ -591,6 +591,11 @@ def end_observation(self):
     '''
     ack = self.send_stopAcquisition()
     ack = self.send_stopFLL()
+    # stop Az/El acquisition
+    cmd = 'screen -X -S mountPLC quit'
+    out,err = shellcommand(cmd)
+    if len(err)>0:
+        print('%s - error ending Az/El acquisition: %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),err))
     print('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
