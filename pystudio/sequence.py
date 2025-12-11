@@ -562,7 +562,7 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     if parm_name not in vals.keys():
         dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
         print('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
-    else    
+    else:
         dataset_name = vals[parm_name]['value']
 
     # start dumping the azel data
