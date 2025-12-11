@@ -38,11 +38,12 @@ class obsmount:
     command_port = 9000
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
-    el_zero_offset = 40.0  # To Be Measured
-    az_zero_offset = 0.0  # To Be Measured
-    ro_zero_offset = 0.0  # To Be Measured
-    tr_zero_offset = 0.0  # To Be Measured
-    position_offset = {'AZ': az_zero_offset, 'EL': el_zero_offset, 'RO': ro_zero_offset, 'TR': tr_zero_offset}
+    # position offsets To Be Measured !!
+    position_offset = {'AZ': 0.0,
+                       'EL': 40.0,
+                       'RO': 0.0,
+                       'TR': 0.0
+                       }
     axis_fullname = {'AZ': 'azimuth', 'EL': 'elevation', 'RO': 'boresight rotation', 'TR': 'Little Train'}
     axis_keys = list(position_offset.keys())
     n_axis_keys = len(axis_keys)
@@ -68,7 +69,7 @@ class obsmount:
                  'IS_MOVING',
                  'IS_OUTOFRANGE',
                  'FAULT']
-    position_key = 'ACT_POS_ENC'
+    position_key = 'ACT_POS_RES'
     
     n_data_keys = len(data_keys)
 
