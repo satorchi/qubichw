@@ -581,13 +581,6 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
         
     cmd = 'start_mountplc_acquisition.sh %s' % dump_dir
     out,err = shellcommand(cmd)
-    
-                  
-
-    
-        
-        
-    
    
     print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return
