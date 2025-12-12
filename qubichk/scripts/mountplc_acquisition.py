@@ -13,15 +13,16 @@ read mount position data from the PLC and dump it to binary data file
 '''
 import sys,os
 from qubichk.obsmount import obsmount
-from qubichk.utilities import make_errmsg
+from qubichk.utilities import make_errmsg, verify_directory
 from satorchipy.datefunctions import utcnow
 
 dump_dir = None
-for arg in sys.argv:
-    if os.path.isdir(arg):
-        dump_dir = arg
 
-date_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
+if len(sys.argv)>1:
+    for arg in sys.argv[1:]:
+        dump_dir = verify_directory(arg)
+
+date_str = utcnow().strftime('%Y-%m-%d %H:%M:%S UT')
 if dump_dir is None:
     msg = 'not dumping Az/El data'
 else:
