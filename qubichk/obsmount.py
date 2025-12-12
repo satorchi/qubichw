@@ -124,7 +124,10 @@ class obsmount:
         print a message and return the error code and stuff in a dictionary
         '''
         retval['ok'] = False
-        self.printmsg('ERROR! %s' % retval['error'])
+        if retval['error'].find('KeyboardInterrupt')>=0:
+            self.printmsg('Ending by Ctrl-C')
+        else:
+            self.printmsg('ERROR! %s' % retval['error'])
         return retval
 
 
