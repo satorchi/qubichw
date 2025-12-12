@@ -345,6 +345,10 @@ class obsmount:
             self.subscribed[port] = False
             retval['error'] = 'socket time out'
             return self.return_with_error(retval)
+        except KeyboardInterrupt:
+            self.subscribed[port] = False
+            retval['error'] = 'Detected keyboard interrupt Ctrl-C'
+            return self.return_with_error(retval)
         except:
             self.subscribed[port] = False
             retval['error'] = make_errmsg('could not get az,el data')
