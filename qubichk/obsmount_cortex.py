@@ -382,7 +382,7 @@ class obsmount:
             return self.return_with_error(retval)
         except:
             self.subscribed[port] = False
-            retval['error'] = error = make_errmsg('could not get az,el data')
+            retval['error'] = make_errmsg('could not get az,el data')
             return self.return_with_error(retval)
 
                             
