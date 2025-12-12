@@ -448,7 +448,7 @@ class obsmount:
 
         if dump_dir is not None:
             try:
-                dump_ok = self.dump_data(packet)
+                dump_ok = self.dump_data(packet,dump_dir=dump_dir)
             except:
                 errmsg.append(make_errmsg('Could not dump data to file'))
                 errlevel += 1
