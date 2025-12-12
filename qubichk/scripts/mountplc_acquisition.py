@@ -14,11 +14,19 @@ read mount position data from the PLC and dump it to binary data file
 import sys,os
 from qubichk.obsmount import obsmount
 from qubichk.utilities import make_errmsg
+from satorchipy.datefunctions import utcnow
 
 dump_dir = None
 for arg in sys.argv:
     if os.path.isdir(arg):
         dump_dir = arg
+
+date_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
+if dump_dir is None:
+    msg = 'not dumping Az/El data'
+else:
+    msg = 'dumping to directory: %s' % dump_dir
+print('%s - %s' % (date_str,msg))
 
 mount = obsmount()
 keepgoing = True
