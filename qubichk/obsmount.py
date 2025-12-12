@@ -40,7 +40,7 @@ class obsmount:
     qubicstudio_ip = known_hosts['qubic-studio']
     # position offsets To Be Measured !!
     position_offset = {'AZ': 0.0,
-                       'EL': 40.0,
+                       'EL': 49.315, # see elog: https://elog-qubic.in2p3.fr/demo/1296
                        'RO': 0.0,
                        'TR': 0.0
                        }
@@ -459,6 +459,7 @@ class obsmount:
             except:
                 errmsg.append(make_errmsg('Could not dump data to file'))
                 errlevel += 1
+            
             
         retval['error'] = '\n'.join(errmsg)
         if errlevel >= 2:
