@@ -15,7 +15,7 @@ see documentation from Luciano Ferreyro and Lucia Sucunza
 ANEXO-C_command_lists_PLC.pdf
 ANEXO-C_monitor_data_PLC.pdf
 QUBIC_Mount_General_documentation.pdf
-email from Lucia: 2025-12-10, on elog: https://elog-qubic.in2p3.fr/demo/1294
+email from Lucia: 2025-12-10/11, on elog: https://elog-qubic.in2p3.fr/demo/1294
 
 '''
 import os,sys,socket,time,re
@@ -69,7 +69,7 @@ class obsmount:
                  'IS_MOVING',
                  'IS_OUTOFRANGE',
                  'FAULT']
-    position_key = 'ACT_POS_RES'
+    position_key = 'ACT_POS_ENC'
     
     n_data_keys = len(data_keys)
 
