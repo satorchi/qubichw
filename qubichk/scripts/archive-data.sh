@@ -12,6 +12,7 @@
 
 HK_DIR=/home/qubic/data/temperature/broadcast
 FRIDGESCRIPTS_DIR=/home/qubic/data/temperature
+LOCAL_DATASET_DIR=/home/qubic/data
 
 # copy from the RaspberryPi because there's a problem with the Windows share on qubic-central
 # 2022-02-23 17:36:24 back to using the raspberry pi as a bridge to QubicStudio
@@ -56,6 +57,7 @@ rsync -avztP $HK_DIR/ $ARCHIVE_HKDIR
 rsync -avztP $QS_DIR/QubicStudio $ARCHIVE_DIR
 rsync -avztP $QS_DIR/Script $ARCHIVE_DIR
 rsync -avztP $QS_DIR/Data/ $ARCHIVE_DIR
+rsync -avztP $LOCAL_DATASET_DIR/20??-??-?? $ARCHIVE_DIR
 rsync -avztP $HWP_DIR $ARCHIVE_DIR
 rsync -avztP $WEATHER_DIR $ARCHIVE_DIR/weather
 
