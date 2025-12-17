@@ -24,8 +24,9 @@ server4 = '192.168.88.20'
 server5 = '192.168.88.18'  # inside weather 2025-03-26 15:50:23, now outside (see above)
 server6 = '192.168.88.107' # inside weather 2025-04-15 13:50:39
 server7 = '192.168.88.53'
+server8 = '192.168.88.28'
 inside_server = server6
-outside_server = server7
+outside_server = server8
 
 weather_log_values = ['temperature','humidity','pressure','windspeed','winddir']
 weather_csv_keys = ['date','temperature','humidity','battery','pressure','windspeed','winddir','radiation','rain']
