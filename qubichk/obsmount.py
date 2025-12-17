@@ -390,7 +390,7 @@ class obsmount:
         full_cmd_str = '%s' % cmd_str.upper()
         self.printmsg('sending command: %s' % full_cmd_str)
         if self.testmode:
-            print("TESTMODE:  I didn't really send the command")
+            self.printmsg("TESTMODE:  I didn't really send the command")
             return retval
         
         try:
@@ -431,7 +431,7 @@ class obsmount:
         '''
         prefix = bytearray([0xaa,0xaa])
         filename = os.sep.join([dump_dir,'POINTING.dat'])
-        print('%s | pointing acquisition starting on file: %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),filename))        
+        self.printmsg('pointing acquisition starting on file: %s' % filename)
         h = open(filename,'ab')
         ans = self.get_data()
         keepgoing = ans['ok']
@@ -442,7 +442,7 @@ class obsmount:
             keepgoing = ans['ok']
 
         h.close()
-        print('%s | pointing acquisition ended: %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),ans['error']))        
+        self.printmsg('pointing acquisition ended: %s' % ans['error'])
         return ans
     
     def get_azel(self,chunksize=None):
@@ -493,10 +493,10 @@ class obsmount:
         '''
         ans = self.get_azel()
         if not ans['ok']:
-            print('AZ,EL = ERROR: %s' % ans['error'])
+            self.printmsg('AZ,EL = ERROR: %s' % ans['error'])
             return False
 
-        print('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']))
+        self.printmsg('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']))
         return True
 
 
@@ -640,7 +640,7 @@ class obsmount:
             now = utcnow().timestamp()
             azel = self.get_azel()
             if (now-tstart)>maxwait:
-                print('Error! Could not get AZ,EL position.')
+                self.printmsg('Error! Could not get AZ,EL position.')
                 return False
         
         val = azel[key]
@@ -649,7 +649,7 @@ class obsmount:
             time.sleep(2)
             now = utcnow().timestamp()
             if (now-tstart)>maxwait:
-                print('Maximum wait time')
+                self.printmsg('Maximum wait time')
                 return False
         
             azel = self.get_azel()
@@ -657,8 +657,7 @@ class obsmount:
                 time.sleep(2)
                 continue
 
-            now_str = utcnow().strftime(self.datefmt)
-            print('%s - AZ,EL = %.2f %.2f' % (now_str, azel['AZ'],azel['EL']))
+            self.printmsg('AZ,EL = %.2f %.2f' % (azel['AZ'],azel['EL']))
 
             val = azel[key]
 
@@ -679,13 +678,13 @@ class obsmount:
         
         azok = self.wait_for_arrival(az=self.azmin)
         if not azok:
-            print('ERROR! Did not successfully get to starting azimuth position')
+            self.printmsg('ERROR! Did not successfully get to starting azimuth position')
             return False
 
         self.goto_el(self.elmin)
         elok = self.wait_for_arrival(el=self.elmin)
         if not elok:
-            print('ERROR! Did not successfully get to starting elevation position')
+            self.printmsg('ERROR! Did not successfully get to starting elevation position')
             return False
 
         azel = self.get_azel()
@@ -694,7 +693,7 @@ class obsmount:
             azel = self.get_azel()
             now = utcnow().timestamp()
             if (now-start_tstamp)>10:
-                print('ERROR! Could not get current position.')
+                self.printmsg('ERROR! Could not get current position.')
                 return False
         
         
@@ -709,14 +708,14 @@ class obsmount:
                 time.sleep(1) # wait before next command
                 elok = self.wait_for_arrival(el=self.elmax)
                 if not elok:
-                    print('ERROR! Did not successfully get to starting elevation position')
+                    self.printmsg('ERROR! Did not successfully get to starting elevation position')
                     return False
             
 
                 self.goto_el(self.elmin)
                 azok = self.wait_for_arrival(el=self.elmin)
                 if not azok:
-                    print('ERROR! Did not successfully get to starting azimuth position')
+                    self.printmsg('ERROR! Did not successfully get to starting azimuth position')
                     return False
 
                 az += azstep
