@@ -15,7 +15,7 @@ if ! ps auxw | grep "/home/qubic/.local/bin/weather.py" | grep -v -e grep -e SCR
     screen -X -S weather quit
     echo "Starting a new screen and launching the weather logger"
     cd $HOME/data/temperature/broadcast
-    screen -S weather -d -m /home/qubic/.local/bin/weather.py --server-type='outside' --log --period=60 --logfile=$HOME/data/temperature/broadcast/weather.txt --server=192.168.88.53
+    screen -S weather -d -m /home/qubic/.local/bin/weather.py --server-type='outside' --log --period=60 --logfile=$HOME/data/temperature/broadcast/weather.txt --server=192.168.88.28
 else
     echo "weather logger already running"
 fi

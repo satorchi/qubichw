@@ -24,7 +24,7 @@ server4 = '192.168.88.20'
 server5 = '192.168.88.18'  # inside weather 2025-03-26 15:50:23, now outside (see above)
 server6 = '192.168.88.107' # inside weather 2025-04-15 13:50:39
 server7 = '192.168.88.53'
-server8 = '192.168.88.28'
+server8 = '192.168.88.28'  # outside weather 2025-12-17 18:25:25
 inside_server = server6
 outside_server = server8
 
