@@ -425,12 +425,27 @@ class obsmount:
     def acquisition(self,dump_dir=hk_dir):
         '''
         dump the data supplied by the mount PLC without any interpretation
+        this is an infinite loop to be interrupted by ctrl-c, or socket error
+        
         this replaces dump_data above and has lower overhead
         '''
-        
-        return
+        prefix = bytearray([0xaa,0xaa])
+        filename = os.sep.join([dump_dir,'POINTING.dat'])
+        print('%s | pointing acquisition starting on file: %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),filename))        
+        h = open(filename,'ab')
+        ans = self.get_data()
+        keepgoing = ans['ok']
+        while keepgoing:
+            packet = prefix + ans['CHUNK']
+            h.write(packet)
+            ans = self.get_data()
+            keepgoing = ans['ok']
+
+        h.close()
+        print('%s | pointing acquisition ended: %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),ans['error']))        
+        return ans
     
-    def get_azel(self,dump_dir=None,chunksize=None):
+    def get_azel(self,chunksize=None):
         '''
         get the azimuth and elevation and return it with a timestamp
         '''

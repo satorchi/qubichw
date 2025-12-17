@@ -27,7 +27,7 @@ if dump_dir is None:
     msg = 'not dumping Az/El data'
 else:
     msg = 'dumping to directory: %s' % dump_dir
-print('%s - %s' % (date_str,msg))
+print('%s | %s' % (date_str,msg))
 
 mount = obsmount()
 mount.acquisition(dump_dir=dump_dir)
