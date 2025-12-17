@@ -317,7 +317,7 @@ class obsmount:
         packet['TIMESTAMP'] *= 0.001
         return packet
     
-    def read_data(self,chunksize=None):
+    def get_data(self,chunksize=None):
         '''
         once we're subscribed, we can listen for the data
         
@@ -355,14 +355,8 @@ class obsmount:
             return self.return_with_error(retval)
 
 
-        retval['DATA'] = self.interpret_chunk(dat)
+        retval['CHUNK'] = dat
         return retval
-
-    def get_data(self,chunksize=None):
-        '''
-        this is a wrapper for read_data() because I keep forgetting
-        '''
-        return self.read_data(chunksize=chunksize)
     
     def send_command(self,cmd_str):
         '''
@@ -427,6 +421,14 @@ class obsmount:
             h.close()
             
         return True
+
+    def acquisition(self,dump_dir=hk_dir):
+        '''
+        dump the data supplied by the mount PLC without any interpretation
+        this replaces dump_data above and has lower overhead
+        '''
+        
+        return
     
     def get_azel(self,dump_dir=None,chunksize=None):
         '''
@@ -436,11 +438,13 @@ class obsmount:
         retval['ok'] = True
         retval['error'] = 'NONE'
 
-        ans = self.read_data(chunksize=chunksize)
+        ans = self.get_data(chunksize=chunksize)
         if not ans['ok']:
             return self.return_with_error(ans)
 
-        packet = ans['DATA']
+        packet = self.interpret_chunk(ans['CHUNK'])
+        ans['DATA'] = packet
+        
         errmsg = []
         errlevel = 0
         retval['TIMESTAMP'] = packet['TIMESTAMP']

@@ -30,12 +30,5 @@ else:
 print('%s - %s' % (date_str,msg))
 
 mount = obsmount()
-keepgoing = True
-while keepgoing:
-    ans = mount.get_azel(dump_dir=dump_dir)
-    if not ans['ok']:
-        errmsg = make_errmsg(ans['error'])
-        print(errmsg)
-        if errmsg.find('KeyboardInterrupt')>=0: 
-            keepgoing = False
+mount.acquisition()
             
