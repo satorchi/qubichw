@@ -30,5 +30,6 @@ else:
 print('%s - %s' % (date_str,msg))
 
 mount = obsmount()
-mount.acquisition()
+mount.acquisition(dump_dir=dump_dir)
+
             
