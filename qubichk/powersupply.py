@@ -25,7 +25,7 @@ import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
 from qubichk.utilities import shellcommand, get_fullpath
-
+from satorchipy.datefunctions import utcnow
 class PowerSupply :
 
     def __init__(self,port=None, verbosity=1):
@@ -58,7 +58,7 @@ class PowerSupply :
         
         logfile = homedir + os.sep + 'hk_powersupply.log'
         
-        now=dt.datetime.utcnow()
+        now = utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
         try:
             h=open(logfile,'a')
@@ -148,9 +148,10 @@ class PowerSupply :
         ''' read user supplied labels corresponding to HEATER1, HEATER2, etc
             this is called by identify_PowerSupply()
         '''
-        configfile = get_fullpath('powersupply.conf')
+        labelfile = 'LABELS.txt' # replacing 'powersupply.conf'
+        configfile = get_fullpath(labelfile)
         if configfile is None:
-            self.log('Could not find configuration file: powersupply.conf', verbosity=0)
+            self.log('Could not find configuration file: %s' % labelfile, verbosity=0)
             return
 
         self.log('Reading user supplied configuration file: %s' % configfile,verbosity=2)
@@ -461,7 +462,7 @@ class PowerSupplies :
         
         logfile = homedir + os.sep + 'hk_powersupply.log'
         
-        now=dt.datetime.utcnow()
+        now = utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
         try:
             h=open(logfile,'a')
