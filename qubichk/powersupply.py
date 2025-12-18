@@ -19,12 +19,10 @@ The TTi PL303QMD-P power supply has two supplies
 import os,sys,serial
 from glob import glob
 import numpy as np
-import datetime as dt
-import re
 import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
-from qubichk.utilities import shellcommand, get_fullpath
+from qubichk.utilities import shellcommand, get_fullpath, read_labels
 from satorchipy.datefunctions import utcnow
 class PowerSupply :
 
@@ -148,39 +146,64 @@ class PowerSupply :
         ''' read user supplied labels corresponding to HEATER1, HEATER2, etc
             this is called by identify_PowerSupply()
         '''
-        labelfile = 'LABELS.txt' # replacing 'powersupply.conf'
-        delimiter = '=' # replacing the ':' used in powersupply.conf
-        configfile = get_fullpath(labelfile)
-        if configfile is None:
-            self.log('Could not find configuration file: %s' % labelfile, verbosity=0)
-            return
+        labels = read_labels()
+        for sensor in labels.keys():
+            if sensor.find('HEATER')<0: continue
+            userinfo = labels[sensor].split(';')
+            if len(userinfo)<2: continue
+            userlabel = userinfo[0]
+            labels[sensor] = userlabel
+            resistor_str = userinfo[1].upper().replace('OHM','').strip()
+            try:
+                resistor = eval(resistor_str)
+            except:
+                resistor = None
 
-        self.log('Reading user supplied configuration file: %s' % configfile,verbosity=2)
-        h = open(configfile,'r')
-        lines = h.read().split('\n')
-        for line in lines:
-            match = re.match('^(HEATER.*)%s (.*)' % delimiter,line)
-            if match:
-                label = match.groups()[0]
-                userinfo = match.groups()[1].split(';')
-                userlabel = userinfo[0].strip()
-                if len(userinfo)>1:
-                    resistor = float(userinfo[1].strip())
-                else:
-                    resistor = None
+            if sensor==self.info['label_left']:
+                self.info['userlabel_left'] = userlabel
+                self.log('assigning userlabel left: %s' % userlabel,verbosity=4)
+                continue
+            if sensor==self.info['label_right']:
+                self.info['userlabel_right']=userlabel
+                self.log('assigning userlabel right: %s' % userlabel,verbosity=4)
+                continue
+
+        return     
+
+        # #### old code to be deleted
+        # labelfile = 'LABELS.txt' # replacing 'powersupply.conf'
+        # delimiter = '=' # replacing the ':' used in powersupply.conf
+        # configfile = get_fullpath(labelfile)
+        # if configfile is None:
+        #     self.log('Could not find configuration file: %s' % labelfile, verbosity=0)
+        #     return
+
+        # self.log('Reading user supplied configuration file: %s' % configfile,verbosity=2)
+        # h = open(configfile,'r')
+        # lines = h.read().split('\n')
+        # for line in lines:
+        #     match = re.match('^(HEATER.*)%s (.*)' % delimiter,line)
+        #     if match:
+        #         label = match.groups()[0]
+        #         userinfo = match.groups()[1].split(';')
+        #         userlabel = userinfo[0].strip()
+        #         if len(userinfo)>1:
+        #             resistor = float(userinfo[1].strip())
+        #         else:
+        #             resistor = None
                 
-                self.log('found user label %s = %s' % (label,userlabel),verbosity=3)
-                self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']),verbosity=4)
-                if label==self.info['label_left']:
-                    self.info['userlabel_left']=userlabel
-                    self.log('assigning userlabel left: %s' % userlabel,verbosity=4)
-                    continue
-                if label==self.info['label_right']:
-                    self.info['userlabel_right']=userlabel
-                    self.log('assigning userlabel right: %s' % userlabel,verbosity=4)
-                    continue
+        #         self.log('found user label %s = %s' % (label,userlabel),verbosity=3)
+        #         self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']),verbosity=4)
+        #         if label==self.info['label_left']:
+        #             self.info['userlabel_left']=userlabel
+        #             self.log('assigning userlabel left: %s' % userlabel,verbosity=4)
+        #             continue
+        #         if label==self.info['label_right']:
+        #             self.info['userlabel_right']=userlabel
+        #             self.log('assigning userlabel right: %s' % userlabel,verbosity=4)
+        #             continue
             
-        return
+        # return
     
     def init_TTiPowerSupply(self,port=None):
         '''initialize the power supply
@@ -733,10 +756,10 @@ known_supplies[5]=('431969',
                    'HEATER7')
 
 
-def cli():
-    ps=PowerSupplies(verbosity=1)
-    command=ps.parseargs(sys.argv)
-    keep_going=not command['quit']
+def cli(verbosity=1):
+    ps = PowerSupplies(verbosity=verbosity)
+    command = ps.parseargs(sys.argv)
+    keep_going = not command['quit']
     while keep_going:
         ps.runCommands(command)
 
@@ -755,5 +778,10 @@ def cli():
         
     
 if __name__=='__main__':
-    cli()
+    verbosity = 1
+    for arg in sys.argv:
+        if arg.find('verbosity=')>=0:
+            verbosity = eval(arg.split('=')[1])
+            
+    cli(verbosity=verbosity)
     
