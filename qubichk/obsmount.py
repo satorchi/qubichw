@@ -441,7 +441,7 @@ class obsmount:
             h.write(packet)
             ans = self.get_data()
             keepgoing = ans['ok']
-            if not ans['ok'] and ans['error'].find('timeout')>=0:
+            if (not ans['ok']) and (ans['error'].find('timeout')>=0):
                 keepgoing = True
 
         h.close()
