@@ -344,7 +344,7 @@ class obsmount:
             dat = self.sock[port].recv(chunksize)
         except socket.timeout:
             self.subscribed[port] = False
-            retval['error'] = 'socket timeout'
+            retval['error'] = 'get_data: socket timeout'
             return self.return_with_error(retval)
         except KeyboardInterrupt:
             self.subscribed[port] = False
