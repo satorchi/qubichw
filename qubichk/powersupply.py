@@ -170,41 +170,6 @@ class PowerSupply :
 
         return     
 
-        # #### old code to be deleted
-        # labelfile = 'LABELS.txt' # replacing 'powersupply.conf'
-        # delimiter = '=' # replacing the ':' used in powersupply.conf
-        # configfile = get_fullpath(labelfile)
-        # if configfile is None:
-        #     self.log('Could not find configuration file: %s' % labelfile, verbosity=0)
-        #     return
-
-        # self.log('Reading user supplied configuration file: %s' % configfile,verbosity=2)
-        # h = open(configfile,'r')
-        # lines = h.read().split('\n')
-        # for line in lines:
-        #     match = re.match('^(HEATER.*)%s (.*)' % delimiter,line)
-        #     if match:
-        #         label = match.groups()[0]
-        #         userinfo = match.groups()[1].split(';')
-        #         userlabel = userinfo[0].strip()
-        #         if len(userinfo)>1:
-        #             resistor = float(userinfo[1].strip())
-        #         else:
-        #             resistor = None
-                
-        #         self.log('found user label %s = %s' % (label,userlabel),verbosity=3)
-        #         self.log('checking for this powersupply:  %s = %s or %s ?' % (label,self.info['label_left'],self.info['label_right']),verbosity=4)
-        #         if label==self.info['label_left']:
-        #             self.info['userlabel_left']=userlabel
-        #             self.log('assigning userlabel left: %s' % userlabel,verbosity=4)
-        #             continue
-        #         if label==self.info['label_right']:
-        #             self.info['userlabel_right']=userlabel
-        #             self.log('assigning userlabel right: %s' % userlabel,verbosity=4)
-        #             continue
-            
-        # return
-    
     def init_TTiPowerSupply(self,port=None):
         '''initialize the power supply
         it should be recognized as /dev/powersupply or /dev/ttyACMn (n=0,1,2,...)
