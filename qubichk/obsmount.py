@@ -435,13 +435,13 @@ class obsmount:
         self.printmsg('pointing acquisition starting on file: %s' % filename)
         h = open(filename,'ab')
         ans = self.get_data()
-        keepgoing = ans['ok']
+        keepgoing = True
         while keepgoing:
             packet = prefix + ans['CHUNK']
             h.write(packet)
             ans = self.get_data()
             keepgoing = ans['ok']
-            if ans['error'].find('timeout')>=0:
+            if (not ans['ok']) and (ans['error'].find('timeout')>=0):
                 self.printmsg('acquisition timeout')
                 keepgoing = True
 
