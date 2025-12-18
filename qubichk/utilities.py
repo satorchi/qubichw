@@ -307,6 +307,33 @@ def verify_directory(dirname):
     return dirname
     
 
+def read_labels():
+    '''
+    read the sensor labels
+    '''
+    label = {}
+    labelfile = get_fullpath('LABELS.txt')
+    
+    if labelfile is None:
+        print('Could not find labels!  Where is LABELS.txt?')
+        print('It should be found in directory: %s' % (os.sep.join([os.environ['HOME'],'.local','share','qubic'])))
+        return label
+
+        
+    h = open(labelfile,'r')
+    lines = h.read().split('\n')
+    h.close()
+    del(lines[-1])
+    for line in lines:
+        if line=='': continue
+        pair = line.split('=')
+        if len(pair)<2: continue
+        key = pair[0].strip()
+        val = pair[1].strip()
+        label[key] = val
+        if key.find('HEATER')<0: continue
+        for keytype in ['Volt','Amp']:
+            heater_key = '%s_%s' % (key,keytype)            
+            label[heater_key] = val
+    return label
             
-                
-                
