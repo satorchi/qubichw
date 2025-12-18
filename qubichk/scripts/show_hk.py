@@ -20,7 +20,7 @@ from termcolor import colored
 from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
-from qubichk.utilities import get_fullpath
+from qubichk.utilities import get_fullpath, read_labels
 
 year_str = utcnow().strftime('%Y')
 
@@ -44,41 +44,6 @@ exclude_files = ['TEMPERATURE_RAW.txt',
                  'CRYOSTAT.txt']
 touchname = 'AVS47_1_ch0.txt'
 
-def read_labels():
-    '''
-    read the sensor labels
-    '''
-    labels = {}
-    
-    labelfile = get_fullpath('LABELS.txt')
-    if labelfile is not None:
-        h = open(labelfile,'r')
-        lines = h.read().split('\n')
-        del(lines[-1])
-        for line in lines:
-            col = line.split('=')
-            if len(col)<2: continue
-            key = col[0].strip()
-            val = col[1].strip()
-            labels[key] = val
-        h.close()
-
-    heaterfile = get_fullpath('powersupply.conf')
-    if heaterfile is None: return labels
-
-    h = open(heaterfile,'r')
-    lines = h.read().split('\n')
-    del(lines[-1])
-    for line in lines:
-        col = line.split(':')
-        if len(col)<2: continue
-        for ext in ['','_Volt','_Amp']:
-            key = col[0].strip()+ext
-            val = col[1].strip()
-            labels[key] = val
-    h.close()
-    return labels
-    
 def read_lastline(filename):
     '''
     read the last line of a file
@@ -367,6 +332,8 @@ def list_hk():
 
 
     # read latest values saved to HK files
+
+    # read the sensor labels
     labels = read_labels()
 
     # find all the existing HK files
