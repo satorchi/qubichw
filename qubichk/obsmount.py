@@ -330,6 +330,7 @@ class obsmount:
         retval['error'] = 'NONE'
         retval['CHUNK TIMESTAMP'] = utcnow().timestamp()
         retval['DATA'] = None
+        retval['CHUNK'] = bytearray([]) # initialize with empty chunk
 
         # check that we are subscribed
         if not self.subscribed[port]:
@@ -343,7 +344,7 @@ class obsmount:
             dat = self.sock[port].recv(chunksize)
         except socket.timeout:
             self.subscribed[port] = False
-            retval['error'] = 'socket time out'
+            retval['error'] = 'socket timeout'
             return self.return_with_error(retval)
         except KeyboardInterrupt:
             self.subscribed[port] = False
@@ -425,7 +426,7 @@ class obsmount:
     def acquisition(self,dump_dir=hk_dir):
         '''
         dump the data supplied by the mount PLC without any interpretation
-        this is an infinite loop to be interrupted by ctrl-c, or socket error
+        this is an infinite loop to be interrupted by ctrl-c, or socket error, but not timeout error
         
         this replaces dump_data above and has lower overhead
         '''
@@ -440,6 +441,8 @@ class obsmount:
             h.write(packet)
             ans = self.get_data()
             keepgoing = ans['ok']
+            if not ans['ok'] and ans['error'].find('timeout')>=0:
+                keepgoing = True
 
         h.close()
         self.printmsg('pointing acquisition ended: %s' % ans['error'])
