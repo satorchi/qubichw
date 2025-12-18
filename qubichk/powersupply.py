@@ -149,6 +149,7 @@ class PowerSupply :
             this is called by identify_PowerSupply()
         '''
         labelfile = 'LABELS.txt' # replacing 'powersupply.conf'
+        delimiter = '=' # replacing the ':' used in powersupply.conf
         configfile = get_fullpath(labelfile)
         if configfile is None:
             self.log('Could not find configuration file: %s' % labelfile, verbosity=0)
@@ -158,7 +159,7 @@ class PowerSupply :
         h = open(configfile,'r')
         lines = h.read().split('\n')
         for line in lines:
-            match = re.match('^(HEATER.*): (.*)',line)
+            match = re.match('^(HEATER.*)%s (.*)' % delimiter,line)
             if match:
                 label = match.groups()[0]
                 userinfo = match.groups()[1].split(';')
