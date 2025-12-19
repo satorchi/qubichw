@@ -150,14 +150,7 @@ class PowerSupply :
         for sensor in labels.keys():
             if sensor.find('HEATER')<0: continue
             userinfo = labels[sensor].split(';')
-            if len(userinfo)<2: continue
             userlabel = userinfo[0]
-            labels[sensor] = userlabel
-            resistor_str = userinfo[1].upper().replace('OHM','').strip()
-            try:
-                resistor = eval(resistor_str)
-            except:
-                resistor = None
 
             if sensor==self.info['label_left']:
                 self.info['userlabel_left'] = userlabel

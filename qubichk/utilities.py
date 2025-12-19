@@ -332,8 +332,21 @@ def read_labels():
         val = pair[1].strip()
         label[key] = val
         if key.find('HEATER')<0: continue
-        for keytype in ['Volt','Amp']:
+        for keytype in ['Volt','Amp','Ohm']:
             heater_key = '%s_%s' % (key,keytype)            
-            label[heater_key] = val
+            userinfo = val.split(';')
+            label[heater_key] = userinfo[0]
+            if len(userinfo)>1 and keytype=='Ohm':
+                resistor_str = userinfo[1].upper().replace('OHM','').strip()                
+                try:
+                    resistor = eval(resistor_str)
+                except:
+                    resistor = None
+                if resistor is not None:
+                    label[heater_key] = 'expect %.0f Ohm' % resistor
+                else:
+                    label[heater_key] = userinfo[0]
+
+            
     return label
             

@@ -347,9 +347,10 @@ def list_hk():
     for idx in range(7):
         counter = idx + 1
         heatervals = {}
+        heatername = 'HEATER%i' % counter
 
         for filetype in heaterfiletypes:
-            basename = 'HEATER%i_%s.txt' % (counter,filetype)
+            basename = '%s_%s.txt' % (heatername,filetype)
             F = '%s%s%s' % (hk_dir,os.sep,basename)
             if not os.path.isfile(F): continue
 
@@ -388,7 +389,12 @@ def list_hk():
             tstamps.append(tstamp)
             lines.append(line)
             if R_str is not None:
-                line = '%s %s %s %s' % (date_str, R_str.rjust(20), label.center(20), labelkey)
+                R_key = '%s_Ohm' % heatername
+                if R_key in labels.keys():
+                    R_label = labels[R_key]
+                else:
+                    R_label = label
+                line = '%s %s %s %s' % (date_str, R_str.rjust(20), R_label.center(20), labelkey)
                 tstamps.append(tstamp)
                 lines.append(line)
 
