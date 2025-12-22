@@ -22,12 +22,9 @@ import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import make_errmsg, known_hosts
+from qubichk.utilities import make_errmsg, known_hosts, hk_dir
+from qubicpack.pointing import position_key, STX, delimiter, interpret_pointing_chunk, axis_fullname
 
-hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
-rec_fmt = '<Bdd'
-rec_names = 'STX,TIMESTAMP,VALUE'    
-    
 class obsmount:
     '''
     class to read to and command the observation mount
@@ -44,35 +41,9 @@ class obsmount:
                        'RO': 0.0,
                        'TR': 0.0
                        }
-    axis_fullname = {'AZ': 'azimuth', 'EL': 'elevation', 'RO': 'boresight rotation', 'TR': 'Little Train'}
     axis_keys = list(position_offset.keys())
     n_axis_keys = len(axis_keys)
     datefmt = '%Y-%m-%d-%H:%M:%S UT'
-    delimiter = ':'
-    header_keys = ['TIMESTAMP',
-                   'IS_ETHERCAT',
-                   'IS_SYNC',
-                   'IS_MAINT',
-                   'AXES_ASYNC_COUNT']
-    n_header_keys = len(header_keys)
-
-    data_keys = ['AXIS',
-                 'ACT_VEL_RES',
-                 'ACT_VEL_ENC',
-                 'ACT_POS_RES',
-                 'ACT_POS_ENC',
-                 'ACT_TORQUE',
-                 'IS_ENABLED',
-                 'IS_HOMING',
-                 'IS_HOMINGSKIP',
-                 'IS_OPERATIVE',
-                 'IS_MOVING',
-                 'IS_OUTOFRANGE',
-                 'FAULT']
-    position_key = 'ACT_POS_ENC'
-    
-    n_data_keys = len(data_keys)
-
 
     available_commands = ['ENA',    # enable
                           'DIS',    # disable
@@ -268,55 +239,6 @@ class obsmount:
             self.subscribed[port] = False
         return None
 
-    def interpret_chunk(self,dat):
-        '''
-        interpret the data in the chunk
-        '''
-
-        dat_str = dat.decode()
-        if len(dat_str)==0:
-            retval['error'] = 'no bytes received'
-            self.subscribed[port] = False
-            return self.return_with_error(retval)
-        
-        dat_list = dat_str.split('\n')
-        if len(dat_list)<5:
-            retval['error'] = 'partial data: %s' % dat_str
-            return self.return_with_error(retval)
-
-        axis = None
-        packet = {}
-        for line in dat_list:            
-            col = line.split(self.delimiter)
-            ncols = len(col)
-            if ncols==self.n_header_keys:
-                for idx,val_str in enumerate(col):
-                    key = self.header_keys[idx]
-                    try:
-                        packet[key] = eval(val_str)
-                    except:
-                        packet[key] = val_str
-                continue
-
-            if ncols>=self.n_data_keys:
-                axis = col[0]
-                axis_data = {}
-                for subidx,val_str in enumerate(col[1:]):
-                    idx = subidx + 1
-                    if idx<len(self.data_keys):
-                        key = self.data_keys[idx]
-                    else:
-                        key = 'UNKNOWN%02i' % idx
-                    try:
-                        val = eval(val_str)
-                    except:
-                        val = val_str
-                    axis_data[key] = val
-                packet[axis] = axis_data
-
-        packet['TIMESTAMP'] *= 0.001
-        return packet
-    
     def get_data(self,chunksize=None):
         '''
         once we're subscribed, we can listen for the data
@@ -377,7 +299,7 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        cmd_list = cmd_str.split(self.delimiter)
+        cmd_list = cmd_str.split(delimiter)
         if len(cmd_list)<2:
             retval['error'] = 'not enough arguments for command: %s' % cmd_str
             return self.return_with_error(retval)
@@ -403,26 +325,6 @@ class obsmount:
 
         return retval
 
-    def dump_data(self,packet,dump_dir=hk_dir):
-        '''
-        write all data to binary data file
-        dump to a specific location, if given
-        NOTE: in order to reduce overhead on dumping
-        NOTE: error checking for directory existence is NOT done here.  Give a valid directory!
-        '''
-        rec = np.recarray(names=rec_names,formats="uint8,float64,float64",shape=(1))
-        rec.STX = 0xAA
-        rec.TIMESTAMP = packet['TIMESTAMP']
-        for axis in self.axis_keys:
-            offset = self.position_offset[axis]            
-            rec.VALUE = packet[axis][self.position_key] + offset
-            filename = '%s.dat' % (os.sep.join([dump_dir,axis]))
-            h = open(filename,'ab')
-            h.write(rec)
-            h.close()
-            
-        return True
-
     def acquisition(self,dump_dir=hk_dir):
         '''
         dump the data supplied by the mount PLC without any interpretation
@@ -430,14 +332,13 @@ class obsmount:
         
         this replaces dump_data above and has lower overhead
         '''
-        prefix = bytearray([0xaa,0xaa])
         filename = os.sep.join([dump_dir,'POINTING.dat'])
         self.printmsg('pointing acquisition starting on file: %s' % filename)
         h = open(filename,'ab')
         ans = self.get_data()
         keepgoing = True
         while keepgoing:
-            packet = prefix + ans['CHUNK']
+            packet = STX + ans['CHUNK']
             h.write(packet)
             ans = self.get_data()
             keepgoing = ans['ok']
@@ -461,7 +362,7 @@ class obsmount:
         if not ans['ok']:
             return self.return_with_error(ans)
 
-        packet = self.interpret_chunk(ans['CHUNK'])
+        packet = interpret_pointing_chunk(ans['CHUNK'])
         ans['DATA'] = packet
         
         errmsg = []
@@ -471,23 +372,14 @@ class obsmount:
 
         for axis in self.axis_keys:
             if axis not in packet.keys() or len(packet[axis])==0:
-                errmsg.append('no data for %s' % self.axis_fullname[axis])
+                errmsg.append('no data for %s' % axis_fullname[axis])
                 errlevel += 1
             else:
-                retval[axis] = packet[axis][self.position_key] + self.position_offset[axis]
-
-        if dump_dir is not None:
-            try:
-                dump_ok = self.dump_data(packet,dump_dir=dump_dir)
-            except:
-                errmsg.append(make_errmsg('Could not dump data to file'))
-                errlevel += 1
-            
+                retval[axis] = packet[axis][position_key] + self.position_offset[axis]            
             
         retval['error'] = '\n'.join(errmsg)
         if errlevel >= 2:
             return self.return_with_error(retval)        
-            
             
         return retval
 
@@ -535,9 +427,9 @@ class obsmount:
         note that val is converted to string
         '''
         if val is None:
-            cmd_str = self.delimiter.join([axis.upper(),cmd.upper()])
+            cmd_str = delimiter.join([axis.upper(),cmd.upper()])
         else:
-            cmd_str = self.delimiter.join([axis.upper(),cmd.upper(),str(val)])
+            cmd_str = delimiter.join([axis.upper(),cmd.upper(),str(val)])
         return cmd_str
     
     def goto_az(self,az):
