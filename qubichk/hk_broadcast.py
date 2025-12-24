@@ -44,9 +44,10 @@ class hk_broadcast :
         self.nENTROPY_TEMPERATURE = 8
         self.nMECH = 2
         self.nHEATER = 8 # QubicStudio is expecting 8 heaters (there are only 6)
-        self.nPRESSURE = 5 # QubicStudio is expecting 8 pressure gauges (there is only 1)
+        self.nPRESSURE = 3 # QubicStudio is expecting 8 pressure gauges (there is only 1)
         # two of the spots reserved for pressure are used for azimuth and elevation
         # one of the spots reserved for pressure is used for the cryostat outside temperature
+        # two more spots reserved for pressure are used for obsmount rotation and little train position
         self.record = self.define_hk_record()
         self.hk_entropy = None
         self.powersupply = None
