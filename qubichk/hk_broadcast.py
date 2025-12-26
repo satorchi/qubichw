@@ -145,7 +145,7 @@ class hk_broadcast :
         record_zero.append(dummy_val)
         dummy_val -= 1
 
-        # azimuth and elevation
+        # pointing: azimuth, elevation, rotation, little train
         for name in obsmount.axis_keys:
             names.append(name)
             fmts.append('f8')
