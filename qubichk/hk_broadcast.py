@@ -138,6 +138,14 @@ class hk_broadcast :
             record_zero.append(dummy_val)
             dummy_val -= 1
 
+        # pointing: rotation and little train
+        # we have to split this with az and el in order to maintain compatibility with previously saved data
+        for name in ['RO','TR']:
+            names.append(name)
+            fmts.append('f8')
+            record_zero.append(dummy_val)
+            dummy_val -= 1
+        
         # cryostat outside temperature
         name = 'CRYOSTAT'
         names.append(name)
@@ -146,7 +154,9 @@ class hk_broadcast :
         dummy_val -= 1
 
         # pointing: azimuth, elevation, rotation, little train
-        for name in obsmount.axis_keys:
+        # AZ ends up in 'Pressure_6' in QubicStudio
+        # EL ends up in 'Pressure_7' in QubicStudio
+        for name in ['AZ','EL']:
             names.append(name)
             fmts.append('f8')
             record_zero.append(dummy_val)
