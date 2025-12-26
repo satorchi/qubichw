@@ -140,6 +140,8 @@ class hk_broadcast :
 
         # pointing: rotation and little train
         # we have to split this with az and el in order to maintain compatibility with previously saved data
+        # RO ends up in 'Pressure_3' in QubicStudio
+        # TR ends up in 'Pressure_4' in QubicStudio
         for name in ['RO','TR']:
             names.append(name)
             fmts.append('f8')
