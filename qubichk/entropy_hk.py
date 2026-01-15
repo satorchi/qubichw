@@ -14,7 +14,7 @@ Mechanical heat switches
 '''
 import time,socket,re
 
-from satorchipy.datefunctions import *
+from satorchipy.datefunctions import utcnow
 
 class entropy_hk :
     def __init__(self,hostname=None):
@@ -151,8 +151,10 @@ class entropy_hk :
         self.startTime = str2dt(a) 
 
         # assume the Windows computer is on the same time as qubic-central (this computer)
-        tzone = int(( utcnow() - dt.datetime.now() ).total_seconds())
-        self.startTime += dt.timedelta(seconds = tzone) # convert to UT
+
+        # this correction is no longer necessary because we are using time zone aware in datetime
+        #tzone = int(( utcnow() - dt.datetime.now() ).total_seconds())
+        #self.startTime += dt.timedelta(seconds = tzone) # convert to UT
         self.log('Logging start time: %s' % self.startTime.strftime('%Y-%m-%d %H:%M:%S.%f UT'))
         return self.startTime
     
