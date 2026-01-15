@@ -14,7 +14,7 @@ Mechanical heat switches
 '''
 import time,socket,re
 
-from satorchipy.datefunctions import utcnow
+from satorchipy.datefunctions import str2dt, utcnow
 
 class entropy_hk :
     def __init__(self,hostname=None):
