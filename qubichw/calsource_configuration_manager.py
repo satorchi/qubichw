@@ -115,7 +115,8 @@ class calsource_configuration_manager():
         # the redpitaya requires ??
         self.wait_after_switch_on = {}
         self.wait_after_switch_on['modulator'] = 5
-        self.wait_after_switch_on['calsource'] = 1
+        self.wait_after_switch_on['calsource_150'] = 1
+        self.wait_after_switch_on['calsource_220'] = 1
         self.wait_after_switch_on['amplifier'] = 1
 
         self.estimated_wait = deepcopy(self.wait_after_switch_on)
@@ -194,13 +195,13 @@ class calsource_configuration_manager():
 
             if cmd=='on' or cmd=='off':
                 command['all']['onoff'] = cmd
-                for dev in ['calsource','amplifier','modulator']:
+                for dev in ['calsource_150','calsource_220','amplifier','modulator']:
                     command[dev]['onoff'] = cmd
                 continue
             
             if cmd=='default':
                 command['all']['default'] = True
-                for dev in ['calsource','amplifier','modulator']:
+                for dev in ['calsource_150','calsource_220','amplifier','modulator']:
                     command[dev]['default'] = True
                 continue
                                 
@@ -542,8 +543,10 @@ class calsource_configuration_manager():
                 ack = retval['ACK']
             if 'device_on' in retval.keys():
                 self.device_on = retval['device_on']
+            if 'calsource_150 state' in retval.keys():
+                self.device['calsource_150'].state = retval['calsource_150 state']
             if 'calsource state' in retval.keys():
-                self.device['calsource'].state = retval['calsource state']
+                self.device['calsource_220'].state = retval['calsource_220 state']
             if 'amplifier state' in retval.keys():
                 # reassign amplifier state in the amplifier object
                 # this is a weirdness I don't quite understand because of using multiprocess
