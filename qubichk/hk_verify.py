@@ -96,7 +96,7 @@ def check_power(verbosity=1):
     msg_list = []
     if verbosity>0: print('\n============ checking for power connections ============')
 
-    powerbar_names = ['electronics rack','cryostat','mount']
+    powerbar_names = ['electronics rack','cryostat']
     for pb_id in powerbar_names:
         powerbar = energenie(pb_id)
         
