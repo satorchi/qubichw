@@ -29,7 +29,7 @@ known_hosts['horn']          = "192.168.2.9"
 known_hosts['mgc3']          = "192.168.2.214"
 known_hosts['mmr3']          = "192.168.2.213"
 known_hosts['motorplc']      = "192.168.2.113"
-known_hosts['weather']       = "192.168.88.28"
+known_hosts['weather']       = "192.168.88.7"
 known_hosts['inside-weather'] = "192.168.88.113"
 date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 
