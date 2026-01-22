@@ -21,6 +21,7 @@ if os.uname().machine.find('arm')>=0:
 from glob import glob
 import datetime as dt
 from qubichk.utilities import shellcommand
+from satorchipy.datefunctions import utcnow
 
 device_address = {}
 device_address['heater']        = 15
@@ -75,7 +76,7 @@ class relay:
         
         filename = 'relay.log'
         h = open(filename,'a')
-        full_msg = '%s|RELAY| %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg)
+        full_msg = '%s|RELAY| %s' % (utcnow().strftime(self.date_fmt),msg)
         h.write(full_msg+'\n')
         h.close()
         print(full_msg)

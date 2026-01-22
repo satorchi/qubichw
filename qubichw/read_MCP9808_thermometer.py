@@ -24,6 +24,7 @@ if os.uname().machine.find('arm')>=0:
 import datetime as dt
 import numpy as np
 from qubichk.utilities import get_myip, get_receiver_list
+from satorchipy.datefunctions import utcnow
 
 # 4 sensors in the calsource box
 sensors = [0,1,2,4] # these numbers correspond to which GPIO the sensor is connected
@@ -141,7 +142,7 @@ class MCP9808:
         print a statement if we are sufficiently verbose
         '''
         if verbosity>self.verbosity_threshold: return
-        print('%s|MCP9808|%s' % (dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),msg))
+        print('%s|MCP9808|%s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),msg))
         return
                  
     def read_temperatures(self):
@@ -240,7 +241,7 @@ class MCP9808:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-        date_now = dt.datetime.utcnow()
+        date_now = utcnow()
         date_str = date_now.strftime('%Y-%m-%d %H:%M:%S.%f')
         trycount = 0
 
@@ -270,10 +271,10 @@ class MCP9808:
                        ]
         self.log('\n   '.join(logmsg_list),verbosity=0)
 
-        previous_sample_tstamp = dt.datetime.utcnow().timestamp()
-        next_sample_tstamp = dt.datetime.utcnow().timestamp()
+        previous_sample_tstamp = utcnow().timestamp()
+        next_sample_tstamp = utcnow().timestamp()
         while True:
-            now_tstamp = dt.datetime.utcnow().timestamp()
+            now_tstamp = utcnow().timestamp()
             if now_tstamp<next_sample_tstamp: continue
             
             try:
@@ -292,7 +293,7 @@ class MCP9808:
                 continue
             else:
                 trycount = 0
-                next_sample_tstamp = dt.datetime.utcnow().timestamp() + 1/self.acquisition_rate
+                next_sample_tstamp = utcnow().timestamp() + 1/self.acquisition_rate
 
             # add temperatures to the buffer
             broadcast_temperature_buffer[broadcast_buffer_idx,:] = temperatures
@@ -307,7 +308,7 @@ class MCP9808:
             temperatures = broadcast_temperature_buffer.mean(axis=0)
                 
                 
-            rec[0].timestamp = dt.datetime.utcnow().timestamp()
+            rec[0].timestamp = utcnow().timestamp()
             for idx,sensor in enumerate(sensors):
                 fmt_idx = idx + 2
                 data_type = rec_formats_list[fmt_idx]
@@ -367,12 +368,12 @@ class MCP9808:
             try:
                 dat = client.recv(packetsize)
             except socket.timeout:
-                now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                now_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
                 self.log('%8i: %s timeout error on socket' % (counter,now_str),verbosity=0)
                 continue
             except KeyboardInterrupt:
                 h.close()
-                now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                now_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
                 self.log('%8i: %s exit using ctrl-c' % (counter,now_str),verbosity=0)
                 return
             else: # continue as normal if no exception

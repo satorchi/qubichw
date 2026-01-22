@@ -16,6 +16,7 @@ import datetime as dt
 # the numato relay for switching on/off
 from qubichw.relay import relay as numato_relay
 from qubichk.utilities import get_myip
+from satorchipy.datefunctions import utcnow
 
 class heater():
     '''
@@ -63,8 +64,8 @@ class heater():
         '''
         if verbosity>self.verbosity_threshold: return
         date_fmt = '%Y-%m-%d %H:%M:%S.%f'
-        now = dt.datetime.utcnow()
-        full_msg = '%s|HEATER| %s' % (dt.datetime.utcnow().strftime(date_fmt),msg)
+        now = utcnow()
+        full_msg = '%s|HEATER| %s' % (utcnow().strftime(date_fmt),msg)
         print(full_msg)
         return
 
@@ -115,7 +116,7 @@ class heater():
             self.log('Error! socket is not initialized')
             return None
         
-        now = dt.datetime.utcnow()
+        now = utcnow()
 
         try:
             msgbytes, addr_tple = s.recvfrom(self.nbytes)
@@ -126,7 +127,7 @@ class heater():
             self.log('nothing on socket',verbosity=3)
             return None
     
-        received_date = dt.datetime.utcnow()
+        received_date = utcnow()
         received_tstamp = received_date.timestamp()
         logmsg = '%s received command from %s: %s' % (received_date.strftime('%Y-%m-%d %H:%M:%S'),
                                                       addr_tple[0],
@@ -217,7 +218,7 @@ class heater():
         keepgoing = True
         current_mode = 'off'
         new_mode = None
-        last_statechange = dt.datetime.utcnow()
+        last_statechange = utcnow()
         duty = 0.0
         on_duration = 0.0
         off_duration = 1.0e6
@@ -276,7 +277,7 @@ class heater():
                 if not heater_state: self.heateron()
                 continue
 
-            now = dt.datetime.utcnow()
+            now = utcnow()
             delta = now - last_statechange
             delta_seconds = delta.total_seconds()
             if heater_state:

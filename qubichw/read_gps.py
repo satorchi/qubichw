@@ -22,6 +22,7 @@ import numpy as np
 from qubichk.utilities import get_myip, get_receiver_list
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
+from satorchipy.datefunctions import utcnow
 
 receivers = get_receiver_list('calbox.conf')
 
@@ -59,7 +60,7 @@ def read_gps_chunk(chunk,sock,verbosity=0):
             if verbosity>0: print('INCOMPLETE LINE %i columns: %s' % (len(data_list),data_line))
             continue
 
-        now = dt.datetime.utcnow()
+        now = utcnow()
         date_str = '%s%s000' % (now.strftime('%Y%m%d'),data_list[0].strip())
         try:
             date = dt.datetime.strptime(date_str,'%Y%m%d%H%M%S.%f')
@@ -120,7 +121,7 @@ def broadcast_gps(verbosity=0):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    date_now = dt.datetime.utcnow()
+    date_now = utcnow()
     old_date = date_now
     trycount = 0
 
@@ -171,7 +172,7 @@ def plot_orientation(dat,ax,curve=None,dateobj=None,scale=None):
     if dateobj is not None: dateobj.remove()
     date = dt.datetime.utcfromtimestamp(dat[1])
     date_str = date.strftime('%Y-%m-%d %H:%M:%S.%f')
-    now = dt.datetime.utcnow()
+    now = utcnow()
     now_str = now.strftime('%Y-%m-%d %H:%M:%S.%f')
     delta = (now-date).total_seconds()
     date_text = 'data: %s\nnow:  %s\ndiff: %.3f seconds' % (date_str,now_str,delta)
@@ -246,12 +247,12 @@ def acquire_gps(listener=None,verbosity=0,monitor=False):
             if monitor: curve,dateobj = plot_orientation(dat_list, ax, curve, dateobj)
             time.sleep(packet_period)
         except socket.timeout:
-            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            now_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
             print('%8i: %s timeout error on socket' % (counter,now_str))
             continue
         except KeyboardInterrupt:
             h.close()
-            now_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            now_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
             print('%8i: %s exit using ctrl-c' % (counter,now_str))
             return
         # except:

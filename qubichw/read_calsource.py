@@ -20,6 +20,7 @@ import socket,time
 import datetime as dt
 import numpy as np
 import struct
+from satorchipy.datefunctions import utcnow
 
 from qubichk.utilities import get_receiver_list
 
@@ -47,7 +48,7 @@ PORT = 31337
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-date_now = dt.datetime.utcnow()
+date_now = utcnow()
 old_date = date_now
 old_print_date = date_now
 count = 0
@@ -64,7 +65,7 @@ while True:
         time.sleep(0.1)
         continue
     
-    date_now = dt.datetime.utcnow()
+    date_now = utcnow()
     if(date_now-old_date>deltat):
         rec[0].TIMESTAMP = np.float64(date_now.strftime("%s.%f"))
         rec[0].VALUE = np.int64(value)

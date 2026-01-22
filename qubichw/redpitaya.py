@@ -13,6 +13,7 @@ control the RedPitaya oscilloscope/signal-generator
 import time,socket,os,sys
 import numpy as np
 import datetime as dt
+from satorchipy.datefunctions import utcnow
 
 default_setting = {}
 default_setting['frequency'] = 0.7
@@ -58,7 +59,7 @@ class redpitaya:
         if verbosity is not None: self.verbosity = verbosity
         self.log('creating new object',verbosity=2)
 
-        t = dt.datetime.utcnow()
+        t = utcnow()
         self.utcoffset = t.timestamp() - dt.datetime.utcfromtimestamp(t.timestamp()).timestamp()
         
         self.connection_status = False
@@ -73,7 +74,7 @@ class redpitaya:
         if verbosity > self.verbosity: return
         
         filename = 'redpitaya_command.log'
-        fullmsg = '%s: RedPitaya - %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg)
+        fullmsg = '%s: RedPitaya - %s' % (utcnow().strftime(self.date_fmt),msg)
         h = open(filename,'a')
         h.write('%s\n' % fullmsg)
         h.close()
@@ -566,7 +567,7 @@ class redpitaya:
         '''
         acquire data for delta seconds
         '''
-        start_tstamp = dt.datetime.utcnow().timestamp()
+        start_tstamp = utcnow().timestamp()
         sample_period = self.get_sample_period()
         
         cmd = 'ACQ:SOUR%1i:DATA?' % ch
