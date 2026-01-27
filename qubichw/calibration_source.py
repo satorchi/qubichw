@@ -36,6 +36,7 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{seria
 import os,serial
 import numpy as np
 import datetime as dt
+from satorchipy.datefunctions import utcnow
 
 import readline
 readline.parse_and_bind('tab: complete')
@@ -66,7 +67,7 @@ class calibration_source:
         '''
         print messages
         '''
-        fullmsg = '%s: CALSOURCE - %s' % (dt.datetime.utcnow().strftime(date_fmt),msg)
+        fullmsg = '%s: CALSOURCE - %s' % (utcnow().strftime(date_fmt),msg)
         print(fullmsg)
         return fullmsg
 
@@ -284,15 +285,15 @@ class calibration_source:
         '''
         return a status message compatible with the calsource_configuration_manager
         '''
-        state = self.get_Frequency()
-        if state is None:
+        #state = self.get_Frequency()
+        if self.state is None:
             msg = 'calsource_%s:frequency=UNKNOWN' % self.calsource
-            msg += ' synthesiser:frequency=UNKNOWN'
+            msg += ' synthesiser_%s:frequency=UNKNOWN' % self.calsource
             return msg
     
             
-        msg = 'calsource_%s:frequency=%+06fGHz' % (self.calsource,state['frequency'])
-        msg += ' synthesiser:frequency=%+06fGHz' % state['synthesiser_frequency']
+        msg = 'calsource_%s:frequency=%+06fGHz' % (self.calsource,self.state['frequency'])
+        msg += ' synthesiser_%s:frequency=%+06fGHz' % (self.calsource,self.state['synthesiser_frequency'])
         return msg
     
         
