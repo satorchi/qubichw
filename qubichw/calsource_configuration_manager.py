@@ -463,7 +463,7 @@ class calsource_configuration_manager():
         if len(command[dev])>0:
             
             if 'default' in command[dev].keys() and command[dev]['default']:
-                self.device[dev].set_default_settings(channel=self.modulator_channel[dev])
+                self.device[dev].set_default_settings()
             else:
                 for modcmd in valid_commands[dev]:
                     if modcmd not in command[dev].keys():
@@ -473,12 +473,10 @@ class calsource_configuration_manager():
                                            shape=command[dev]['shape'],
                                            offset=command[dev]['offset'],
                                            duty=command[dev]['duty'],
-                                           output=command[dev]['output'],
                                            input_gain=command[dev]['input_gain'],
                                            acquisition_units=command[dev]['acquisition_units'],
                                            decimation=command[dev]['decimation'],
-                                           coupling=command[dev]['coupling'],
-                                           channel=self.modulator_channel[dev])
+                                           coupling=command[dev]['coupling'])
 
 
             # wait a bit before trying to read the results
