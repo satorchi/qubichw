@@ -97,7 +97,7 @@ class redpitaya:
         '''
         connect to the RedPitaya
         '''
-        if ip is None: ip = '192.168.3.21'
+        if ip is None: ip = '192.168.2.21'
         self.ip = ip
         port    = 5000
         timeout = 0.1
