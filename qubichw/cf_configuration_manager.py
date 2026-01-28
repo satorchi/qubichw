@@ -21,8 +21,6 @@ from copy import deepcopy
 #from PyMS import PMSDevice
 from qubichw.energenie import energenie
 from qubichk.utilities import shellcommand
-# the calibration source
-from qubichw.calibration_source import calibration_source
 
 # the low noise amplifier
 from qubichw.amplifier import amplifier
@@ -78,7 +76,6 @@ class cf_configuration_manager():
             valid_commands = ', '.join(self.valid_commands[dev])
             txt += 'valid commands for %s: %s\n' % (dev,valid_commands)
         txt += '\nFor the modulator, frequency is given in Hz\n'
-        txt += 'For the calibration source, frequency is given in GHz\n'
         txt += '\nExample:\n'
         txt += 'cf:on cf:frequency=0.333 cf:duty=33 cf:shape=squ\n'
         print(txt)
@@ -191,14 +188,13 @@ class cf_configuration_manager():
         self.role = role
                 
         if role=='manager':
-            self.log('I am the calsource configuration manager')
+            self.log('I am the carbon fibre configuration manager')
             #self.energenie = PMSDevice('energenie', '1')
             self.device['modulator'] = modulator()
-            self.device['calsource'] = calibration_source('LF')
             self.device['amplifier'] = amplifier()
             self.device['cf'] = self.device['modulator']
 
-        self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
+        self.log('Carbon Fibre Configuration: I am %s as the %s' % (self.hostname,self.role))
         return None
 
     def parse_command_string(self,cmdstr):
@@ -331,7 +327,7 @@ class cf_configuration_manager():
         try:
             ack, addr = s.recvfrom(self.nbytes)
         except:
-            self.log('no response from Calibration Source Manager')
+            self.log('no response from Carbon Fibre Manager')
             return None
         received_date = dt.datetime.utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
@@ -635,7 +631,7 @@ class cf_configuration_manager():
                 
     def send_command(self,cmd_str):
         '''
-        send commands to the calibration source manager
+        send commands to the carbon fibre manager
         '''
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
