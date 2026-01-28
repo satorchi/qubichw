@@ -557,7 +557,7 @@ class redpitaya:
         for ch in [1,2]:
             for key in self.current_setting[ch].keys():
                 key_str = key.replace(' ','_')
-                msg_list.append('modulator%i:%s=%s' % (ch,key_str,self.current_setting[ch][key]))
+                msg_list.append('modulator_ch%i:%s=%s' % (ch,key_str,self.current_setting[ch][key]))
                 
         msg = ' '.join(msg_list)
         return msg
