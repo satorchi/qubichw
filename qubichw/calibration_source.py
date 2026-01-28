@@ -43,10 +43,10 @@ readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
 
 default_setting = {}
-default_setting['LF'] = {}
-default_setting['LF']['frequency']  = 150.0
-default_setting['HF'] = {}
-default_setting['HF']['frequency']  = 220.0
+default_setting['150'] = {}
+default_setting['150']['frequency']  = 150.0
+default_setting['220'] = {}
+default_setting['220']['frequency']  = 220.0
 
 date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
@@ -84,15 +84,15 @@ class calibration_source:
             print('Please enter the calibration source: HF or LF')
             return None
 
-        if source.upper()=='HF':
+        if source.upper()=='220':
             dev='/dev/calsource-HF'
             which_freq='High'
-            self.calsource = 'HF'
+            self.calsource = '220'
             self.factor = 24.
         else:
             dev='/dev/calsource-LF'
             which_freq='Low'
-            self.calsource = 'LF'
+            self.calsource = '150'
             self.factor = 12.
 
         
@@ -261,10 +261,10 @@ class calibration_source:
         '''
         set default settings
         '''
-        if self.calsource == 'LF':
+        if self.calsource == '150':
             freq = 150.0
 
-        if self.calsource == 'HF':
+        if self.calsource == '220':
             freq = 220.0
 
         of = self.set_Frequency(freq)
