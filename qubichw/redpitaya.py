@@ -481,7 +481,7 @@ class redpitaya:
         if decimation is not None:
             self.set_decimation(decimation)
 
-        if input_coupling is not None:
+        if coupling is not None:
             self.set_input_coupling(coupling,channel)
             
         self.set_output_on(ch)
