@@ -32,6 +32,22 @@ default_setting['chunksize'] = 4096
 # wait time after sending a command and before requesting a response
 default_setting['response_delay'] = 0.1
 
+setting_fmt = {}
+setting_fmt['frequency'] = '%.3f'
+setting_fmt['shape'] = '%s'
+setting_fmt['amplitude'] = '%.3f'
+setting_fmt['offset'] = '%.3f'
+setting_fmt['duty'] = '%.2f'
+setting_fmt['input_gain'] = '%s'
+setting_fmt['acquisition_units'] = '%s'
+setting_fmt['decimation'] = '%i'
+setting_fmt['coupling'] = '%s'
+setting_fmt['channel'] = '%1i'
+setting_fmt['output'] = '%s'
+setting_fmt['chunksize'] = '%i' 
+setting_fmt['response_delay'] = '%.2f'
+
+
 class redpitaya:
     '''
     class to control the RedPitaya oscilloscope/signal-generator
@@ -547,7 +563,8 @@ class redpitaya:
         for ch in [1,2]:
             print('-----------------')
             for key in self.current_setting[ch].keys():
-                line = 'ch%i: %s = %s' % (ch,key,self.current_setting[ch][key])
+                fmt = 'ch%%i: %%s = %s' % setting_fmt[key]
+                line = fmt % (ch,key,self.current_setting[ch][key])
                 print(line)
         return
 
@@ -562,7 +579,8 @@ class redpitaya:
         for key in self.current_setting.keys():
             if key==1 or key==2: continue
             key_str = key.replace(' ','_')
-            msg = 'modulator:%s=%s' % (key_str,self.current_setting[key])
+            fmt = 'modulator:%%s=%s' % setting_fmt[key]
+            msg = fmt % (key_str,self.current_setting[key])
             msg_list.append(msg)
 
         # the parameters for each channel
