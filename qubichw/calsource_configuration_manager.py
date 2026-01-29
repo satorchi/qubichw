@@ -93,7 +93,7 @@ class calsource_configuration_manager():
         txt += '\nFor the modulator, frequency is given in Hz\n'
         txt += 'For the calibration source, frequency is given in GHz\n'
         txt += '\nExample:\n'
-        txt += 'calsource:on amplifier:on modulator:on modulator:frequency=0.333 modulator:duty=33 modulator:shape=squ calsource:frequency=150\n'
+        txt += 'calsource_150:on amplifier:on modulator:on modulator_150:frequency=0.333 modulator_150:duty=33 modulator_150:shape=squ calsource_150:frequency=150\n'
         print(txt)
         return
     
@@ -206,12 +206,20 @@ class calsource_configuration_manager():
                 continue
                                 
             cmd_lst = cmd.split(':')
-            try:
-                devcmd = cmd_lst[1]
-                dev = cmd_lst[0]
-            except:
+            if len(cmd_lst)<2:
                 # if we forget to specify the device, use the most recent one
                 devcmd = cmd_lst[0]
+            else:
+                devcmd = cmd_lst[1]
+                dev = cmd_lst[0]
+
+            # check for modulator output channel
+            if dev=='modulator_150' or dev=='modulator_ch1':
+                dev = 'modulator'
+                command[dev]['channel'] = 1
+            if dev=='modulator_220' or dev=='modulator_ch2':
+                dev = 'modulator'
+                command[dev]['channel'] = 2                
 
             if dev not in self.device_list:
                 continue
@@ -377,6 +385,14 @@ class calsource_configuration_manager():
                 msg += ' '+self.device[dev].status()
             
         return msg
+
+    def configure_modulator(self,command):
+        '''
+        interpret the commands related to the modulator
+        '''
+        if 'modulator' in command.keys():
+            ok
+        return True
     
     def interpret_commands(self,command,retval):
         '''
@@ -476,7 +492,8 @@ class calsource_configuration_manager():
                                            input_gain=command[dev]['input_gain'],
                                            acquisition_units=command[dev]['acquisition_units'],
                                            decimation=command[dev]['decimation'],
-                                           coupling=command[dev]['coupling'])
+                                           coupling=command[dev]['coupling'],
+                                           output=command[dev]['output'])
 
 
             # wait a bit before trying to read the results

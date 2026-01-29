@@ -25,6 +25,8 @@ default_setting['input_gain'] = 'HV'
 default_setting['acquisition_units'] = 'RAW'
 default_setting['decimation'] = 65536
 default_setting['coupling'] = 'DC'
+default_setting['channel'] = 1
+default_setting['output'] = 'OFF'
 # number of bytes to receive by default (but not for acquisition)
 default_setting['chunksize'] = 4096 
 # wait time after sending a command and before requesting a response
@@ -59,9 +61,6 @@ class redpitaya:
         if verbosity is not None: self.verbosity = verbosity
         self.log('creating new object',verbosity=2)
 
-        t = utcnow()
-        self.utcoffset = t.timestamp() - dt.datetime.utcfromtimestamp(t.timestamp()).timestamp()
-        
         self.connection_status = False
         self.init(ip)
 
@@ -449,7 +448,8 @@ class redpitaya:
                   input_gain=None,
                   acquisition_units=None,
                   decimation=None,
-                  coupling=None):
+                  coupling=None,
+                  output=None):
         '''
         configure the settings for a given output channel
         '''
@@ -483,8 +483,14 @@ class redpitaya:
 
         if coupling is not None:
             self.set_input_coupling(coupling,channel)
-            
-        self.set_output_on(ch)
+
+        if output is not None:
+            if str(output).upper()=='ON' or output==1:
+                self.set_output_on(channel)
+            elif str(output).upper()=='OFF' or output==0:
+                self.set_output_off(channel)
+            else:
+                self.log('ERROR! Invalid command: %s' % str(output))
 
         if not self.connection_status:
             self.log('ERROR! configure: Problem setting parameters')
