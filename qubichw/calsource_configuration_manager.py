@@ -402,7 +402,10 @@ class calsource_configuration_manager():
                 ch = 1
             if command[dev]['channel']=='220' or command[dev]['channel']=='2':
                 ch = 2
-            
+        else:
+            self.log('modulator channel not specified',verbosity=2)
+
+        self.log('configuring Redpitaya for output channel: %s' % ch, verbosity=2)
 
         if 'default' in command[dev].keys() and command[dev]['default']:
             self.device[dev].set_default_settings(channel=ch)
