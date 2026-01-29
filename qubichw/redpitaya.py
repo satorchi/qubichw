@@ -443,7 +443,7 @@ class redpitaya:
         return True
 
     def configure(self,
-                  channel=1,
+                  channel=None,
                   frequency=None,
                   shape=None,
                   amplitude=None,
@@ -460,6 +460,8 @@ class redpitaya:
         if not self.connection_status:
             self.log('ERROR! default settings: Device not connected')
             return None
+
+        if channel is None: channel = 1
 
         if frequency is not None:
             self.set_frequency(frequency,channel)
