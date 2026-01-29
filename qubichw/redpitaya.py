@@ -46,6 +46,7 @@ setting_fmt['channel'] = '%1i'
 setting_fmt['output'] = '%s'
 setting_fmt['chunksize'] = '%i' 
 setting_fmt['response_delay'] = '%.2f'
+setting_fmt['buffer size'] = '%i'
 
 
 class redpitaya:
@@ -563,7 +564,10 @@ class redpitaya:
         for ch in [1,2]:
             print('-----------------')
             for key in self.current_setting[ch].keys():
-                fmt = 'ch%%i: %%s = %s' % setting_fmt[key]
+                if key in setting_fmt.keys():
+                    fmt = 'ch%%i: %%s = %s' % setting_fmt[key]
+                else:
+                    fmt = 'ch%i: %s = %s'
                 line = fmt % (ch,key,self.current_setting[ch][key])
                 print(line)
         return
@@ -579,7 +583,10 @@ class redpitaya:
         for key in self.current_setting.keys():
             if key==1 or key==2: continue
             key_str = key.replace(' ','_')
-            fmt = 'modulator:%%s=%s' % setting_fmt[key]
+            if key in setting_fmt.keys():
+                fmt = 'modulator:%%s=%s' % setting_fmt[key]
+            else:
+                fmt = 'modulator:%s=%s'
             msg = fmt % (key_str,self.current_setting[key])
             msg_list.append(msg)
 
