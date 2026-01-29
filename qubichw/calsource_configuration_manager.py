@@ -93,7 +93,7 @@ class calsource_configuration_manager():
         txt += '\nFor the modulator, frequency is given in Hz\n'
         txt += 'For the calibration source, frequency is given in GHz\n'
         txt += '\nExample:\n'
-        txt += 'calsource_150:on amplifier:on modulator:on modulator_150:frequency=0.333 modulator_150:duty=33 modulator_150:shape=squ calsource_150:frequency=150\n'
+        txt += 'calsource_150:on amplifier:on modulator:on modulator:channel=1 modulator:frequency=0.333 modulator:duty=33 modulator:shape=squ calsource_150:frequency=150\n'
         print(txt)
         return
     
@@ -390,9 +390,45 @@ class calsource_configuration_manager():
         '''
         interpret the commands related to the modulator
         '''
-        if 'modulator' in command.keys():
-            ok
-        return True
+        dev = 'modulator'
+        retval = {}
+        retval['ack'] = ''
+        if dev not in command.keys() or len(command[dev])==0:
+            return retval
+
+        if 'default' in command[dev].keys() and command[dev]['default']:
+            self.device[dev].set_default_settings()
+        else:
+            
+            for modcmd in valid_commands[dev]:
+                if modcmd not in command[dev].keys():
+                    command[dev][modcmd] = None
+            self.device[dev].configure(frequency=command[dev]['frequency'],
+                                       amplitude=command[dev]['amplitude'],
+                                       shape=command[dev]['shape'],
+                                       offset=command[dev]['offset'],
+                                       duty=command[dev]['duty'],
+                                       input_gain=command[dev]['input_gain'],
+                                       acquisition_units=command[dev]['acquisition_units'],
+                                       decimation=command[dev]['decimation'],
+                                       coupling=command[dev]['coupling'],
+                                       output=command[dev]['output'],
+                                       channel=command[dev]['channel'])
+
+
+        # wait a bit before trying to read the results
+        time.sleep(1)
+        status = self.device[dev].status()
+        if status is None:
+            msg = '%s:FAILED' % dev
+        else:
+            msg = status
+                
+        self.log(msg)
+        ack += '%s ' % msg
+        retval['ack'] = msg
+        
+        return retval
     
     def interpret_commands(self,command,retval):
         '''
@@ -457,6 +493,7 @@ class calsource_configuration_manager():
         # do configuration command for calsource
         parm =  'frequency'
         for dev in ['calsource_150','calsource_220']:
+            which_cal = dev.split('_')[1]
             if len(command[dev])==0: continue
             if 'default' in command[dev].keys() and command[dev]['default']:
                 of = self.device[dev].set_default_settings()
@@ -468,44 +505,15 @@ class calsource_configuration_manager():
                     msg += 'FAILED'
                     retval['%s state' % dev] = None
                 else:
-                    msg += 'synthesiser:frequency=%+06fGHz' % of
+                    msg += 'synthesiser_%s:frequency=%+06fGHz' % (which_cal,of)
                     retval['%s state' % dev] = self.device[dev].state
             self.log(msg)
             ack += '%s ' % msg
                 
 
         # the modulator configuration
-        dev = 'modulator'
-        if len(command[dev])>0:
-            
-            if 'default' in command[dev].keys() and command[dev]['default']:
-                self.device[dev].set_default_settings()
-            else:
-                for modcmd in valid_commands[dev]:
-                    if modcmd not in command[dev].keys():
-                        command[dev][modcmd] = None
-                self.device[dev].configure(frequency=command[dev]['frequency'],
-                                           amplitude=command[dev]['amplitude'],
-                                           shape=command[dev]['shape'],
-                                           offset=command[dev]['offset'],
-                                           duty=command[dev]['duty'],
-                                           input_gain=command[dev]['input_gain'],
-                                           acquisition_units=command[dev]['acquisition_units'],
-                                           decimation=command[dev]['decimation'],
-                                           coupling=command[dev]['coupling'],
-                                           output=command[dev]['output'])
-
-
-            # wait a bit before trying to read the results
-            time.sleep(1)
-            status = self.device[dev].status()
-            if status is None:
-                msg = '%s:FAILED' % dev
-            else:
-                msg = status
-                
-            self.log(msg)
-            ack += '%s ' % msg
+        modulator_config = self.configure_modulator(command)
+        ack += modulator_config['ack']
 
 
         # the amplifier configuration
