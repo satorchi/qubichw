@@ -425,7 +425,6 @@ class calsource_configuration_manager():
             msg = status
                 
         self.log(msg)
-        ack += '%s ' % msg
         retval['ack'] = msg
         
         return retval
@@ -513,7 +512,7 @@ class calsource_configuration_manager():
 
         # the modulator configuration
         modulator_config = self.configure_modulator(command)
-        ack += modulator_config['ack']
+        ack += '%s ' % modulator_config['ack']
 
 
         # the amplifier configuration
