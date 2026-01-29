@@ -396,8 +396,16 @@ class calsource_configuration_manager():
         if dev not in command.keys() or len(command[dev])==0:
             return retval
 
+        ch = None
+        if 'channel' in command[dev].keys():
+            if command[dev]['channel']=='150' or command[dev]['channel']=='1':
+                ch = 1
+            if command[dev]['channel']=='220' or command[dev]['channel']=='2':
+                ch = 2
+            
+
         if 'default' in command[dev].keys() and command[dev]['default']:
-            self.device[dev].set_default_settings()
+            self.device[dev].set_default_settings(channel=ch)
         else:
             
             for modcmd in valid_commands[dev]:
@@ -413,7 +421,7 @@ class calsource_configuration_manager():
                                        decimation=command[dev]['decimation'],
                                        coupling=command[dev]['coupling'],
                                        output=command[dev]['output'],
-                                       channel=command[dev]['channel'])
+                                       channel=ch)
 
 
         # wait a bit before trying to read the results

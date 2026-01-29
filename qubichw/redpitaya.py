@@ -413,7 +413,7 @@ class redpitaya:
         return coupling
         
         
-    def set_default_settings(self,ch=None):
+    def set_default_settings(self,channel=None):
         '''
         set the default settings for a given output channel
         '''
@@ -421,17 +421,17 @@ class redpitaya:
             self.log('ERROR! default settings: Device not connected')
             return False
 
-        if ch is None: ch = 1
+        if channel is None: channel = 1
         
-        self.set_frequency(self.default_setting['frequency'],ch)
-        self.set_shape(self.default_setting['shape'],ch)
-        self.set_amplitude(self.default_setting['amplitude'],ch)
-        self.set_offset(self.default_setting['offset'],ch)
-        self.set_duty(self.default_setting['duty'],ch)
-        self.set_input_gain(self.default_setting['input_gain'],ch)
+        self.set_frequency(self.default_setting['frequency'],channel)
+        self.set_shape(self.default_setting['shape'],channel)
+        self.set_amplitude(self.default_setting['amplitude'],channel)
+        self.set_offset(self.default_setting['offset'],channel)
+        self.set_duty(self.default_setting['duty'],channel)
+        self.set_input_gain(self.default_setting['input_gain'],channel)
         self.set_acquisition_units(self.default_setting['acquisition_units'])
         self.set_decimation(self.default_setting['decimation'])
-        self.set_input_coupling(self.default_setting['coupling'],ch)
+        self.set_input_coupling(self.default_setting['coupling'],channel)
 
         # do not switch on the output by default
         # self.set_output_on(ch)
