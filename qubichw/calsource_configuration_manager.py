@@ -398,9 +398,15 @@ class calsource_configuration_manager():
 
         ch = None
         if 'channel' in command[dev].keys():
-            if command[dev]['channel']=='150' or command[dev]['channel']=='1':
+            ch_arg = command[dev]['channel']
+            self.log('modulator channel argument: %s is type: %s' % (str(ch_arg),type(ch_arg)), verbosity=2)
+            try:
+                ch = eval(ch_arg)
+            except:
+                ch = None
+            if ch==150:
                 ch = 1
-            if command[dev]['channel']=='220' or command[dev]['channel']=='2':
+            if ch_arg==220:
                 ch = 2
         else:
             self.log('modulator channel not specified',verbosity=2)
