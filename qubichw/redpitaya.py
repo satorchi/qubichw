@@ -150,7 +150,7 @@ class redpitaya:
         
         return ans
 
-    def get_response(self,chunksize=None,string=False):
+    def get_response(self,chunksize=None,is_string=False):
         '''
         get the result of an inquiry command
         '''
@@ -168,7 +168,7 @@ class redpitaya:
 
         
         val_str = ans.decode().replace('ERR!','').strip()
-        if string: return val_str
+        if is_string: return val_str
             
         try:
             return eval(val_str)            
@@ -177,7 +177,7 @@ class redpitaya:
         return None
 
 
-    def get_info(self,cmd,string=True):
+    def get_info(self,cmd,is_string=True):
         '''
         get info.  
         We pause before reading the response, otherwise there's a trailing byte leftover
@@ -185,13 +185,13 @@ class redpitaya:
         ans = self.send_command(cmd)
         pausetime = self.default_setting['response_delay']
         time.sleep(pausetime)
-        return self.get_response(string=string)
+        return self.get_response(is_string=is_string)
 
     def get_id(self):
         '''
         get the identity string
         '''
-        id = self.get_info('*IDN?',string=True)
+        id = self.get_info('*IDN?',is_string=True)
         self.current_setting['id'] = id
         return id
     
@@ -207,7 +207,7 @@ class redpitaya:
         '''
         get the decimation value:  max is 65536
         '''
-        decnum = self.get_info('ACQ:DEC?',string=False)
+        decnum = self.get_info('ACQ:DEC?',is_string=False)
         self.current_setting['decimation'] = decnum
         return decnum
     
@@ -215,7 +215,7 @@ class redpitaya:
         '''
         get the buffer size.  This is 16384.  but in case you want the Red Pitaya to tell you...
         '''
-        self.buffer_size = self.get_info('ACQ:BUF:SIZE?',string=False)
+        self.buffer_size = self.get_info('ACQ:BUF:SIZE?',is_string=False)
         self.current_setting['buffer size'] = self.buffer_size
         return self.buffer_size
 
@@ -247,7 +247,7 @@ class redpitaya:
         get the output state
         '''
         cmd = 'OUTPUT%1i:STATE?' % ch
-        onoff = self.get_info(cmd,string=False)
+        onoff = self.get_info(cmd,is_string=False)
         self.current_setting[ch]['output state'] = onoff
         return onoff
 
@@ -282,7 +282,7 @@ class redpitaya:
         get the current frequency
         '''
         cmd = 'SOUR%1i:FREQ:FIX?' % ch
-        return self.get_info(cmd,string=False)
+        return self.get_info(cmd,is_string=False)
     
     def set_shape(self,shape,ch=1):
         '''
@@ -305,7 +305,7 @@ class redpitaya:
         get the shape
         '''
         cmd = 'SOUR%1i:FUNC?' % ch
-        shape = self.get_info(cmd,string=True)
+        shape = self.get_info(cmd,is_string=True)
         self.current_setting[ch]['shape'] = shape
 
     def set_duty(self,duty,ch=1):
@@ -320,7 +320,7 @@ class redpitaya:
         get the duty cycle
         '''
         cmd = 'SOUR%1i:DCYC?' % ch
-        duty = self.get_info(cmd,string=False)
+        duty = self.get_info(cmd,is_string=False)
         self.current_setting[ch]['duty'] = duty
         return duty
 
@@ -336,7 +336,7 @@ class redpitaya:
         get the modulation offset
         '''
         cmd = 'SOUR%1i:VOLT:OFFS?' % (ch)
-        offset = self.get_info(cmd,string=False)
+        offset = self.get_info(cmd,is_string=False)
         self.current_setting[ch]['offset'] = offset
         return offset
 
@@ -352,7 +352,7 @@ class redpitaya:
         get the modulation amplitude
         '''
         cmd = 'SOUR%1i:VOLT?' % ch
-        a = self.get_info(cmd,string=False)
+        a = self.get_info(cmd,is_string=False)
         self.current_setting[ch]['amplitude'] = a
         return a
         
@@ -377,7 +377,7 @@ class redpitaya:
         get the data acquisition units, either RAW or VOLTS
         '''
         cmd = 'ACQ:DATA:UNITS?'
-        acqunits = self.get_info(cmd,string=True)
+        acqunits = self.get_info(cmd,is_string=True)
         self.current_setting['units'] = acqunits
         return acqunits
 
@@ -405,7 +405,7 @@ class redpitaya:
         get the input gain, HV or LV (high or low)
         '''
         cmd = 'ACQ:SOUR%1i:GAIN?' % ch
-        gain = self.get_info(cmd,string=True)
+        gain = self.get_info(cmd,is_string=True)
         self.current_setting[ch]['gain'] = gain
         return gain
 
@@ -425,7 +425,7 @@ class redpitaya:
         get the input coupling (AC or DC)
         '''
         cmd = 'ACQ:SOUR%1i:COUP?' % ch
-        coupling = self.get_info(cmd,string=True)
+        coupling = self.get_info(cmd,is_string=True)
         self.current_setting[ch]['coupling'] = coupling
         return coupling
         
@@ -612,7 +612,7 @@ class redpitaya:
         pausetime = self.default_setting['response_delay']
         time.sleep(sample_period+pausetime)
 
-        acq_str = self.get_response(chunksize=2**18,string=True)
+        acq_str = self.get_response(chunksize=2**18,is_string=True)
 
         val = self.acq2array(acq_str)
         if val is None:
