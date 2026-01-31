@@ -400,10 +400,12 @@ class calsource_configuration_manager():
         if 'channel' in command[dev].keys():
             ch_arg = command[dev]['channel']
             self.log('modulator channel argument: %s is type: %s' % (str(ch_arg),type(ch_arg)), verbosity=2)
-            try:
-                ch = eval(ch_arg)
-            except:
-                ch = None
+            if isinstance(ch_arg,str):
+                try:
+                    ch = eval(ch_arg)
+                except:
+                    self.log('ERROR! Invalid request for channel: %s' % ch_arg,verbosity=2)
+                    ch = None
             if ch==150:
                 ch = 1
             if ch_arg==220:
