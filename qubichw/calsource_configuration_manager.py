@@ -406,6 +406,8 @@ class calsource_configuration_manager():
                 except:
                     self.log('ERROR! Invalid request for channel: %s' % ch_arg,verbosity=2)
                     ch = None
+            else:
+                ch = ch_arg
             if ch==150:
                 ch = 1
             if ch_arg==220:
