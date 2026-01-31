@@ -227,6 +227,9 @@ class redpitaya:
         '''
         decnum = self.get_decimation()
         if decnum is None: return None
+        if is_instance(decnum,str):
+            self.log('ERROR! Could not calculate sample rate with decimation number = %s' % decnum,verbosity=1)
+            return None
 
         sample_rate = self.max_sample_rate/decnum
         self.current_setting['sample rate'] = sample_rate
@@ -237,6 +240,7 @@ class redpitaya:
         the length of time to fill a buffer
         '''
         sample_rate = self.get_sample_rate()
+        if sample_rate is None: return None
         sample_period = self.buffer_size/sample_rate
         self.current_setting['sample period'] = sample_period
         return sample_period
