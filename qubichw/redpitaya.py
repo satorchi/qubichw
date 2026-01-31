@@ -229,7 +229,7 @@ class redpitaya:
         '''
         decnum = self.get_decimation()
         if decnum is None: return None
-        if is_instance(decnum,str):
+        if isinstance(decnum,str):
             self.log('ERROR! Could not calculate sample rate with decimation number = %s' % decnum,verbosity=1)
             return None
 
