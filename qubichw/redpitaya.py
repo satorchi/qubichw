@@ -13,6 +13,7 @@ control the RedPitaya oscilloscope/signal-generator
 import time,socket,os,sys
 import numpy as np
 import datetime as dt
+from qubichk.utilities import make_errmsg
 from satorchipy.datefunctions import utcnow
 
 default_setting = {}
@@ -162,7 +163,8 @@ class redpitaya:
             self.log('ERROR! time out.  No response.',verbosity=1)
             return None
         except:
-            self.log('ERROR!  Could not get reply from RedPitaya: %s' % self.sock.error,verbosity=1)
+            errmsg = make_errmsg('ERROR!  Could not get reply from RedPitaya')
+            self.log(errmsg,verbosity=1)
             self.connection_status = False
             return None
 
