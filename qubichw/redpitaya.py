@@ -589,10 +589,11 @@ class redpitaya:
         for key in self.current_setting.keys():
             if key==1 or key==2: continue
             key_str = key.replace(' ','_')
-            if key in setting_fmt.keys() and self.current_setting[key] is not None:
-                fmt = 'modulator:%%s=%s' % setting_fmt[key]
-            else:
+            if self.current_setting[key] is None or isinstance(self.current_setting[key],str) or key not in setting_fmt.keys():
                 fmt = 'modulator:%s=%s'
+            else:
+                fmt = 'modulator:%%s=%s' % setting_fmt[key]
+                
             msg = fmt % (key_str,self.current_setting[key])
             msg_list.append(msg)
 
