@@ -114,7 +114,7 @@ class calsource_configuration_manager():
         # the calsource, only 1 second
         # the redpitaya requires ??
         self.wait_after_switch_on = {}
-        self.wait_after_switch_on['modulator'] = 5
+        self.wait_after_switch_on['modulator'] = 15
         self.wait_after_switch_on['calsource_150'] = 1
         self.wait_after_switch_on['calsource_220'] = 1
         self.wait_after_switch_on['amplifier'] = 1
