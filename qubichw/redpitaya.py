@@ -127,7 +127,8 @@ class redpitaya:
             self.connection_status = True
 
         except:
-            print('ERROR! Failed to connect to RedPitaya')
+            msg = make_errmsg('ERROR! Failed to connect to RedPitaya')
+            self.log(msg,verbosity=1)
             self.connection_status = False
             return False        
 
@@ -139,13 +140,14 @@ class redpitaya:
         '''
         send a command to the RedPitaya
         '''
-        if self.verbosity>1: print('sending command: %s' % cmd)
+        self.log('sending command: %s' % cmd,verbosity=1)
         cmd_str = cmd + '\r\n'
         cmd_encode = cmd_str.encode()
         try:
             ans = self.sock.send(cmd_encode)
         except:
-            if self.verbosity>0: print('ERROR!  Could not send to RedPitaya')
+            msg = make_errmsg('ERROR!  Could not send to RedPitaya')
+            self.log(errmsg,verbosity=1)
             self.connection_status = False
             return None
         
@@ -639,7 +641,7 @@ class redpitaya:
 
         # check if it's a string
         if type(acq_str)!=str:
-            if self.verbosity>0: print('ERROR! acquisition is expected to be type string.  This is %s' % (str(type(acq_str))))
+            self.log('ERROR! acquisition is expected to be type string.  This is %s' % (str(type(acq_str))),verbosity=1)
             return None
         
         val_list = []
