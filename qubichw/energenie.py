@@ -41,9 +41,9 @@ socketinfo['mount'][4] = 'unused'
 socketinfo['cf'] = {}
 socketinfo['cf']['serial'] = '01:01:5f:06:f2'
 socketinfo['cf'][1] ='modulator'
-socketinfo['cf'][2] ='calsource'
-socketinfo['cf'][3] ='lamp'
-socketinfo['cf'][4] ='amplifier'
+socketinfo['cf'][2] ='unused'
+socketinfo['cf'][3] ='unused'
+socketinfo['cf'][4] ='unused'
 
 
 class energenie:
