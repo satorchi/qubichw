@@ -10,7 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 basic sequences for running observations
 '''
-import time
+import os,time
 import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
