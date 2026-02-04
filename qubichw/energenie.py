@@ -38,12 +38,12 @@ socketinfo['mount'][2] = 'unused'
 socketinfo['mount'][3] = 'unused'
 socketinfo['mount'][4] = 'unused'
 
-socketinfo['calsource'] = {}
-socketinfo['calsource']['serial'] = '01:01:5f:06:f2'
-socketinfo['calsource'][1] ='modulator'
-socketinfo['calsource'][2] ='calsource'
-socketinfo['calsource'][3] ='lamp'
-socketinfo['calsource'][4] ='amplifier'
+socketinfo['cf'] = {}
+socketinfo['cf']['serial'] = '01:01:5f:06:f2'
+socketinfo['cf'][1] ='modulator'
+socketinfo['cf'][2] ='calsource'
+socketinfo['cf'][3] ='lamp'
+socketinfo['cf'][4] ='amplifier'
 
 
 class energenie:
@@ -76,7 +76,7 @@ class energenie:
         which_cmd = 'which %s' % energenie_app
         app_cmd = '%s' % energenie_app
         
-        if name=='calsource' and hostname.find('pigps')<0:
+        if (name=='cf' or name=='cryostat') and hostname.find('pigps')<0:
             pingresult = ping('pigps',verbosity=self.verbosity)
             if not pingresult['ok']:
                 msg = 'ERROR: PiGPS is UNREACHABLE'
