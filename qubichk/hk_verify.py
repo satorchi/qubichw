@@ -206,7 +206,7 @@ def check_diskspace(verbosity=1):
     
     space_warning = 10*1024**2 # 10GB minimum disk space (df gives results in 1k blocks)
     if verbosity>0: print('\n============ checking for disk space ============')
-    parts = ['home','archive','entropy','qs2','qs3']
+    parts = ['home','archive','entropy','qs3']
         
     find_str = '/'+'|/'.join(parts)
     
