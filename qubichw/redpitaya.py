@@ -29,7 +29,8 @@ default_setting['coupling'] = 'DC'
 default_setting['channel'] = 1
 default_setting['output'] = 'OFF'
 # number of bytes to receive by default (but not for acquisition)
-default_setting['chunksize'] = 4096 
+default_setting['chunksize'] = 4096
+default_setting['acquisition_chunksize'] = 2**32
 # wait time after sending a command and before requesting a response
 default_setting['response_delay'] = 0.1
 
@@ -609,10 +610,12 @@ class redpitaya:
         return msg
         
                
-    def acquire(self,ch=1):
+    def acquire(self,ch=1,chunksize=None):
         '''
         acquire data for delta seconds
         '''
+        if chunksize is None:
+            chunksize = default_setting['acquisition_chunksize']
         start_tstamp = utcnow().timestamp()
         sample_period = self.get_sample_period()
         
@@ -621,7 +624,7 @@ class redpitaya:
         pausetime = self.default_setting['response_delay']
         time.sleep(sample_period+pausetime)
 
-        acq_str = self.get_response(chunksize=2**18,is_string=True)
+        acq_str = self.get_response(chunksize=chunksize,is_string=True)
 
         val = self.acq2array(acq_str)
         if val is None:
