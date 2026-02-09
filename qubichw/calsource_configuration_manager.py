@@ -15,6 +15,7 @@ import socket,time,re,os,multiprocessing,sys
 import datetime as dt
 from copy import deepcopy
 
+from satorchipy.datefunctions import utcnow
 from qubichk.utilities import shellcommand, get_myip, known_hosts, get_calsource_host
 
 # the numato relay for switching on/off
@@ -72,7 +73,7 @@ class calsource_configuration_manager():
         
         filename = 'calsource_configuration_%s.log' % self.role
         h = open(filename,'a')
-        h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
+        h.write('%s: %s\n' % (utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)
         return
@@ -129,7 +130,7 @@ class calsource_configuration_manager():
             self.device_on[dev] = None
 
             
-        self.relay_lastcommand_date = dt.datetime.utcnow()
+        self.relay_lastcommand_date = utcnow()
         self.relay_timeout = 1
         
         self.broadcast_port = 37020
@@ -265,7 +266,7 @@ class calsource_configuration_manager():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.bind((self.receiver, self.broadcast_port))
 
-        now = dt.datetime.utcnow()        
+        now = utcnow()        
         try:
             cmdstr, addr_tple = s.recvfrom(self.nbytes)
             addr = addr_tple[0]
@@ -279,7 +280,7 @@ class calsource_configuration_manager():
             cmdstr_clean = '%s UNKNOWN ERROR' %  now.strftime('%s.%f')
             
         
-        received_date = dt.datetime.utcnow()
+        received_date = utcnow()
         received_tstamp = received_date.timestamp()
         self.log('received a command from %s at %s: %s' % (addr,received_date.strftime(self.date_fmt),cmdstr_clean))
         return received_tstamp, cmdstr_clean, addr
@@ -299,14 +300,14 @@ class calsource_configuration_manager():
         s.settimeout(timeout)
         s.bind((self.receiver, self.broadcast_port))
 
-        now = dt.datetime.utcnow()
+        now = utcnow()
 
         try:
             ack, addr = s.recvfrom(self.nbytes)
         except:
             self.log('no response from Calibration Source Manager')
             return None
-        received_date = dt.datetime.utcnow()
+        received_date = utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
         self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)))
         # clean up the acknowledgement
@@ -324,7 +325,7 @@ class calsource_configuration_manager():
                   if states is None, get status
         '''
         reset_delta = self.relay_timeout # minimum time to wait
-        now = dt.datetime.utcnow()
+        now = utcnow()
         delta = (now - self.relay_lastcommand_date).total_seconds()
 
         if delta < reset_delta:
@@ -357,7 +358,7 @@ class calsource_configuration_manager():
             self.device_on = states_read
             self.log('retrieved RELAY states: %s' % states_read,verbosity=2)
             
-        self.relay_lastcommand_date = dt.datetime.utcnow()
+        self.relay_lastcommand_date = utcnow()
         return ack
 
 
@@ -456,7 +457,7 @@ class calsource_configuration_manager():
         this method is called by the "manager"
         '''
         self.log('interpreting command: %s' % command,verbosity=2)
-        ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
+        ack = '%s ' % utcnow().strftime('%s.%f')
 
         # get current on/off status from the relay
         onoff_ack = self.onoff()
@@ -609,7 +610,7 @@ class calsource_configuration_manager():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
 
-        now = dt.datetime.utcnow()
+        now = utcnow()
         now_str = now.strftime('%s.%f')
         len_nowstr = len(now_str)
         len_remain = self.nbytes - len_nowstr - 1
@@ -632,7 +633,7 @@ class calsource_configuration_manager():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
 
-        now=dt.datetime.utcnow()
+        now = utcnow()
         now_str = now.strftime('%s.%f')
         len_nowstr = len(now_str)
         len_ack = len(ack)

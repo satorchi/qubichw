@@ -16,6 +16,7 @@ import re,os,sys,time
 from glob import glob
 import datetime as dt
 
+from satorchipy.datefunctions import utcnow
 from qubichw.compressor import compressor
 from qubichk.send_telegram import send_telegram, get_alarm_recipients
 from qubichk.ups import get_ups_info
@@ -378,7 +379,7 @@ def check_temps(verbosity=1):
             retval[F] = info
             continue
 
-        now = dt.datetime.utcnow()
+        now = utcnow()
         tstamp_now = now.timestamp()
         delta = tstamp_now - tstamp
         if delta > delta_max:
