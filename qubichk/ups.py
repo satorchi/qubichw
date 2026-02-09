@@ -14,6 +14,7 @@ a few methods to access info from the UPS
 import sys,os,time
 import datetime as dt
 from qubichk.utilities import shellcommand
+from satorchipy.datefunctions import utcnow
 
 def get_ups_info():
     '''
@@ -36,7 +37,7 @@ def get_ups_info():
     full_output,err = shellcommand(cmd)
 
     brief_msg_list = []
-    log_msg_list = [dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')]
+    log_msg_list = [utcnow().strftime('%Y-%m-%dT%H:%M:%S')]
     lines = full_output.split('\n')
     for line in lines:
         col = line.split(':')

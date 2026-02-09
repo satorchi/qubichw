@@ -22,6 +22,7 @@ import struct
 from shutil import copyfile
 import numpy as np
 from scipy import interpolate
+from satorchipy.datefunctions import utcnow
 
 class temperature_hk :
     ''' a class to gather temperatures from the temperature diodes
@@ -74,7 +75,7 @@ class temperature_hk :
         '''
         if verbosity>self.verbosity_threshold: return
         
-        now=dt.datetime.utcnow()
+        now = utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
         h=open('hk_temperature.log','a')
         h.write(logmsg+'\n')
@@ -102,7 +103,7 @@ class temperature_hk :
         
         # wait for activation
         data_length = 0
-        now=dt.datetime.utcnow()
+        now = utcnow()
         max_wait=dt.timedelta(seconds=30)
         wait_endtime=now+max_wait
         while data_length == 0 and now < wait_endtime:
@@ -110,7 +111,7 @@ class temperature_hk :
             if string0 is None:
                 return False
             data_length = len(string0)
-            now=dt.datetime.utcnow()
+            now = utcnow()
 
             if data_length == 0:
                 self.log("ERROR! Timeout! Could not connect to cryo temperatures!")

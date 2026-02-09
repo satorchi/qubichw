@@ -14,6 +14,7 @@ import serial,sys,os,re,time
 from glob import glob
 import datetime as dt
 from qubichk.utilities import shellcommand
+from satorchipy.datefunctions import utcnow
 
 psi_to_bar = 1.01325 /  14.696
 shortlabel = {}
@@ -408,7 +409,7 @@ class compressor:
         '''
         format the status info into a text for the log file
         '''
-        now_str = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S UT')
+        now_str = utcnow().strftime('%Y-%m-%dT%H:%M:%S UT')
         if not status['status']:
             msg = '%s - compressor OFFLINE' % now_str
             return msg

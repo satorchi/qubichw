@@ -13,7 +13,7 @@ control of the Energenie USB power bar.  Code originally was in hk_verify.py
 import time,re,os
 import datetime as dt
 from qubichk.utilities import shellcommand, ping
-
+from satorchipy.datefunctions import utcnow
 energenie_app = 'sispmctl'
 
 socketinfo = {}
@@ -109,7 +109,7 @@ class energenie:
         
         filename = '%s/energenie.log' % os.environ['HOME']
         h = open(filename,'a')
-        h.write('%s|ENERGENIE| %s\n' % (dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'),msg))
+        h.write('%s|ENERGENIE| %s\n' % (utcnow().strftime('%Y-%m-%dT%H:%M:%S'),msg))
         h.close()
         print(msg)
         return
