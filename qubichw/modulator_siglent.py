@@ -16,6 +16,7 @@ and: USBTMC_1_00.pdf
 import time,os,sys,socket,struct,string,re
 import usbtmc
 import datetime as dt
+from satorchipy.datefunctions import utcnow
 from qubichk.utilities import shellcommand
 class siglent:
     '''
@@ -63,7 +64,7 @@ class siglent:
         
         filename = 'siglent_command.log'
         h = open(filename,'a')
-        h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
+        h.write('%s: %s\n' % (utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)
         return
@@ -76,12 +77,12 @@ class siglent:
         dev = '/dev/siglent'
         
         # wait for device to appear
-        start_time = dt.datetime.utcnow()
+        start_time = utcnow()
         end_time = start_time + dt.timedelta(seconds=45)
         self.log('waiting for %s' % dev)
-        while not os.path.exists(dev) and dt.datetime.utcnow()<end_time:
+        while not os.path.exists(dev) and utcnow()<end_time:
             time.sleep(1)
-        waited = dt.datetime.utcnow() - start_time
+        waited = utcnow() - start_time
         self.log('waited %.1f seconds for device %s' % (waited.total_seconds(),dev))
 
         # now try a few times to connect

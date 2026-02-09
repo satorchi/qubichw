@@ -36,7 +36,7 @@ from matplotlib import pyplot as plt
 from astropy.io import fits
 import gnuplotlib as gp
 
-from satorchipy.datefunctions import str2dt
+from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 from qubichk.utilities import get_known_hosts, get_myip
 
 known_hosts = get_known_hosts()
@@ -103,7 +103,7 @@ class horn_monitor:
         '''
         listen for the inductance data arriving on socket
         '''
-        previous = dt.datetime.utcfromtimestamp(0)
+        previous = utcfromtimestamp(0)
         double_horn_change_time = dt.timedelta(seconds=1)
     
         # setup the plot
@@ -145,7 +145,7 @@ class horn_monitor:
             if retval=='KeyboardInterrupt': break
             if retval=='UnpackError': continue
             
-            now = dt.datetime.utcnow()
+            now = utcnow()
             tstamp = float(now.strftime('%s.%f'))
             self.write_horn_fits(tstamp)
             #############################################
@@ -273,7 +273,7 @@ class horn_monitor:
         '''
         plot the inductance curve from the horn switch
         '''
-        now_str = dt.datetime.utcnow().strftime(self.date_fmt)
+        now_str = utcnow().strftime(self.date_fmt)
         if self.header['IS_GOOD']==1:
             goodbad = 'good'
         else:

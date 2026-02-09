@@ -11,8 +11,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 remote control of the TTi 5012A Signal Generator
 '''
 import time,os,sys,socket,struct,string,re
-import datetime as dt
 from PyMS import PMSDevice
+from satorchipy.datefunctions import utcnow
 
 class tg5012:
     '''
@@ -168,7 +168,7 @@ class tg5012:
         self.settings = {}
 
         debugfile = open('modulator_tg5012a.debug.log','a')
-        debugfile.write('\nDEBUG read_settings: %s' % dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+        debugfile.write('\nDEBUG read_settings: %s' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
         
         self.send_command("*LRN?\n")
         answer1 = self.read_response()

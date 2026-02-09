@@ -13,9 +13,9 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 open/close the Mechanical heat switches
 '''
 import sys,os,time
-import datetime as dt
 
 from qubichk.entropy_hk import entropy_hk
+from satorchipy.datefunctions import utcnow
 
 datefmt = '%Y-%m-%d %H:%M:%S UT'
 hk = entropy_hk()
@@ -41,12 +41,12 @@ for arg in sys.argv:
         continue
         
 
-now = dt.datetime.utcnow()
+now = utcnow()
 print('%s | Opening Mechanical Heat Switch' % now.strftime(datefmt))
 hk.mech_command(1,nsteps,'open')
 
 time.sleep(wait_open)
-now = dt.datetime.utcnow()            
+now = utcnow()            
 print('%s | Closing Mechanical Heat Switch' % now.strftime(datefmt))
 hk.mech_command(1,nsteps+nsqueeze,'close')
     

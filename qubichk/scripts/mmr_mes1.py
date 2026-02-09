@@ -31,9 +31,10 @@ the data packets have the following:
 
 '''
 import sys,socket,time,struct
-import datetime as dt
-
-mmr_ip = '192.168.2.213'
+from satorchipy.datefunctions import utcnow
+from qubichk.utilities import get_known_hosts
+known_hosts = get_known_hosts
+mmr_ip = known_hosts['mmr3']
 mmr_port = 12000 + int(mmr_ip.split('.')[-1])
 
 
@@ -115,7 +116,7 @@ def mes_acquisition(sock):
             nmillisecs = struct.unpack('<H',ret[10:12])[0]
             t = nsecs + 0.001*nmillisecs
             if t0 is None:
-                tstamp = float(dt.datetime.utcnow().strftime('%s.%f'))
+                tstamp = utcnow().timestamp()
                 t0 = tstamp - t
             else:
                 tstamp = t0 + t

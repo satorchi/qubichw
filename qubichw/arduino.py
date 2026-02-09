@@ -14,9 +14,9 @@ use the Arduino Uno as an ADC to monitor the signal generator
 import socket,serial,time,multiprocessing,os,pathlib
 from glob import glob
 import numpy as np
-#from scipy.optimize import curve_fit
 import datetime as dt
 import struct
+from satorchipy.datefunctions import utcnow
 
 class arduino:
     '''
@@ -56,7 +56,7 @@ class arduino:
         logfile = homedir + os.sep + 'arduino.log'
 
         # test we can write to log file
-        now = dt.datetime.utcnow()
+        now = utcnow()
         try:
             h=open(logfile,'a')
             h.write('%s | arduino assigning logfile\n' % now.strftime('%Y-%m-%d %H:%M:%S UT'))
@@ -72,7 +72,7 @@ class arduino:
         '''
         print a message to screen and to the log file
         '''
-        now=dt.datetime.utcnow()
+        now=utcnow()
         logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
         if self.logfile is not None:
             h=open(self.logfile,'a')
@@ -239,9 +239,9 @@ class arduino:
 
         #y=[]
         #t=[]
-        start_time=dt.datetime.utcnow()
-        end_time=start_time+dt_duration
-        now=dt.datetime.utcnow()
+        start_time = utcnow()
+        end_time = start_time+dt_duration
+        now = utcnow()
 
         # open a file for on-the-fly acquisition to disk
         outfile = start_time.strftime('calsource_%Y%m%dT%H%M%S.dat')
@@ -252,7 +252,7 @@ class arduino:
             while now < end_time and not os.path.isfile(self.interrupt_flag_file):
                 x = self.s.readline()
                 val = x.strip()
-                now=dt.datetime.utcnow()
+                now = utcnow()
                 h.write('%s %s\n' % (now.strftime('%s.%f'),val))
                 #y.append(val)
                 #t.append(now)
@@ -264,7 +264,7 @@ class arduino:
                 # Mon 29 Apr 2019 16:31:25 CEST
                 # now we are using the ADC on the Raspberry Pi and not the Arduino
                 # the name "arduino" remains as a nickname
-                now = dt.datetime.utcnow()
+                now = utcnow()
                 #val = x.strip()
                 #h.write('%s %s\n' % (now.strftime('%s.%f'),val))
 

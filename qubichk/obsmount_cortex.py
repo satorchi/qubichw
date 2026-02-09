@@ -131,9 +131,10 @@ new offset: 60.713
 
 '''
 import os,sys,socket,time,re
-import datetime as dt
 import numpy as np
 from qubichk.utilities import make_errmsg, get_known_hosts
+from satorchipy.datefunctions import utcnow
+
 known_hosts = get_known_hosts()
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
@@ -214,7 +215,7 @@ class obsmount:
         '''
         if self.verbosity<1: return
         
-        date_str = dt.datetime.utcnow().strftime(self.datefmt)
+        date_str = utcnow().strftime(self.datefmt)
         print('%s | obsmount: %s' % (date_str,msg))
         return
 
@@ -363,7 +364,7 @@ class obsmount:
         retval = {}
         retval['ok'] = True
         retval['error'] = 'NONE'
-        retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
+        retval['TIMESTAMP'] = utcnow().timestamp()
 
         # check that we are subscribed
         if not self.subscribed[port]:
@@ -373,7 +374,7 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        retval['TIMESTAMP'] = dt.datetime.utcnow().timestamp()
+        retval['TIMESTAMP'] = utcnow().timestamp()
         try:
             dat = self.sock[port].recv(chunksize)
         except socket.timeout:
@@ -628,7 +629,7 @@ class obsmount:
         '''
         wait for telescope to get into requested position
         '''
-        tstart = dt.datetime.now().timestamp()
+        tstart = utcnow().timestamp()
         if maxwait is None: maxwait = self.maxwait
 
         az_final = az
@@ -650,7 +651,7 @@ class obsmount:
         
         while not azel['ok']:
             time.sleep(2)
-            now = dt.datetime.now().timestamp()
+            now = utcnow().timestamp()
             azel = self.get_azel()
             if (now-tstart)>maxwait:
                 print('Error! Could not get AZ,EL position.')
@@ -660,7 +661,7 @@ class obsmount:
 
         while np.abs(val-val_final)>self.pos_margin:
             time.sleep(2)
-            now = dt.datetime.now().timestamp()
+            now = utcnow().timestamp()
             if (now-tstart)>maxwait:
                 print('Maximum wait time')
                 return False
@@ -670,7 +671,7 @@ class obsmount:
                 time.sleep(2)
                 continue
 
-            now_str = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            now_str = utcnow().strftime('%Y-%m-%d %H:%M:%S')
             print('%s - AZ,EL = %.2f %.2f' % (now_str, azel['AZ'],azel['EL']))
 
             val = azel[key]
@@ -684,7 +685,7 @@ class obsmount:
         '''
         if azstep is None: azstep = self.azstep
     
-        start_tstamp = dt.datetime.now().timestamp()
+        start_tstamp = utcnow().timestamp()
 
         ack = self.goto_az(self.azmin)
         if not ack['ok']:
@@ -705,7 +706,7 @@ class obsmount:
         while not azel['ok']:
             time.sleep(2)
             azel = self.get_azel()
-            now = dt.datetime.now().timestamp()
+            now = utcnow().timestamp()
             if (now-start_tstamp)>10:
                 print('ERROR! Could not get current position.')
                 return False

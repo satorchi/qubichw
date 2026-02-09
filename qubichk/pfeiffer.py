@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 read the Pfeiffer pressure sensor
 '''
 import os,sys,serial
-import datetime as dt
+from satorchipy.datefunctions import utcnow
 
 class Pfeiffer :
 
@@ -33,9 +33,9 @@ class Pfeiffer :
     def log(self,msg):
         '''messages to log file and to screen
         '''
-        now=dt.datetime.utcnow()
-        logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h=open('hk_pfeiffer.log','a')
+        now = utcnow()
+        logmsg = '%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
+        h = open('hk_pfeiffer.log','a')
         h.write(logmsg+'\n')
         h.close()
         print(logmsg)

@@ -14,6 +14,7 @@ read the weather stuff from the weather station online
 import sys,re,time,os
 import datetime as dt
 from urllib.request import urlopen
+from satorchipy.datefunctions import utcnow
 from qubichk.utilities import shellcommand, get_known_hosts
 known_hosts = get_known_hosts()
 
@@ -305,7 +306,7 @@ def show_weather(values,options):
     if 'date' in values.keys():
         tstamp = values['date'].timestamp()
     else:
-        tstamp = dt.datetime.utcnow().timestamp()
+        tstamp = utcnow().timestamp()
 
     line_list = ['%f' % tstamp]
     for key in weather_log_values:
