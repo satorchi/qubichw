@@ -30,6 +30,8 @@ from qubichw.amplifier import amplifier
 #from qubichw.modulator_tg5012a import tg5012 as modulator
 from qubichw.modulator_siglent import siglent as modulator
 
+from satorchipy.datefunctions import utcnow
+
 class cf_configuration_manager():
 
     def __init__(self,role=None, verbosity=0):
@@ -57,7 +59,7 @@ class cf_configuration_manager():
         
         filename = 'cf_configuration_%s.log' % self.role
         h = open(filename,'a')
-        h.write('%s: %s\n' % (dt.datetime.utcnow().strftime(self.date_fmt),msg))
+        h.write('%s: %s\n' % (utcnow().strftime(self.date_fmt),msg))
         h.close()
         print(msg)
         return
@@ -148,7 +150,7 @@ class cf_configuration_manager():
             self.device_on[dev] = None
 
             
-        self.energenie_lastcommand_date = dt.datetime.utcnow()
+        self.energenie_lastcommand_date = utcnow()
         self.energenie_timeout = 1
 
         self.known_hosts = {}
@@ -289,7 +291,7 @@ class cf_configuration_manager():
 
         self.log('listening on %s' % self.receiver)
 
-        now = dt.datetime.utcnow()        
+        now = utcnow()        
         try:
             cmdstr, addr_tple = s.recvfrom(self.nbytes)
             addr = addr_tple[0]
@@ -303,7 +305,7 @@ class cf_configuration_manager():
             cmdstr_clean = '%s UNKNOWN ERROR' %  now.strftime('%s.%f')
             
         
-        received_date = dt.datetime.utcnow()
+        received_date = utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
         self.log('received a command from %s at %s: %s' % (addr,received_date.strftime(self.date_fmt),cmdstr_clean))
         return received_tstamp, cmdstr_clean, addr
@@ -321,7 +323,7 @@ class cf_configuration_manager():
         s.settimeout(timeout)
         s.bind((self.hostname, self.broadcast_port))
 
-        now = dt.datetime.utcnow()
+        now = utcnow()
         self.log('waiting up to %.0f seconds for acknowledgement on %s' % (timeout,self.hostname))
 
         try:
@@ -329,7 +331,7 @@ class cf_configuration_manager():
         except:
             self.log('no response from Carbon Fibre Manager')
             return None
-        received_date = dt.datetime.utcnow()
+        received_date = utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
         self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)))
         # clean up the acknowledgement
@@ -346,7 +348,7 @@ class cf_configuration_manager():
         we have to wait for the Energenie powerbar to reset
         '''
         reset_delta = self.energenie_timeout # minimum time to wait
-        now = dt.datetime.utcnow()
+        now = utcnow()
         delta = (now - self.energenie_lastcommand_date).total_seconds()
         powerbar = energenie('calsource')
 
@@ -384,7 +386,7 @@ class cf_configuration_manager():
                 self.device_on[dev] = state
             self.device_on['cf'] = self.device_on['modulator'] # carbon fibre and modulator are the same device
 
-        self.energenie_lastcommand_date = dt.datetime.utcnow()
+        self.energenie_lastcommand_date = utcnow()
         return ack
 
 
@@ -445,7 +447,7 @@ class cf_configuration_manager():
         interpret the dictionary of commands, and take the necessary steps
         this method is called by the "manager"
         '''
-        ack = '%s ' % dt.datetime.utcnow().strftime('%s.%f')
+        ack = '%s ' % utcnow().strftime('%s.%f')
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
@@ -637,7 +639,7 @@ class cf_configuration_manager():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
 
-        now=dt.datetime.utcnow()
+        now = utcnow()
         now_str = now.strftime('%s.%f')
         len_nowstr = len(now_str)
         len_remain = self.nbytes - len_nowstr - 1
@@ -659,7 +661,7 @@ class cf_configuration_manager():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(0.2)
 
-        now=dt.datetime.utcnow()
+        now = utcnow()
         now_str = now.strftime('%s.%f')
         len_nowstr = len(now_str)
         len_ack = len(ack)
