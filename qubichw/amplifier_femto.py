@@ -17,6 +17,8 @@ import datetime as dt
 if os.uname().machine.find('arm')>=0:
     import RPi.GPIO as gpio
 
+from satorchipy.datefunctions import utcnow
+
 default_setting = {}
 default_setting['gain'] = 20
 default_setting['bandwidth'] = 100
@@ -34,7 +36,7 @@ class amplifier:
         '''
         if verbosity is not None: self.verbosity = verbosity
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
-        self.creation = dt.datetime.utcnow()
+        self.creation = utcnow()
         self.creation_str = self.creation.strftime('%Y-%m-%d %H:%M:%S')
         self.state = {}
         self.state['bandwidth'] = None
@@ -56,7 +58,7 @@ class amplifier:
         
         filename = 'amplifier_command.log'
         h = open(filename,'a')
-        fullmsg = '%s: FEMTO - %s' % (dt.datetime.utcnow().strftime(self.date_fmt),msg) 
+        fullmsg = '%s: FEMTO - %s' % (utcnow().strftime(self.date_fmt),msg) 
         h.write(fullmsg+'\n')
         h.close()
         print(fullmsg)
