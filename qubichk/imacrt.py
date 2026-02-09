@@ -15,7 +15,8 @@ this is especially the MGC3 temperature controller for the TES bath temperature
 see also in scripts directory:  mmr_mes1.py, fast_mmr.py (possibly to be updated)
 '''
 import socket
-from qubichk.utilities import known_hosts
+from qubichk.utilities import get_known_hosts
+known_hosts = get_known_hosts()
 
 class iMACRT:
     def __init__(self,device='mgc'):

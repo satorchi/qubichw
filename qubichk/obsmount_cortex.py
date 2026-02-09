@@ -133,8 +133,8 @@ new offset: 60.713
 import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
-from qubichk.utilities import make_errmsg, known_hosts
-
+from qubichk.utilities import make_errmsg, get_known_hosts
+known_hosts = get_known_hosts()
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
 rec_names = 'STX,TIMESTAMP,VALUE'    
@@ -144,7 +144,7 @@ class obsmount:
     class to read to and command the observation mount
     '''
     
-    mount_ip = '192.168.2.103'
+    mount_ip = known_hosts['mountpi']
     listen_port = 4546
     command_port = 4545
     qubicstudio_port = 4003 # port for receiving data from the red platform

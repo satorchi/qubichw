@@ -12,8 +12,9 @@ general utilities for communicating with the dispatcher
 '''
 import socket,time,re
 import numpy as np
-from qubichk.utilities import known_hosts, bytes2str
+from qubichk.utilities import get_known_hosts, bytes2str
 
+known_hosts = get_known_hosts()
 QS_IP = known_hosts['qubic-studio']
 
 def interpret_parameter_TM(self,parm_bytes,parm_name):

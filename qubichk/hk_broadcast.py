@@ -20,12 +20,14 @@ from qubichk.powersupply import PowerSupply, PowerSupplies, known_supplies
 from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
-from qubichk.utilities import shellcommand, known_hosts, get_myip
+from qubichk.utilities import shellcommand, get_known_hosts, get_myip
 from qubichk.obsmount import obsmount
 from qubichk.usbthermometer_hk import usbthermometer_hk
 
 from qubicpack.utilities import fmt_translation
 
+
+known_hosts = get_known_hosts()
 class hk_broadcast :
     '''a class for broadcasting  and receiving QUBIC housekeeping data
     '''

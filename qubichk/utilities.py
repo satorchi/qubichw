@@ -18,6 +18,7 @@ qubic_latitude = -(24 + 11.2002/60)
 qubic_longitude = -(66 + 28.7039/60)
 qubic_altitude = 4830.3
 
+# these are the default known hosts.  Updated addresses are read from /etc/hosts and from ~/.local/share/qubic/known_hosts
 known_hosts = {}
 known_hosts['qubic-central'] = "192.168.2.1"
 known_hosts['qubic-studio']  = "192.168.2.114"
@@ -35,6 +36,46 @@ date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 fridge_dir = '/home/qubic/data/temperature'
+
+def read_hosts_file(filename):
+    '''
+    read a file that has the format of /etc/hosts
+
+    by default, return the existing known_hosts
+    '''
+
+    if not os.path.isfile(filename):
+        return known_hosts
+
+    h = open(filename,'r')
+    lines = h.read().split('\n')
+    h.close()
+
+    for line in lines:
+        if line.find('#')==0: continue
+        if (line.find('192.168.2.')<0 and line.find('192.168.88.')<0): continue
+        col = line.split()
+        if len(col)<2: continue
+        ipaddr = col[0]
+        for nickname in col[1:]:
+            known_hosts[nickname] = ipaddr
+    
+    return known_hosts
+
+def get_known_hosts():
+    '''
+    read known_hosts from standard places and add/modify the default values
+    '''
+
+    # read the etc/hosts file
+    known_hosts = read_hosts_file('/etc/hosts')
+
+    # read the known_hosts file in the user's share location
+    user_known_hosts = get_fullpath('known_hosts')
+    if user_known_hosts is not None:
+        known_hosts = read_hosts_file(user_known_hosts)
+        
+    return known_hosts
 
 def get_fullpath(filename=None):
     '''

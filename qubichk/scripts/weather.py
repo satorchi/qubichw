@@ -14,7 +14,8 @@ read the weather stuff from the weather station online
 import sys,re,time,os
 import datetime as dt
 from urllib.request import urlopen
-from qubichk.utilities import shellcommand, known_hosts
+from qubichk.utilities import shellcommand, get_known_hosts
+known_hosts = get_known_hosts()
 
 #### history of server addresses ####
 server0 = '45.224.140.42:8989'

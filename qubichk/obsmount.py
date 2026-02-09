@@ -22,9 +22,10 @@ import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import make_errmsg, known_hosts, hk_dir
+from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir
 from qubicpack.pointing import position_key, STX, delimiter, interpret_pointing_chunk, axis_fullname
 
+known_hosts = get_known_hosts()
 class obsmount:
     '''
     class to read to and command the observation mount

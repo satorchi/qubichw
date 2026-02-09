@@ -37,8 +37,9 @@ from astropy.io import fits
 import gnuplotlib as gp
 
 from satorchipy.datefunctions import str2dt
-from qubichk.utilities import known_hosts, get_myip
+from qubichk.utilities import get_known_hosts, get_myip
 
+known_hosts = get_known_hosts()
 IP_HORN = known_hosts['horn']
 LISTENER = get_myip()
 

@@ -16,7 +16,9 @@ import datetime as dt
 from copy import deepcopy
 
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import shellcommand, get_myip, known_hosts, get_calsource_host
+from qubichk.utilities import shellcommand, get_myip, get_known_hosts, get_calsource_host
+
+known_hosts = get_known_hosts()
 
 # the numato relay for switching on/off
 from qubichw.relay import device_address as relay_device_address
