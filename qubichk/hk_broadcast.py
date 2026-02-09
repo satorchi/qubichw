@@ -15,6 +15,7 @@ import numpy as np
 import datetime as dt
 import re
 
+from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.powersupply import PowerSupply, PowerSupplies, known_supplies
 from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
@@ -62,16 +63,16 @@ class hk_broadcast :
     def millisecond_timestamp(self):
         '''return the current date in milliseconds since 1970-01-01 in UT
         '''
-        now=dt.datetime.utcnow()
-        msec=now.strftime('%f')[0:3]
-        tstamp=int('%s%s' % (now.strftime('%s'),msec))
+        now = utcnow()
+        msec = now.strftime('%f')[0:3]
+        tstamp = int('%s%s' % (now.strftime('%s'),msec))
         return tstamp
 
     def current_timestamp(self):
         '''return the current date in milliseconds since 1970-01-01 in UT
         '''
-        now=dt.datetime.utcnow()
-        tstamp=float(now.strftime('%s.%f'))
+        now = utcnow()
+        tstamp = now.timestamp()
         return tstamp
     
     def define_hk_record(self):
@@ -409,7 +410,7 @@ class hk_broadcast :
             data, addr = client.recvfrom(nbytes)
             self.unpack_data(data)
             self.log_record()
-            timestamp_date=dt.datetime.fromtimestamp(1e-3*self.record.DATE[0]).strftime('%Y-%m-%d %H:%M:%S UT')
+            timestamp_date = utcfromtimestamp(1e-3*self.record.DATE[0]).strftime('%Y-%m-%d %H:%M:%S UT')
             msg='client %08i: received timestamp: %s' % (local_counter,timestamp_date)
             self.log(msg)
             local_counter+=1
@@ -442,8 +443,8 @@ class hk_broadcast :
         hostname = line.split()[1]
         self.log('server: hostname=%s' % hostname)
         self.log('server: receiver=%s' % self.RECEIVER)
-        now = dt.datetime.utcnow()
-        stoptime = now+dt.timedelta(days=1000)
+        now = utcnow()
+        stoptime = now+dt.timedelta(days=3650)
 
         if test:
             hostname = '127.0.0.1' # for testing
@@ -474,7 +475,7 @@ class hk_broadcast :
             ###################################################################################
             
             time.sleep(self.sampling_period)
-            now = dt.datetime.utcnow()
+            now = utcnow()
             counter+=1
 
         s.close()
@@ -523,9 +524,9 @@ class hk_broadcast :
         '''
         if verbosity>self.verbosity_threshold: return
         
-        now=dt.datetime.utcnow()
-        logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h=open('hk_broadcast.log','a')
+        now = utcnow()
+        logmsg = '%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
+        h = open('hk_broadcast.log','a')
         h.write(logmsg+'\n')
         h.close()
         print(logmsg)
