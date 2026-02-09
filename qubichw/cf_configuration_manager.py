@@ -30,7 +30,10 @@ from qubichw.amplifier import amplifier
 #from qubichw.modulator_tg5012a import tg5012 as modulator
 from qubichw.modulator_siglent import siglent as modulator
 
+from qubichk.utilities import get_known_hosts, get_myip
 from satorchipy.datefunctions import utcnow
+
+known_hosts = get_known_hosts()
 
 class cf_configuration_manager():
 
@@ -152,31 +155,20 @@ class cf_configuration_manager():
             
         self.energenie_lastcommand_date = utcnow()
         self.energenie_timeout = 1
-
-        self.known_hosts = {}
-        self.known_hosts['qubic-central'] = "192.168.2.1"
-        self.known_hosts['qubic-studio']  = "192.168.2.8"
-        self.known_hosts['calsource']     = "192.168.2.5"
-        self.known_hosts['pigps'] = '192.168.2.17'
         
         self.broadcast_port = 37020
         self.nbytes = 1024
-        self.receiver = self.known_hosts['pigps']
+        self.receiver = known_hosts['pigps']
 
         self.hostname = None
         if self.hostname is None and 'HOST' in os.environ.keys():
             self.hostname = os.environ['HOST']
             
         # try to get hostname from the ethernet device
-        cmd = '/sbin/ifconfig -a'
-        out, err = shellcommand(cmd)
-        match = re.match('.* inet (192\.168\.2\..*?) ',out.replace('\n',' '))
-        if match:
-            ip_addr = match.groups()[0]
-            if ip_addr in self.known_hosts.values():
-                self.hostname = next(key for key,val in self.known_hosts.items() if val==ip_addr)
-            else:
-                self.hostname = ip_addr
+        ip_addr = get_myip()
+        self.hostname = ip_addr
+        if ip_addr is not None and ip_addr in known_hosts.values():
+            self.hostname = next(key for key,val in known_hosts.items() if val==ip_addr)
 
         # finally, if still undefined
         if self.hostname is None:
