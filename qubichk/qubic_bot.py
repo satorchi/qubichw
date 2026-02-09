@@ -30,7 +30,6 @@ from qubichk.hk_verify import check_compressors,check_diskspace
 from qubichk.send_telegram import get_botId,get_TelegramAddresses, get_alarm_recipients
 from qubichk.utilities import get_fullpath
 from qubichk.ups import get_ups_info
-#from qubichk.platform import get_position
 from qubichk.utilities import shellcommand
 
 class dummy_bot:
@@ -1341,28 +1340,6 @@ class qubic_bot :
         return
 
 
-    # def position(self):
-    #     '''
-    #     get the azimuth and elevation pointing of the platform
-    #     '''
-    #     az,el,azwarn,elwarn = get_position()
-    #     date_str = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    #     if type(az)==str:
-    #         az_str = 'ERROR'
-    #     else:
-    #         if azwarn:
-    #             az_str = '%7.2f degrees (possible encoder readout error)' % az
-    #         else:
-    #             az_str = '%7.2f degrees' % az
-                
-    #     if type(el)==str:
-    #         el_str = 'ERROR'
-    #     else:
-    #         el_str = '%7.2f degrees' % el
-    #     answer = "\nazimuth = %s\nelevation = %s" % (az_str,el_str)
-    #     self._send_message(answer)
-    #     return
-
     def position(self):
         '''
         read the mount positions
@@ -1370,7 +1347,7 @@ class qubic_bot :
         latest_date = utcfromtimestamp(0)
         fmt_str = '\n%9s:  %.3f degrees'
         answer = 'Pointing:\n'
-        for basename in ['AZIMUTH','ELEVATION']:
+        for basename in ['AZ','EL','RO']:
             fullname = '%s/%s.txt' % (self.hk_dir,basename)
             if not os.path.isfile(fullname):
                 continue
