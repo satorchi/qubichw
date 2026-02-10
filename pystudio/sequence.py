@@ -254,7 +254,7 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     return True
 
 
-def do_DACoffset_measurement(self,acqtime=30):
+def do_DACoffset_measurement(self,duration=30):
     '''
     run a short acquisition with DAC offsets set to zero
     afterwards, this dataset is used to calculate the DACoffsetTable
@@ -269,7 +269,7 @@ def do_DACoffset_measurement(self,acqtime=30):
     ack = self.send_offsetTable(asicNum,offset_table)
     
     ack = self.send_startAcquisition(dataset_name,comment)
-    time.sleep(acqtime)
+    time.sleep(duration)
     ack = self.send_stopAcquisition()
     return
 
