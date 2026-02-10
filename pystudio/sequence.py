@@ -254,7 +254,7 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     return True
 
 
-def do_DACoffset_measurement(self,duration=30):
+def do_DACoffset_measurement(self,duration=30,Tbath=None,Voffset=None):
     '''
     run a short acquisition with DAC offsets set to zero
     afterwards, this dataset is used to calculate the DACoffsetTable
@@ -265,12 +265,18 @@ def do_DACoffset_measurement(self,duration=30):
     comment = 'sent by pystudio'
     asicNum = [1,2]
 
+    # make sure FLL is stopped
+    
+    
+    # set the offset table to zero
     offset_table = np.zeros(128,dtype=float)
     ack = self.send_offsetTable(asicNum,offset_table)
-    
-    ack = self.send_startAcquisition(dataset_name,comment)
+
+    # start an acquisition, but with no FLL regulations
+    ack = self.start_observations(Tbath=Tbath,Voffset=Voffset,FLL=False)
+
     time.sleep(duration)
-    ack = self.send_stopAcquisition()
+    ack = self.end_observation()
     return
 
 def assign_saved_DACoffsetTables(self):
@@ -501,7 +507,7 @@ def do_SQUID_optimization(self,
     return
 
 
-def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
+def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True):
     '''
     setup the frontend for observing and start the acquisition
     '''
@@ -550,7 +556,7 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None):
     ack = self.send_TESDAC_CONTINUOUS(asicNum,Voffset)
 
     # start all regulations
-    ack = self.send_startFLL(asicNum)
+    if FLL: ack = self.send_startFLL(asicNum)
 
     # start recording data
     acq_start = utcnow()
