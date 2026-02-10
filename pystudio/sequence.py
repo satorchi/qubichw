@@ -288,7 +288,7 @@ def assign_saved_DACoffsetTables(self):
     '''
     offsetTables = read_DACoffsetTables()
     for asic_num in offsetTables.keys():
-        ack = send_offsetTable(asic_num,offsetTables[asic_num])
+        ack = self.send_offsetTable(asic_num,offsetTables[asic_num])
         
     return ack
 
