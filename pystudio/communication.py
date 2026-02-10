@@ -410,7 +410,7 @@ def send_request(self,reqNum=None,parameterList=None):
     vals = self.interpret_communication(ack,parameterList=parameterList)
 
     # then read the data
-    time.sleep(0.1)
+    time.sleep(0.2)
     ack = self.get_data()
     if ack is None:
         return vals
