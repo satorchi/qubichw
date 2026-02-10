@@ -254,7 +254,7 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     return True
 
 
-def do_DACoffset_measurement(self,duration=30,Tbath=None,Voffset=None):
+def do_DACoffset_measurement(self,duration=30,Tbath=None,Voffset=None,comment=None):
     '''
     run a short acquisition with DAC offsets set to zero
     afterwards, this dataset is used to calculate the DACoffsetTable
@@ -273,7 +273,7 @@ def do_DACoffset_measurement(self,duration=30,Tbath=None,Voffset=None):
     ack = self.send_offsetTable(asicNum,offset_table)
 
     # start an acquisition, but with no FLL regulations
-    ack = self.start_observations(Tbath=Tbath,Voffset=Voffset,FLL=False)
+    ack = self.start_observations(Tbath=Tbath,Voffset=Voffset,FLL=False,comment=comment)
 
     time.sleep(duration)
     ack = self.end_observation()
