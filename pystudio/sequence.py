@@ -254,13 +254,15 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     return True
 
 
-def do_DACoffset_measurement(self,duration=30,Tbath=None,Voffset=None,comment=None):
+def do_DACoffset_measurement(self,duration=None,Tbath=None,Voffset=None,comment=None):
     '''
     run a short acquisition with DAC offsets set to zero
     afterwards, this dataset is used to calculate the DACoffsetTable
 
     we don't change the current settings except to put zeros in the DACoffsetTable
     '''
+    if duration is None: duration = 30
+    
     dataset_name = 'DACoffsetMeasurement'
     comment = 'sent by pystudio'
     asicNum = [1,2]
