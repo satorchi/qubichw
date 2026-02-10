@@ -275,7 +275,7 @@ def do_DACoffset_measurement(self,duration=None,Tbath=None,Voffset=None,comment=
     ack = self.send_offsetTable(asicNum,offset_table)
 
     # start an acquisition, but with no FLL regulations
-    ack = self.start_observation(Tbath=Tbath,Voffset=Voffset,FLL=False,comment=comment)
+    ack = self.start_observation(Tbath=Tbath,Voffset=Voffset,FLL=False,comment=comment,title='DAC_offset_measurement')
 
     time.sleep(duration)
     ack = self.end_observation()
