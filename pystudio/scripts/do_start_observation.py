@@ -34,7 +34,6 @@ def cli():
     ack = dispatcher.subscribe_dispatcher()
     ack = dispatcher.start_observation(Voffset=options['Voffset'],
                                        Tbath=options['Tbath'],
-                                       duration=options['duration'],
                                        comment=options['comment'],
                                        title=options['title']
                                        )
