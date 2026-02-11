@@ -25,7 +25,8 @@ from pystudio import pystudio
 parameterList = ['Voffset',
                  'Tbath',
                  'duration',
-                 'comment']
+                 'comment',
+                 'title']
 options = parseargs(sys.argv,expected_args=parameterList)
 
 def cli():
@@ -34,7 +35,8 @@ def cli():
     ack = dispatcher.start_observation(Voffset=options['Voffset'],
                                        Tbath=options['Tbath'],
                                        duration=options['duration'],
-                                       comment=options['comment']
+                                       comment=options['comment'],
+                                       title=options['title']
                                        )
 
     if options['duration'] is not None:

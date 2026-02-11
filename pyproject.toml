@@ -113,22 +113,8 @@ script-files = ["qubichk/scripts/start_calsource_acq.sh",
 		"pystudio/scripts/do_DACoffset_measurement.py",
 		"pystudio/scripts/do_start_observation.py",
 		"pystudio/scripts/do_end_observation.py",
+		"pystudio/scripts/do_assign_saved_DACoffsetTables.py",
+		"pystudio/scripts/do_assign_default_DACoffsetTables.py",		
                 "qubichk/scripts/archive-data.sh",
                 "qubichk/scripts/clean-hk.sh",
                 "qubichk/scripts/start_gpsd-ntpd.sh"]
-                
-# These are python executable scripts using hatch, but all the scripts have to be modified to have a "main" function like cli() or whatever
-# [project.scripts]
-# "calsource_commander.py" = "qubichk.scripts.calsource_commander:cli"
-# "cf_commander.py" = "qubichk.scripts.cf_commander:cli"
-# "powersupply.py" = "qubichk.powersupply:cli"
-# "run_bot.py" = "qubichk.scripts.run_bot:cli"
-# "run_hkserver.py" = "qubichk.scripts.run_hkserver:hkserver"
-# "calsource2fits.py" = "qubichk.scripts.calsource2fits:cli"
-# "compressor_commander.py" = "qubichk.scripts.compressor_commander:cli"
-# "show_hk.py" = "qubichk.scripts.show_hk:list_hk"
-# "show_hk" = "qubichk.scripts:show_hk"
-# "do_IV_sequence" = "pystudio.scripts.do_IV_sequence:cli"
-# "do_NEP_sequence" = "pystudio.scripts.do_NEP_sequence:cli"
-# "do_SQUID_sequence" = "pystudio.scripts.do_SQUID_sequence:cli"
-# "do_init_frontend" = "pystudio.scripts.do_init_frontend:cli"
