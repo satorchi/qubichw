@@ -186,6 +186,7 @@ class obsmount:
 
         if self.error is None:
             retval['ok'] = True
+            self.subscribed[port] = True
             return True
 
         retval['error'] = 'could not communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num)
@@ -240,7 +241,7 @@ class obsmount:
             self.subscribe(port='data')
 
         if not self.subscribed[port]:
-            retval['error'] = 'could not subscribe'
+            retval['error'] = 'could not subscribe to data stream'
             return self.return_with_error(retval)
 
         try:
@@ -277,7 +278,7 @@ class obsmount:
             self.subscribe(port)
 
         if not self.subscribed[port]:
-            retval['error'] = 'could not subscribe'
+            retval['error'] = 'could not subscribe to command port'
             return self.return_with_error(retval)
 
         cmd_list = cmd_str.split(command_delimiter)
