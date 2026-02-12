@@ -130,9 +130,11 @@ class obsmount:
                 retval = self.do_command_init(axis)
                 if not retval['ok']: return retval
             self.error = None
+            retval['ok'] = True
             self.printmsg('command port initialized')
             return retval
-        
+
+        # handshake for data stream
         sampleperiod_str = '%i' % sampleperiod
         try:
             nbytes = self.sock[port].send(sampleperiod_str.encode())
