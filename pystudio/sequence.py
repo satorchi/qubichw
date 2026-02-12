@@ -509,13 +509,14 @@ def do_SQUID_optimization(self,
     return
 
 
-def set_observation_mode(self,Voffset=None,Tbath=None,FLL=True):
+def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
     '''
     setup the frontend for observing but do not start the acquisition
     '''
     #####################################
     # defaults
     if Voffset is None: Voffset = 3.0
+    if FLL is None: FLL = True
     asicNum = default_setting['asicNum']
 
     #####################################

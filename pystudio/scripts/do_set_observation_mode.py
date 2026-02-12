@@ -18,13 +18,14 @@ from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
 parameterList = ['Voffset',
-                 'Tbath']
+                 'Tbath',
+                 'FLL']
 options = parseargs(sys.argv,expected_args=parameterList)
 
 def cli():
     dispatcher = pystudio()
     ack = dispatcher.subscribe_dispatcher()
-    ack = dispatcher.set_observation_mode(Voffset=options['Voffset'],Tbath=options['Tbath'])
+    ack = dispatcher.set_observation_mode(Voffset=options['Voffset'],Tbath=options['Tbath'],FLL=options['FLL'])
     ack = dispatcher.unsubscribe()
     return
 
