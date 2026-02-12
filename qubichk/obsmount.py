@@ -37,8 +37,10 @@ class obsmount:
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
     # position offsets To Be Measured !!
+    # 'EL': 49.315, # see elog: https://elog-qubic.in2p3.fr/demo/1296
+    # 'EL': 49.935,   # see elog: https://elog-qubic.in2p3.fr/demo/1321
     position_offset = {'AZ': 0.0,
-                       'EL': 49.315, # see elog: https://elog-qubic.in2p3.fr/demo/1296
+                       'EL': 49.935,
                        'RO': 0.0,
                        'TR': 0.0
                        }
