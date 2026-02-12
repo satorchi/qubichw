@@ -184,7 +184,9 @@ class obsmount:
             self.subscribed[port] = True
             self.error = None                      
 
-        if self.error is None: return True
+        if self.error is None:
+            retval['ok'] = True
+            return True
 
         retval['error'] = 'could not communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num)
         return self.return_with_error(retval)
@@ -296,7 +298,7 @@ class obsmount:
             return retval
         
         try:
-            self.sock[port].send(full_cmd_str.encode())
+            self.sock[port].sendall(full_cmd_str.encode())
         except:
             self.subscribed[port] = False
             retval['error'] = make_errmsg('command unsuccessful')
