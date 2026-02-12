@@ -120,6 +120,7 @@ class obsmount:
         '''
         do the handshake with the server
         '''
+        self.printmsg('Doing handshake for port: %s' % port)
         retval = {}
         retval['ok'] = False
         if sampleperiod is None: sampleperiod = self.default_sampleperiod
@@ -181,6 +182,7 @@ class obsmount:
             self.subscribed[port] = False
             self.error = make_errmsg('SOCKET ERROR')
         else:
+            self.printmsg('doing handshake after port connection')
             retval = self.do_handshake(port)
             if not retval['ok']: return self.return_with_error(retval)
             self.subscribed[port] = True
@@ -189,7 +191,7 @@ class obsmount:
         if self.error is None:
             retval['ok'] = True
             self.subscribed[port] = True
-            return True
+            return retval
 
         retval['error'] = 'could not communicate because of %s to %s:%s' % (self.error,self.mount_ip,port_num)
         return self.return_with_error(retval)
@@ -277,6 +279,7 @@ class obsmount:
 
         # check that we are subscribed
         if not self.subscribed[port]:
+            self.printmsg('not subscribed to %s port.  subscribing now.' % port)
             self.subscribe(port)
 
         if not self.subscribed[port]:
