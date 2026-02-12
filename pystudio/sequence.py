@@ -509,14 +509,12 @@ def do_SQUID_optimization(self,
     return
 
 
-def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True):
+def set_observation_mode(self,Voffset=None,Tbath=None,FLL=True):
     '''
-    setup the frontend for observing and start the acquisition
+    setup the frontend for observing but do not start the acquisition
     '''
     #####################################
     # defaults
-    if title is None: title = 'observation'
-    if comment is None: comment = 'observation sent by pystudio'
     if Voffset is None: Voffset = 3.0
     asicNum = default_setting['asicNum']
 
@@ -557,9 +555,20 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     # configure continuous bias
     ack = self.send_TESDAC_CONTINUOUS(asicNum,Voffset)
 
-    # start all regulations
+    # start all regulations.  Optionally, do not start regulations
     if FLL: ack = self.send_startFLL(asicNum)
 
+    return
+
+def start_acquisition(self,title=None,comment=None):
+    '''
+    start the data acquisition
+    '''
+    #####################################
+    # defaults
+    if title is None: title = 'observation'
+    if comment is None: comment = 'observation sent by pystudio'
+    
     # start recording data
     acq_start = utcnow()
     ack = self.send_startAcquisition(title,comment)
@@ -591,6 +600,21 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     out,err = shellcommand(cmd)
    
     print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
+    return
+
+def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True):
+    '''
+    setup the frontend for observing and start the acquisition
+    '''
+    #####################################
+    # defaults
+    if title is None: title = 'observation'
+    if comment is None: comment = 'observation sent by pystudio'
+    if Voffset is None: Voffset = 3.0
+
+    ack = self.set_observation_mode(Voffset=Voffset,Tbath=Tbath,FLL=FLL)
+    ack = self.start_acquisition(title=title,comment=comment)
+    
     return
 
 def end_observation(self):

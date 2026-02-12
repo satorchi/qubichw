@@ -195,6 +195,8 @@ class pystudio:
         do_NEP_measurement,\
         do_SQUID_optimization,\
         do_skydip,\
+        set_observation_mode,\
+        start_acquisition,\
         start_observation,\
         end_observation,\
         park_frontend,\
