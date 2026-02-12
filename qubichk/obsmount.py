@@ -111,7 +111,7 @@ class obsmount:
         '''
         for cmd_arg in ['ENA','START','VEL 1']:
             cmd = '%s %s' % (axname,cmd_arg)
-            retval = self.send_comand(cmd)
+            retval = self.send_command(cmd)
             if not retval['ok']: return retval
             
         return retval
