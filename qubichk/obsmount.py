@@ -23,7 +23,7 @@ import datetime as dt
 import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir
-from qubicpack.pointing import position_key, STX, delimiter, interpret_pointing_chunk, axis_fullname
+from qubicpack.pointing import position_key, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
 class obsmount:
@@ -38,8 +38,9 @@ class obsmount:
     qubicstudio_ip = known_hosts['qubic-studio']
     # position offsets To Be Measured !!
     # 'EL': 49.315, # see elog: https://elog-qubic.in2p3.fr/demo/1296
-    # 'EL': 49.935,   # see elog: https://elog-qubic.in2p3.fr/demo/1321
-    position_offset = {'AZ': 0.0,
+    # 'EL': 49.935, # see elog: https://elog-qubic.in2p3.fr/demo/1321
+    # 'AZ':  9.0    # see elog: https://elog-qubic.in2p3.fr/demo/1322 
+    position_offset = {'AZ': 9.0, 
                        'EL': 49.935,
                        'RO': 0.0,
                        'TR': 0.0
@@ -60,10 +61,10 @@ class obsmount:
     verbosity = 1
     testmode = False
 
-    elmin = 50 # minimum permitted elevation
+    elmin = 30 # minimum permitted elevation
     elmax = 70 # maximum permitted elevation
-    azmin = 0  # minimum permitted azimuth
-    azmax = 25 # maximum permitted azimuth (changed to 25 on 2025-06-06 15:51:25 UT)
+    azmin = -38 # minimum permitted azimuth
+    azmax = 398 # maximum permitted azimuth (2026-02-12 15:49:34)
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.1 # default margin of precision for exiting the wait_for_arrival loop
@@ -104,6 +105,16 @@ class obsmount:
             self.printmsg('ERROR! %s' % retval['error'])
         return retval
 
+    def do_command_init(self,axname):
+        '''
+        do the command initialization commands
+        '''
+        for cmd_arg in ['ENA','START','VEL 1']:
+            cmd = '%s %s' % (axname,cmd_arg)
+            retval = self.send_comand(cmd)
+            if not retval['ok']: return retval
+            
+        return retval
 
     def do_handshake(self,port='data',sampleperiod=None):
         '''
@@ -111,64 +122,29 @@ class obsmount:
         '''
         retval = {}
         retval['ok'] = False
-        ack = 'NO ACK'
-
         if sampleperiod is None: sampleperiod = self.default_sampleperiod
 
+        # no handshake necessary for the PLC command port
         if port=='command':
-            # this was the handshake with the Raspi... TO BE UPDATED
-            self.printmsg('Getting acknowledgement from %s on %s port' % (self.mount_ip,port))
-            try:
-                ack_bin = self.sock[port].recv(4)
-            except socket.timeout:
-                self.subscribed[port] = False
-                self.error = 'HANDSHAKE TIMEOUT'
-                retval['error'] = 'Timeout error for handshake with motor %s' % port
-                return self.return_with_error(retval)
-            except:
-                self.subscribed[port] = False
-                self.error = 'HANDSHAKE FAIL'
-                retval['error'] = 'Failed handshake with motor %s' % port
-                return self.return_with_error(retval)
-            
-            
-            ack = ack_bin.decode()
-            if ack!='True':
-                self.error = 'BAD ACK'
-                self.subscribed[port] = False
-                retval['error'] = 'Did not receive correct acknowledgement for %s port: %s' % (port,ack)
-                return self.return_with_error(retval)
-            
-            time.sleep(self.wait)
-            self.printmsg('sending OK')
-
-            try:
-                ans = self.sock[port].send('OK'.encode())
-            except socket.timeout:
-                self.subscribed[port] = False
-                self.error = 'HANDSHAKE TIMEOUT ON SEND'
-                retval['error'] = 'Timeout error for sending handshake to motor %s' % port
-                return self.return_with_error(retval)
-            except:
-                self.subscribed[port] = False
-                self.error = 'HANDSHAKE FAIL ON SEND'
-                retval['error'] = 'Failed to send handshake to motor %s' % port
-                return self.return_with_error(retval)
-            # end handshake for command port
-
-        else:
-            sampleperiod_str = '%i' % sampleperiod
-            try:
-                nbytes = self.sock[port].send(sampleperiod_str.encode())
-            except:
-                retval['error'] = 'Failed to send sampling period to PLC on port %s' % port
-                return self.return_with_error(retval)
-            time.sleep(self.wait)
-            # end handshake for data port
+            for axis in self.axis_keys:
+                retval = self.do_command_init(axis)
+                if not retval['ok']: return retval
+            self.error = None
+            self.printmsg('command port initialized')
+            return retval
+        
+        sampleperiod_str = '%i' % sampleperiod
+        try:
+            nbytes = self.sock[port].send(sampleperiod_str.encode())
+        except:
+            retval['error'] = 'Failed to send sampling period to PLC on port %s' % port
+            return self.return_with_error(retval)
+        time.sleep(self.wait)
+        # end handshake for data port
         
         retval['ok'] = True
         self.error = None
-        self.printmsg('Handshake successful: ack=%s' % ack)
+        self.printmsg('Handshake successful for PLC data port')
         return retval
                     
         
@@ -192,7 +168,7 @@ class obsmount:
 
         self.printmsg('creating socket with type: %s' % socktype)
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
-        self.sock[port].settimeout(10)
+        self.sock[port].settimeout(0.1)
         self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
         try:
             self.sock[port].connect((self.mount_ip,port_num))
