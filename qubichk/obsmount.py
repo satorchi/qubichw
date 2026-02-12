@@ -135,6 +135,8 @@ class obsmount:
             self.printmsg('command port handshaking is not required')
             return retval
 
+        self.printmsg('Doing handshake for port: data')
+
         # handshake for data stream
         sampleperiod_str = '%i' % sampleperiod
         try:
@@ -183,8 +185,13 @@ class obsmount:
             self.error = make_errmsg('SOCKET ERROR')
         else:
             self.printmsg('doing handshake after port connection')
-            retval = self.do_handshake(port)
-            if not retval['ok']: return self.return_with_error(retval)
+            retval['ok'] = True
+            if port=='data':
+                retval = self.do_handshake(port)
+            else:
+                self.printmsg('no handshake for command port')
+            #if not retval['ok']: return self.return_with_error(retval)
+            self.printmsg('setting subscribed to True for port: %s' % port)
             self.subscribed[port] = True
             self.error = None                      
 
