@@ -24,7 +24,7 @@ import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir
 from qubicpack.pointing import position_key, STX, delimiter, interpret_pointing_chunk, axis_fullname
-
+command_delimiter = ' '
 known_hosts = get_known_hosts()
 class obsmount:
     '''
@@ -302,7 +302,7 @@ class obsmount:
             retval['error'] = 'could not subscribe'
             return self.return_with_error(retval)
 
-        cmd_list = cmd_str.split(delimiter)
+        cmd_list = cmd_str.split(command_delimiter)
         if len(cmd_list)<2:
             retval['error'] = 'not enough arguments for command: %s' % cmd_str
             return self.return_with_error(retval)
@@ -430,9 +430,9 @@ class obsmount:
         note that val is converted to string
         '''
         if val is None:
-            cmd_str = delimiter.join([axis.upper(),cmd.upper()])
+            cmd_str = command_delimiter.join([axis.upper(),cmd.upper()])
         else:
-            cmd_str = delimiter.join([axis.upper(),cmd.upper(),str(val)])
+            cmd_str = command_delimiter.join([axis.upper(),cmd.upper(),str(val)])
         return cmd_str
     
     def goto_az(self,az):
