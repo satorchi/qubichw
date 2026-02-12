@@ -127,12 +127,12 @@ class obsmount:
 
         # no handshake necessary for the PLC command port
         if port=='command':
-            for axis in self.axis_keys:
-                retval = self.do_command_init(axis)
-                if not retval['ok']: return retval
+            # for axis in self.axis_keys:
+            #     retval = self.do_command_init(axis)
+            #     if not retval['ok']: return retval
             self.error = None
             retval['ok'] = True
-            self.printmsg('command port initialized')
+            self.printmsg('command port handshaking is not required')
             return retval
 
         # handshake for data stream
