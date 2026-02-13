@@ -113,6 +113,7 @@ class obsmount:
             cmd = '%s %s' % (axname,cmd_arg)
             retval = self.send_command(cmd)
             if not retval['ok']: return retval
+            time.sleep(0.3)
             
         return retval
 
