@@ -585,7 +585,7 @@ def start_acquisition(self,title=None,comment=None):
 
     # start dumping the azel data
     day_str = acq_start.strftime('%Y-%m-%d')
-    dump_dir = os.sep.join([os.environ['HOME'],day_str,dataset_name,'Hks'])
+    dump_dir = os.sep.join([os.environ['HOME'],'data',day_str,dataset_name,'Hks'])
     dump_dir = verify_directory(dump_dir)
     if dump_dir is None:
         dump_dir = os.sep.join([os.environ['HOME'],'data'])
