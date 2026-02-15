@@ -24,6 +24,7 @@ $ do_constant_elevation_scanning.py el=50 azmin=155 azmax=205 duration=10800 tit
 '''
 import sys
 from satorchipy.utilities import parseargs
+from satorchipy.datefunctions import utcnow
 from pystudio import pystudio
 from qubichk.obsmount import obsmount
 

@@ -634,7 +634,7 @@ class obsmount:
          azmin    : azimuth start position
          azmax    : azimuth end position
          duration : duration in seconds.
-             By default, this is a near endless loop and must be stopped manually with do_end_observation.py
+             By default, this is a near endless loop and must be stopped manually with ctrl-c and do_end_observation.py
         '''
         if el is None: el = 50
         if azmin is None: azmin = 155
@@ -653,29 +653,18 @@ class obsmount:
             self.printmsg('ERROR! Did not successfully get to elevation position')
             return False
 
+
+        # maximum wait time for each scan
+        maxwait = np.abs(azmax-azmin)/0.9 + 30 # margin added to 1 deg/sec rotation speed
+        self.printmsg('using wait time for each azimuth scan: %.1 secs' % maxwait)
         
         ack = self.goto_az(azmin)
         if not ack['ok']: return False
         
-        azok = self.wait_for_arrival(az=azmin)
+        azok = self.wait_for_arrival(az=azmin,maxwait=maxwait)
         if not azok:
             self.printmsg('ERROR! Did not successfully get to starting azimuth position')
             return False
-
-
-        azel = self.get_azel()
-        while not azel['ok']:
-            time.sleep(2)
-            azel = self.get_azel()
-            now = utcnow().timestamp()
-            if (now-start_tstamp)>10:
-                self.printmsg('ERROR! Could not get current position.')
-                return False
-        
-        
-        az = azel['AZ']
-        el = azel['EL']
-
 
         now = utcnow()
         end_time = now + duration_delta
@@ -684,7 +673,7 @@ class obsmount:
             for azlimit in [azmax, azmin]:
                 self.goto_az(azlimit)
                 time.sleep(1) # wait before next command
-                azok = self.wait_for_arrival(az=azlimit)
+                azok = self.wait_for_arrival(az=azlimit,maxwait=maxwait)
                 if not azok:
                     self.printmsg('ERROR! Did not successfully get to azimuth position')
                     return False
