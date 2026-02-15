@@ -318,6 +318,13 @@ class obsmount:
             retval['error'] = make_errmsg('command unsuccessful')
             return self.return_with_error(retval)
 
+        # try to get the command echo
+        try:
+            cmd_echo = self.sock[port].recv(1024)
+        except:
+            cmd_echo = 'NO COMMAND ECHO'
+
+        retval['command echo'] = cmd_echo
         return retval
 
     def acquisition(self,dump_dir=hk_dir):
@@ -616,4 +623,76 @@ class obsmount:
             azstep = -azstep
 
         return True
+    
+
+    def do_constant_elevation_scanning(self,el=None,azmin=None,azmax=None,duration=None):
+        '''
+        do azimuth back and forth scanning at a given elevation
+
+        ARGUMENTS:
+         el       : elevation position during scanning
+         azmin    : azimuth start position
+         azmax    : azimuth end position
+         duration : duration in seconds.
+             By default, this is a near endless loop and must be stopped manually with do_end_observation.py
+        '''
+        if el is None: el = 50
+        if azmin is None: azmin = 155
+        if azmax is None: azmax = 205
+        if duration is None:
+            duration_delta = dt.timedelta(days=30) # must end observation manually
+        else:
+            duration_delta = dt.timedelta(seconds=duration)
+    
+        start_tstamp = utcnow().timestamp()
+
+        ack = self.goto_el(el)
+        if not ack['ok']: return False
+        elok = self.wait_for_arrival(el=el)
+        if not elok:
+            self.printmsg('ERROR! Did not successfully get to elevation position')
+            return False
+
+        
+        ack = self.goto_az(azmin)
+        if not ack['ok']: return False
+        
+        azok = self.wait_for_arrival(az=azmin)
+        if not azok:
+            self.printmsg('ERROR! Did not successfully get to starting azimuth position')
+            return False
+
+
+        azel = self.get_azel()
+        while not azel['ok']:
+            time.sleep(2)
+            azel = self.get_azel()
+            now = utcnow().timestamp()
+            if (now-start_tstamp)>10:
+                self.printmsg('ERROR! Could not get current position.')
+                return False
+        
+        
+        az = azel['AZ']
+        el = azel['EL']
+
+
+        now = utcnow()
+        end_time = now + duration_delta
+        while now<end_time:
+            
+            for azlimit in [azmax, azmin]:
+                self.goto_az(azlimit)
+                time.sleep(1) # wait before next command
+                azok = self.wait_for_arrival(az=azlimit)
+                if not azok:
+                    self.printmsg('ERROR! Did not successfully get to azimuth position')
+                    return False
+
+            now = utcnow()
+
+
+        return True
+
+
     
