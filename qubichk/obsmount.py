@@ -656,7 +656,7 @@ class obsmount:
 
         # maximum wait time for each scan
         maxwait = np.abs(azmax-azmin)/0.9 + 30 # margin added to 1 deg/sec rotation speed
-        self.printmsg('using wait time for each azimuth scan: %.1 secs' % maxwait)
+        self.printmsg('using wait time for each azimuth scan: %.1f secs' % maxwait)
         
         ack = self.goto_az(azmin)
         if not ack['ok']: return False
