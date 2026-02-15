@@ -62,14 +62,14 @@ def cli():
     
     #####################################
     # setup and start the acquisition
-    self.start_observation(Voffset=options['Voffset'],Tbath=options['Tbath'],dataset_name=dataset_name,comment=comment)
+    dispatcher.start_observation(Voffset=options['Voffset'],Tbath=options['Tbath'],dataset_name=dataset_name,comment=comment)
 
     # run the scanning sequence from obsmount
     mount.do_constant_elevation_scanning(el=el,azmin=options['azmin'],azmax=options['azmax'],duration=options['duration'])
     mount.disconnect()
 
     # stop the acquisition
-    ack = self.end_observation()
+    ack = dispatcher.end_observation()
     
     print('%s - Scan completed for ' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),dataset_name))
     return
