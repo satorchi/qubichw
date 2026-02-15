@@ -72,7 +72,7 @@ def cli():
     # stop the acquisition
     ack = dispatcher.end_observation()
     
-    print('%s - Scan completed for ' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),dataset_name))
+    print('%s - Scan completed for %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),dataset_name))
     return
 
     ack = dispatcher.unsubscribe()
