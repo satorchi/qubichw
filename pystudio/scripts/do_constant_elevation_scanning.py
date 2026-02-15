@@ -62,7 +62,7 @@ def cli():
     
     #####################################
     # setup and start the acquisition
-    dispatcher.start_observation(Voffset=options['Voffset'],Tbath=options['Tbath'],dataset_name=dataset_name,comment=comment)
+    dispatcher.start_observation(Voffset=options['Voffset'],Tbath=options['Tbath'],title=dataset_name,comment=comment)
 
     # run the scanning sequence from obsmount
     mount.do_constant_elevation_scanning(el=el,azmin=options['azmin'],azmax=options['azmax'],duration=options['duration'])
