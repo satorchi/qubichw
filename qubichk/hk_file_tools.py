@@ -75,11 +75,15 @@ def read_hk_file(filename):
         try:
             tstamp = float(tstamp_str)
             reading = eval(val_str)
-            v[idx] = reading
-            t[idx] = tstamp
         except:
             print("ERROR! Couldn't read line: %i) %s" % (line_idx+1,line))
             continue
+
+        if tstamp>4e9: continue
+        if tstamp<1.4e9: continue
+        v[idx] = reading
+        t[idx] = tstamp
+        
 
         if len(cols)>2:
             if cols[2]=='ON': onoff[idx] = True
