@@ -491,7 +491,7 @@ def list_hk():
         date_str = now.strftime(date_fmt)
 
         sun_altaz = get_altaz(now,source='sun',verbose=False)
-        val_str = 'Az: %.2f, El: %.2f' % (sun_altaz.az.deg, sun_altaz.alt.deg)
+        val_str = '%.2f, %.2f' % (sun_altaz.az.deg, sun_altaz.alt.deg)
         label = 'Sun position'        
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
         lines.append(line)
