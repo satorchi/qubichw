@@ -492,7 +492,7 @@ def list_hk():
 
         sun_altaz = get_altaz(now,source='sun',verbose=False)
         val_str = '%.2f, %.2f' % (sun_altaz.az.deg, sun_altaz.alt.deg)
-        label = 'Sun position'        
+        label = 'Sun: az, el'        
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
         lines.append(line)
         
