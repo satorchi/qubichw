@@ -12,11 +12,15 @@ utilities used by various modules in qubichk/hw especially hk_verify
 '''
 import sys,os,subprocess,re,struct
 import numpy as np
+from astropy.coordinates import SkyCoord, EarthLocation, AltAz, get_body, angular_separation
+from satorchipy.datefunctions import utcnow
 
 # QUBIC position from PiGPS (antenna on the mount): https://elog-qubic.in2p3.fr/demo/1234
+qubic_site = 'Alto Chorrillos'
 qubic_latitude = -(24 + 11.2002/60)
 qubic_longitude = -(66 + 28.7039/60)
 qubic_altitude = 4830.3
+qubicloc = EarthLocation(lon=qubic_longitude,lat=qubic_latitude,height=qubic_altitude)
 
 # these are the default known hosts.  Updated addresses are read from /etc/hosts and from ~/.local/share/qubic/known_hosts
 known_hosts = {}
@@ -36,6 +40,40 @@ date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
 fridge_dir = '/home/qubic/data/temperature'
+
+def get_altaz(d,source='sun',verbose=False):
+    '''
+    get the position of a solar system body at a given time
+    '''
+    if verbose: print('%s location: longitude=%.2f degrees, latitude=%.2f degrees' % (qubic_site,qubic_longitude,qubic_latitude))
+
+    obstime_astro= astrotime(d,format='datetime',scale='utc')
+    solbody = get_body(source,obstime_astro,location=qubicloc)
+    frame_Qubic = AltAz(obstime=obstime_astro,location=qubicloc)
+    altaz = solbody.transform_to(frame_Qubic)
+
+    az_geo = altaz.az.deg
+    el_geo = altaz.alt.deg
+
+    if verbose:
+        print('======= %s ==========' % d.strftime('%Y-%m-%d %H:%M:%S'))
+        print('%s coordinates from %s:  az=%.2f degrees, el=%.2f degrees' % (qubic_site,source,az_geo,el_geo))
+
+    return altaz
+
+def get_sun_separation(az,el,d=None):
+    '''
+    get the angular separation to the Sun at time d (datetime object)
+    '''
+    if d is None: d = utcnow()
+
+    sun_altaz = get_altaz(d,source='sun',verbose=False)
+    
+    angsep_rad = angular_separation( np.radians(az), np.radians(el), sun_altaz.az.rad, sun_altaz.alt.rad )
+    angsep = np.degrees(angsep_rad)
+    
+    return angsep
+
 
 def read_hosts_file(filename):
     '''

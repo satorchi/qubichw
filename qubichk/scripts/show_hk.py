@@ -15,12 +15,11 @@ text highlighting from: https://stackoverflow.com/questions/5947742/how-to-chang
 '''
 import sys,os
 from glob import glob
-import datetime as dt
 from termcolor import colored
 from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
-from qubichk.utilities import get_fullpath, read_labels
+from qubichk.utilities import get_fullpath, read_labels, get_sun_separation
 
 year_str = utcnow().strftime('%Y')
 
@@ -420,6 +419,8 @@ def list_hk():
     
         
     # do the rest of the HK files
+    az = None
+    el = None
     for F in sorted_hk_files:
         basename = os.path.basename(F)
         if basename in exclude_files: continue
@@ -477,6 +478,20 @@ def list_hk():
 
 
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        lines.append(line)
+
+        if basename.find('AZ')==0: az = val
+        if basename.find('EL')==0: el = val
+
+    sun_sep = None
+    if (az is not None) and (el is not None):
+        sun_sep = get_sun_separation(az,el)
+        date_str = utcnow().strftime(date_fmt)
+        val_str = assign_val_string(sun_sep,'degrees')
+        label = 'angle to Sun'
+        labelkey = 'SUN'
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        if sun_sep<25: line = colored(line,'red','on_white')
         lines.append(line)
 
 
