@@ -19,7 +19,7 @@ from termcolor import colored
 from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
-from qubichk.utilities import get_fullpath, read_labels, get_sun_separation
+from qubichk.utilities import get_fullpath, read_labels, get_sun_separation, get_altaz
 
 year_str = utcnow().strftime('%Y')
 
@@ -483,13 +483,22 @@ def list_hk():
         if basename.find('AZ')==0: az = val
         if basename.find('EL')==0: el = val
 
+    # angular distance to Sun from current pointing
     sun_sep = None
     if (az is not None) and (el is not None):
+        labelkey = 'SUN'
+        now = utcnow()
+        date_str = now.strftime(date_fmt)
+
+        sun_altaz = get_altaz(now,source='sun',verbose=False)
+        val_str = 'Az: %.2f, El: %.2f' % (sun_altaz.az.deg, sun_altaz.alt.deg)
+        label = 'Sun position'        
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        lines.append(line)
+        
         sun_sep = get_sun_separation(az,el)
-        date_str = utcnow().strftime(date_fmt)
         val_str = assign_val_string(sun_sep,'degrees')
         label = 'angle to Sun'
-        labelkey = 'SUN'
         line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
         if sun_sep<25: line = colored(line,'red','on_white')
         lines.append(line)
