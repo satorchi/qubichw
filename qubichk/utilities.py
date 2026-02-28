@@ -13,6 +13,7 @@ utilities used by various modules in qubichk/hw especially hk_verify
 import sys,os,subprocess,re,struct
 import numpy as np
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz, get_body, angular_separation
+from astropy.time import Time as astrotime
 from satorchipy.datefunctions import utcnow
 
 # QUBIC position from PiGPS (antenna on the mount): https://elog-qubic.in2p3.fr/demo/1234
