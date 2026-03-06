@@ -319,6 +319,7 @@ class obsmount:
             return self.return_with_error(retval)
 
         # try to get the command echo
+        time.sleep(0.1)
         try:
             cmd_echo = self.sock[port].recv(1024)
         except:
