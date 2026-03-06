@@ -31,6 +31,7 @@ from qubichk.send_telegram import get_botId,get_TelegramAddresses, get_alarm_rec
 from qubichk.utilities import get_fullpath
 from qubichk.ups import get_ups_info
 from qubichk.utilities import shellcommand
+from qubichk.scripts.show_hk import list_hk
 
 class dummy_bot:
     '''
@@ -110,7 +111,8 @@ class qubic_bot :
                          '/position': self.position,
                          '/az': self.position,
                          '/el': self.position,
-                         '/azel': self.position
+                         '/azel': self.position,
+                         '/hk': self.list_hk
                          }
 
 
@@ -1365,6 +1367,14 @@ class qubic_bot :
             answer += fmt_str % (basename,reading)
 
         answer += '\n\nTime: %s' % latest_date.strftime(self.time_fmt)    
+        self._send_message(answer)
+        return
+
+    def list_hk(self):
+        '''
+        return the HK listing as displayed by show_hk.py
+        '''
+        answer = list_hk()
         self._send_message(answer)
         return
     

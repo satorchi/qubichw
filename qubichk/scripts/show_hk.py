@@ -522,11 +522,12 @@ def list_hk():
 
 
     page = '\n'.join(lines)
-    print(page)
-
-    return
+    return page
 
 if __name__ == '__main__':
-    list_hk()
+    page = list_hk()
+    print(page)
+
+
     
 
