@@ -164,6 +164,10 @@ class obsmount:
         retval['ok'] = False
         retval['error'] = 'init error'
         self.error = None
+
+        if self.subscribed[port]:
+            retval['error'] = 'already subscribed to port: %s' % port
+            self.return_with_error(retval)
         
         if port=='data':
             port_num = self.listen_port
@@ -174,23 +178,20 @@ class obsmount:
 
         self.printmsg('creating socket with type: %s' % socktype)
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
-        self.sock[port].settimeout(0.1)
+        self.sock[port].settimeout(0.5)
         self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
         try:
             self.sock[port].connect((self.mount_ip,port_num))
         except socket.timeout:
-            self.subscribed[port] = False
+            # self.subscribed[port] = False
             self.error = 'TIMEOUT'
         except:
-            self.subscribed[port] = False
+            # self.subscribed[port] = False
             self.error = make_errmsg('SOCKET ERROR')
         else:
             self.printmsg('doing handshake after port connection')
             retval['ok'] = True
-            if port=='data':
-                retval = self.do_handshake(port)
-            else:
-                self.printmsg('no handshake for command port')
+            retval = self.do_handshake(port)
             #if not retval['ok']: return self.return_with_error(retval)
             self.printmsg('setting subscribed to True for port: %s' % port)
             self.subscribed[port] = True
@@ -232,6 +233,12 @@ class obsmount:
             self.sock[port] = None
             self.subscribed[port] = False
         return None
+
+    def unsubscribe(self):
+        '''
+        alias for disconnect
+        '''
+        return self.disconnect()
 
     def get_data(self,chunksize=None):
         '''
