@@ -334,7 +334,13 @@ class obsmount:
         except:
             cmd_echo = 'NO COMMAND ECHO'
 
+        if isinstance(cmd_echo,bytes):
+            cmd_echo = cmd_echo.decode()
+
         retval['command echo'] = cmd_echo
+        if cmd_echo.find('out of range')>=0:
+            retval['error'] = cmd_echo
+            self.return_with_error(retval)
         return retval
 
     def acquisition(self,dump_dir=hk_dir):
