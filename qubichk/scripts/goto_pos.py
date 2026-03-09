@@ -73,4 +73,5 @@ if azel=='el':
 else:
     mount.goto_az(pos)
     mount.wait_for_arrival(az=pos)
-
+    
+mount.disconnect()
