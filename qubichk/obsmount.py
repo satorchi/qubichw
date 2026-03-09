@@ -183,6 +183,7 @@ class obsmount:
 
         # we set the "subscribed" flag to True, just for trying because the PLC doesn't like multiple attempts
         self.subscribed[port] = True
+        self.printmsg('setting subscribed to True just for trying on port: %s' % port)
         try:
             self.sock[port].connect((self.mount_ip,port_num))
         except socket.timeout:
