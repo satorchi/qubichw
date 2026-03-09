@@ -672,34 +672,13 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     if comment is None: comment = 'Sky Dip sequence sent by pystudio'
     dataset_name = 'SkyDip'
 
-    if azstep is None: azstep = mount.azstep
-    if azmin is None:
-        azmin = mount.azmin
-    else:
-        mount.azmin = azmin
-        
-    if azmax is None:
-        azmax = mount.azmax
-    else:
-        mount.azmax = azmax
-        
-    if elmin is None:
-        elmin = mount.elmin
-    else:
-        mount.elmin = elmin
-        
-    if elmax is None:
-        elmax = mount.elmax
-    else:
-        mount.elmax = elmax
-
     
     #####################################
     # setup and start the acquisition
     self.start_observation(Voffset,Tbath,dataset_name,comment)
 
     # run the Sky Dip sequency from obsmount
-    mount.do_skydip_sequence(azstep)
+    mount.do_skydip_sequence(azstep=azstep,azmin=azmin,azmax=azmax,elmin=elmin,elmax=elmax)
     mount.disconnect()
 
     # stop the acquisition

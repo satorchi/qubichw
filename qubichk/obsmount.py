@@ -578,25 +578,30 @@ class obsmount:
         return True
         
     
-    def do_skydip_sequence(self,azstep=None):
+    def do_skydip_sequence(self,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None):
         '''
         do the sky dip movements
         '''
         if azstep is None: azstep = self.azstep
+        if azmin is None:  azmin  = self.azmin
+        if azmax is None:  azmax  = self.azmax
+        if elmin is None:  elmin  = self.elmin
+        if elmax is None:  elmax  = self.elmax
+        
     
         start_tstamp = utcnow().timestamp()
 
-        ack = self.goto_az(self.azmin)
+        ack = self.goto_az(azmin)
         if not ack['ok']:
             return False
         
-        azok = self.wait_for_arrival(az=self.azmin)
+        azok = self.wait_for_arrival(az=azmin)
         if not azok:
             self.printmsg('ERROR! Did not successfully get to starting azimuth position')
             return False
 
-        self.goto_el(self.elmin)
-        elok = self.wait_for_arrival(el=self.elmin)
+        self.goto_el(elmin)
+        elok = self.wait_for_arrival(el=elmin)
         if not elok:
             self.printmsg('ERROR! Did not successfully get to starting elevation position')
             return False
@@ -615,19 +620,19 @@ class obsmount:
         el = azel['EL']
 
 
-        for azlimit in [self.azmax, self.azmin]:
+        for azlimit in [azmax, azmin]:
         
             while np.abs(az-azlimit)>self.pos_margin:
-                self.goto_el(self.elmax)
+                self.goto_el(elmax)
                 time.sleep(1) # wait before next command
-                elok = self.wait_for_arrival(el=self.elmax)
+                elok = self.wait_for_arrival(el=elmax)
                 if not elok:
                     self.printmsg('ERROR! Did not successfully get to starting elevation position')
                     return False
             
 
-                self.goto_el(self.elmin)
-                azok = self.wait_for_arrival(el=self.elmin)
+                self.goto_el(elmin)
+                azok = self.wait_for_arrival(el=elmin)
                 if not azok:
                     self.printmsg('ERROR! Did not successfully get to starting azimuth position')
                     return False
