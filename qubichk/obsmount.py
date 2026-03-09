@@ -176,7 +176,7 @@ class obsmount:
             port_num = self.command_port
             socktype = socket.SOCK_STREAM
 
-        self.printmsg('creating socket with type: %s' % socktype)
+        self.printmsg('creating socket for %s with type: %s' % (port,socktype))
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
         self.sock[port].settimeout(0.5)
         self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
