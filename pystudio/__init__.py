@@ -203,6 +203,7 @@ class pystudio:
         do_skydip,\
         do_scan,\
         init_frontend,\
+        get_spol,\
         get_frontend_settings
 
     from .tparameterstable import assign_parameterstable

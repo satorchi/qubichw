@@ -575,14 +575,20 @@ def start_acquisition(self,title=None,comment=None):
     ack = self.send_startAcquisition(title,comment)
 
     # get the assigned dataset name
-    parm_name = 'DISP_BackupSessionName_ID'
-    vals = self.send_request(parameterList=[parm_name])
-    if parm_name not in vals.keys():
-        dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
-        print('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
-    else:
-        dataset_name = vals[parm_name]['value']
+    # this does not work because the BackupSessionName_ID does not include the date
+    # parm_name = 'DISP_BackupSessionName_ID'
+    # vals = self.send_request(parameterList=[parm_name])
+    # if parm_name not in vals.keys():
+    #     dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
+    #     print('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
+    # else:
+    #     dataset_name = vals[parm_name]['value']
 
+    # need to implement a way to get the full dataset name assigned by QubicStudio
+    # this could be off by a second, but not always
+    # if it's off by a second, then acq_start is one second early (never the other way around)
+    dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
+    
     # start dumping the azel data
     day_str = acq_start.strftime('%Y-%m-%d')
     dump_dir = os.sep.join([os.environ['HOME'],'data',day_str,dataset_name,'Hks'])
@@ -687,6 +693,32 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
+def get_spol(self):
+    '''
+    get the current SQUID bias setting:  Spol
+    '''
+    retval = {}
+    retval['ok'] = False
+    retval['error'] = None
+    parm_name = 'ASIC_Spol_ID'
+    vals = self.send_request(parameterList=[parm_name])
+    retval['values'] = vals
+    if 'bytes' not in vals.keys():
+        retval['error'] = 'no answer'
+        return retval
+
+    if parm_name not in vals.keys():
+        retval['error'] = 'parameter not returned: %s' % parm_name
+        return retval
+    
+
+    parm_vals = vals[parm_name]['value']
+    
+    for idx,val in enumerate(parm_vals):
+        key = 'ASIC %2i' % (idx+1)
+        retval[key] = val
+
+    return retval
 
 def get_frontend_settings(self,parameterList=None):
     '''
