@@ -503,6 +503,21 @@ def list_hk():
         if sun_sep<25: line = colored(line,'red','on_white')
         lines.append(line)
 
+        labelkey = 'MOON'
+        moon_altaz = get_altaz(now,source='moon',verbose=False)
+        val_str = '%.2f, %.2f' % (moon_altaz.az.deg, moon_altaz.alt.deg)
+        label = 'Moon: az, el'        
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        lines.append(line)
+        
+        moon_sep = get_moon_separation(az,el)
+        val_str = assign_val_string(moon_sep,'degrees')
+        label = 'angle to Moon'
+        line = '%s %s %s %s' % (date_str, val_str.rjust(20), label.center(20), labelkey)
+        if moon_sep<25: line = colored(line,'red','on_white')
+        lines.append(line)
+        
+
 
     latest = max(tstamps)
     n_tstamps = len(tstamps)

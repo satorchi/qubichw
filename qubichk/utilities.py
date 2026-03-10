@@ -62,18 +62,31 @@ def get_altaz(d,source='sun',verbose=False):
 
     return altaz
 
-def get_sun_separation(az,el,d=None):
+def get_solbody_separation(az,el,d=None,source='sun'):
     '''
-    get the angular separation to the Sun at time d (datetime object)
+    get the angular separation to a solar system body at time d (datetime object)
     '''
     if d is None: d = utcnow()
 
-    sun_altaz = get_altaz(d,source='sun',verbose=False)
+    sun_altaz = get_altaz(d,source=source,verbose=False)
     
     angsep_rad = angular_separation( np.radians(az), np.radians(el), sun_altaz.az.rad, sun_altaz.alt.rad )
     angsep = np.degrees(angsep_rad)
     
     return angsep
+
+def get_sun_separation(az,el,d=None):
+    '''
+    get the angular separation to the Sun
+    '''
+    return get_solbody_separation(az,el,d=d,source='sun')
+
+def get_moon_separation(az,el,d=None):
+    '''
+    get the angular separation to the Moon
+    '''
+    return get_solbody_separation(az,el,d=d,source='moon')
+
 
 
 def read_hosts_file(filename):
