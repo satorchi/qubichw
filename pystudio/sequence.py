@@ -441,6 +441,10 @@ def do_SQUID_optimization(self,
     if Tbath is None: Tbath = 0.420
 
     #####################################
+    # save the current Spol values to re-assign them after the end of the measurement
+    spol_start = self.get_spol()
+
+    #####################################
     # make sure the bias does not go out of acceptable range
     Vmax = Voffset + 0.5*amplitude
     if (Vmax>9):
@@ -504,6 +508,17 @@ def do_SQUID_optimization(self,
     # switch off the temperature feedback
     mgc.set_mgc_pid(0)
     mgc.disconnect()
+
+    # reset the Spol values back to what they were at the start of the measurement
+    if isinstance(asicNum,int):
+        asicNum_list = [asicNum]
+    else:
+        asicNum_list = asicNum
+    for asic in asicNum_list:
+        key = 'ASIC %2i' % asic
+        Spol = spol_start[key]
+        ack =self.send_Spol(asic,Spol)
+        time.sleep(0.1)
     
     print('%s - SQUID optimization measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
