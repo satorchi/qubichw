@@ -19,7 +19,7 @@ from termcolor import colored
 from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
-from qubichk.utilities import get_fullpath, read_labels, get_sun_separation, get_altaz
+from qubichk.utilities import get_fullpath, read_labels, get_sun_separation, get_moon_separation, get_altaz
 
 year_str = utcnow().strftime('%Y')
 
