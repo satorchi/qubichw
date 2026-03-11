@@ -31,6 +31,7 @@ from qubichk.obsmount import obsmount
 parameterList = ['el',
                  'azmin',
                  'azmax',
+                 'duration',
                  'Voffset',
                  'Tbath',
                  'title',
