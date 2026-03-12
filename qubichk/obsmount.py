@@ -22,10 +22,11 @@ import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir
+from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip
 from qubicpack.pointing import position_key, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
+my_ip = get_myip()
 class obsmount:
     '''
     class to read to and command the observation mount
@@ -34,6 +35,7 @@ class obsmount:
     mount_ip = known_hosts['motorplc']
     listen_port = 9180
     command_port = 9000
+    broadcast_port = 61337
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
     # position offsets To Be Measured !!
@@ -283,7 +285,7 @@ class obsmount:
 
         retval['CHUNK'] = dat
         return retval
-    
+
     def send_command(self,cmd_str):
         '''
         send a command to the observation mount
@@ -347,8 +349,6 @@ class obsmount:
         '''
         dump the data supplied by the mount PLC without any interpretation
         this is an infinite loop to be interrupted by ctrl-c, or socket error, but not timeout error
-        
-        this replaces dump_data above and has lower overhead
         '''
         filename = os.sep.join([dump_dir,'POINTING.dat'])
         self.printmsg('pointing acquisition starting on file: %s' % filename)
@@ -367,6 +367,34 @@ class obsmount:
         h.close()
         self.printmsg('pointing acquisition ended: %s' % ans['error'])
         return ans
+
+    def broadcast_data(self):
+        '''
+        get data from the PLC and rebroadcast it to a local port
+        '''
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        rx = my_ip
+        PORT = self.broadcast_port
+
+        while True:
+            chunkdat = self.get_data()
+            if not chunkdat['ok']:
+                if chunkdat['error'].find('Ctrl-C')>0:
+                    sock.close()
+                    return
+                time.sleep(0.25)
+                continue
+                
+            time.sleep(0.05)
+            sock.sendto(chunkdat['CHUNK'],(rx,PORT))
+
+        # never reach this point
+        sock.close()
+        return
+
+    
+    
     
     def get_azel(self,chunksize=None):
         '''
@@ -676,7 +704,7 @@ class obsmount:
 
 
         # maximum wait time for each scan
-        maxwait = np.abs(azmax-azmin)/0.9 + 30 # margin added to 1 deg/sec rotation speed
+        maxwait = np.abs(azmax-azmin)/0.9 + 120 # margin added to 1 deg/sec rotation speed
         self.printmsg('using wait time for each azimuth scan: %.1f secs' % maxwait)
         
         ack = self.goto_az(azmin)
