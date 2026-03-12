@@ -714,7 +714,7 @@ class obsmount:
         if not ack['ok']: return False
         elok = self.wait_for_arrival(el=el)
         if not elok:
-            self.printmsg('ERROR! Did not successfully get to elevation position')
+            self.printmsg('ERROR! Did not successfully get to elevation position: %.3f degrees' % el)
             return False
 
 
@@ -727,7 +727,7 @@ class obsmount:
         
         azok = self.wait_for_arrival(az=azmin,maxwait=maxwait)
         if not azok:
-            self.printmsg('ERROR! Did not successfully get to starting azimuth position')
+            self.printmsg('ERROR! Did not successfully get to starting azimuth position: %.3f degrees' % azmin)
             return False
 
         now = utcnow()
@@ -739,7 +739,7 @@ class obsmount:
                 time.sleep(1) # wait before next command
                 azok = self.wait_for_arrival(az=azlimit,maxwait=maxwait)
                 if not azok:
-                    self.printmsg('ERROR! Did not successfully get to azimuth position')
+                    self.printmsg('ERROR! Did not successfully get to azimuth position: %.3f degrees' % azlimit)
                     return False
 
             now = utcnow()
