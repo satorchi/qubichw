@@ -22,7 +22,7 @@ import os,sys,socket,time,re
 import datetime as dt
 import numpy as np
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip
+from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory
 from qubicpack.pointing import position_key, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
@@ -83,6 +83,15 @@ class obsmount:
         self.subscribed = {}
         self.subscribed['data'] = False
         self.subscribed['command'] = False
+        log_dir = os.sep.join([os.environ['HOME'],'log'])
+        log_dir = verify_directory(log_dir)
+        if log_dir is None:
+            log_dir = verify_directory('/tmp')
+        if log_dir is None:
+            self.logfile = None
+        else:
+            self.logfile = os.sep.join([log_dir,'obsmount_log.txt'])
+        
         
         return
 
@@ -90,10 +99,16 @@ class obsmount:
         '''
         print a message to screen
         '''
+        date_str = utcnow().strftime(self.datefmt)
+        full_msg = '%s | obsmount: %s' % (date_str,msg)
+
+        if self.logfile is not None:
+            h = open(logfile,'a')
+            h.write(full_msg+'\n')
+            h.close()
         if self.verbosity<1: return
         
-        date_str = utcnow().strftime(self.datefmt)
-        print('%s | obsmount: %s' % (date_str,msg))
+        print(full_msg)
         return
 
     def return_with_error(self,retval):
