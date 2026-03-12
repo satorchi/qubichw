@@ -69,7 +69,7 @@ class obsmount:
     azmax = 398 # maximum permitted azimuth (2026-02-12 15:49:34)
     azstep = 5 # default step size for azimuth movement for skydips
 
-    pos_margin = 0.1 # default margin of precision for exiting the wait_for_arrival loop
+    pos_margin = 0.3 # default margin of precision for exiting the wait_for_arrival loop
     maxwait = 180 # default maximum wait time in seconds for wait_for_arrival loop
 
     
