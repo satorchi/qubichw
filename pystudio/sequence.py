@@ -586,7 +586,9 @@ def start_acquisition(self,title=None,comment=None):
     if comment is None: comment = 'observation sent by pystudio'
     
     # start recording data
-    acq_start = utcnow()
+    # we add a margin to get the time the QubicStudio dataset begins.
+    # This is a hack. It should be done in a better way
+    acq_start = utcnow() + dt.timedelta(seconds=1.1)
     ack = self.send_startAcquisition(title,comment)
 
     # get the assigned dataset name
