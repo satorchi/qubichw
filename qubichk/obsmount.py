@@ -734,7 +734,7 @@ class obsmount:
         
         ack = self.goto_az(azmin)
         if not ack['ok']:
-            ack['error'] = 'Scan unable to send command')
+            ack['error'] = 'Scan unable to send command'
             return self.return_with_error(ack)
         
         azel = self.wait_for_arrival(az=azmin,maxwait=maxwait)
