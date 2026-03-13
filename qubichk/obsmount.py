@@ -661,7 +661,7 @@ class obsmount:
             azel = self.get_azel()
             now = utcnow().timestamp()
             if (now-start_tstamp)>10:
-                azel['error'] = 'skydip unable to get current position: %s' % azel['error'])
+                azel['error'] = 'skydip unable to get current position: %s' % azel['error']
                 return self.return_with_error(azel)
         
         
