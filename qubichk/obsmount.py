@@ -285,15 +285,12 @@ class obsmount:
         try:
             dat = self.sock[port].recv(chunksize)
         except socket.timeout:
-            self.subscribed[port] = False
             retval['error'] = 'get_data: socket timeout'
             return self.return_with_error(retval)
         except KeyboardInterrupt:
-            self.subscribed[port] = False
             retval['error'] = 'Detected keyboard interrupt Ctrl-C'
             return self.return_with_error(retval)
         except:
-            self.subscribed[port] = False
             retval['error'] = make_errmsg('could not get az,el data')
             return self.return_with_error(retval)
 
