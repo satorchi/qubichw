@@ -580,7 +580,10 @@ class obsmount:
 
         if (az_final is None) and (el_final is None):
             print('Please specify one of az or el with option az=<value> or el=<value>')
-            return
+            retval = {}
+            retval['ok'] = False
+            retval['error'] = 'insufficient input to wait_for_arrival'
+            return self.return_with_error(retval)
 
         if az_final is not None:
             key = 'AZ'
@@ -597,8 +600,9 @@ class obsmount:
             now = utcnow().timestamp()
             azel = self.get_azel()
             if (now-tstart)>maxwait:
-                self.printmsg('Error! Could not get AZ,EL position.')
-                return False
+                errmsg = 'Could not get AZ,EL position after having retried for %.0f seconds' % maxwait
+                azel['error'] = errmsg
+                return self.return_with_error(azel)
         
         val = azel[key]
 
@@ -606,8 +610,10 @@ class obsmount:
             time.sleep(2)
             now = utcnow().timestamp()
             if (now-tstart)>maxwait:
-                self.printmsg('Maximum wait time')
-                return False
+                errmsg = 'Exiting after maximum wait time: %.0f seconds' % maxwait
+                errmsg += '      current value: %s = %.3f degrees' % (key,val)
+                azel['error'] = errmsg
+                return self.return_with_error(azel)
         
             azel = self.get_azel()
             if not azel['ok']:
@@ -618,7 +624,7 @@ class obsmount:
 
             val = azel[key]
 
-        return True
+        return azel
         
     
     def do_skydip_sequence(self,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None):
@@ -636,18 +642,18 @@ class obsmount:
 
         ack = self.goto_az(azmin)
         if not ack['ok']:
-            return False
+            return ack
         
-        azok = self.wait_for_arrival(az=azmin)
-        if not azok:
-            self.printmsg('ERROR! Did not successfully get to starting azimuth position')
-            return False
+        azel = self.wait_for_arrival(az=azmin)
+        if not azel['ok']:
+            azel['error'] = 'Did not successfully get to starting azimuth position: %s' % azel['error']
+            return self.return_with_error(azel)
 
         self.goto_el(elmin)
-        elok = self.wait_for_arrival(el=elmin)
-        if not elok:
-            self.printmsg('ERROR! Did not successfully get to starting elevation position')
-            return False
+        azel = self.wait_for_arrival(el=elmin)
+        if not azel['ok']:
+            azel['error'] = 'Did not successfully get to starting elevation position: %s' % azel['error']
+            return self.return_with_error(azel)
 
         azel = self.get_azel()
         while not azel['ok']:
@@ -655,8 +661,8 @@ class obsmount:
             azel = self.get_azel()
             now = utcnow().timestamp()
             if (now-start_tstamp)>10:
-                self.printmsg('ERROR! Could not get current position.')
-                return False
+                azel['error'] = 'skydip unable to get current position: %s' % azel['error'])
+                return self.return_with_error(azel)
         
         
         az = azel['AZ']
@@ -668,25 +674,29 @@ class obsmount:
             while np.abs(az-azlimit)>self.pos_margin:
                 self.goto_el(elmax)
                 time.sleep(1) # wait before next command
-                elok = self.wait_for_arrival(el=elmax)
-                if not elok:
-                    self.printmsg('ERROR! Did not successfully get to starting elevation position')
-                    return False
+                azel = self.wait_for_arrival(el=elmax)
+                if not azel['ok']:
+                    azel['error'] = 'Did not successfully get to starting elevation position: %s' % azel['error']
+                    return self.return_with_error(azel)
             
 
                 self.goto_el(elmin)
-                azok = self.wait_for_arrival(el=elmin)
-                if not azok:
-                    self.printmsg('ERROR! Did not successfully get to starting azimuth position')
-                    return False
+                azel = self.wait_for_arrival(el=elmin)
+                if not azel['ok']:
+                    azel['error'] = 'Did not successfully get to starting azimuth position: %s' % azel['error']
+                    return self.return_with_error(azel)
 
                 az += azstep
                 self.goto_az(az)
-                self.wait_for_arrival(az=az)
+                azel = self.wait_for_arrival(az=az)
+                if not azel['ok']:
+                    azel['error'] = 'Did not get to next azimuth position: %s' % azel['error']
+                    return self.return_with_error(azel)
+                    
 
             azstep = -azstep
 
-        return True
+        return azel
     
 
     def do_constant_elevation_scanning(self,el=None,azmin=None,azmax=None,duration=None):
@@ -711,36 +721,38 @@ class obsmount:
         start_tstamp = utcnow().timestamp()
 
         ack = self.goto_el(el)
-        if not ack['ok']: return False
-        elok = self.wait_for_arrival(el=el)
-        if not elok:
-            self.printmsg('ERROR! Did not successfully get to elevation position: %.3f degrees' % el)
-            return False
+        if not ack['ok']: return self.return_with_error(ack)
+        azel = self.wait_for_arrival(el=el)
+        if not azel['ok']:
+            azel['error'] = 'Did not successfully get to elevation position: %.3f degrees' % el
+            return self.return_with_error(azel)
 
 
         # maximum wait time for each scan
-        maxwait = np.abs(azmax-azmin)/0.9 + 120 # margin added to 1 deg/sec rotation speed
+        maxwait = np.abs(azmax-azmin)/0.9 + 10 # margin added to 1 deg/sec rotation speed
         self.printmsg('using wait time for each azimuth scan: %.1f secs' % maxwait)
         
         ack = self.goto_az(azmin)
-        if not ack['ok']: return False
+        if not ack['ok']:
+            ack['error'] = 'Scan unable to send command')
+            return self.return_with_error(ack)
         
-        azok = self.wait_for_arrival(az=azmin,maxwait=maxwait)
-        if not azok:
-            self.printmsg('ERROR! Did not successfully get to starting azimuth position: %.3f degrees' % azmin)
-            return False
+        azel = self.wait_for_arrival(az=azmin,maxwait=maxwait)
+        if not azel['ok']:
+            azel['error'] = 'Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin
+            return self.return_with_error(azel)
 
         now = utcnow()
         end_time = now + duration_delta
         while now<end_time:
             
             for azlimit in [azmax, azmin]:
-                self.goto_az(azlimit)
+                ack = self.goto_az(azlimit)
                 time.sleep(1) # wait before next command
-                azok = self.wait_for_arrival(az=azlimit,maxwait=maxwait)
-                if not azok:
-                    self.printmsg('ERROR! Did not successfully get to azimuth position: %.3f degrees' % azlimit)
-                    return False
+                azel = self.wait_for_arrival(az=azlimit,maxwait=maxwait)
+                if not azel['ok']:
+                    azel['error'] = 'Scan did not successfully get to azimuth position: %.3f degrees' % azlimit
+                    return self.return_with_error(azel)
 
             now = utcnow()
 
