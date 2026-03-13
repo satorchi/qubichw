@@ -11,6 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 basic sequences for running observations
 '''
 import os,time
+from datetime import timedelta
 import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
@@ -588,7 +589,7 @@ def start_acquisition(self,title=None,comment=None):
     # start recording data
     # we add a margin to get the time the QubicStudio dataset begins.
     # This is a hack. It should be done in a better way
-    acq_start = utcnow() + dt.timedelta(seconds=1.1)
+    acq_start = utcnow() + timedelta(seconds=1.1)
     ack = self.send_startAcquisition(title,comment)
 
     # get the assigned dataset name
