@@ -572,6 +572,14 @@ class obsmount:
         tstart = utcnow().timestamp()
         if maxwait is None: maxwait = self.maxwait
 
+        ##### temporary until I implement the PLC rebroadcaster
+        retval = {}
+        retval['ok'] = True
+        retval['error'] = 'just waiting the maximum until I implement the PLC rebroadcaster'
+        time.sleep(maxwait)
+        return retval
+        
+
         az_final = az
         el_final = el
 
@@ -726,7 +734,7 @@ class obsmount:
 
 
         # maximum wait time for each scan
-        maxwait = np.abs(azmax-azmin)/0.9 + 10 # margin added to 1 deg/sec rotation speed
+        maxwait = np.abs(azmax-azmin)/0.9 + 5 # margin added to 1 deg/sec rotation speed
         self.printmsg('using wait time for each azimuth scan: %.1f secs' % maxwait)
         
         ack = self.goto_az(azmin)
