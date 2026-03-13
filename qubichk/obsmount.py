@@ -103,7 +103,7 @@ class obsmount:
         full_msg = '%s | obsmount: %s' % (date_str,msg)
 
         if self.logfile is not None:
-            h = open(logfile,'a')
+            h = open(self.logfile,'a')
             h.write(full_msg+'\n')
             h.close()
         if self.verbosity<1: return
