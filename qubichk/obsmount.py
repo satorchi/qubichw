@@ -418,7 +418,7 @@ class obsmount:
 
         now = utcnow()
         keepgoing = True
-        while keepgoing
+        while keepgoing:
             ans = None
 
             ### listen for a command
