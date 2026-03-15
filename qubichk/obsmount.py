@@ -423,7 +423,7 @@ class obsmount:
 
             ### listen for a command
             try:
-                ans = s.recvfrom(1024)
+                ans = sock.recvfrom(1024)
             except socket.error:
                 errmsg = make_errmsg('socket error')
             except:
@@ -452,6 +452,7 @@ class obsmount:
 
             if cmdstr_clean=='EXIT SERVER':
                 keepgoing = False
+                sock.close()
                 break
             
             if cmdstr_clean!='GET AZEL':
@@ -467,7 +468,7 @@ class obsmount:
             client_sock.settimeout(0.2)
             self.printmsg('sending position info')
             try:
-                s.sendto(azel_bytes, (addr, client_port))
+                client_sock.sendto(azel_bytes, (addr, client_port))
             except:
                 self.printmsg('Error! Could not send acknowledgement to %s:%i' % (addr,client_port))
 
