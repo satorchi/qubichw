@@ -454,6 +454,7 @@ class obsmount:
             if cmdstr_clean=='EXIT SERVER':
                 keepgoing = False
                 sock.close()
+                self.printmsg('quitting the PLC re-broadcaster')
                 break
             
             if cmdstr_clean!='GET AZEL':
@@ -467,7 +468,7 @@ class obsmount:
             client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             client_sock.settimeout(0.2)
-            self.printmsg('sending position info')
+            self.printmsg('sending position info to %s:%i' % (addr,)
             try:
                 client_sock.sendto(azel_bytes, (addr, client_port))
             except:
@@ -528,12 +529,10 @@ class obsmount:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sock.settimeout(0.2)
         sock.sendto(cmd.encode(), (qc_ip, self.broadcast_request_port))
-
         
-        sock.bind((my_ip, self.broadcast_request_port))
         ack = None
         try:
-            ack, addr = sock.recvfrom(1024)
+            ack, addr = sock.recvfrom(2048)
         except:
             retval['error'] = 'no response from PLC rebroadcaster'
             self.return_with_error(retval)
@@ -674,12 +673,12 @@ class obsmount:
         tstart = utcnow().timestamp()
         if maxwait is None: maxwait = self.maxwait
 
-        ##### temporary until I implement the PLC rebroadcaster
-        retval = {}
-        retval['ok'] = True
-        retval['error'] = 'just waiting the maximum until I implement the PLC rebroadcaster'
-        time.sleep(maxwait)
-        return retval
+        # ##### temporary until I implement the PLC rebroadcaster
+        # retval = {}
+        # retval['ok'] = True
+        # retval['error'] = 'just waiting the maximum until I implement the PLC rebroadcaster'
+        # time.sleep(maxwait)
+        # return retval
         
 
         az_final = az
