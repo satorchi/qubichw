@@ -448,6 +448,7 @@ class obsmount:
             addr = addr_tple[0]
             client_port = addr_tple[1]
             cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
+            received_date = utcnow()
             self.printmsg('received a request from %s at %s: %s' % (addr,received_date.strftime(self.datefmt),cmdstr_clean))
 
             if cmdstr_clean=='EXIT SERVER':
