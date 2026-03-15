@@ -16,20 +16,28 @@ from qubichk.obsmount import obsmount
 from qubichk.utilities import make_errmsg, verify_directory
 from satorchipy.datefunctions import utcnow
 
-dump_dir = None
+def cli():
+    dump_dir = None
 
-if len(sys.argv)>1:
-    for arg in sys.argv[1:]:
-        dump_dir = verify_directory(arg)
+    if len(sys.argv)>1:
+        for arg in sys.argv[1:]:
+            dump_dir = verify_directory(arg)
 
-date_str = utcnow().strftime('%Y-%m-%d %H:%M:%S UT')
-if dump_dir is None:
-    msg = 'not dumping Az/El data'
-else:
-    msg = 'dumping to directory: %s' % dump_dir
-print('%s | %s' % (date_str,msg))
+    date_str = utcnow().strftime('%Y-%m-%d %H:%M:%S UT')
+    if dump_dir is None:
+        msg = 'not dumping Az/El data'
+    else:
+        msg = 'dumping to directory: %s' % dump_dir
+    print('%s | %s' % (date_str,msg))
 
-mount = obsmount()
-mount.acquisition(dump_dir=dump_dir)
+    mount = obsmount()
+    mount.acquisition(dump_dir=dump_dir)
+    return
+
+if __name__=='__main__':
+    # cli()
+    print('FAST ACQUISITION DISABLED UNTIL REBROADCAST SERVER IS IMPLEMENTED')
+
+    
 
             
