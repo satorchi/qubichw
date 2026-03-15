@@ -12,10 +12,9 @@ A class with methods to send/receive configuration command for the calibration s
 Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
 '''
 import socket,time,re,os,multiprocessing,sys
-import datetime as dt
 from copy import deepcopy
 
-from satorchipy.datefunctions import utcnow
+from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.utilities import shellcommand, get_myip, get_known_hosts, get_calsource_host
 
 known_hosts = get_known_hosts()
@@ -571,12 +570,12 @@ class calsource_configuration_manager():
             if cmdstr is None: received_tstamp, cmdstr, addr = self.listen_for_command()
             command = self.parse_command_string(cmdstr)
             try:
-                sent_date = dt.datetime.fromtimestamp(command['timestamp']['sent'])
+                sent_date = utcfromtimestamp(command['timestamp']['sent'])
                 self.log('command sent:     %s' % sent_date.strftime(self.date_fmt))
             except:
                 self.log('command sent:     %s' % command['timestamp']['sent'])
                          
-            received_date = dt.datetime.fromtimestamp(received_tstamp)
+            received_date = utcfromtimestamp(received_tstamp)
             self.log('command received: %s' % received_date.strftime(self.date_fmt))
 
             retval = {}
