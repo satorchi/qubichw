@@ -18,15 +18,14 @@ QUBIC_Mount_General_documentation.pdf
 email from Lucia: 2025-12-10/11, on elog: https://elog-qubic.in2p3.fr/demo/1294
 
 '''
-import os,sys,socket,time,re
-import datetime as dt
+import os,sys,socket,time,re,pickle
+from datetime import timedelta
 import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory
 from qubicpack.pointing import position_key, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
-my_ip = get_myip()
 class obsmount:
     '''
     class to read to and command the observation mount
@@ -35,7 +34,7 @@ class obsmount:
     mount_ip = known_hosts['motorplc']
     listen_port = 9180
     command_port = 9000
-    broadcast_port = 61337
+    broadcast_request_port = 61337
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
     # position offsets To Be Measured !!
@@ -386,9 +385,9 @@ class obsmount:
         '''
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        rx = my_ip
-        PORT = self.broadcast_port
 
+        PORT = self.broadcast_port
+        rx = get_myip()
         while True:
             chunkdat = self.get_data()
             if not chunkdat['ok']:
@@ -405,10 +404,79 @@ class obsmount:
         sock.close()
         return
 
+    def listen_for_command(self):
+        '''
+        listen for a command string arriving on socket and respond with data from the PLC
+        This is the slow re-broadcast
+        '''
+
+        my_ip = get_myip()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.settimeout(None)
+        sock.bind((my_ip, self.broadcast_request_port))
+
+        now = utcnow()
+        keepgoing = True
+        while keepgoing
+            ans = None
+
+            ### listen for a command
+            try:
+                ans = s.recvfrom(1024)
+            except socket.error:
+                errmsg = make_errmsg('socket error')
+            except:
+                errmsg = make_errmsg('unknown error')
+                
+            if ans is None:
+                self.printmsg(errmsg)
+                continue
+                
+
+            ### verify the command
+            cmdstr = None
+            try:
+                cmdstr, addr_tple = ans
+            except:
+                errmsg = make_errmsg('inappropriate response')
+
+            if cmdstr is None:
+                self.printmsg(errmsg)
+                continue
+            
+            addr = addr_tple[0]
+            client_port = addr_tple[1]
+            cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
+            self.printmsg('received a request from %s at %s: %s' % (addr,received_date.strftime(self.datefmt),cmdstr_clean))
+
+            if cmdstr_clean=='EXIT SERVER':
+                keepgoing = False
+                break
+            
+            if cmdstr_clean!='GET AZEL':
+                self.printmsg('inappropriate request')
+                continue
+
+            ### get position from the PLC and return it to the requester
+            azel = self.get_azel_from_plc()
+            azel_bytes = pickle.dumps(azel)
+
+            client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            client_sock.settimeout(0.2)
+            self.printmsg('sending position info')
+            try:
+                s.sendto(azel_bytes, (addr, client_port))
+            except:
+                self.printmsg('Error! Could not send acknowledgement to %s:%i' % (addr,client_port))
+
+            client_sock.close()
+        return 
     
     
     
-    def get_azel(self,chunksize=None):
+    def get_azel_from_plc(self,chunksize=None):
         '''
         get the azimuth and elevation and return it with a timestamp
         '''
@@ -440,6 +508,38 @@ class obsmount:
             return self.return_with_error(retval)        
             
         return retval
+
+    def get_azel(self):
+        '''
+        get azimuth and elevation by sending a query to the rebroadcast server
+        '''
+        retval = {}
+        retval['ok'] = False
+        retval['error'] = 'NONE'
+        
+
+        cmd = 'GET AZEL'
+
+        qc_ip = known_hosts['qubic-central']
+        my_ip = get_myip()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.settimeout(0.2)
+        sock.sendto(cmd.encode(), (qc_ip, self.broadcast_request_port))
+
+        
+        sock.bind((my_ip, self.broadcast_request_port))
+        ack = None
+        try:
+            ack, addr = sock.recvfrom(1024)
+        except:
+            retval['error'] = 'no response from PLC rebroadcaster'
+            self.return_with_error(retval)
+
+        azel = pickle.loads(ack)
+        sock.close()
+        return azel
+        
 
     def show_azel(self):
         '''
@@ -719,9 +819,9 @@ class obsmount:
         if azmin is None: azmin = 155
         if azmax is None: azmax = 205
         if duration is None:
-            duration_delta = dt.timedelta(days=30) # must end observation manually
+            duration_delta = timedelta(days=30) # must end observation manually
         else:
-            duration_delta = dt.timedelta(seconds=duration)
+            duration_delta = timedelta(seconds=duration)
     
         start_tstamp = utcnow().timestamp()
 
