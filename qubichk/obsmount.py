@@ -21,7 +21,7 @@ email from Lucia: 2025-12-10/11, on elog: https://elog-qubic.in2p3.fr/demo/1294
 import os,sys,socket,time,re,pickle
 from datetime import timedelta
 import numpy as np
-from satorchipy.datefunctions import utcnow
+from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory
 from qubicpack.pointing import position_key, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
