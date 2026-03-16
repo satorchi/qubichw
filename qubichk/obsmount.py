@@ -470,6 +470,8 @@ class obsmount:
 
             ### get position from the PLC and return it to the requester
             azel = self.get_azel_from_plc()
+            # we have to disconnect to get a fresh value next time, or else make a loop to catch up
+            ack = self.disconnect() 
             azel_bytes = pickle.dumps(azel)
 
             client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
