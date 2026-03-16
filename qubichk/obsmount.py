@@ -768,7 +768,9 @@ class obsmount:
                 time.sleep(2)
                 continue
 
-            self.printmsg('AZ,EL = %.2f %.2f' % (azel['AZ'],azel['EL']))
+            obsmount_tstamp = azel['TIMESTAMP']
+            obsmount_date_str = utcfromtimestamp(obsmount_tstamp).strftime(self.datefmt)
+            self.printmsg('[%s] AZ,EL = %.2f %.2f' % (obsmount_date_str,azel['AZ'],azel['EL']))
 
             val = azel[key]
 
