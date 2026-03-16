@@ -58,7 +58,7 @@ class obsmount:
                           'VEL']    # set velocity
     wait = 0.0 # seconds to wait before next socket command
     default_chunksize = 512 # motor PLC sends packets of approx 200 bytes each time
-    default_sampleperiod = 100 # sample period in milliseconds (Note: PLC default is 1000 msec)
+    sampleperiod = 100 # sample period in milliseconds (Note: PLC default is 1000 msec)
     verbosity = 1
     testmode = False
 
@@ -140,7 +140,10 @@ class obsmount:
         self.printmsg('Doing handshake for port: %s' % port)
         retval = {}
         retval['ok'] = False
-        if sampleperiod is None: sampleperiod = self.default_sampleperiod
+        if sampleperiod is None:
+            sampleperiod = self.sampleperiod
+        else:
+            self.sampleperiod = sampleperiod
 
         # no handshake necessary for the PLC command port
         if port=='command':
@@ -183,7 +186,7 @@ class obsmount:
 
         if self.subscribed[port]:
             retval['error'] = 'already subscribed to port: %s' % port
-            self.return_with_error(retval)
+            return self.return_with_error(retval)
         
         if port=='data':
             port_num = self.listen_port
@@ -296,6 +299,29 @@ class obsmount:
 
         retval['CHUNK'] = dat
         return retval
+
+    def flush_data(self):
+        '''
+        flush the data stream from the PLC
+        '''
+        maxloop = 1000
+        counter = 0
+        now_tstamp = utcnow().timestamp()
+        tstamp_delta = 1000.0
+        tstamp_precision = 10*0.001*self.sampleperiod
+        errmsg = 'NONE'
+        
+        while (tstamp_delta>tstamp_precision) and (errmsg.find('timeout')<0) and (counter<maxloop):
+            azel = self.get_azel_from_plc()
+            errmsg = azel['error']
+            if not azel['ok']:
+                break
+            
+            tstamp = azel['TIMESTAMP']
+            tstamp_delta = now_tstamp-tstamp
+        
+        return azel
+        
 
     def send_command(self,cmd_str):
         '''
@@ -472,9 +498,13 @@ class obsmount:
             if not self.subscribed['data']:
                 ack = self.subscribe('data',sampleperiod=1000)
 
-            azel = self.get_azel_from_plc()
-            # we have to disconnect to get a fresh value next time, or else make a loop to catch up
-            ack = self.disconnect() 
+            azel = self.flush_data()
+            # # we have to disconnect to get a fresh value next time, or else make a loop to catch up
+            # ack = self.disconnect()
+            if not azel['ok']:
+                self.printmsg('ERROR! unsuccessful after flush data')
+                continue
+            
             azel_bytes = pickle.dumps(azel)
 
             client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
