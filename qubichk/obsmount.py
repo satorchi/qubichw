@@ -547,10 +547,12 @@ class obsmount:
             ack, addr = sock.recvfrom(2048)
         except:
             retval['error'] = 'no response from PLC rebroadcaster'
-            self.return_with_error(retval)
+
+        sock.close()
+        if ack is None:
+            return self.return_with_error(retval)
 
         azel = pickle.loads(ack)
-        sock.close()
         return azel
         
 
