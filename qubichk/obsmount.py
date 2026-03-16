@@ -496,11 +496,9 @@ class obsmount:
 
             ### get position from the PLC and return it to the requester
             if not self.subscribed['data']:
-                ack = self.subscribe('data',sampleperiod=1000)
+                ack = self.subscribe('data')
 
             azel = self.flush_data()
-            # # we have to disconnect to get a fresh value next time, or else make a loop to catch up
-            # ack = self.disconnect()
             if not azel['ok']:
                 self.printmsg('ERROR! unsuccessful after flush data')
                 continue
