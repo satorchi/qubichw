@@ -426,6 +426,8 @@ class obsmount:
                 ans = sock.recvfrom(1024)
             except socket.error:
                 errmsg = make_errmsg('socket error')
+            except socket.timeout:
+                errmsg = 'socket TIMEOUT'
             except:
                 errmsg = make_errmsg('unknown error')
                 
@@ -468,11 +470,11 @@ class obsmount:
             client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             client_sock.settimeout(0.2)
-            self.printmsg('sending position info to %s:%i' % (addr,)
+            self.printmsg('sending position info to %s:%i' % (addr,client_port))
             try:
                 client_sock.sendto(azel_bytes, (addr, client_port))
             except:
-                self.printmsg('Error! Could not send acknowledgement to %s:%i' % (addr,client_port))
+                self.printmsg('Error! Could not send position info to %s:%i' % (addr,client_port))
 
             client_sock.close()
         return 
