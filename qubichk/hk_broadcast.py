@@ -349,8 +349,9 @@ class hk_broadcast :
             self.record[recname][0] = val
             self.log_hk(recname,tstamp,val,tstamp_rx)
 
-        # disconnect to free up access to pointing data
-        self.hk_azel.disconnect()
+        # # disconnect to free up access to pointing data
+        # disconnect no longer necessary with rebroadcaster
+        # self.hk_azel.disconnect()
         return self.record
 
     def get_cryostat_temperature_hk(self):
