@@ -171,7 +171,7 @@ class obsmount:
                     
         
 
-    def init_socket(self,port='data'):
+    def init_socket(self,port='data',sampleperiod=None):
         '''
         initialize the communication socket
         the port is either 'data' or 'command'
@@ -197,9 +197,9 @@ class obsmount:
         self.sock[port].settimeout(0.5)
         self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
 
-        # we set the "subscribed" flag to True, just for trying because the PLC doesn't like multiple attempts
-        self.subscribed[port] = True
-        self.printmsg('setting subscribed to True just for trying on port: %s' % port)
+        # # we set the "subscribed" flag to True, just for trying because the PLC doesn't like multiple attempts
+        # self.subscribed[port] = True
+        # self.printmsg('setting subscribed to True just for trying on port: %s' % port)
         try:
             self.sock[port].connect((self.mount_ip,port_num))
         except socket.timeout:
@@ -209,7 +209,7 @@ class obsmount:
         else:
             self.printmsg('doing handshake after port connection')
             retval['ok'] = True
-            retval = self.do_handshake(port)
+            retval = self.do_handshake(port,sampleperiod=sampleperiod)
             #if not retval['ok']: return self.return_with_error(retval)
             self.printmsg('setting subscribed to True for port: %s' % port)
             self.subscribed[port] = True
@@ -224,7 +224,7 @@ class obsmount:
         return self.return_with_error(retval)
 
     
-    def subscribe(self,port='data'):
+    def subscribe(self,port='data',sampleperiod=None):
         '''
         subscribe to the observation mount server
         the port is 'data' or 'command'
@@ -232,7 +232,7 @@ class obsmount:
 
         retval = {}
         if not self.subscribed[port]:
-            self.init_socket(port=port)
+            self.init_socket(port=port,sampleperiod=sampleperiod)
         
         # check that the socket is valid
         if not self.subscribed[port]:
@@ -469,6 +469,9 @@ class obsmount:
                 continue
 
             ### get position from the PLC and return it to the requester
+            if not self.subscribed['data']:
+                ack = self.subscribe('data',sampleperiod=1000)
+
             azel = self.get_azel_from_plc()
             # we have to disconnect to get a fresh value next time, or else make a loop to catch up
             ack = self.disconnect() 
