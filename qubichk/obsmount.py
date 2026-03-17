@@ -821,7 +821,7 @@ class obsmount:
 
         for azlimit in [azmax, azmin]:
         
-            while np.abs(az-azlimit)>self.pos_margin:
+            while (az<azmax) and (np.abs(az-azlimit)>self.pos_margin):
                 self.goto_el(elmax)
                 time.sleep(1) # wait before next command
                 azel = self.wait_for_arrival(el=elmax)
