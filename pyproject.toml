@@ -122,6 +122,7 @@ script-files = ["qubichk/scripts/start_calsource_acq.sh",
 		"pystudio/scripts/do_assign_saved_DACoffsetTables.py",
 		"pystudio/scripts/do_assign_default_DACoffsetTables.py",
 		"pystudio/scripts/do_park_frontend.py",
+		"pystudio/scripts/do_Vbias_optimisation_sequence.py",
                 "qubichk/scripts/archive-data.sh",
                 "qubichk/scripts/clean-hk.sh",
                 "qubichk/scripts/start_gpsd-ntpd.sh"]
