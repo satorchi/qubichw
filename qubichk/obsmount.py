@@ -501,6 +501,7 @@ class obsmount:
             azel = self.flush_data()
             if not azel['ok']:
                 self.printmsg('ERROR! unsuccessful after flush data')
+                self.disconnect()
                 continue
             
             azel_bytes = pickle.dumps(azel)
