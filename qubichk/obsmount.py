@@ -18,8 +18,10 @@ QUBIC_Mount_General_documentation.pdf
 email from Lucia: 2025-12-10/11, on elog: https://elog-qubic.in2p3.fr/demo/1294
 
 '''
-import os,sys,socket,time,re,pickle
+import os,sys,socket,re,pickle
 from datetime import timedelta
+from time import sleep
+from threading import Thread
 import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory
@@ -48,7 +50,7 @@ class obsmount:
                        }
     axis_keys = list(position_offset.keys())
     n_axis_keys = len(axis_keys)
-    datefmt = '%Y-%m-%d-%H:%M:%S UT'
+    datefmt = '%Y-%m-%dT%H:%M:%S UT'
 
     available_commands = ['ENA',    # enable
                           'DIS',    # disable
@@ -91,7 +93,7 @@ class obsmount:
         else:
             self.logfile = os.sep.join([log_dir,'obsmount_log.txt'])
         
-        
+        self.dump_pointing = False
         return
 
     def printmsg(self,msg):
@@ -129,7 +131,7 @@ class obsmount:
             cmd = '%s %s' % (axname,cmd_arg)
             retval = self.send_command(cmd)
             if not retval['ok']: return retval
-            time.sleep(0.3)
+            sleep(0.3)
             
         return retval
 
@@ -164,7 +166,7 @@ class obsmount:
         except:
             retval['error'] = 'Failed to send sampling period to PLC on port %s' % port
             return self.return_with_error(retval)
-        time.sleep(self.wait)
+        sleep(self.wait)
         # end handshake for data port
         
         retval['ok'] = True
@@ -367,7 +369,7 @@ class obsmount:
             return self.return_with_error(retval)
 
         # try to get the command echo
-        time.sleep(0.25)
+        sleep(0.25)
         try:
             cmd_echo = self.sock[port].recv(1024)
         except:
@@ -391,44 +393,45 @@ class obsmount:
         self.printmsg('pointing acquisition starting on file: %s' % filename)
         h = open(filename,'ab')
         ans = self.get_data()
-        keepgoing = True
-        while keepgoing:
+        self.dump_pointing = True
+        while self.dump_pointing:
             packet = STX + ans['CHUNK']
             h.write(packet)
             ans = self.get_data()
-            keepgoing = ans['ok']
-            if (not ans['ok']) and (ans['error'].find('timeout')>=0):
-                self.printmsg('acquisition timeout')
-                keepgoing = True
+            if not ans['ok']:
+                if ans['error'].find('timeout')>=0:
+                    self.printmsg('acquisition timeout')
+                else:
+                    self.dump_pointing = False
 
         h.close()
         self.printmsg('pointing acquisition ended: %s' % ans['error'])
         return ans
 
-    def broadcast_data(self):
-        '''
-        get data from the PLC and rebroadcast it to a local port
-        '''
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # def broadcast_data(self):
+    #     '''
+    #     get data from the PLC and rebroadcast it to a local port
+    #     '''
+    #     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-        PORT = self.broadcast_port
-        rx = get_myip()
-        while True:
-            chunkdat = self.get_data()
-            if not chunkdat['ok']:
-                if chunkdat['error'].find('Ctrl-C')>0:
-                    sock.close()
-                    return
-                time.sleep(0.25)
-                continue
+    #     PORT = self.broadcast_port
+    #     rx = get_myip()
+    #     while True:
+    #         chunkdat = self.get_data()
+    #         if not chunkdat['ok']:
+    #             if chunkdat['error'].find('Ctrl-C')>0:
+    #                 sock.close()
+    #                 return
+    #             sleep(0.25)
+    #             continue
                 
-            time.sleep(0.05)
-            sock.sendto(chunkdat['CHUNK'],(rx,PORT))
+    #         sleep(0.05)
+    #         sock.sendto(chunkdat['CHUNK'],(rx,PORT))
 
-        # never reach this point
-        sock.close()
-        return
+    #     # never reach this point
+    #     sock.close()
+    #     return
 
     def listen_for_command(self):
         '''
@@ -489,6 +492,10 @@ class obsmount:
                 sock.close()
                 self.printmsg('quitting the PLC re-broadcaster')
                 break
+
+            if cmdstr_clean.find('DUMP=')==0:
+                # to be implemented
+                continue
             
             if cmdstr_clean!='GET AZEL':
                 self.printmsg('inappropriate request')
@@ -557,12 +564,21 @@ class obsmount:
         '''
         get azimuth and elevation by sending a query to the rebroadcast server
         '''
+        ans = self.send_request_to_rebroadcaster('GET AZEL')
+        if isinstance(ans,bytes):
+            azel = pickle.loads(ans)
+            return azel
+        return ans
+        
+
+    def send_request_to_rebroadcaster(self,cmd):
+        '''
+        send a request to the rebroadcaster
+        see above: self.lisen_for_command ()
+        '''
         retval = {}
         retval['ok'] = False
         retval['error'] = 'NONE'
-        
-
-        cmd = 'GET AZEL'
 
         qc_ip = known_hosts['qubic-central']
         my_ip = get_myip()
@@ -581,8 +597,7 @@ class obsmount:
         if ack is None:
             return self.return_with_error(retval)
 
-        azel = pickle.loads(ack)
-        return azel
+        return ack
         
 
     def show_azel(self):
@@ -716,14 +731,6 @@ class obsmount:
         tstart = utcnow().timestamp()
         if maxwait is None: maxwait = self.maxwait
 
-        # ##### temporary until I implement the PLC rebroadcaster
-        # retval = {}
-        # retval['ok'] = True
-        # retval['error'] = 'just waiting the maximum until I implement the PLC rebroadcaster'
-        # time.sleep(maxwait)
-        # return retval
-        
-
         az_final = az
         el_final = el
 
@@ -741,11 +748,11 @@ class obsmount:
             key = 'EL'
             val_final = el_final
 
-        time.sleep(2)
+        sleep(2)
         azel = self.get_azel()
         
         while not azel['ok']:
-            time.sleep(2)
+            sleep(2)
             now = utcnow().timestamp()
             azel = self.get_azel()
             if (now-tstart)>maxwait:
@@ -756,7 +763,7 @@ class obsmount:
         val = azel[key]
 
         while np.abs(val-val_final)>self.pos_margin:
-            time.sleep(2)
+            sleep(2)
             now = utcnow().timestamp()
             if (now-tstart)>maxwait:
                 errmsg = 'Exiting after maximum wait time: %.0f seconds' % maxwait
@@ -766,7 +773,7 @@ class obsmount:
         
             azel = self.get_azel()
             if not azel['ok']:
-                time.sleep(2)
+                sleep(2)
                 continue
 
             obsmount_tstamp = azel['TIMESTAMP']
@@ -808,7 +815,7 @@ class obsmount:
 
         azel = self.get_azel()
         while not azel['ok']:
-            time.sleep(2)
+            sleep(2)
             azel = self.get_azel()
             now = utcnow().timestamp()
             if (now-start_tstamp)>10:
@@ -824,7 +831,7 @@ class obsmount:
         
             while (az<azmax) and (np.abs(az-azlimit)>self.pos_margin):
                 self.goto_el(elmax)
-                time.sleep(1) # wait before next command
+                sleep(1) # wait before next command
                 azel = self.wait_for_arrival(el=elmax)
                 if not azel['ok']:
                     azel['error'] = 'Did not successfully get to starting elevation position: %s' % azel['error']
@@ -880,7 +887,8 @@ class obsmount:
 
 
         # maximum wait time for each scan
-        maxwait = np.abs(azmax-azmin)/0.9 + 5 # margin added to 1 deg/sec rotation speed
+        maxwait = 1.1*np.abs(azmax-azmin) + 5 # margin added to 1 deg/sec rotation speed
+        if maxwait<60: maxwait=60 # always wait at least a minute
         self.printmsg('using wait time for each azimuth scan: %.1f secs' % maxwait)
         
         ack = self.goto_az(azmin)
@@ -899,7 +907,7 @@ class obsmount:
             
             for azlimit in [azmax, azmin]:
                 ack = self.goto_az(azlimit)
-                time.sleep(1) # wait before next command
+                sleep(1) # wait before next command
                 azel = self.wait_for_arrival(az=azlimit,maxwait=maxwait)
                 if not azel['ok']:
                     azel['error'] = 'Scan did not successfully get to azimuth position: %.3f degrees' % azlimit
