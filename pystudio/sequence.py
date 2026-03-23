@@ -10,7 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 basic sequences for running observations
 '''
-import os,time
+import os
+from time import sleep
 from datetime import timedelta
 import numpy as np
 from satorchipy.datefunctions import utcnow
@@ -163,9 +164,9 @@ def init_frontend(self,
 
     # configure the frontend
     ack = self.send_NSample(asicNum,nsamples)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_AcqMode(asicNum,0)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_Apol(asicNum, Apol)
 
     # special case for Spol and DAC offsets which are different for each ASIC
@@ -197,18 +198,18 @@ def init_frontend(self,
     ack = self.send_startRow(asicNum,startRow)
     ack = self.send_setColumn(asicNum,column)
     ack = self.send_CycleRawMode(asicNum, CycleRawMode)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_RawMask(asicNum,RawMask)
     ack = self.send_AsicInit(asicNum)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_AsicConf(asicNum,2,3)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_AsicConf(asicNum,2,0)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_AsicInit(asicNum)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_FeedbackRelay(asicNum,FeedbackRelay)
-    time.sleep(1.0)
+    sleep(1.0)
     ack = self.send_Aplitude(asicNum,Aplitude)
 
     ack = self.send_configurePID(asicNum,PID[0],PID[1],PID[2])
@@ -233,7 +234,7 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
 
     
     ans = mgc.set_mgc_setpoint(Tbath)
-    time.sleep(0.2)
+    sleep(0.2)
     ans = mgc.set_mgc_pid(1)
 
     # wait for temperature
@@ -241,7 +242,7 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     maxcount = int(timeout) + 1
     count = 0
     while (Tdelta>precision) and (count<maxcount):
-        time.sleep(1)
+        sleep(1)
         Tmeas = mgc.get_mgc_measurement()
         Tdelta = np.abs(Tmeas-Tbath)
         count += 1
@@ -278,7 +279,7 @@ def do_DACoffset_measurement(self,duration=None,Tbath=None,Voffset=None,comment=
     # start an acquisition, but with no FLL regulations
     ack = self.start_observation(Tbath=Tbath,Voffset=Voffset,FLL=False,comment=comment,title='DAC_offset_measurement')
 
-    time.sleep(duration)
+    sleep(duration)
     ack = self.end_observation()
     return
 
@@ -372,7 +373,7 @@ def do_IV_measurement(self,
     ack = self.send_startAcquisition(dataset_name,comment)
 
     # wait for measurement
-    time.sleep(duration)
+    sleep(duration)
 
     # stop the acquisition
     ack = self.send_stopAcquisition()
@@ -494,13 +495,13 @@ def do_SQUID_optimization(self,
     for bias_index in range(16):
         # set the Spol value
         ack = self.send_Spol(asicNum,bias_index)
-        time.sleep(0.1)
+        sleep(1)
         
         dataset_name = 'SQUIDs_opt_bias_aplitude_%i_%i' % (aplitude,bias_index)
         ack = self.send_startAcquisition(dataset_name,comment)
 
         # wait for measurement
-        time.sleep(duration)
+        sleep(duration)
 
         # stop the acquisition
         ack = self.send_stopAcquisition()
@@ -519,7 +520,7 @@ def do_SQUID_optimization(self,
         key = 'ASIC %2i' % asic
         Spol = spol_start[key]
         ack =self.send_Spol(asic,Spol)
-        time.sleep(0.1)
+        sleep(1)
     
     print('%s - SQUID optimization measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
