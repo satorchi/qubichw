@@ -59,7 +59,7 @@ default_setting['I-V']['FeedbackRelay'] = 10
 default_setting['SQUID'] = {}
 default_setting['SQUID']['Voffset'] = 8
 default_setting['SQUID']['amplitude'] = 1
-default_setting['SQUID']['duration'] = 2
+default_setting['SQUID']['duration'] = 10
 default_setting['SQUID']['Aplitude'] = 1800
 
 default_setting['observation'] = {}
