@@ -26,9 +26,6 @@ parameterList = ['Vmin',
 options = parseargs(sys.argv,expected_args=parameterList)
 
 def cli():
-    dispatcher = pystudio()
-    ack = dispatcher.subscribe_dispatcher()
-
     if options['title'] is None:
         title_prefix = 'Vbias_optimisation_sequence'
     else:
@@ -58,8 +55,10 @@ def cli():
         duration = 300
     else:
         duration = options['duration']
-        
 
+        
+    dispatcher = pystudio()
+    ack = dispatcher.subscribe_dispatcher()
     Vbias = Vmax
     while Vbias>=Vmin:
 
