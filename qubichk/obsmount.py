@@ -896,7 +896,7 @@ class obsmount:
             ack['error'] = 'Scan unable to send command'
             return self.return_with_error(ack)
         
-        azel = self.wait_for_arrival(az=azmin,maxwait=maxwait)
+        azel = self.wait_for_arrival(az=azmin)
         if not azel['ok']:
             azel['error'] = 'Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin
             return self.return_with_error(azel)
