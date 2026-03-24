@@ -120,6 +120,8 @@ def cli():
                 return
             
         ack = dispatcher.end_observation()
+        ack = dispatcher.park_frontend()
+        sleep(2)
         Vbias -= Vstep
 
         
