@@ -384,25 +384,40 @@ class obsmount:
             self.return_with_error(retval)
         return retval
 
-    def acquisition(self,dump_dir=hk_dir):
+    def acquisition(self,dump_dir=None):
         '''
         dump the data supplied by the mount PLC without any interpretation
-        this is an infinite loop to be interrupted by ctrl-c, or socket error, but not timeout error
+
+        this is called by the PLC rebroadcaster:  see listen_for_command()
+        
+        this is an infinite loop to be stopped by setting self.dump_pointing=False
+          which is done by sending a request to the PLC rebroadcaster:  see listen_for_command()
         '''
+        dump_dir = verify_directory(dump_dir)
+        if dump_dir is None:
+            dump_dir = os.sep.join([os.environ['HOME'],'data'])
+            dump_dir = verify_directory(dump_dir)        
+        if dump_dir is None:
+            dump_dir = hk_dir
+            dump_dir = verify_directory(dump_dir)            
+        if dump_dir is None:
+            dump_dir = '/tmp'
+            
         filename = os.sep.join([dump_dir,'POINTING.dat'])
         self.printmsg('pointing acquisition starting on file: %s' % filename)
         h = open(filename,'ab')
-        ans = self.get_data()
         self.dump_pointing = True
         while self.dump_pointing:
-            packet = STX + ans['CHUNK']
-            h.write(packet)
             ans = self.get_data()
-            if not ans['ok']:
+            if ans['ok']:
+                packet = STX + ans['CHUNK']
+                h.write(packet)
+            else:
                 if ans['error'].find('timeout')>=0:
                     self.printmsg('acquisition timeout')
                 else:
                     self.dump_pointing = False
+            
 
         h.close()
         self.printmsg('pointing acquisition ended: %s' % ans['error'])
@@ -411,7 +426,10 @@ class obsmount:
     def listen_for_command(self):
         '''
         listen for a command string arriving on socket and respond with data from the PLC
-        This is the slow re-broadcast
+        This is the PLC rebroadcaster
+        
+        It is used to query the current mount position
+        and also to start/stop the fast acquisition
         '''
 
         my_ip = get_myip()
@@ -469,7 +487,17 @@ class obsmount:
                 break
 
             if cmdstr_clean.find('DUMP=')==0:
-                # to be implemented
+                dumparglist = cmdstr_clean.split('=')
+                if len(dumparglist)==2:
+                    dump_dir = dumparglist[1]
+                else:
+                    dump_dir = None
+                dump_thread = Thread(target = self.acquisition, args =(dump_dir, ))
+                dump_thread.start()                
+                continue
+
+            if cmdstr_clean.find('STOP DUMP')==0:
+                self.dump_pointing = False
                 continue
             
             if cmdstr_clean!='GET AZEL':

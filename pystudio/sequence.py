@@ -595,9 +595,11 @@ def start_acquisition(self,title=None,comment=None):
     # This is a hack. It should be done in a better way
     acq_start = utcnow() + timedelta(seconds=1.1)
     ack = self.send_startAcquisition(title,comment)
+    dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
 
-    # get the assigned dataset name
-    # this does not work because the BackupSessionName_ID does not include the date
+    ######################################################################################
+    ## get the assigned dataset name
+    ## this does not work because the BackupSessionName_ID does not include the date
     # parm_name = 'DISP_BackupSessionName_ID'
     # vals = self.send_request(parameterList=[parm_name])
     # if parm_name not in vals.keys():
@@ -605,28 +607,17 @@ def start_acquisition(self,title=None,comment=None):
     #     print('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
     # else:
     #     dataset_name = vals[parm_name]['value']
+    ######################################################################################
 
-    # need to implement a way to get the full dataset name assigned by QubicStudio
-    # this could be off by a second, but not always
-    # if it's off by a second, then acq_start is one second early (never the other way around)
-    dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
+    
     
     # start dumping the azel data
+    mount = obsmount()
     day_str = acq_start.strftime('%Y-%m-%d')
     dump_dir = os.sep.join([os.environ['HOME'],'data',day_str,dataset_name,'Hks'])
-    dump_dir = verify_directory(dump_dir)
-    if dump_dir is None:
-        dump_dir = os.sep.join([os.environ['HOME'],'data'])
-        dump_dir = verify_directory(dump_dir)
-        
-    if dump_dir is None:
-        dump_dir = '/tmp'
-
-    if self.verbosity>2:        
-        print('Dumping in directory: %s' % dump_dir)
-        
-    cmd = 'start_mountplc_acquisition.sh %s' % dump_dir
-    out,err = shellcommand(cmd)
+    cmd = 'DUMP=%s' % dump_dir
+    ack = mount.send_request_to_rebroadcaster(cmd)
+    mount.disconnect()
    
     print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return
@@ -653,10 +644,9 @@ def end_observation(self):
     ack = self.send_stopAcquisition()
     ack = self.send_stopFLL()
     # stop Az/El acquisition
-    cmd = 'screen -X -S mountPLC quit'
-    out,err = shellcommand(cmd)
-    if len(err)>0:
-        print('%s - error ending Az/El acquisition: %s' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),err))
+    mount = obsmount()
+    ans = mount.send_request_to_rebroadcaster('STOP DUMP')
+    mount.disconnect()
     print('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
