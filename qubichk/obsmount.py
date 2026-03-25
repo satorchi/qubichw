@@ -71,7 +71,7 @@ class obsmount:
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.3 # default margin of precision for exiting the wait_for_arrival loop
-    maxwait = 180 # default maximum wait time in seconds for wait_for_arrival loop
+    maxwait = 60 # default maximum wait time in seconds for wait_for_arrival loop, this is adjusted if it's a long slew
 
     
     def __init__(self):
@@ -762,6 +762,12 @@ class obsmount:
         
         val = azel[key]
 
+        # maximum wait time to get to target
+        maxwait = 1.1*np.abs(val_final-val) + 5 # margin added to 1 deg/sec rotation speed
+        if maxwait<self.maxwait: maxwait=self.maxwait # always have patience for at least the default maxwait (1 minute)
+        self.printmsg('using wait time to reach target: %.1f secs' % maxwait)
+        
+        
         while np.abs(val-val_final)>self.pos_margin:
             sleep(2)
             now = utcnow().timestamp()
@@ -884,12 +890,6 @@ class obsmount:
         if not azel['ok']:
             azel['error'] = 'Did not successfully get to elevation position: %.3f degrees' % el
             return self.return_with_error(azel)
-
-
-        # maximum wait time for each scan
-        maxwait = 1.1*np.abs(azmax-azmin) + 5 # margin added to 1 deg/sec rotation speed
-        if maxwait<60: maxwait=60 # always wait at least a minute
-        self.printmsg('using wait time for each azimuth scan: %.1f secs' % maxwait)
         
         ack = self.goto_az(azmin)
         if not ack['ok']:
@@ -908,7 +908,7 @@ class obsmount:
             for azlimit in [azmax, azmin]:
                 ack = self.goto_az(azlimit)
                 sleep(1) # wait before next command
-                azel = self.wait_for_arrival(az=azlimit,maxwait=maxwait)
+                azel = self.wait_for_arrival(az=azlimit)
                 if not azel['ok']:
                     azel['error'] = 'Scan did not successfully get to azimuth position: %.3f degrees' % azlimit
                     return self.return_with_error(azel)
