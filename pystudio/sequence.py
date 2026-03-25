@@ -493,6 +493,9 @@ def do_SQUID_optimization(self,
     
     # loop through the Spol values
     for bias_index in range(16):
+        # go to index 7, and then to the desired one (not sure why)
+        ack = self.send_Spol(asicNum,7)
+        sleep(1)
         # set the Spol value
         ack = self.send_Spol(asicNum,bias_index)
         sleep(1)
