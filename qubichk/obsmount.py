@@ -408,31 +408,6 @@ class obsmount:
         self.printmsg('pointing acquisition ended: %s' % ans['error'])
         return ans
 
-    # def broadcast_data(self):
-    #     '''
-    #     get data from the PLC and rebroadcast it to a local port
-    #     '''
-    #     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-    #     PORT = self.broadcast_port
-    #     rx = get_myip()
-    #     while True:
-    #         chunkdat = self.get_data()
-    #         if not chunkdat['ok']:
-    #             if chunkdat['error'].find('Ctrl-C')>0:
-    #                 sock.close()
-    #                 return
-    #             sleep(0.25)
-    #             continue
-                
-    #         sleep(0.05)
-    #         sock.sendto(chunkdat['CHUNK'],(rx,PORT))
-
-    #     # never reach this point
-    #     sock.close()
-    #     return
-
     def listen_for_command(self):
         '''
         listen for a command string arriving on socket and respond with data from the PLC
