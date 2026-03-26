@@ -26,6 +26,8 @@ $ do_constant_elevation_scanning.py el=50 azmin=155 azmax=205 tstart=2026-03-26T
 
 '''
 import sys
+import datetime as dt
+UTC = dt.timezone.utc
 from satorchipy.utilities import parseargs
 from satorchipy.datefunctions import utcnow
 from pystudio import pystudio
@@ -79,7 +81,14 @@ def cli():
     if options['azmax'] is None:
         azmax = 225
     else:
-        azmax = options['azmax']        
+        azmax = options['azmax']
+
+    if tstart is None:
+        start_time = utcnow()
+    else:
+        # correct for ambiguous timezone
+        start_time = tstart.replace(tzone=UTC)
+        
     ## the rest of the defaults are defined in dispatcher.start_observation() and in obsmount.do_constant_elevation_scanning()
 
     ####### start immediately by going to the starting position ##########

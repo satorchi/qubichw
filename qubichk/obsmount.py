@@ -906,7 +906,6 @@ class obsmount:
         else:
             # correct for ambiguous timezone
             start_time = tstart.replace(tzone=UTC)
-        start_tstamp = start_time.timestamp()
 
         if duration is None:
             duration_delta = timedelta(days=30) # must end observation manually
@@ -914,7 +913,7 @@ class obsmount:
             duration_delta = timedelta(seconds=duration)
 
         if tend is None:
-            end_time = start_tstamp + duration_delta
+            end_time = start_time + duration_delta
         else:
             end_time = tend
 
