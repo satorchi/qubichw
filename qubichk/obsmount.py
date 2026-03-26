@@ -96,6 +96,7 @@ class obsmount:
             self.logfile = os.sep.join([log_dir,'obsmount_log.txt'])
         
         self.dump_pointing = False
+        self.printmsg('obsmount python object initialized')
         return
 
     def printmsg(self,msg):
@@ -418,11 +419,12 @@ class obsmount:
                 if ans['error'].find('timeout')>=0:
                     self.printmsg('acquisition timeout')
                 else:
-                    self.dump_pointing = False
+                    #self.dump_pointing = False
+                    self.printmsg('dumping error: %s' % ans['error'])
             
 
         h.close()
-        self.printmsg('pointing acquisition ended: %s' % ans['error'])
+        self.printmsg('pointing acquisition ended')
         return ans
 
     def reply_to_client(self,data_bytes,addr,client_port):
