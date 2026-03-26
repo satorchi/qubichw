@@ -98,7 +98,7 @@ class pystudio:
     DISPATCHER_PORT = 3002
 
     dispatcher_socket = None
-    backupsID = None
+    backupsID = 0x0003
     command_counter = 0
     chunksize = 2**24
 
