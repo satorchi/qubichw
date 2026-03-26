@@ -26,6 +26,7 @@ $ do_constant_elevation_scanning.py el=50 azmin=155 azmax=205 tstart=2026-03-26T
 
 '''
 import sys
+from time import sleep
 import datetime as dt
 UTC = dt.timezone.utc
 from satorchipy.utilities import parseargs
