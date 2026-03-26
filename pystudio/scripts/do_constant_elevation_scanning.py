@@ -83,7 +83,7 @@ def cli():
     else:
         azmax = options['azmax']
 
-    if tstart is None:
+    if options['tstart'] is None:
         start_time = utcnow()
     else:
         # correct for ambiguous timezone
