@@ -20,6 +20,8 @@ email from Lucia: 2025-12-10/11, on elog: https://elog-qubic.in2p3.fr/demo/1294
 '''
 import os,sys,socket,re,pickle
 from datetime import timedelta
+import datetime as dt
+UTC = dt.timezone.utc
 from time import sleep
 from threading import Thread
 import numpy as np
@@ -866,7 +868,7 @@ class obsmount:
         return azel
     
 
-    def do_constant_elevation_scanning(self,el=None,azmin=None,azmax=None,duration=None):
+    def do_constant_elevation_scanning(self,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None):
         '''
         do azimuth back and forth scanning at a given elevation
 
@@ -874,38 +876,35 @@ class obsmount:
          el       : elevation position during scanning
          azmin    : azimuth start position
          azmax    : azimuth end position
+         tstart   : datetime object for start time (default is now)
+         tend     : datetime object for end time (default is defined by duration)
          duration : duration in seconds.
              By default, this is a near endless loop and must be stopped manually with ctrl-c and do_end_observation.py
         '''
         if el is None: el = 50
         if azmin is None: azmin = 155
         if azmax is None: azmax = 205
+
+        if tstart is None:
+            start_time = utcnow()
+        else:
+            # correct for ambiguous timezone
+            start_time = tstart.replace(tzone=UTC)
+        start_tstamp = start_time.timestamp()
+
         if duration is None:
             duration_delta = timedelta(days=30) # must end observation manually
         else:
             duration_delta = timedelta(seconds=duration)
-    
-        start_tstamp = utcnow().timestamp()
 
-        ack = self.goto_el(el)
-        if not ack['ok']: return self.return_with_error(ack)
-        azel = self.wait_for_arrival(el=el)
-        if not azel['ok']:
-            azel['error'] = 'Did not successfully get to elevation position: %.3f degrees' % el
-            return self.return_with_error(azel)
-        
-        ack = self.goto_az(azmin)
-        if not ack['ok']:
-            ack['error'] = 'Scan unable to send command'
-            return self.return_with_error(ack)
-        
-        azel = self.wait_for_arrival(az=azmin)
-        if not azel['ok']:
-            azel['error'] = 'Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin
-            return self.return_with_error(azel)
+        if tend is None:
+            end_time = start_tstamp + duration_delta
+        else:
+            end_time = tend
 
-        now = utcnow()
-        end_time = now + duration_delta
+        
+
+            
         while now<end_time:
             
             for azlimit in [azmax, azmin]:
