@@ -915,7 +915,7 @@ class obsmount:
         if tend is None:
             end_time = start_time + duration_delta
         else:
-            end_time = tend
+            end_time = tend.replace(tzinfo=UTC)
 
         now = utcnow()
         while now<end_time:
