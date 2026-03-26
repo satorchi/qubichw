@@ -87,7 +87,7 @@ def cli():
         start_time = utcnow()
     else:
         # correct for ambiguous timezone
-        start_time = options['tstart'].replace(tzone=UTC)
+        start_time = options['tstart'].replace(tzinfo=UTC)
         
     ## the rest of the defaults are defined in dispatcher.start_observation() and in obsmount.do_constant_elevation_scanning()
 
