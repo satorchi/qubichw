@@ -917,9 +917,7 @@ class obsmount:
         else:
             end_time = tend
 
-        
-
-            
+        now = utcnow()
         while now<end_time:
             
             for azlimit in [azmax, azmin]:
