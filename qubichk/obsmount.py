@@ -425,6 +425,25 @@ class obsmount:
         self.printmsg('pointing acquisition ended: %s' % ans['error'])
         return ans
 
+    def reply_to_client(self,data_bytes,addr,client_port):
+        '''
+        reply to a client request to the rebroadcaster
+        this is called from listen_for_command()
+        '''
+        client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        client_sock.settimeout(0.2)
+        self.printmsg('sending info to %s:%i' % (addr,client_port))
+        ack = True
+        try:
+            client_sock.sendto(data_bytes, (addr, client_port))
+        except:
+            self.printmsg('Error! Could not send info to %s:%i' % (addr,client_port))
+            ack = False
+
+        client_sock.close()
+        return ack
+    
     def listen_for_command(self):
         '''
         listen for a command string arriving on socket and respond with data from the PLC
@@ -486,6 +505,7 @@ class obsmount:
                 keepgoing = False
                 sock.close()
                 self.printmsg('quitting the PLC re-broadcaster')
+                self.reply_to_client('quitting PLC re-broadcaster'.encode(),addr,client_port)
                 break
 
             if cmdstr_clean.find('DUMP=')==0:
@@ -495,15 +515,18 @@ class obsmount:
                 else:
                     dump_dir = None
                 dump_thread = Thread(target = self.acquisition, args =(dump_dir, ))
-                dump_thread.start()                
+                dump_thread.start()
+                self.reply_to_client('started dumping'.encode(),addr,client_port)
                 continue
 
             if cmdstr_clean.find('STOP DUMP')==0:
                 self.dump_pointing = False
+                self.reply_to_client('stopped dumping'.encode(),addr,client_port)
                 continue
             
             if cmdstr_clean!='GET AZEL':
                 self.printmsg('inappropriate request')
+                self.reply_to_client('inappropriate request'.encode(),addr,client_port)
                 continue
 
             ### get position from the PLC and return it to the requester
@@ -518,16 +541,7 @@ class obsmount:
             
             azel_bytes = pickle.dumps(azel)
 
-            client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-            client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            client_sock.settimeout(0.2)
-            self.printmsg('sending position info to %s:%i' % (addr,client_port))
-            try:
-                client_sock.sendto(azel_bytes, (addr, client_port))
-            except:
-                self.printmsg('Error! Could not send position info to %s:%i' % (addr,client_port))
-
-            client_sock.close()
+            ack = self.reply_to_client(azel_bytes,addr,client_port)
         return 
     
     
