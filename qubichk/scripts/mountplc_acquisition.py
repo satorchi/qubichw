@@ -26,17 +26,20 @@ def cli():
     date_str = utcnow().strftime('%Y-%m-%d %H:%M:%S UT')
     if dump_dir is None:
         msg = 'not dumping Az/El data'
-    else:
-        msg = 'dumping to directory: %s' % dump_dir
+        return
+    
+    msg = 'dumping to directory: %s' % dump_dir
     print('%s | %s' % (date_str,msg))
-
+    
     mount = obsmount()
-    mount.acquisition(dump_dir=dump_dir)
+    cmd = 'DUMP=%s' % dump_dir
+    ack = mount.send_request_to_rebroadcaster(cmd)
+    mount.disconnect()
+    
     return
 
 if __name__=='__main__':
-    # cli()
-    print('FAST ACQUISITION DISABLED UNTIL REBROADCAST SERVER IS IMPLEMENTED')
+    cli()
 
     
 
