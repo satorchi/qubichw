@@ -98,7 +98,7 @@ class pystudio:
     DISPATCHER_PORT = 3002
 
     dispatcher_socket = None
-    backupsID = 0x0003
+    backupsID = None
     command_counter = 0
     chunksize = 2**24
 
@@ -213,4 +213,5 @@ class pystudio:
     def __init__(self):
         self.assign_parameterstable()
         self.assign_dispatcher_IDs()
+        self.backupsID = self.make_backupsID()
         return

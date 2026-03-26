@@ -96,11 +96,11 @@ def send_stopAcquisition(self):
     send the command to stop an acquisition
     '''
 
-    #### this is unnecessary, and causes confusion to the user
-    # # even if we haven't started an acquisition, send the stop anyway
-    # if self.backupsID is None:
-    #     print('WARNING! It seems there is no running acquisition to stop.')
-    #     self.backupsID = self.make_backupsID()
+    #### It is unnecessary to send a warning to the user, and causes confusion to the user
+    # even if we haven't started an acquisition, send the stop anyway
+    if self.backupsID is None:
+        # print('WARNING! It seems there is no running acquisition to stop.')
+        self.backupsID = self.make_backupsID()
 
     cmd_bytes = self.make_command_stopAcquisition()
     print('%s - Stopping Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
