@@ -905,7 +905,7 @@ class obsmount:
             start_time = utcnow()
         else:
             # correct for ambiguous timezone
-            start_time = tstart.replace(tzone=UTC)
+            start_time = tstart.replace(tzinfo=UTC)
 
         if duration is None:
             duration_delta = timedelta(days=30) # must end observation manually
