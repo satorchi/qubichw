@@ -435,12 +435,12 @@ class obsmount:
         client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         client_sock.settimeout(0.2)
-        self.printmsg('sending info to %s:%i' % (addr,client_port))
+        self.printmsg('REBROADCASTER sending info to %s:%i' % (addr,client_port))
         ack = True
         try:
             client_sock.sendto(data_bytes, (addr, client_port))
         except:
-            self.printmsg('Error! Could not send info to %s:%i' % (addr,client_port))
+            self.printmsg('REBROADCASTER ERROR! Could not send info to %s:%i' % (addr,client_port))
             ack = False
 
         client_sock.close()
@@ -482,7 +482,7 @@ class obsmount:
                 errmsg = make_errmsg('unknown error')
                 
             if ans is None:
-                self.printmsg(errmsg)
+                self.printmsg('REBROADCASTER '+errmsg)
                 continue
                 
 
@@ -494,19 +494,19 @@ class obsmount:
                 errmsg = make_errmsg('inappropriate response')
 
             if cmdstr is None:
-                self.printmsg(errmsg)
+                self.printmsg('REBROADCASTER '+errmsg)
                 continue
             
             addr = addr_tple[0]
             client_port = addr_tple[1]
             cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
             received_date = utcnow()
-            self.printmsg('received a request from %s at %s: %s' % (addr,received_date.strftime(self.datefmt),cmdstr_clean))
+            self.printmsg('REBROADCASTER received a request from %s at %s: %s' % (addr,received_date.strftime(self.datefmt),cmdstr_clean))
 
             if cmdstr_clean=='EXIT SERVER':
                 keepgoing = False
                 sock.close()
-                self.printmsg('quitting the PLC re-broadcaster')
+                self.printmsg('REBROADCASTER quitting')
                 self.reply_to_client('quitting PLC re-broadcaster'.encode(),addr,client_port)
                 break
 
@@ -527,7 +527,7 @@ class obsmount:
                 continue
             
             if cmdstr_clean!='GET AZEL':
-                self.printmsg('inappropriate request')
+                self.printmsg('REBROADCASTER received inappropriate request')
                 self.reply_to_client('inappropriate request'.encode(),addr,client_port)
                 continue
 
@@ -537,7 +537,7 @@ class obsmount:
 
             azel = self.flush_data()
             if not azel['ok']:
-                self.printmsg('ERROR! unsuccessful after flush data')
+                self.printmsg('REBROADCASTER ERROR! unsuccessful after flush data')
                 self.disconnect()
                 continue
             
