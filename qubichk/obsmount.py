@@ -73,7 +73,7 @@ class obsmount:
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.3 # default margin of precision for exiting the wait_for_arrival loop
-    maxwait = 60 # default maximum wait time in seconds for wait_for_arrival loop, this is adjusted if it's a long slew
+    maxwait = 180 # default maximum wait time in seconds for wait_for_arrival loop, this is adjusted if it's a long slew
 
     
     def __init__(self):
