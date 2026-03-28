@@ -632,6 +632,9 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     if comment is None: comment = 'observation sent by pystudio'
     if Voffset is None: Voffset = 3.0
 
+    # make sure there is no running acquisition
+    ack = self.end_observation()
+
     ack = self.set_observation_mode(Voffset=Voffset,Tbath=Tbath,FLL=FLL)
     ack = self.start_acquisition(title=title,comment=comment)
     
@@ -646,6 +649,7 @@ def end_observation(self):
     # stop Az/El acquisition
     mount = obsmount()
     ans = mount.send_request_to_rebroadcaster('STOP DUMP')
+    mount.stop()
     mount.disconnect()
     print('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
