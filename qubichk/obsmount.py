@@ -925,8 +925,14 @@ class obsmount:
                 sleep(1) # wait before next command
                 azel = self.wait_for_arrival(az=azlimit)
                 if not azel['ok']:
-                    azel['error'] = 'Scan did not successfully get to azimuth position: %.3f degrees' % azlimit
-                    return self.return_with_error(azel)
+                    errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees' % azlimit
+                    self.printmsg(errmsg)
+                    self.printmsg('Azimuth scan trying to send command one more time')
+                    ack = self.goto_az(azlimit)
+                    azel = self.wait_for_arrival(az=azlimit)
+                    if not azel['ok']:
+                        azel['error'] = errmsg+' after two attempts to send command'                    
+                        return self.return_with_error(azel)
 
             now = utcnow()
 
