@@ -711,7 +711,7 @@ class obsmount:
         send command to stop all movement
         '''
         for axis in self.axis_keys:
-            cmd_str = self.make_command_str(axis,'STOP')
+            cmd_str = self.make_command_string(axis,'STOP')
             self.send_command(cmd_str)
         return
 
@@ -732,7 +732,7 @@ class obsmount:
         send command to enable all motors
         '''
         for axis in self.axis_keys:
-            cmd_str = self.make_command_str(axis,'ENA')
+            cmd_str = self.make_command_string(axis,'ENA')
             self.send_command(cmd_str)
         return
         
@@ -741,7 +741,7 @@ class obsmount:
         send command to disable all motors
         '''
         for axis in self.axis_keys:
-            cmd_str = self.make_command_str(axis,'DIS')
+            cmd_str = self.make_command_string(axis,'DIS')
             self.send_command(cmd_str)
         return
 
