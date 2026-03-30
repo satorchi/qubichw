@@ -47,6 +47,7 @@ see in QubicStudio source code: TVirtualCommandEncode.cpp, QDispatcherTCByteArra
                                 methods: startNewInternTC, sendInternTC...
 
 '''
+from satorchipy.datefunctions import utcnow
 class pystudio:
 
     # class variables.  You can change these before instantiating an object
