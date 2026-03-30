@@ -508,10 +508,11 @@ class obsmount:
             except socket.timeout:
                 errmsg = 'socket TIMEOUT'
             except KeyboardInterrupt:
-                retval['error'] = 'quitting the PLC re-broadcaster by Ctrl-C'
+                errmsg = 'quitting the PLC re-broadcaster by Ctrl-C'
                 keepgoing = False
                 sock.close()
-                return self.return_with_error(retval)
+                self.printmsg('REBROADCASTER: '+errmsg)
+                return
             except:
                 errmsg = make_errmsg('unknown error')
                 
