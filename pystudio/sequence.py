@@ -615,8 +615,8 @@ def start_acquisition(self,title=None,comment=None):
         qs_dset = dset_list[0]
         qs_dset_date = str2dt(qs_dset.split('__')[0],timezone='UTC')
         if qs_dset_date is not None:
-            delta_secs = (acq_start - qs_dset_date).total_seconds()
-            if (delta_secs>0) and (delta_secs<10):
+            delta_secs = np.abs((acq_start - qs_dset_date).total_seconds())
+            if delta_secs<10:
                 dataset_name = qs_dset
                 acq_start = qs_dset_date
     
