@@ -613,7 +613,7 @@ def start_acquisition(self,title=None,comment=None):
     dset_list = get_dataset_list()
     if dataset_name not in dset_list:
         qs_dset = dset_list[0]
-        qs_dset_date = str2dt(qs_dset.split('__')[0])
+        qs_dset_date = str2dt(qs_dset.split('__')[0],timezone='UTC')
         if qs_dset_date is not None:
             delta_secs = (acq_start - qs_dset_date).total_seconds()
             if (delta_secs>0) and (delta_secs<10):
