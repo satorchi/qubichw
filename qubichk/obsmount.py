@@ -378,7 +378,7 @@ class obsmount:
             cmd_echo = make_errmsg('NO COMMAND ECHO')
 
         if isinstance(cmd_echo,bytes):
-            cmd_echo = cmd_echo.decode()
+            cmd_echo = cmd_echo.decode().strip()
 
         retval['command echo'] = cmd_echo
         self.printmsg('response from PLC: %s' % cmd_echo)
