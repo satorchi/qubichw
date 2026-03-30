@@ -95,7 +95,9 @@ class obsmount:
         else:
             self.logfile = os.sep.join([log_dir,'obsmount_log.txt'])
         
-        self.dump_pointing = False
+        self.acquire_pointing = False # to be eliminated.  using dumpfile_handle instead
+        self.client_address = None
+        self.dumpfile_handle = None
         self.printmsg('obsmount python object initialized')
         return
 
@@ -379,19 +381,15 @@ class obsmount:
             cmd_echo = cmd_echo.decode()
 
         retval['command echo'] = cmd_echo
+        self.printmsg('response from PLC: %s' % cmd_echo)
         if cmd_echo.find('out of range')>=0:
             retval['error'] = cmd_echo
             self.return_with_error(retval)
         return retval
 
-    def acquisition(self,dump_dir=None):
+    def open_dumpfile(self,dump_dir=None):
         '''
-        dump the data supplied by the mount PLC without any interpretation
-
-        this is called by the PLC rebroadcaster:  see listen_for_command()
-        
-        this is an infinite loop to be stopped by setting self.dump_pointing=False
-          which is done by sending a request to the PLC rebroadcaster:  see listen_for_command()
+        open the POINTING.dat file for fast acquisition and assign the dumpfile_handle
         '''
         dump_dir = verify_directory(dump_dir)
         if dump_dir is None:
@@ -405,42 +403,77 @@ class obsmount:
             
         filename = os.sep.join([dump_dir,'POINTING.dat'])
         self.printmsg('pointing acquisition starting on file: %s' % filename)
-        h = open(filename,'ab')
-        self.dump_pointing = True
-        while self.dump_pointing:
-            ans = self.get_data()
-            if ans['ok']:
-                packet = STX + ans['CHUNK']
-                h.write(packet)
+        self.dumpfile_handle = open(filename,'ab')
+        return dump_dir
+
+    def close_dumpfile(self):
+        '''
+        close the POINTING.dat file, and reset the flags to stop dumping
+        '''
+        if self.dumpfile_handle is not None:
+            self.dumpfile_handle.close()
+            self.printmsg('pointing acquisition ended')
+        else:
+            self.printmsg('WARNING! no pointing acquisition to stop')
+        self.dumpfile_handle = None
+        return
+    
+    def acquisition(self):
+        '''
+        continuously acquire the data supplied by the mount PLC without any interpretation
+
+        this is called by the PLC rebroadcaster and is run in a separate thread.  see listen_for_command()
+        
+        this is an infinite loop to be stopped by setting self.acquire_pointing=False
+          which is done by sending a request to the PLC rebroadcaster:  see listen_for_command()
+
+        The loop acquires pointing data contiuously and will dump to file if the file handle is defined
+        it will send data to a client on request
+        '''
+        self.acquire_pointing = True
+        while self.acquire_pointing:
+            plc_data = self.get_data()
+            if plc_data['ok']:
+                packet = STX + plc_data['CHUNK']
+                if self.dumpfile_handle is not None:
+                    self.dumpfile_handle.write(packet)
+                if self.client_address is not None:
+                    azel = self.get_data_from_plc(plc_data=plc_data)
+                    azel_bytes = pickle.dumps(azel)
+                    ack = self.reply_to_client(azel_bytes)
             else:
-                if ans['error'].find('timeout')>=0:
+                if plc_data['error'].find('timeout')>=0:
                     self.printmsg('acquisition timeout')
                 else:
-                    #self.dump_pointing = False
-                    self.printmsg('dumping error: %s' % ans['error'])
+                    self.printmsg('ERROR on PLC acquisition: %s' % plc_data['error'])
             
+        return plc_data
 
-        h.close()
-        self.printmsg('pointing acquisition ended')
-        return ans
-
-    def reply_to_client(self,data_bytes,addr,client_port):
+    def reply_to_client(self,data_bytes,client_address=None):
         '''
         reply to a client request to the rebroadcaster
         this is called from listen_for_command()
+        and also from acquisition()
+
         '''
+        if client_address is None:
+            client_address = self.client_address
+        if client_address is None:
+            return False
+        
         client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         client_sock.settimeout(0.2)
-        self.printmsg('REBROADCASTER sending info to %s:%i' % (addr,client_port))
+        self.printmsg('REBROADCASTER sending info to %s:%i' % client_address)
         ack = True
         try:
-            client_sock.sendto(data_bytes, (addr, client_port))
+            client_sock.sendto(data_bytes, client_address)
         except:
-            self.printmsg('REBROADCASTER ERROR! Could not send info to %s:%i' % (addr,client_port))
+            self.printmsg('REBROADCASTER ERROR! Could not send info to %s:%i' % client_address)
             ack = False
 
         client_sock.close()
+        self.client_address = None
         return ack
     
     def listen_for_command(self):
@@ -452,6 +485,10 @@ class obsmount:
         and also to start/stop the fast acquisition
         '''
 
+        # first of all, start the fast acquisition loop
+        acquisition_thread = Thread(target = self.acquisition)
+        acquisition_thread.start()
+        
         my_ip = get_myip()
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -486,7 +523,7 @@ class obsmount:
             ### verify the command
             cmdstr = None
             try:
-                cmdstr, addr_tple = ans
+                cmdstr, client_address = ans
             except:
                 errmsg = make_errmsg('inappropriate response')
 
@@ -494,8 +531,6 @@ class obsmount:
                 self.printmsg('REBROADCASTER '+errmsg)
                 continue
             
-            addr = addr_tple[0]
-            client_port = addr_tple[1]
             cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
             received_date = utcnow()
             self.printmsg('REBROADCASTER received a request from %s at %s: %s' % (addr,received_date.strftime(self.datefmt),cmdstr_clean))
@@ -504,7 +539,7 @@ class obsmount:
                 keepgoing = False
                 sock.close()
                 self.printmsg('REBROADCASTER quitting')
-                self.reply_to_client('quitting PLC re-broadcaster'.encode(),addr,client_port)
+                self.reply_to_client('quitting PLC re-broadcaster'.encode(),client_address)
                 break
 
             if cmdstr_clean.find('DUMP=')==0:
@@ -513,22 +548,28 @@ class obsmount:
                     dump_dir = dumparglist[1]
                 else:
                     dump_dir = None
-                dump_thread = Thread(target = self.acquisition, args =(dump_dir, ))
-                dump_thread.start()
-                self.reply_to_client('started dumping'.encode(),addr,client_port)
+                ##### set flag to start dumping (create the file handle)
+                dump_dir = self.open_dumpfile(dump_dir)
+                msg = 'started dumping to directory: %s' % dump_dir
+                self.reply_to_client(msg.encode(),client_address)
                 continue
 
             if cmdstr_clean.find('STOP DUMP')==0:
-                self.dump_pointing = False
-                self.reply_to_client('stopped dumping'.encode(),addr,client_port)
+                self.close_dumpfile()
+                self.reply_to_client('stopped dumping'.encode(),client_address)
                 continue
             
             if cmdstr_clean!='GET AZEL':
                 self.printmsg('REBROADCASTER received inappropriate request')
-                self.reply_to_client('inappropriate request'.encode(),addr,client_port)
+                self.reply_to_client('inappropriate request'.encode(),client_address)
                 continue
 
             ### get position from the PLC and return it to the requester
+            ### by assigning the client_address, the acquisition() loop will send the info back to the client
+            self.client_address = client_address
+
+            ############### no longer necessary #####################################
+            ''' no longer necessary
             if not self.subscribed['data']:
                 ack = self.subscribe('data')
 
@@ -540,30 +581,40 @@ class obsmount:
             
             azel_bytes = pickle.dumps(azel)
 
-            ack = self.reply_to_client(azel_bytes,addr,client_port)
+            ack = self.reply_to_client(azel_bytes,client_address)
+            '''
+            ########################################################################
         return 
     
     
     
-    def get_azel_from_plc(self,chunksize=None):
+    def get_azel_from_plc(self,plc_data=None,chunksize=None):
         '''
         get the azimuth and elevation and return it with a timestamp
+
+        this is probably an unnecessary wrapping, but I continue it for historical reasons
+        this is called from the acquisition() loop
+
+        plc_data is the return value from get_data()
         '''
         retval = {}
         retval['ok'] = True
         retval['error'] = 'NONE'
 
-        ans = self.get_data(chunksize=chunksize)
-        if not ans['ok']:
-            return self.return_with_error(ans)
 
-        packet = interpret_pointing_chunk(ans['CHUNK'])
-        ans['DATA'] = packet
+        if plc_data is None:
+            plc_data = self.get_data(chunksize=chunksize)
+            
+        if not plc_data['ok']:
+            return self.return_with_error(plc_data)
+
+        packet = interpret_pointing_chunk(plc_data['CHUNK'])
+        plc_data['DATA'] = packet
         
         errmsg = []
         errlevel = 0
         retval['TIMESTAMP'] = packet['TIMESTAMP']
-        retval['data'] = ans
+        retval['data'] = plc_data
 
         for axis in self.axis_keys:
             if axis not in packet.keys() or len(packet[axis])==0:
@@ -782,7 +833,7 @@ class obsmount:
 
         # maximum wait time to get to target
         maxwait = 1.1*np.abs(val_final-val) + 5 # margin added to 1 deg/sec rotation speed
-        if maxwait<self.maxwait: maxwait=self.maxwait # always have patience for at least the default maxwait (1 minute)
+        if maxwait<self.maxwait: maxwait=self.maxwait # always have patience for at least the default maxwait (3 minutes)
         self.printmsg('using wait time to reach target: %.1f secs' % maxwait)
         
         
