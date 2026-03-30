@@ -25,7 +25,7 @@ def make_backupsID(self):
     backups_ID_LSB = (0x00FF & backups_ID)
 
     
-    print('backupsID: 0x%04x = %i' % (backups_ID,backups_ID))
+    self.printmsg('backupsID: 0x%04x = %i' % (backups_ID,backups_ID))
     return backups_ID_MSB, backups_ID_LSB
 
 def make_command_startAcquisition(self,session_name=None,comment=None):

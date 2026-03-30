@@ -214,4 +214,29 @@ class pystudio:
         self.assign_parameterstable()
         self.assign_dispatcher_IDs()
         self.backupsID = self.make_backupsID()
+        log_dir = os.sep.join([os.environ['HOME'],'log'])
+        log_dir = verify_directory(log_dir)
+        if log_dir is None:
+            log_dir = verify_directory('/tmp')
+        if log_dir is None:
+            self.logfile = None
+        else:
+            self.logfile = os.sep.join([log_dir,'pystudio_log.txt'])
+        return
+
+    def printmsg(self,msg):
+        '''
+        print a message to screen and to the log
+        '''
+        datefmt = '%Y-%m-%dT%H:%M:%S UT'
+        date_str = utcnow().strftime(datefmt)
+        full_msg = '%s | DISPATCHER: %s' % (date_str,msg)
+
+        if self.logfile is not None:
+            h = open(self.logfile,'a')
+            h.write(full_msg+'\n')
+            h.close()
+        if self.verbosity<1: return
+        
+        print(full_msg)
         return
