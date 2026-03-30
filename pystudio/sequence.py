@@ -14,7 +14,7 @@ import os
 from time import sleep
 from datetime import timedelta
 import numpy as np
-from satorchipy.datefunctions import utcnow
+from satorchipy.datefunctions import utcnow, str2dt
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
 from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
