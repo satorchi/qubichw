@@ -533,7 +533,7 @@ class obsmount:
             
             cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
             received_date = utcnow()
-            self.printmsg('REBROADCASTER received a request from %s at %s: %s' % (addr,received_date.strftime(self.datefmt),cmdstr_clean))
+            self.printmsg('REBROADCASTER received a request from %s at %s: %s' % (client_address[0],received_date.strftime(self.datefmt),cmdstr_clean))
 
             if cmdstr_clean=='EXIT SERVER':
                 keepgoing = False
