@@ -376,7 +376,7 @@ class obsmount:
         try:
             cmd_echo = self.sock[port].recv(1024)
         except:
-            cmd_echo = 'NO COMMAND ECHO'
+            cmd_echo = make_errmsg('NO COMMAND ECHO')
 
         if isinstance(cmd_echo,bytes):
             cmd_echo = cmd_echo.decode()
