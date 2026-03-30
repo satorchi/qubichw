@@ -609,6 +609,7 @@ def start_acquisition(self,title=None,comment=None):
     
     # check if the dataset_name is correct, it should be the most recent
     # no match, or not close, continue with the assigned dataset name
+    sleep(1)
     dset_list = get_dataset_list()
     if dataset_name not in dset_list:
         qs_dset = dset_list[0]
@@ -617,6 +618,7 @@ def start_acquisition(self,title=None,comment=None):
             delta_secs = (acq_start - qs_dset_date).total_seconds()
             if (delta_secs>0) and (delta_secs<10):
                 dataset_name = qs_dset
+                acq_start = qs_dset_date
     
     
     # start dumping the azel data
