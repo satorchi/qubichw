@@ -48,11 +48,13 @@ see in QubicStudio source code: TVirtualCommandEncode.cpp, QDispatcherTCByteArra
 
 '''
 from satorchipy.datefunctions import utcnow
+from qubichk.utilities import verify_directory
 class pystudio:
 
     # class variables.  You can change these before instantiating an object
     verbosity = 0
     __object_type__ = 'pystudio'
+    logfile = None
 
     # dispatcher byte codes
     DISPATCHER_STX = 0x55 # start transmission
@@ -215,6 +217,7 @@ class pystudio:
         self.assign_parameterstable()
         self.assign_dispatcher_IDs()
         self.backupsID = self.make_backupsID()
+        self.logfile = None
         log_dir = os.sep.join([os.environ['HOME'],'log'])
         log_dir = verify_directory(log_dir)
         if log_dir is None:
