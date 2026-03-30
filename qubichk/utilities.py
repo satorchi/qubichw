@@ -26,6 +26,7 @@ qubicloc = EarthLocation(lon=qubic_longitude,lat=qubic_latitude,height=qubic_alt
 # these are the default known hosts.  Updated addresses are read from /etc/hosts and from ~/.local/share/qubic/known_hosts
 known_hosts = {}
 known_hosts['qubic-central'] = "192.168.2.1"
+known_hosts['qsbridge'] = "192.168.2.3"
 known_hosts['qubic-studio']  = "192.168.2.114"
 known_hosts['calsource']     = "192.168.2.5"
 known_hosts['pigps']         = "192.168.2.17"
@@ -106,7 +107,8 @@ def read_hosts_file(filename):
     for line in lines:
         if line.find('#')==0: continue
         if (line.find('192.168.2.')<0 and line.find('192.168.88.')<0): continue
-        col = line.split()
+        line_clean = line.split('#')[0]
+        col = line_clean.split()
         if len(col)<2: continue
         ipaddr = col[0]
         for nickname in col[1:]:
@@ -443,3 +445,12 @@ def read_labels():
             
     return label
             
+def get_dataset_list():
+    '''
+    get a list of datasets currently on QubicStudio
+    '''
+    cmd = 'ssh qsbridge /bin/ls -1Ltd /QubicStudioData/20??-??-??/*'
+    out,err = shellcommand(cmd)
+    
+    return out
+
