@@ -451,7 +451,11 @@ def get_dataset_list():
     '''
     cmd = 'ssh qsbridge /bin/ls -1Ltd /QubicStudioData/20??-??-??/*'
     out,err = shellcommand(cmd)
+
+    dataset_list = []
+    for line in out.split('\n'):
+        dataset_list.append(os.path.basename(line))
     
-    return out.split('\n')
+    return dataset_list
 
 
