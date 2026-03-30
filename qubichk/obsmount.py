@@ -205,13 +205,10 @@ class obsmount:
         self.sock[port].settimeout(0.5)
         self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
 
-        # # we set the "subscribed" flag to True, just for trying because the PLC doesn't like multiple attempts
-        # self.subscribed[port] = True
-        # self.printmsg('setting subscribed to True just for trying on port: %s' % port)
         try:
             self.sock[port].connect((self.mount_ip,port_num))
         except socket.timeout:
-            self.error = 'TIMEOUT'
+            self.error = 'timeout'
         except:
             self.error = make_errmsg('SOCKET ERROR')
         else:
