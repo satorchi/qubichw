@@ -455,6 +455,9 @@ def get_dataset_list():
     dataset_list = []
     for line in out.split('\n'):
         dataset_list.append(os.path.basename(line))
+
+    # make sure dataset list is in reverse chronological order
+    dataset_list.sort(reverse=True)
     
     return dataset_list
 
