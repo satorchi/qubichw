@@ -17,7 +17,7 @@ import numpy as np
 from satorchipy.datefunctions import utcnow
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
-from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory
+from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
 from qubicpack.utilities import interpret_rawmask
 
 #####################################
@@ -591,10 +591,8 @@ def start_acquisition(self,title=None,comment=None):
     if comment is None: comment = 'observation sent by pystudio'
     
     # start recording data
-    # we add a margin to get the time the QubicStudio dataset begins.
-    # This is a hack. It should be done in a better way
-    acq_start = utcnow() + timedelta(seconds=1.1)
     ack = self.send_startAcquisition(title,comment)
+    acq_start = utcnow()
     dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
 
     ######################################################################################
@@ -608,7 +606,17 @@ def start_acquisition(self,title=None,comment=None):
     # else:
     #     dataset_name = vals[parm_name]['value']
     ######################################################################################
-
+    
+    # check if the dataset_name is correct, it should be the most recent
+    # no match, or not close, continue with the assigned dataset name
+    dset_list = get_dataset_list()
+    if dataset_name not in dset_list:
+        qs_dset = dset_list[0]
+        qs_dset_date = str2dt(qs_dset.split('__')[0])
+        if qs_dset_date is not None:
+            delta_secs = (acq_start - qs_dset_date).total_seconds()
+            if (delta_secs>0) and (delta_secs<10):
+                dataset_name = qs_dset
     
     
     # start dumping the azel data
