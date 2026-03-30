@@ -438,7 +438,7 @@ class obsmount:
                 if self.dumpfile_handle is not None:
                     self.dumpfile_handle.write(packet)
                 if self.client_address is not None:
-                    azel = self.get_data_from_plc(plc_data=plc_data)
+                    azel = self.get_azel_from_plc(plc_data=plc_data)
                     azel_bytes = pickle.dumps(azel)
                     ack = self.reply_to_client(azel_bytes)
             else:
