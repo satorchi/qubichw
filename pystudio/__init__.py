@@ -47,6 +47,7 @@ see in QubicStudio source code: TVirtualCommandEncode.cpp, QDispatcherTCByteArra
                                 methods: startNewInternTC, sendInternTC...
 
 '''
+import os
 from satorchipy.datefunctions import utcnow
 from qubichk.utilities import verify_directory
 class pystudio:
