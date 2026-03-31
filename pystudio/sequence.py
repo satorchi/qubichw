@@ -227,10 +227,10 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
     if Tmeas is None or Tmeas=='':
-        print('Could not get temperature from MGC3.')
+        self.printmsg('Could not get temperature from MGC3.')
         return None
     else:
-        print('Tbath is currently: %.3f mK' % (Tmeas*1000))
+        self.printmsg('Tbath is currently: %.3f mK' % (Tmeas*1000))
 
     
     ans = mgc.set_mgc_setpoint(Tbath)
@@ -249,10 +249,10 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
     mgc.disconnect()
     
     if Tdelta>precision:
-        print('Did not reach desired bath temperature.  Current temperature: %.3f mK' % (1000*Tmeas))
+        self.printmsg('Did not reach desired bath temperature.  Current temperature: %.3f mK' % (1000*Tmeas))
         return False
 
-    print('Current bath temperature: %.3f mK' % (1000*Tmeas))
+    self.printmsg('Current bath temperature: %.3f mK' % (1000*Tmeas))
     return True
 
 
@@ -322,24 +322,24 @@ def do_IV_measurement(self,
     # make sure the bias does not go out of acceptable range
     Vmax = Voffset + 0.5*amplitude
     if (Vmax>9):
-        print('STOP:  Maximum bias voltage will be greater than 9 Volts: %.2f V' % Vmax)
+        self.printmsg('STOP:  Maximum bias voltage will be greater than 9 Volts: %.2f V' % Vmax)
         return None
 
     Vmin = Voffset - 0.5*amplitude
     if (Vmin<1.0):
-        print('STOP:  Minimum bias voltage will be less than 1 Volt: %.2f V' % Vmin)
+        self.printmsg('STOP:  Minimum bias voltage will be less than 1 Volt: %.2f V' % Vmin)
         return None
 
     #####################################
     # check for desired bath temperature
     if Tbath is None:
-        print('Doing I-V curves at current temperature:  No commands will be sent to iMACRT')
+        self.printmsg('Doing I-V curves at current temperature:  No commands will be sent to iMACRT')
         Tbath_ok = True
     else:
         Tbath_ok = self.set_bath_temperature(Tbath)
 
     if not Tbath_ok:
-        print("Tbath temperature not reached.  I'm not continuing with the I-V curve measurement.")
+        self.printmsg("Tbath temperature not reached.  I'm not continuing with the I-V curve measurement.")
         return None
 
 
@@ -381,7 +381,7 @@ def do_IV_measurement(self,
     # stop the FLL
     ack = self.send_stopFLL(asicNum)
 
-    print('%s - IV measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('%s - IV measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
 def do_NEP_measurement(self,
@@ -410,7 +410,7 @@ def do_NEP_measurement(self,
     for Tbath in Tbath_list:
         self.do_IV_measurement(asicNum,Voffset,amplitude,undersampling,increment,Tbath,duration,comment)
 
-    print('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
 
@@ -450,12 +450,12 @@ def do_SQUID_optimization(self,
     # make sure the bias does not go out of acceptable range
     Vmax = Voffset + 0.5*amplitude
     if (Vmax>9):
-        print('STOP:  Maximum bias voltage will be greater than 9 Volts: %.2f V' % Vmax)
+        self.printmsg('STOP:  Maximum bias voltage will be greater than 9 Volts: %.2f V' % Vmax)
         return None
 
     Vmin = Voffset - 0.5*amplitude
     if (Vmin<1.0):
-        print('STOP:  Minimum bias voltage will be less than 1 Volt: %.2f V' % Vmin)
+        self.printmsg('STOP:  Minimum bias voltage will be less than 1 Volt: %.2f V' % Vmin)
         return None
 
     #####################################
@@ -463,7 +463,7 @@ def do_SQUID_optimization(self,
     Tbath_ok = self.set_bath_temperature(Tbath)
 
     if not Tbath_ok:
-        print("Tbath temperature not reached.  I'm not continuing with the SQUID optimization measurement.")
+        self.printmsg("Tbath temperature not reached.  I'm not continuing with the SQUID optimization measurement.")
         return None
 
 
@@ -525,7 +525,7 @@ def do_SQUID_optimization(self,
         ack =self.send_Spol(asic,Spol)
         sleep(1)
     
-    print('%s - SQUID optimization measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('%s - SQUID optimization measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
 
@@ -547,18 +547,18 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
     if Tmeas is None or Tmeas=='':
-        print('ERROR! Could not get temperature from MGC3.  aborting')
+        self.printmsg('ERROR! Could not get temperature from MGC3.  aborting')
         return None
     
-    print('Tbath is currently: %.3f mK' % (Tmeas*1000))
+    self.printmsg('Tbath is currently: %.3f mK' % (Tmeas*1000))
     
     if Tbath is None:
-        print('WARNING!  TES bath temperature not specified. Using current temperature')
+        self.printmsg('WARNING!  TES bath temperature not specified. Using current temperature')
         Tbath = Tmeas
     Tbath_ok = self.set_bath_temperature(Tbath)
 
     if not Tbath_ok:
-        print("Tbath temperature not reached.  aborting.")
+        self.printmsg("Tbath temperature not reached.  aborting.")
         return None
     
     #####################################
@@ -602,7 +602,7 @@ def start_acquisition(self,title=None,comment=None):
     # vals = self.send_request(parameterList=[parm_name])
     # if parm_name not in vals.keys():
     #     dataset_name = '%s__%s' % (acq_start.strftime('%Y-%m-%d_%H.%M.%S'),title)
-    #     print('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
+    #     self.printmsg('WARNING! could not get assigned dataset name.  Using: %s' % dataset_name)
     # else:
     #     dataset_name = vals[parm_name]['value']
     ######################################################################################
@@ -629,7 +629,7 @@ def start_acquisition(self,title=None,comment=None):
     ack = mount.send_request_to_rebroadcaster(cmd)
     mount.disconnect()
    
-    print('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
+    self.printmsg('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return
 
 def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True):
@@ -661,7 +661,7 @@ def end_observation(self):
     ans = mount.send_request_to_rebroadcaster('STOP DUMP')
     mount.stop()
     mount.disconnect()
-    print('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    self.printmsg('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
 def park_frontend(self):
@@ -690,7 +690,7 @@ def park_frontend(self):
     ans = mgc.set_mgc_pid(0)
     mgc.disconnect()
     
-    print('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    self.printmsg('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
 def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None):
@@ -716,7 +716,7 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     # stop the acquisition
     ack = self.end_observation()
     
-    print('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
 def get_spol(self):
@@ -848,12 +848,6 @@ def get_frontend_settings(self,parameterList=None):
         lines += txt['ERROR']
     msg = '\n'.join(lines)
     return msg
-
-def do_scan(self):
-    '''
-    do a scan
-    '''
-    return
 
 
     

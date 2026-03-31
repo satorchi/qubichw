@@ -25,7 +25,7 @@ def make_backupsID(self):
     backups_ID_LSB = (0x00FF & backups_ID)
 
     
-    self.printmsg('backupsID: 0x%04x = %i' % (backups_ID,backups_ID))
+    self.printmsg('backupsID: 0x%04x = %i' % (backups_ID,backups_ID),threshold=2)
     return backups_ID_MSB, backups_ID_LSB
 
 def make_command_startAcquisition(self,session_name=None,comment=None):
@@ -65,7 +65,7 @@ def send_startAcquisition(self,session_name=None,comment=None):
     '''
     if comment is None: comment = "sent by pystudio"
     cmd_bytes = self.make_command_startAcquisition(session_name=session_name,comment=comment)
-    print('%s - Starting Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('Starting Acquisition')
     ack = self.send_command(cmd_bytes)
     
     return ack
@@ -81,8 +81,7 @@ def make_command_stopAcquisition(self):
     '''
 
     if self.backupsID is None:
-        print('ERROR! There is no running acquisition to stop.  Cannot make the stop command.')
-        return 0
+        self.backupsID = self.make_backupsID()
     
     cmd_bytes_list = [self.INTERN_TC_ID,
                       (self.STOP_ACQUISITION_COMMAND & 0xFF00)>>8,
@@ -95,15 +94,8 @@ def send_stopAcquisition(self):
     '''
     send the command to stop an acquisition
     '''
-
-    #### It is unnecessary to send a warning to the user, and causes confusion to the user
-    # even if we haven't started an acquisition, send the stop anyway
-    if self.backupsID is None:
-        # print('WARNING! It seems there is no running acquisition to stop.')
-        self.backupsID = self.make_backupsID()
-
     cmd_bytes = self.make_command_stopAcquisition()
-    print('%s - Stopping Acquisition' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('Stopping Acquisition')
     ack = self.send_command(cmd_bytes)
     self.backupsID = None
     return ack

@@ -55,13 +55,13 @@ def interpret_parameter_TM(self,parm_bytes,parm_name):
     if match:
         if parm_bytes[-1]!=0:
             msg = 'Incorrect end of string data: 0x%02X' % parm_bytes[-1]
-            if self.verbosity>0: print('ERROR! %s' % msg)
+            self.printmsg('ERROR! %s' % msg,threshold=1)
             values['ERROR'].append(msg)
         txt_bytes = parm_bytes[:-1]
         txt = txt_bytes.decode('iso-8859-1')
         values['text'] = txt
         values['value'] = txt
-        if self.verbosity>1: print('%s = %s' % (parm_name,txt))
+        self.printmsg('%s = %s' % (parm_name,txt),threshold=1)
         return values
 
     if parm_name=='DISP_BackupsState_ID':
@@ -107,31 +107,31 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False):
     if stx!=self.DISPATCHER_STX:
         msg = 'Incorrect Start of Transmission: 0x%02X' % stx
         packet_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
         
     counter = (chunk[packet_start_idx+1]<<8) + chunk[packet_start_idx+2]
     packet_info['counter'] = counter
-    if self.verbosity>1: print('COUNTER: 0x%04X = %i' % (counter,counter))
+    self.printmsg('COUNTER: 0x%04X = %i' % (counter,counter),threshold=2)
 
     pkt_size = (chunk[packet_start_idx+3]<<24) + (chunk[packet_start_idx+4]<<16) + (chunk[packet_start_idx+5]<<8) + chunk[packet_start_idx+6]
     packet_info['packet size'] = pkt_size
-    if self.verbosity>1: print('PKT_SIZE: 0x%08X = %i' % (pkt_size,pkt_size))
+    self.printmsg('PKT_SIZE: 0x%08X = %i' % (pkt_size,pkt_size),threshold=2)
     packet_end_idx = packet_start_idx + 7 + pkt_size
     packet_info['last index'] = packet_end_idx
     
     if packet_end_idx>=len(chunk):
         msg = 'Given size is larger than the communication length: %i > %i' % (packet_end_idx+1,len(chunk))
         packet_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
         packet_end_idx = len(chunk)-1
     
     eot = chunk[packet_end_idx]
     packet_info['end transmission'] = eot
-    if self.verbosity>1: print('final byte (EOT): 0x%02X' % eot)
+    self.printmsg('final byte (EOT): 0x%02X' % eot,threshold=2)
     if eot!=self.DISPATCHER_ETX:
         msg = 'Incorrect End of Transmission: 0x%02X' % eot
         packet_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
 
     packet_bytes = chunk[packet_start_idx:packet_end_idx]
     packet_info['bytes'] = packet_bytes
@@ -153,23 +153,21 @@ def interpret_packet(self,chunk,packet_start_idx,print_command_string=False):
         
         packet_info['dispatcher name'] = self.dispatcher_IDname[dispatcher_id]
         body = chunk[packet_start_idx+9:packet_end_idx]
-        if self.verbosity>1: 
-            print('ID: 0x%02X %s' % (dispatcher_id,packet_info['dispatcher name']))
+        self.printmsg('ID: 0x%02X %s' % (dispatcher_id,packet_info['dispatcher name']),threshold=2)
             
     if dispatcher_id in self.command_ID.keys():
         packet_info['command name'] = self.command_name[dispatcher_id]
         sub_id = (chunk[packet_start_idx+8]<<8) + chunk[packet_start_idx+9]
         packet_info['command subID'] = sub_id
         body = chunk[packet_start_idx+10:packet_end_idx]
-        if self.verbosity>1:
-            print('CMD_ID: 0x%02X %s' % (dispatcher_id,packet_info['command name']))
-            print('SUBCMD_ID: 0x%04X' % sub_id)
+        self.printmsg('CMD_ID: 0x%02X %s' % (dispatcher_id,packet_info['command name']),threshold=2)
+        self.printmsg('SUBCMD_ID: 0x%04X' % sub_id,threshold=2)
         if print_command_string and self.verbosity>0:
             cmd_str = body.decode('iso-8859-1')
-            print('COMMAND: %s' % cmd_str)
+            self.printmsg('COMMAND: %s' % cmd_str,threshold=2)
             
     packet_info['communication body'] = body
-    if self.verbosity>1: print('BODY: %s' % (bytes2str(body)))
+    self.printmsg('BODY: %s' % (bytes2str(body)),threshold=2)
     return packet_info
 
 
@@ -187,33 +185,32 @@ def interpret_communication(self,chunk,print_command_string=False, parameterList
     if chunk is None or len(chunk)==0:
         msg = 'No bytes to interpret.'
         chunk_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
         return chunk_info
     
     chunk_info['bytes'] = chunk
     chunk_info['communication size'] = len(chunk)
-    if self.verbosity>1:
-        print('COMMUNICATION BYTES:\n%s' % bytes2str(chunk).replace('0xAA 0x55','0xAA\n0x55'))
-        print('COMMUNICATION TOTAL BYTES: %i' % len(chunk))
+    self.printmsg('COMMUNICATION BYTES:\n%s' % bytes2str(chunk).replace('0xAA 0x55','0xAA\n0x55'),threshold=2)
+    self.printmsg('COMMUNICATION TOTAL BYTES: %i' % len(chunk),threshold=2)
 
     if chunk[0]!=self.DISPATCHER_STX:
         msg = 'Incorrect STX: 0x%02X (should be 0x%02X)' % (chunk[0],self.DISPATCHER_STX)
         chunk_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
 
     if chunk[-1]!=self.DISPATCHER_ETX:
         msg = 'Incorrect ETX: 0x%02X (should be 0x%02X)' % (chunk[-1],self.DISPATCHER_ETX)
         chunk_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
 
     if len(chunk)<7:
         msg = 'communication packet is too small: %i bytes' % len(chunk)
         chunk_info['ERROR'].append(msg)
-        if self.verbosity>0: print('ERROR! '+msg)
+        self.printmsg('ERROR! '+msg,threshold=1)
         return chunk_info
     
     # there may be multiple packets in the given chunk
-    if self.verbosity>1: print('\n'+' Looking at packets '.center(80,'*'))
+    self.printmsg('\n'+' Looking at packets '.center(80,'*'),threshold=2)
     packet_start_idx = 0
     parm_idx = 0
     while packet_start_idx < len(chunk):
@@ -239,11 +236,11 @@ def print_acknowledgement(self,ack,comment=''):
     msg = ' COMMUNICATION WITH DISPATCHER ACKNOWLEDGEMENT: %s ' % comment
     msg_len = len(msg) + 40
     msg = msg.center(msg_len,'v')
-    print(msg)
+    self.printmsg(msg,threshold=1)
     self.interpret_communication(ack)
     msg = ' COMMUNICATION WITH DISPATCHER ACKNOWLEDGED: %s ' % comment
     msg = msg.center(msg_len,'^')
-    print(msg)
+    self.printmsg(msg,threshold=1)
     return
 
 def subscribe_dispatcher(self):
@@ -256,14 +253,14 @@ def subscribe_dispatcher(self):
     try:
         self.dispatcher_socket.connect((QS_IP, self.DISPATCHER_PORT))
     except:
-        if self.verbosity>0: print('ERROR! Could not subscribe to dispatcher.')
+        self.printmsg('ERROR! Could not subscribe to dispatcher.',threshold=1)
         self.dispatcher_socket = None
         return None
     
     try:
         ack = self.dispatcher_socket.recv(self.chunksize)
     except:
-        if self.verbosity>0: print('ERROR!  NO ACKNOWLEDGEMENT for subscription.')
+        self.printmsg('ERROR!  NO ACKNOWLEDGEMENT for subscription.',threshold=1)
         return None
               
         
@@ -278,7 +275,7 @@ def unsubscribe(self):
     if self.dispatcher_socket is None:
         print('Unsubscribe is not necessary: Not connected')
         return
-    if self.verbosity>0: print('Unsubscribing')
+    self.printmsg('Unsubscribing',threshold=1)
     self.dispatcher_socket.close()
     del(self.dispatcher_socket)
     self.dispatcher_socket = None
@@ -297,7 +294,7 @@ def get_data(self):
     try:
         ack = self.dispatcher_socket.recv(self.chunksize)
     except:
-        if self.verbosity>0: print('No data')
+        self.printmsg('No data',threshold=1)
         return None
     
     return ack
@@ -314,14 +311,14 @@ def send_command(self,cmd_bytes):
     try:
         nbytes_sent = self.dispatcher_socket.send(cmd_bytes)
     except:
-        if self.verbosity>0: print('ERROR! Could not send to dispatcher.')
+        self.printmsg('ERROR! Could not send to dispatcher.',threshold=1)
         return None
     
-    if self.verbosity>1: print('sent %i bytes' % nbytes_sent)
+    self.printmsg('sent %i bytes' % nbytes_sent,threshold=2)
     time.sleep(0.1)
     ack = self.get_data()
     if ack is None:
-        if self.verbosity>0: print('ERROR!  No acknowledgement from dispatcher')
+        self.printmsg('ERROR!  No acknowledgement from dispatcher',threshold=1)
         return None
     
     self.print_acknowledgement(ack)

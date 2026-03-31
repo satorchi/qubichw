@@ -101,10 +101,12 @@ class obsmount:
         self.printmsg('obsmount python object initialized')
         return
 
-    def printmsg(self,msg):
+    def printmsg(self,msg,threshold=0):
         '''
         print a message to screen
         '''
+        if self.verbosity<threshold: return
+        
         date_str = utcnow().strftime(self.datefmt)
         full_msg = '%s | obsmount: %s' % (date_str,msg)
 
@@ -112,7 +114,6 @@ class obsmount:
             h = open(self.logfile,'a')
             h.write(full_msg+'\n')
             h.close()
-        if self.verbosity<1: return
         
         print(full_msg)
         return
@@ -144,7 +145,7 @@ class obsmount:
         '''
         do the handshake with the server
         '''
-        self.printmsg('Doing handshake for port: %s' % port)
+        self.printmsg('Doing handshake for port: %s' % port,threshold=2)
         retval = {}
         retval['ok'] = False
         if sampleperiod is None:
@@ -162,7 +163,7 @@ class obsmount:
             self.printmsg('command port handshaking is not required')
             return retval
 
-        self.printmsg('Doing handshake for port: data')
+        self.printmsg('Doing handshake for port: data',threshold=2)
 
         # handshake for data stream
         sampleperiod_str = '%i' % sampleperiod
@@ -176,7 +177,7 @@ class obsmount:
         
         retval['ok'] = True
         self.error = None
-        self.printmsg('Handshake successful for PLC data port')
+        self.printmsg('Handshake successful for PLC data port',threshold=2)
         return retval
                     
         
@@ -202,10 +203,10 @@ class obsmount:
             port_num = self.command_port
             socktype = socket.SOCK_STREAM
 
-        self.printmsg('creating socket for %s with type: %s' % (port,socktype))
+        self.printmsg('creating socket for %s with type: %s' % (port,socktype),threshold=2)
         self.sock[port] = socket.socket(socket.AF_INET, socktype)
         self.sock[port].settimeout(0.5)
-        self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num))
+        self.printmsg('connecting to address: %s:%i' % (self.mount_ip,port_num),threshold=1)
 
         try:
             self.sock[port].connect((self.mount_ip,port_num))
@@ -214,11 +215,11 @@ class obsmount:
         except:
             self.error = make_errmsg('SOCKET ERROR')
         else:
-            self.printmsg('doing handshake after port connection')
+            self.printmsg('doing handshake after port connection',threshold=2)
             retval['ok'] = True
             retval = self.do_handshake(port,sampleperiod=sampleperiod)
             #if not retval['ok']: return self.return_with_error(retval)
-            self.printmsg('setting subscribed to True for port: %s' % port)
+            self.printmsg('setting subscribed to True for port: %s' % port,threshold=2)
             self.subscribed[port] = True
             self.error = None                      
 
@@ -307,6 +308,8 @@ class obsmount:
     def flush_data(self):
         '''
         flush the data stream from the PLC
+        NOTE:  This is not used anymore since the implementation of acquisition() running in a thread
+        to be deleted
         '''
         maxloop = 1000
         counter = 0
@@ -339,7 +342,7 @@ class obsmount:
 
         # check that we are subscribed
         if not self.subscribed[port]:
-            self.printmsg('not subscribed to %s port.  subscribing now.' % port)
+            self.printmsg('not subscribed to %s port.  subscribing now.' % port,threshold=1)
             self.subscribe(port)
 
         if not self.subscribed[port]:
@@ -358,7 +361,7 @@ class obsmount:
             return self.return_with_error(retval)
 
         full_cmd_str = '%s' % cmd_str.upper()
-        self.printmsg('sending command: %s' % full_cmd_str)
+        self.printmsg('sending command: %s' % full_cmd_str,threshold=2)
         if self.testmode:
             self.printmsg("TESTMODE:  I didn't really send the command")
             return retval
@@ -381,7 +384,7 @@ class obsmount:
             cmd_echo = cmd_echo.decode().strip()
 
         retval['command echo'] = cmd_echo
-        self.printmsg('response from PLC: %s' % cmd_echo)
+        self.printmsg('response from PLC: %s' % cmd_echo,threshold=0)
         if cmd_echo.find('out of range')>=0:
             retval['error'] = cmd_echo
             self.return_with_error(retval)
@@ -402,7 +405,7 @@ class obsmount:
             dump_dir = '/tmp'
             
         filename = os.sep.join([dump_dir,'POINTING.dat'])
-        self.printmsg('pointing acquisition starting on file: %s' % filename)
+        self.printmsg('pointing acquisition starting on file: %s' % filename,threshold=0)
         self.dumpfile_handle = open(filename,'ab')
         return dump_dir
 
@@ -412,9 +415,9 @@ class obsmount:
         '''
         if self.dumpfile_handle is not None:
             self.dumpfile_handle.close()
-            self.printmsg('pointing acquisition ended')
+            self.printmsg('pointing acquisition ended',threshold=0)
         else:
-            self.printmsg('WARNING! no pointing acquisition to stop')
+            self.printmsg('WARNING! no pointing acquisition to stop',threshold=1)
         self.dumpfile_handle = None
         return
     
@@ -443,9 +446,9 @@ class obsmount:
                     ack = self.reply_to_client(azel_bytes)
             else:
                 if plc_data['error'].find('timeout')>=0:
-                    self.printmsg('acquisition timeout')
+                    self.printmsg('acquisition timeout',threshold=1)
                 else:
-                    self.printmsg('ERROR on PLC acquisition: %s' % plc_data['error'])
+                    self.printmsg('ERROR on PLC acquisition: %s' % plc_data['error'],threshold=0)
             
         return plc_data
 
@@ -464,12 +467,12 @@ class obsmount:
         client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         client_sock.settimeout(0.2)
-        self.printmsg('REBROADCASTER sending info to %s:%i' % client_address)
+        self.printmsg('REBROADCASTER sending info to %s:%i' % client_address,threshold=2)
         ack = True
         try:
             client_sock.sendto(data_bytes, client_address)
         except:
-            self.printmsg('REBROADCASTER ERROR! Could not send info to %s:%i' % client_address)
+            self.printmsg('REBROADCASTER ERROR! Could not send info to %s:%i' % client_address,threshold=1)
             ack = False
 
         client_sock.close()
@@ -506,18 +509,18 @@ class obsmount:
             except socket.error:
                 errmsg = make_errmsg('socket error')
             except socket.timeout:
-                errmsg = 'socket TIMEOUT'
+                errmsg = 'socket timeout'
             except KeyboardInterrupt:
                 errmsg = 'quitting the PLC re-broadcaster by Ctrl-C'
                 keepgoing = False
                 sock.close()
-                self.printmsg('REBROADCASTER: '+errmsg)
-                return
+                self.printmsg('REBROADCASTER: '+errmsg,threshold=0)
+                break
             except:
                 errmsg = make_errmsg('unknown error')
                 
             if ans is None:
-                self.printmsg('REBROADCASTER '+errmsg)
+                self.printmsg('REBROADCASTER '+errmsg,threshold=1)
                 continue
                 
 
@@ -529,17 +532,20 @@ class obsmount:
                 errmsg = make_errmsg('inappropriate response')
 
             if cmdstr is None:
-                self.printmsg('REBROADCASTER '+errmsg)
+                self.printmsg('REBROADCASTER '+errmsg,threshold=0)
                 continue
             
             cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
             received_date = utcnow()
-            self.printmsg('REBROADCASTER received a request from %s at %s: %s' % (client_address[0],received_date.strftime(self.datefmt),cmdstr_clean))
+            rx_date_str = received_date.strftime(self.datefmt)
+            msg = 'REBROADCASTER received a request from %s at %s: %s' % (client_address[0],rx_date_str,cmdstr_clean)
+            self.printmsg(msg,threshold=2)
 
             if cmdstr_clean=='EXIT SERVER':
                 keepgoing = False
+                self.close_dumpfile()
                 sock.close()
-                self.printmsg('REBROADCASTER quitting')
+                self.printmsg('REBROADCASTER quitting',threshold=0)
                 self.reply_to_client('quitting PLC re-broadcaster'.encode(),client_address)
                 break
 
@@ -560,31 +566,16 @@ class obsmount:
                 self.reply_to_client('stopped dumping'.encode(),client_address)
                 continue
             
-            if cmdstr_clean!='GET AZEL':
-                self.printmsg('REBROADCASTER received inappropriate request')
-                self.reply_to_client('inappropriate request'.encode(),client_address)
+            if cmdstr_clean=='GET AZEL':
+                ### get position from the PLC and return it to the requester
+                ### by assigning the client_address, the acquisition() loop will send the info back to the client
+                self.client_address = client_address
                 continue
 
-            ### get position from the PLC and return it to the requester
-            ### by assigning the client_address, the acquisition() loop will send the info back to the client
-            self.client_address = client_address
+                
+            self.printmsg('REBROADCASTER received inappropriate request',threshold=0)
+            self.reply_to_client('inappropriate request'.encode(),client_address)
 
-            ############### no longer necessary #####################################
-            ''' no longer necessary
-            if not self.subscribed['data']:
-                ack = self.subscribe('data')
-
-            azel = self.flush_data()
-            if not azel['ok']:
-                self.printmsg('REBROADCASTER ERROR! unsuccessful after flush data')
-                self.disconnect()
-                continue
-            
-            azel_bytes = pickle.dumps(azel)
-
-            ack = self.reply_to_client(azel_bytes,client_address)
-            '''
-            ########################################################################
         return 
     
     
@@ -676,10 +667,10 @@ class obsmount:
         '''
         ans = self.get_azel()
         if not ans['ok']:
-            self.printmsg('AZ,EL = ERROR: %s' % ans['error'])
+            self.printmsg('AZ,EL = ERROR: %s' % ans['error'],threshold=0)
             return False
 
-        self.printmsg('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']))
+        self.printmsg('AZ,EL = %.3f %.3f' % (ans['AZ'],ans['EL']),threshold=0)
         return True
 
 
@@ -835,7 +826,7 @@ class obsmount:
         # maximum wait time to get to target
         maxwait = 1.1*np.abs(val_final-val) + 5 # margin added to 1 deg/sec rotation speed
         if maxwait<self.maxwait: maxwait=self.maxwait # always have patience for at least the default maxwait (3 minutes)
-        self.printmsg('using wait time to reach target: %.1f secs' % maxwait)
+        self.printmsg('using maximum wait time to reach target: %.1f secs' % maxwait,threshold=1)
         
         
         while np.abs(val-val_final)>self.pos_margin:
@@ -843,7 +834,7 @@ class obsmount:
             now = utcnow().timestamp()
             if (now-tstart)>maxwait:
                 errmsg = 'Exiting after maximum wait time: %.0f seconds' % maxwait
-                errmsg += '      current value: %s = %.3f degrees' % (key,val)
+                errmsg += ' current value: %s = %.3f degrees' % (key,val)
                 azel['error'] = errmsg
                 return self.return_with_error(azel)
         
@@ -854,7 +845,7 @@ class obsmount:
 
             obsmount_tstamp = azel['TIMESTAMP']
             obsmount_date_str = utcfromtimestamp(obsmount_tstamp).strftime(self.datefmt)
-            self.printmsg('[%s] AZ,EL = %.2f %.2f' % (obsmount_date_str,azel['AZ'],azel['EL']))
+            self.printmsg('[%s] AZ,EL = %.2f %.2f' % (obsmount_date_str,azel['AZ'],azel['EL']),threshold=0)
 
             val = azel[key]
 
@@ -975,8 +966,8 @@ class obsmount:
                 azel = self.wait_for_arrival(az=azlimit)
                 if not azel['ok']:
                     errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees' % azlimit
-                    self.printmsg(errmsg)
-                    self.printmsg('Azimuth scan trying to send command one more time')
+                    self.printmsg(errmsg,threshold=0)
+                    self.printmsg('Azimuth scan trying to send command one more time',threshold=0)
                     ack = self.goto_az(azlimit)
                     azel = self.wait_for_arrival(az=azlimit)
                     if not azel['ok']:

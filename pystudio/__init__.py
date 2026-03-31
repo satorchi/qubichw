@@ -229,10 +229,12 @@ class pystudio:
             self.logfile = os.sep.join([log_dir,'pystudio_log.txt'])
         return
 
-    def printmsg(self,msg):
+    def printmsg(self,msg,threshold=0):
         '''
         print a message to screen and to the log
         '''
+        if self.verbosity<threshold: return
+        
         datefmt = '%Y-%m-%dT%H:%M:%S UT'
         date_str = utcnow().strftime(datefmt)
         full_msg = '%s | DISPATCHER: %s' % (date_str,msg)
@@ -241,7 +243,5 @@ class pystudio:
             h = open(self.logfile,'a')
             h.write(full_msg+'\n')
             h.close()
-        if self.verbosity<1: return
-        
         print(full_msg)
         return
