@@ -59,8 +59,8 @@ class obsmount:
 
     elmin = 30 # minimum permitted elevation
     elmax = 70 # maximum permitted elevation
-    azmin = -38 # minimum permitted azimuth
-    azmax = 398 # maximum permitted azimuth (2026-02-12 15:49:34)
+    azmin = -38 + position_offset['AZ'] # minimum permitted azimuth
+    azmax = 398 + position_offset['AZ'] # maximum permitted azimuth (2026-02-12 15:49:34)
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.3 # default margin of precision for exiting the wait_for_arrival loop
@@ -86,7 +86,7 @@ class obsmount:
         else:
             self.logfile = os.sep.join([log_dir,'obsmount_log.txt'])
         
-        self.acquire_pointing = False # to be eliminated.  using dumpfile_handle instead
+        self.acquire_pointing = False 
         self.client_address = None
         self.dumpfile_handle = None
         self.printmsg('obsmount python object initialized')
@@ -323,6 +323,20 @@ class obsmount:
 
     def send_command(self,cmd_str):
         '''
+        relay the command from the user to the rebroadcaster
+        '''
+        rebroadcaster_cmd = 'COMMAND_PLC:%s' % cmd_str
+        ans = self.send_request_to_rebroadcaster(rebroadcaster_cmd)
+        if isinstance(ans,bytes):
+            plc_ack = pickle.loads(ans)
+            return plc_ack
+        return ans
+        
+        plc_ack = self.send_command_to_plc(cmd_str)
+        return plc_ack
+    
+    def send_command_to_plc(self,cmd_str):
+        '''
         send a command to the observation mount
         '''
         port = 'command'
@@ -516,6 +530,7 @@ class obsmount:
             except KeyboardInterrupt:
                 errmsg = 'quitting the PLC re-broadcaster by Ctrl-C'
                 keepgoing = False
+                self.acquire_pointing = False
                 sock.close()
                 self.printmsg('REBROADCASTER: '+errmsg,threshold=0)
                 break
@@ -547,6 +562,7 @@ class obsmount:
             if cmdstr_clean=='EXIT SERVER':
                 keepgoing = False
                 self.close_dumpfile()
+                self.acquire_pointing = False
                 sock.close()
                 self.printmsg('REBROADCASTER quitting',threshold=0)
                 self.reply_to_client('quitting PLC re-broadcaster'.encode(),client_address)
@@ -573,6 +589,13 @@ class obsmount:
                 ### get position from the PLC and return it to the requester
                 ### by assigning the client_address, the acquisition() loop will send the info back to the client
                 self.client_address = client_address
+                continue
+
+            if cmdstr_clean.find('PLC_COMMAND:')==0:
+                plc_cmd = cmdstr_clean.split('PLC_COMMAND:')[-1].strip()
+                plc_ack = self.send_command_to_plc(plc_cmd)
+                plc_ack_bytes = pickle.dumps(plc_ack)
+                self.reply_to_client(plc_ack_bytes,client_address)
                 continue
 
                 
