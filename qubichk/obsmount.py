@@ -592,9 +592,10 @@ class obsmount:
                 self.reply_to_client(plc_ack_bytes,client_address)
                 continue
 
-                
-            self.printmsg('REBROADCASTER received inappropriate request',threshold=0)
-            self.reply_to_client('inappropriate request'.encode(),client_address)
+
+            errmsg = 'inappropriate request: %s' % cmdstr_clean
+            self.printmsg('REBROADCASTER received %s' % errmsg,threshold=0)
+            self.reply_to_client(errmsg.encode(),client_address)
 
         return 
     
