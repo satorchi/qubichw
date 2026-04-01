@@ -205,7 +205,6 @@ class pystudio:
         end_observation,\
         park_frontend,\
         do_skydip,\
-        do_scan,\
         init_frontend,\
         get_spol,\
         get_frontend_settings
