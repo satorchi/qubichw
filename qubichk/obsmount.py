@@ -869,6 +869,11 @@ class obsmount:
         start_tstamp = utcnow().timestamp()
 
         ack = self.goto_az(azmin)
+        # if axis still moving, wait a bit and try again
+        if not ack['ok'] and ack['error'].find('already moving')>=0:
+            sleep(5)
+            ack = self.goto_az(azmin)
+            
         if not ack['ok']:
             return ack
         
@@ -900,22 +905,29 @@ class obsmount:
         for azlimit in [azmax, azmin]:
         
             while (az<azmax) and (np.abs(az-azlimit)>self.pos_margin):
-                self.goto_el(elmax)
+                ack = self.goto_el(elmax)
+
+                # if axis still moving, wait a bit and try again
+                if not ack['ok'] and ack['error'].find('already moving')>=0:
+                    sleep(5)
+                    ack = self.goto_el(elmax)
+                
                 sleep(1) # wait before next command
                 azel = self.wait_for_arrival(el=elmax)
                 if not azel['ok']:
-                    azel['error'] = 'Did not successfully get to starting elevation position: %s' % azel['error']
+                    azel['error'] = 'Did not successfully get to maximum elevation: %s' % azel['error']
                     return self.return_with_error(azel)
-            
 
-                self.goto_el(elmin)
+                ack = self.goto_el(elmin)
+                sleep(1) # wait before next command
                 azel = self.wait_for_arrival(el=elmin)
                 if not azel['ok']:
-                    azel['error'] = 'Did not successfully get to starting azimuth position: %s' % azel['error']
+                    azel['error'] = 'Did not successfully get to minimum elevation: %s' % azel['error']
                     return self.return_with_error(azel)
 
                 az += azstep
-                self.goto_az(az)
+                ack = self.goto_az(az)
+                sleep(1)
                 azel = self.wait_for_arrival(az=az)
                 if not azel['ok']:
                     azel['error'] = 'Did not get to next azimuth position: %s' % azel['error']
