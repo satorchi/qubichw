@@ -64,7 +64,7 @@ class obsmount:
     azstep = 5 # default step size for azimuth movement for skydips
 
     pos_margin = 0.3 # default margin of precision for exiting the wait_for_arrival loop
-    maxwait = 180 # default maximum wait time in seconds for wait_for_arrival loop, this is adjusted if it's a long slew
+    maxwait = 60 # default maximum wait time in seconds for wait_for_arrival loop, this is adjusted if it's a long slew
 
     
     def __init__(self):
@@ -327,13 +327,7 @@ class obsmount:
         '''
         rebroadcaster_cmd = 'COMMAND_PLC:%s' % cmd_str
         ans = self.send_request_to_rebroadcaster(rebroadcaster_cmd)
-        if isinstance(ans,bytes):
-            plc_ack = pickle.loads(ans)
-            return plc_ack
         return ans
-        
-        plc_ack = self.send_command_to_plc(cmd_str)
-        return plc_ack
     
     def send_command_to_plc(self,cmd_str):
         '''
@@ -652,9 +646,6 @@ class obsmount:
         get azimuth and elevation by sending a query to the rebroadcast server
         '''
         ans = self.send_request_to_rebroadcaster('GET AZEL')
-        if isinstance(ans,bytes):
-            azel = pickle.loads(ans)
-            return azel
         return ans
         
 
@@ -678,13 +669,27 @@ class obsmount:
         try:
             ack, addr = sock.recvfrom(2048)
         except:
-            retval['error'] = 'no response from PLC rebroadcaster'
+            errmsg = make_errmsg('no response from PLC rebroadcaster')
+            retval['error'] = errmsg
 
         sock.close()
         if ack is None:
             return self.return_with_error(retval)
 
-        return ack
+        # the returned acknowledgement might be a pickled dictionary
+        ack_retval = None
+        try:
+            ack_retval = pickle.loads(ack)
+        except:
+            ack_retval = None
+
+        if ack_retval is None:
+            try:
+                ack_retval = ack.decode()
+            except:
+                ack_retval = ack
+
+        return ack_retval
         
 
     def show_azel(self):
