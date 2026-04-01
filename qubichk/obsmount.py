@@ -421,8 +421,13 @@ class obsmount:
         this is an infinite loop to be stopped by setting self.acquire_pointing=False
           which is done by sending a request to the PLC rebroadcaster:  see listen_for_command()
 
-        The loop acquires pointing data contiuously and will dump to file if the file handle is defined
         it will send data to a client on request
+
+
+        The loop acquires pointing data continuously and will dump to file if the file handle is defined
+        NOTE: the data dumped here has not been corrected for encoder offset.
+        See pointing in qubicpack:  https://github.com/satorchi/qubicpack/blob/master/qubicpack/pointing.py
+        
         '''
         self.acquire_pointing = True
         while self.acquire_pointing:
