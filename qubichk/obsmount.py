@@ -27,7 +27,7 @@ from threading import Thread
 import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory
-from qubicpack.pointing import position_key, STX, interpret_pointing_chunk, axis_fullname
+from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
 class obsmount:
@@ -41,15 +41,6 @@ class obsmount:
     broadcast_request_port = 61337
     qubicstudio_port = 4003 # port for receiving data from the red platform
     qubicstudio_ip = known_hosts['qubic-studio']
-    # position offsets To Be Measured !!
-    # 'EL': 49.315, # see elog: https://elog-qubic.in2p3.fr/demo/1296
-    # 'EL': 49.935, # see elog: https://elog-qubic.in2p3.fr/demo/1321
-    # 'AZ':  9.0    # see elog: https://elog-qubic.in2p3.fr/demo/1322 
-    position_offset = {'AZ': 9.0, 
-                       'EL': 49.935,
-                       'RO': 0.0,
-                       'TR': 0.0
-                       }
     axis_keys = list(position_offset.keys())
     n_axis_keys = len(axis_keys)
     datefmt = '%Y-%m-%dT%H:%M:%S UT'
@@ -613,7 +604,7 @@ class obsmount:
                 errmsg.append('no data for %s' % axis_fullname[axis])
                 errlevel += 1
             else:
-                retval[axis] = packet[axis][position_key[axis]] + self.position_offset[axis]
+                retval[axis] = packet[axis][position_key[axis]] + position_offset[axis]
             
         retval['error'] = '\n'.join(errmsg)
         if errlevel >= 2:
@@ -715,7 +706,7 @@ class obsmount:
         send command to move to the given azimuth
         we correct for the encoder azimuth offset
         '''
-        cmd_az = az - self.position_offset['AZ']
+        cmd_az = az - position_offset['AZ']
         az_str = '%.1f' % cmd_az
         cmd_str = self.make_command_string('AZ','POS',az_str)
         return self.send_command(cmd_str)
@@ -725,7 +716,7 @@ class obsmount:
         send command to move to the given elevation
         we correct for the encoder elevation offset
         '''
-        cmd_el = el - self.position_offset['EL']
+        cmd_el = el - position_offset['EL']
         el_str = '%.1f' % cmd_el
         cmd_str = self.make_command_string('EL','POS',el_str)
         return self.send_command(cmd_str)
