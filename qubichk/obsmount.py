@@ -325,7 +325,7 @@ class obsmount:
         '''
         relay the command from the user to the rebroadcaster
         '''
-        rebroadcaster_cmd = 'COMMAND_PLC:%s' % cmd_str
+        rebroadcaster_cmd = 'PLC_COMMAND:%s' % cmd_str
         ans = self.send_request_to_rebroadcaster(rebroadcaster_cmd)
         return ans
     
