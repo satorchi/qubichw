@@ -376,9 +376,16 @@ class obsmount:
 
         retval['command echo'] = cmd_echo
         self.printmsg('response from PLC: %s' % cmd_echo,threshold=0)
+        
         if cmd_echo.find('out of range')>=0:
             retval['error'] = cmd_echo
-            self.return_with_error(retval)
+            return self.return_with_error(retval)
+
+        if cmd_echo.find('already moving')>=0:
+            retval['error'] = cmd_echo
+            self.printmsg('ERROR! axis is already moving.  Please wait, or send "stop", and try again.')
+            return self.return_with_error(retval)
+        
         return retval
 
     def open_dumpfile(self,dump_dir=None):
@@ -958,6 +965,18 @@ class obsmount:
             
             for azlimit in [azmax, azmin]:
                 ack = self.goto_az(azlimit)
+
+                # if axis still moving, wait a bit and try again
+                if not ack['ok'] and ack['error'].find('already moving')>=0:
+                    sleep(5)
+                    ack = self.goto_az(azlimit)
+
+                # still not ok, try to stop and restart
+                if not ack['ok']:
+                    ack = self.stop()
+                    sleep(5)
+                    ack = self.goto_az(azlimit)
+                    
                 sleep(1) # wait before next command
                 azel = self.wait_for_arrival(az=azlimit)
                 if not azel['ok']:
