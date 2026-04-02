@@ -61,6 +61,9 @@ rsync -avztP $LOCAL_DATASET_DIR/20??-??-?? $ARCHIVE_DIR
 rsync -avztP $HWP_DIR $ARCHIVE_DIR
 rsync -avztP $WEATHER_DIR $ARCHIVE_DIR/weather
 
+# make sure the correct permissions are on archive_hkdir
+sudo chmod -R 1775 $ARCHIVE_HKDIR
+
 # use rsync to copy to CC
 rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
 
@@ -68,7 +71,5 @@ rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
 ## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
 ## rsync -avztP $ARCHIVE_DIR/ apcjupyter:$JUPYTER_DIR
 
-# make sure the correct permissions are on archive_hkdir
-sudo chmod -R 1775 $ARCHIVE_HKDIR
 
 echo "`date +%Y-%m-%dT%H:%M:%S` finished archiving" >> $ARCHIVE_DIR/archive_log.txt
