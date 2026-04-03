@@ -808,6 +808,17 @@ class obsmount:
             cmd_str = self.make_command_string(axis,'ENA')
             self.send_command(cmd_str)
         return
+
+    def reset(self):
+        '''
+        try to reset by sending STOP, DISable and ENAble
+        '''
+        ack = self.stop()
+        sleep(0.5)
+        ack = self.disable()
+        sleep(0.5)
+        ack = self.do_command_init()
+        return
         
     def disable(self):
         '''
@@ -829,7 +840,7 @@ class obsmount:
         el_final = el
 
         if (az_final is None) and (el_final is None):
-            print('Please specify one of az or el with option az=<value> or el=<value>')
+            self.printmsg('ERROR! wait_for_arrival: Please specify one of az or el with option az=<value> or el=<value>')
             retval = {}
             retval['ok'] = False
             retval['error'] = 'insufficient input to wait_for_arrival'
@@ -1013,10 +1024,10 @@ class obsmount:
                     sleep(5)
                     ack = self.goto_az(azlimit)
 
-                # still not ok, try to stop and restart
+                # if still not ok, try to reset
                 if not ack['ok']:
-                    ack = self.stop()
-                    sleep(5)
+                    ack = self.reset()
+                    sleep(1)
                     ack = self.goto_az(azlimit)
                     
                 sleep(1) # wait before next command
@@ -1024,12 +1035,22 @@ class obsmount:
                 if not azel['ok']:
                     errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees' % azlimit
                     self.printmsg(errmsg,threshold=0)
-                    self.printmsg('Azimuth scan trying to send command one more time',threshold=0)
+                    self.printmsg('Azimuth scan trying to send command again',threshold=0)
                     ack = self.goto_az(azlimit)
                     azel = self.wait_for_arrival(az=azlimit)
+
                     if not azel['ok']:
-                        azel['error'] = errmsg+' after two attempts to send command'                    
-                        return self.return_with_error(azel)
+                        errmsg += ' after two attempts to send command.  Trying a reset.'
+                        self.printmsg(errmsg)
+                        ack = self.reset()
+                        sleep(0.5)
+                        ack = self.goto_az(azlimit)
+                        azel = self.wait_for_arrival(az=azlimit)
+
+                        if not azel['ok']:
+                            errmsg += ' Reset unsuccessful.  Aborting.'
+                            azel['error'] = errmsg
+                            return self.return_with_error(azel)
 
             now = utcnow()
 
