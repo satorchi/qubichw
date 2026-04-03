@@ -47,13 +47,6 @@ parameterList = ['el',
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
-def printmsg(msg):
-    '''
-    print the message on the screen
-    '''
-    print('[%s] - %s' % (utcnow().strftime(datefmt),msg))
-    return
-
 def cli():
     dispatcher = pystudio()
     ack = dispatcher.subscribe_dispatcher()
@@ -95,22 +88,22 @@ def cli():
     ####### start immediately by going to the starting position ##########
     ack = mount.goto_el(el)
     if not ack['ok']:
-        printmsg('Scan unable to send elevation command to observation mount')
+        dispatcher.printmsg('Scan unable to send elevation command to observation mount')
         return
     
     azel = mount.wait_for_arrival(el=el)
     if not azel['ok']:
-        printmsg('Did not successfully get to elevation position: %.3f degrees' % el)
+        dispatcher.printmsg('Did not successfully get to elevation position: %.3f degrees' % el)
         return
         
     ack = mount.goto_az(azmin)
     if not ack['ok']:
-        printmsg('Scan unable to send azimuth command to observation mount')
+        dispatcher.printmsg('Scan unable to send azimuth command to observation mount')
         return
         
     azel = mount.wait_for_arrival(az=azmin)
     if not azel['ok']:
-        printmsg('Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin)
+        dispatcher.printmsg('Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin)
         return
 
     #### wait for start time if necessary ####
@@ -118,7 +111,7 @@ def cli():
     if now<start_time:
         wait_delta = start_time - now
         wait_before_start = wait_delta.total_seconds()
-        printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start))
+        dispatcher.printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start))
         sleep(wait_before_start)
     
     #####################################
@@ -128,12 +121,12 @@ def cli():
     # run the scanning sequence from obsmount
     mount.do_constant_elevation_scanning(el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
                                          tstart=options['tstart'],tend=options['tend'],duration=options['duration'])
-    mount.disconnect()
 
     # stop the acquisition
     ack = dispatcher.end_observation()
     
-    printmsg('Scan completed for %s' % dataset_name)
+    dispatcher.printmsg('Scan completed for %s' % dataset_name)
+    mount.disconnect()
     ack = dispatcher.unsubscribe()
     return
 
