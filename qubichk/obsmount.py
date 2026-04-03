@@ -89,7 +89,7 @@ class obsmount:
         self.acquire_pointing = False 
         self.client_address = None
         self.dumpfile_handle = None
-        self.printmsg('obsmount python object initialized')
+        self.printmsg('obsmount python object initialized',threshold=2)
         return
 
     def printmsg(self,msg,threshold=0):
@@ -558,6 +558,7 @@ class obsmount:
                 self.close_dumpfile()
                 self.acquire_pointing = False
                 sock.close()
+                self.disconnect()
                 self.printmsg('REBROADCASTER quitting',threshold=0)
                 self.reply_to_client('quitting PLC re-broadcaster'.encode(),client_address)
                 break
