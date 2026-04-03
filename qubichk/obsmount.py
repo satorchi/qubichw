@@ -870,7 +870,7 @@ class obsmount:
         # maximum wait time to get to target
         maxwait = 1.1*np.abs(val_final-val) + 5 # margin added to 1 deg/sec rotation speed
         if maxwait<self.maxwait: maxwait=self.maxwait # always have patience for at least the default maxwait (3 minutes)
-        self.printmsg('using maximum wait time to reach target: %.1f secs' % maxwait,threshold=1)
+        self.printmsg('maximum wait time to reach target: %.1f secs' % maxwait,threshold=1)
         
         
         while np.abs(val-val_final)>self.pos_margin:
