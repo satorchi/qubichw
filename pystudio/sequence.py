@@ -659,7 +659,7 @@ def end_observation(self):
     # stop Az/El acquisition
     mount = obsmount()
     ans = mount.send_request_to_rebroadcaster('STOP DUMP')
-    mount.stop()
+    # mount.stop() # do not send stop.  This is maybe causing problems (to be confirmed: 2026-04-03 11:53:38)
     mount.disconnect()
     self.printmsg('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
