@@ -259,7 +259,7 @@ class obsmount:
 
     def get_data(self,chunksize=None):
         '''
-        once we're subscribed, we can listen for the data
+        once we're subscribed to the PLC, we can listen for the data
         
         The chunksize is the number of bytes to read.
         '''
@@ -448,7 +448,8 @@ class obsmount:
         while self.acquire_pointing:
             plc_data = self.get_data()
             if plc_data['ok']:
-                packet = STX + plc_data['CHUNK']
+                tstamp_str = 'RX%.6fXR' % plc_data['CHUNK TIMESTAMP']
+                packet = STX + tstamp_str.encode() + plc_data['CHUNK']
                 if self.dumpfile_handle is not None:
                     self.dumpfile_handle.write(packet)
                 if self.client_address is not None:
