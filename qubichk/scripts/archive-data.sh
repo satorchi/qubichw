@@ -62,7 +62,7 @@ rsync -avztP $HWP_DIR $ARCHIVE_DIR
 rsync -avztP $WEATHER_DIR $ARCHIVE_DIR/weather
 
 # make sure the correct permissions are on archive_hkdir
-sudo chmod -R 1775 $ARCHIVE_HKDIR
+sudo chmod -R 0755 $ARCHIVE_HKDIR
 
 # use rsync to copy to CC
 rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
