@@ -124,7 +124,7 @@ class obsmount:
         '''
         do the command initialization commands
         '''
-        for cmd_arg in ['ENA','START','VEL 1']:
+        for cmd_arg in ['STOP','ENA','START','VEL 1']:
             cmd = '%s %s' % (axname,cmd_arg)
             retval = self.send_command(cmd)
             if not retval['ok']: return retval
@@ -665,7 +665,7 @@ class obsmount:
         my_ip = get_myip()
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.settimeout(3)
+        sock.settimeout(10)
         sock.sendto(cmd.encode(), (qc_ip, self.broadcast_request_port))
         
         ack = None
