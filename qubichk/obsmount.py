@@ -53,7 +53,7 @@ class obsmount:
                           'VEL']    # set velocity
     wait = 0.0 # seconds to wait before next socket command
     default_chunksize = 512 # motor PLC sends packets of approx 200 bytes each time
-    sampleperiod = 200 # sample period in milliseconds (Note: PLC default is 1000 msec)
+    sampleperiod = 100 # sample period in milliseconds (Note: PLC default is 1000 msec)
     verbosity = 1
     testmode = False
 
