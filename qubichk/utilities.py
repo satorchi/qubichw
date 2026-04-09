@@ -25,19 +25,20 @@ qubicloc = EarthLocation(lon=qubic_longitude,lat=qubic_latitude,height=qubic_alt
 
 # these are the default known hosts.  Updated addresses are read from /etc/hosts and from ~/.local/share/qubic/known_hosts
 known_hosts = {}
-known_hosts['qubic-central'] = "192.168.2.1"
-known_hosts['qsbridge'] = "192.168.2.3"
-known_hosts['qubic-studio']  = "192.168.2.114"
-known_hosts['calsource']     = "192.168.2.5"
-known_hosts['pigps']         = "192.168.2.17"
-known_hosts['redpitaya']     = "192.168.2.21"
-known_hosts['groundgps']     = "192.168.2.22"
-known_hosts['horn']          = "192.168.2.9"
-known_hosts['mgc3']          = "192.168.2.214"
-known_hosts['mmr3']          = "192.168.2.213"
-known_hosts['motorplc']      = "192.168.2.113"
-known_hosts['weather']       = "192.168.88.7"
+known_hosts['qubic-central']  = "192.168.2.1"
+known_hosts['qsbridge']       = "192.168.2.3"
+known_hosts['qubic-studio']   = "192.168.2.114"
+known_hosts['calsource']      = "192.168.2.5"
+known_hosts['pigps']          = "192.168.2.17"
+known_hosts['redpitaya']      = "192.168.2.21"
+known_hosts['groundgps']      = "192.168.2.22"
+known_hosts['horn']           = "192.168.2.9"
+known_hosts['mgc3']           = "192.168.2.214"
+known_hosts['mmr3']           = "192.168.2.213"
+known_hosts['motorplc']       = "192.168.2.113"
+known_hosts['weather']        = "192.168.88.7"
 known_hosts['inside-weather'] = "192.168.88.113"
+known_hosts['dome']           = "192.168.88.123"
 date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 
 hk_dir = '/home/qubic/data/temperature/broadcast'
