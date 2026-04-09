@@ -50,7 +50,7 @@ def get_dome_status():
     for lctr,l_str in enumerate(len_list):
         l = eval(l_str)
         idx_end = idx + l
-        hex_str = '0x'+ val[idx:idx_end].ljust(4,'0')
+        hex_str = '0x'+ val_str[idx:idx_end].ljust(4,'0')
         try:
             hex_val = eval(hex_str)
         except:
