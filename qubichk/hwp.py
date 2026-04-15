@@ -13,10 +13,11 @@ Half Wave Plate methods for housekeeping acquisition
 HWP control software by Carlos Reyes
 '''
 import socket,re
-from qubichk.utilities import ping,shellcommand,get_myip
+from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts
 
-QC_IP = "192.168.2.1"
-HWP_IP = "192.168.2.100"
+known_hosts = get_known_hosts()
+QC_IP = known_hosts['qubic-central']
+HWP_IP = known_hosts['hwp']
 MY_IP = get_myip()
 LISTEN_PORT = 5455
 
