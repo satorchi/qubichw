@@ -533,7 +533,7 @@ class obsmount:
                 errmsg = make_errmsg('unknown error')
                 
             if ans is None:
-                self.printmsg('REBROADCASTER '+errmsg,threshold=1)
+                self.printmsg('REBROADCASTER '+errmsg,threshold=0)
                 continue
                 
 
