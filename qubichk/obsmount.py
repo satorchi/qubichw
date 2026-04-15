@@ -665,12 +665,16 @@ class obsmount:
         my_ip = get_myip()
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.settimeout(10)
+        sock.settimeout(12)
         sock.sendto(cmd.encode(), (qc_ip, self.broadcast_request_port))
         
         ack = None
+        request_time = utcnow()
         try:
             ack, addr = sock.recvfrom(2048)
+        except socket.timeout:
+            timeout_seconds = (utcnow() - request_time).total_seconds()
+            retval['error'] = 'no response from PLC rebroadcaster: timeout after %.1f seconds' % timeout_seconds
         except:
             errmsg = make_errmsg('no response from PLC rebroadcaster')
             retval['error'] = errmsg
