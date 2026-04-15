@@ -58,6 +58,7 @@ def get_dome_status():
         val_list.append(hex_val)
         idx = idx_end
 
+    values['status'] = val_list[0]
     values['Puerta A'] = val_list[1]
     values['Puerta B'] = val_list[2]
     values['RPM A'] = val_list[3]
