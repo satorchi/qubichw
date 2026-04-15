@@ -219,7 +219,7 @@ def init_frontend(self,
     return
                   
 
-def set_bath_temperature(self,Tbath,timeout=120,precision=0.003):
+def set_bath_temperature(self,Tbath,timeout=120,precision=0.002):
     '''
     set the iMACRT PID for the desired temperature and wait until it reaches the temperature
     '''
@@ -646,6 +646,9 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     ack = self.end_observation()
 
     ack = self.set_observation_mode(Voffset=Voffset,Tbath=Tbath,FLL=FLL)
+
+    # pause a few seconds before starting acquisition
+    sleep(3)
     ack = self.start_acquisition(title=title,comment=comment)
     
     return
