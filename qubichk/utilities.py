@@ -16,6 +16,9 @@ from astropy.coordinates import SkyCoord, EarthLocation, AltAz, get_body, angula
 from astropy.time import Time as astrotime
 from satorchipy.datefunctions import utcnow
 
+# format to use for log output
+log_datefmt = '%Y-%m-%dT%H:%M:%S UT'
+
 # QUBIC position from PiGPS (antenna on the mount): https://elog-qubic.in2p3.fr/demo/1234
 qubic_site = 'Alto Chorrillos'
 qubic_latitude = -(24 + 11.2002/60)

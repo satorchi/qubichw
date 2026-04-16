@@ -49,7 +49,7 @@ see in QubicStudio source code: TVirtualCommandEncode.cpp, QDispatcherTCByteArra
 '''
 import os
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import verify_directory
+from qubichk.utilities import verify_directory, log_datefmt
 class pystudio:
 
     # class variables.  You can change these before instantiating an object
@@ -234,8 +234,7 @@ class pystudio:
         '''
         if self.verbosity<threshold: return
         
-        datefmt = '%Y-%m-%dT%H:%M:%S UT'
-        date_str = utcnow().strftime(datefmt)
+        date_str = utcnow().strftime(log_datefmt)
         full_msg = '%s | DISPATCHER: %s' % (date_str,msg)
 
         if self.logfile is not None:

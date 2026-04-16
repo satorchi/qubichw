@@ -15,9 +15,9 @@ open/close the Mechanical heat switches
 import sys,os,time
 
 from qubichk.entropy_hk import entropy_hk
+from qubichk.utilities import log_datefmt
 from satorchipy.datefunctions import utcnow
 
-datefmt = '%Y-%m-%d %H:%M:%S UT'
 hk = entropy_hk()
 nsteps = 150000 # number of steps to open
 nsqueeze = 500  # extra number of steps to squeeze closed a bit more
@@ -42,11 +42,11 @@ for arg in sys.argv:
         
 
 now = utcnow()
-print('%s | Opening Mechanical Heat Switch' % now.strftime(datefmt))
+print('%s | Opening Mechanical Heat Switch' % now.strftime(log_datefmt))
 hk.mech_command(1,nsteps,'open')
 
 time.sleep(wait_open)
 now = utcnow()            
-print('%s | Closing Mechanical Heat Switch' % now.strftime(datefmt))
+print('%s | Closing Mechanical Heat Switch' % now.strftime(log_datefmt))
 hk.mech_command(1,nsteps+nsqueeze,'close')
     

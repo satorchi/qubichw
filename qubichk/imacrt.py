@@ -15,11 +15,12 @@ this is especially the MGC3 temperature controller for the TES bath temperature
 see also in scripts directory:  mmr_mes1.py, fast_mmr.py (possibly to be updated)
 '''
 import socket
-from qubichk.utilities import get_known_hosts
+from qubichk.utilities import get_known_hosts, log_datefmt
+from satorchipy.datefunctions import utcnow
 known_hosts = get_known_hosts()
 
 class iMACRT:
-    def __init__(self,device='mgc'):
+    def __init__(self,device='mgc',verbosity=1):
         self.sock = None
         
         if device.upper().find('MMR')==0:
@@ -27,7 +28,20 @@ class iMACRT:
         else:
             self.imacrtIP = known_hosts['mgc3']
         self.imacrt_port = 12000 + eval(self.imacrtIP.split('.')[-1])
+        self.verbosity = verbosity
         return
+
+    def printmsg(self,msg,threshold=0):
+        '''
+        print a message to screen
+        '''
+        if self.verbosity<threshold: return
+        
+        date_str = utcnow().strftime(log_datefmt)
+        full_msg = '%s | iMACRT: %s' % (date_str,msg)        
+        print(full_msg)
+        return
+
         
     def init_socket(self):
         '''
@@ -46,7 +60,7 @@ class iMACRT:
         disconnect socket so that the port is free
         '''
         if self.sock is None:
-            print('already disconnected')
+            self.printmsg('already disconnected')
             return None
 
         self.sock.close()
@@ -72,7 +86,7 @@ class iMACRT:
         try:
             ans_b = self.sock.recv(1024)
         except:
-            print('ERROR! No reply from iMACRT device: %s' % self.imacrtIP)
+            self.printmsg('ERROR! No reply from iMACRT device: %s' % self.imacrtIP)
             return None
 
         return ans_b.decode()
@@ -83,7 +97,7 @@ class iMACRT:
         '''
         cmd = '*IDN'
         ans = self.send_command(cmd)
-        print('iMACRT Device: %s' % ans)
+        self.printmsg('iMACRT Device: %s' % ans)
         return ans
 
     
@@ -97,7 +111,7 @@ class iMACRT:
         try:
             ans = eval(ans_str)
         except:
-            print('ERROR! MGC PID state unknown: %s' % ans_str)
+            self.printmsg('ERROR! MGC PID state unknown: %s' % ans_str)
             return None
 
         return ans
@@ -119,10 +133,10 @@ class iMACRT:
         ans_str = self.send_command(cmd)
         try:
             ans = eval(ans_str)
-            print('MGC setpoint: %0.4f K' % ans)
+            self.printmsg('MGC setpoint: %0.4f K' % ans)
         except:
             ans = ans_str
-            print('MGC setpoint: %s' % ans)
+            self.printmsg('MGC setpoint: %s' % ans)
             
         return ans
         
@@ -131,7 +145,7 @@ class iMACRT:
         set the temperature set point for the TES bath temperature
         '''
         if setpt>0.44:
-            print('ERROR!  Requested temperature is too high: %.3f K' % setpt)
+            self.printmsg('ERROR!  Requested temperature is too high: %.3f K' % setpt)
             return None
         cmd = 'MGC3SET 2 %f' % setpt
         return self.send_command(cmd,get_reply=False)
@@ -145,10 +159,10 @@ class iMACRT:
         ans_str = self.send_command(cmd)
         try:
             ans = eval(ans_str)
-            print('MGC measurement: %0.4f K' % ans)
+            self.printmsg('MGC measurement: %0.4f K' % ans)
         except:
             ans = ans_str
-            print('MGC measurement: %s' % ans)
+            self.printmsg('MGC measurement: %s' % ans)
             
         return ans
 

@@ -26,7 +26,7 @@ from time import sleep
 from threading import Thread
 import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
-from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory
+from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory, log_datefmt
 from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
@@ -43,7 +43,6 @@ class obsmount:
     qubicstudio_ip = known_hosts['qubic-studio']
     axis_keys = list(position_offset.keys())
     n_axis_keys = len(axis_keys)
-    datefmt = '%Y-%m-%dT%H:%M:%S UT'
 
     available_commands = ['ENA',    # enable
                           'DIS',    # disable
@@ -98,7 +97,7 @@ class obsmount:
         '''
         if self.verbosity<threshold: return
         
-        date_str = utcnow().strftime(self.datefmt)
+        date_str = utcnow().strftime(log_datefmt)
         full_msg = '%s | obsmount: %s' % (date_str,msg)
 
         if self.logfile is not None:
@@ -550,7 +549,7 @@ class obsmount:
             
             cmdstr_clean = ' '.join(cmdstr.decode().strip().split())
             received_date = utcnow()
-            rx_date_str = received_date.strftime(self.datefmt)
+            rx_date_str = received_date.strftime(log_datefmt)
             msg = 'REBROADCASTER received a request from %s at %s: %s' % (client_address[0],rx_date_str,cmdstr_clean)
             self.printmsg(msg,threshold=2)
 
@@ -893,7 +892,7 @@ class obsmount:
                 continue
 
             obsmount_tstamp = azel['TIMESTAMP']
-            obsmount_date_str = utcfromtimestamp(obsmount_tstamp).strftime(self.datefmt)
+            obsmount_date_str = utcfromtimestamp(obsmount_tstamp).strftime(log_datefmt)
             self.printmsg('[%s] AZ,EL = %.2f %.2f' % (obsmount_date_str,azel['AZ'],azel['EL']),threshold=0)
 
             val = azel[key]
