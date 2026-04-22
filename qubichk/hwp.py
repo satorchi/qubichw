@@ -20,6 +20,7 @@ QC_IP = known_hosts['qubic-central']
 HWP_IP = known_hosts['hwp']
 MY_IP = get_myip()
 LISTEN_PORT = 5455
+CMD_PORT = 5454
 
 
 def get_hwp_info():
@@ -100,5 +101,55 @@ def get_hwp_info():
     retval['message'] = msg
     return retval
 
+cmd_help = {
+    'HALT'         : 'stop HWP',
+    'ENGA'         : 'engage hwp software to a well known position',
+    'CAL'          : 'same as ENGA',
+    'DEBUG'        : 'run custom routine helper',
+    'GOTO'         : 'go to position (valid positions: 1 to 7)',
+    'STEP'         : 'step motor (valid steps: 1 to 500)',
+    'VEL'          : 'set Ton and Toff times as VELOCITY for the square wave signal for the motor driver',
+    'DIS'          : 'disable motor',
+    'EN'           : 'enable motor',
+    'DIR'          : 'sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)'
+}
+
+def show_hwp_help():
+    '''
+    print a help text
+    '''
+    for cmd in cmd_help.keys():
+        print('%s: %s' % (cmd.ljust(8),valid_commands))
+    return
+
+def send_hwp_command(cmd):
+    '''
+    send a command to the HWP controller
+
+	HALT         : stop HWP 
+	ENGA         : engage hwp software to a well known position
+	CAL          : same as ENGA
+	DEBUG        : run custom routine helper
+	GOTO <pos>   : go to position (valid positions: 1 to 7)
+	STEP <steps> : step motor (valid steps: 1 to 500)
+	VEL          : set Ton and Toff times as VELOCITY for the square wave signal for the motor driver
+	DIS          : disable motor
+	EN           : enable motor
+	DIR <dir>    : sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)
+    
+    '''
+    cmd_noarg = cmd.split()[0]
+    if cmd_noarg not in cmd_help.keys():
+        show_hwp_help()
+        return
+    
+    cmd_bytes = str.encode(cmd)
+    s = socket.socket(socket.AF_INET, socket`.SOCK_DGRAM)
+    s.sendto(cmd_bytes, (HWP_IP, CMD_PORT))
+    s.close()
+    return
 
 
+
+
+    
