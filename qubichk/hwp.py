@@ -22,6 +22,18 @@ MY_IP = get_myip()
 LISTEN_PORT = 5455
 CMD_PORT = 5454
 
+cmd_help = {
+    'HALT'         : 'stop HWP',
+    'ENGA'         : 'engage hwp software to a well known position',
+    'CAL'          : 'same as ENGA',
+    'DEBUG'        : 'run custom routine helper',
+    'GOTO'         : 'go to position (valid positions: 1 to 7)',
+    'STEP'         : 'step motor (valid steps: 1 to 500)',
+    'VEL'          : 'set Ton and Toff times as VELOCITY for the square wave signal for the motor driver',
+    'DIS'          : 'disable motor',
+    'EN'           : 'enable motor',
+    'DIR'          : 'sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)'
+}
 
 def get_hwp_info():
     '''
@@ -101,25 +113,13 @@ def get_hwp_info():
     retval['message'] = msg
     return retval
 
-cmd_help = {
-    'HALT'         : 'stop HWP',
-    'ENGA'         : 'engage hwp software to a well known position',
-    'CAL'          : 'same as ENGA',
-    'DEBUG'        : 'run custom routine helper',
-    'GOTO'         : 'go to position (valid positions: 1 to 7)',
-    'STEP'         : 'step motor (valid steps: 1 to 500)',
-    'VEL'          : 'set Ton and Toff times as VELOCITY for the square wave signal for the motor driver',
-    'DIS'          : 'disable motor',
-    'EN'           : 'enable motor',
-    'DIR'          : 'sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)'
-}
 
 def show_hwp_help():
     '''
     print a help text
     '''
     for cmd in cmd_help.keys():
-        print('%s: %s' % (cmd.ljust(8),valid_commands))
+        print('%s: %s' % (cmd.ljust(8),cmd_help[cmd]))
     return
 
 def send_hwp_command(cmd):
