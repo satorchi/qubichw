@@ -166,7 +166,7 @@ def hwp_wait_for_arrival(pos,maxwait=60):
     is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(pos)
 
     if is_arrived:
-        print('HWP in position %s' hwpinfo['pos'])
+        print('HWP in position %s' % hwpinfo['pos'])
         return hwpinfo
 
     start_time = utcnow()
