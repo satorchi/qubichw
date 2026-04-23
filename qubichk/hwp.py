@@ -144,7 +144,7 @@ def send_hwp_command(cmd):
         return
     
     cmd_bytes = str.encode(cmd)
-    s = socket.socket(socket.AF_INET, socket`.SOCK_DGRAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(cmd_bytes, (HWP_IP, CMD_PORT))
     s.close()
     return
