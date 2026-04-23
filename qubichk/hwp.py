@@ -13,7 +13,9 @@ Half Wave Plate methods for housekeeping acquisition
 HWP control software by Carlos Reyes
 '''
 import socket,re
+from time import sleep
 from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts
+from satorchipy.datefunctions import utcnow
 
 known_hosts = get_known_hosts()
 QC_IP = known_hosts['qubic-central']
@@ -41,6 +43,7 @@ def get_hwp_info():
     '''
     retval = {}
     retval['ok'] = False
+    retval['error_message'] = 'NO ERROR MESSAGE'
 
     # check if hwp is responding
     ping_result = ping(HWP_IP,verbosity=0)
@@ -149,7 +152,40 @@ def send_hwp_command(cmd):
     s.close()
     return
 
+def hwp_wait_for_arrival(pos,maxwait=60):
+    '''
+    wait for HWP to get to a particular position
+    '''
+    
+    
+    hwpinfo = get_hwp_info()
+    if not hwpinfo['ok']:
+        print(hwpinfo['error_message'])
+        return hwpinfo
+    
+    is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(pos)
 
+    if is_arrived:
+        print('HWP in position %s' hwpinfo['pos'])
+        return hwpinfo
+
+    start_time = utcnow()
+    delta = utcnow() - start_time
+    while not is_arrived and delta.total_seconds()<maxwait:
+        sleep(2)
+        hwpinfo = get_hwp_info()
+        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(pos)
+        delta = utcnow() - start_time
+
+    if not is_arrived:
+        print('ERROR! HWP did not reach final position: %s' % hwpinfo['error_message'])
+
+    return hwpinfo
+
+
+        
+    
+    
 
 
     
