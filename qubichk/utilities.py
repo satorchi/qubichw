@@ -47,6 +47,22 @@ date_logfmt = '%Y-%m-%d %H:%M:%S UT'
 hk_dir = '/home/qubic/data/temperature/broadcast'
 fridge_dir = '/home/qubic/data/temperature'
 
+
+def printmsg(msg,subsys_name,logfile=None):
+    '''
+    print a message to screen, and optionally to a logfile
+    '''
+    date_str = utcnow().strftime(log_datefmt)
+    full_msg = '%s | %s: %s' % (date_str,subsys_name,msg)
+
+    if logfile is not None:
+        h = open(self.logfile,'a')
+        h.write(full_msg+'\n')
+        h.close()
+        
+    print(full_msg)
+    return
+
 def get_altaz(d,source='sun',verbose=False):
     '''
     get the position of a solar system body at a given time
