@@ -29,6 +29,7 @@ import sys
 from time import sleep
 import datetime as dt
 UTC = dt.timezone.utc
+from datetime import timedelta
 from satorchipy.utilities import parseargs
 from satorchipy.datefunctions import utcnow
 from pystudio import pystudio
