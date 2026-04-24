@@ -146,7 +146,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         # go to next HWP position
         if use_hwp:
             hwp_pos += hwp_increment
-            if hwp_pos>=7 or hwp_pos<=1:
+            if hwp_pos>7 or hwp_pos<1:
                 hwp_increment *= -1
                 hwp_pos += 2*hwp_increment
             printmsg('going to position %i' % hwp_pos, 'HWP')
