@@ -42,7 +42,7 @@ def get_hwp_info():
     get the current position and direction of the HWP
     '''
     retval = {}
-    retval['ok'] = False
+    retval['ok'] = True
     retval['error_message'] = 'NO ERROR MESSAGE'
 
     # check if hwp is responding
@@ -103,13 +103,7 @@ def get_hwp_info():
 
     retval['pos'] = pos_str
     retval['dir'] = dir_str
-    retval['motor'] = motor_str
-    if motor_str=='motor running':
-        retval['ok'] = True
-    else:
-        retval['ok'] = False
-        retval['error_message'] = motor_str
-        
+    retval['motor'] = motor_str       
 
     msg = 'HWP POS=%s, direction=%s, motor state=%s' % (pos_str,dir_str,motor_str)
     retval['brief message'] = msg
@@ -152,7 +146,7 @@ def send_hwp_command(cmd):
     s.close()
     return
 
-def hwp_wait_for_arrival(pos,maxwait=60):
+def hwp_wait_for_arrival(pos,maxwait=180):
     '''
     wait for HWP to get to a particular position
     '''
