@@ -37,14 +37,14 @@ cmd_help = {
     'DIR'          : 'sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)'
 }
 
-def get_hwp_info():
+def check_hwp_status():
     '''
-    get the current position and direction of the HWP
+    check the status of the HWP controller
     '''
     retval = {}
     retval['ok'] = True
     retval['error_message'] = 'NO ERROR MESSAGE'
-
+    
     # check if hwp is responding
     ping_result = ping(HWP_IP,verbosity=0)
     if not ping_result['ok']:
@@ -52,9 +52,6 @@ def get_hwp_info():
         retval['message'] = 'HWP is not responding on the network'
         retval['error_message'] = retval['message']
         retval['brief message'] = 'HWP unavailable'
-        retval['pos'] = None
-        retval['dir'] = None
-        retval['motor'] = None
         return retval
 
     # check if HWP server is running
@@ -68,30 +65,66 @@ def get_hwp_info():
         retval['message'] = 'HWP server not running'
         retval['error_message'] = '%s not running on HWP' % daemon
         retval['brief message'] = '%s not running' % daemon
-        retval['pos'] = None
-        retval['dir'] = None
-        retval['motor'] = None
         return retval
-        
+    
+    return retval
+
+def get_hwp_data():
+    '''
+    open a socket and get the HWP data from the controller
+    '''
+    retval = {}
+    retval['ok'] = True
+    retval['error_message'] = 'NO ERROR MESSAGE'
+    retval['data message'] = None
+    
+    msg_rcv = None
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(1)
     try:
         s.bind((MY_IP, LISTEN_PORT))
-        msg_ack = "cmd received"
-        msg_bytes = msg_ack.encode()
-        msg_rcv, addr = s.recvfrom(1024)
-        s.close()
     except:
+        s.close()
         retval['ok'] = False
-        retval['message'] = 'HWP info unavailable: socket in use.  Try again.'
         retval['error_message'] = 'HWP info unavailable: socket in use.'
+        retval['message'] = 'HWP info unavailable: socket in use.  Try again.'
         retval['brief message'] = retval['message']
-        retval['pos'] = None
-        retval['dir'] = None
-        retval['motor'] = None
+        return retval
+
+    try:
+        msg_rcv, addr = s.recvfrom(1024)
+    except:
+        s.close()
+        retval['ok'] = False
+        retval['message'] = 'HWP did not send info'
+        retval['error_message'] = retval['message']
+        retval['brief message'] = retval['message']
         return retval
     
     msg = msg_rcv.decode()
+    retval['data message'] = msg
+    return retval
+
+def get_hwp_info():
+    '''
+    get the current position and direction of the HWP
+    '''
+    n_attempts = 4
+    for idx in range(n_attempts):
+        retval = get_hwp_data()
+        if not retval['ok']:
+            print('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']))
+            if idx<n_attempts-1: sleep(1.2)            
+
+    retval['pos'] = None
+    retval['dir'] = None
+    retval['motor'] = None
+    if not retval['ok']:
+        print('ERROR! Could not get HWP info after %i attempts.' % n_attempts)
+        return retval
+        
+    
+    msg = retval['data message']
     if msg.find('motor not running')>0:
         motor_str = 'motor not running'
         pos_str = msg.split('motor')[0].split()[1]
