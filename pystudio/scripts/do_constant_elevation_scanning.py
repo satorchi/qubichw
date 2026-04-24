@@ -93,7 +93,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
     hwpinfo = get_hwp_info()
     is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
     if not is_arrived:
-        send_hwp_command('POS %i' % hwp_pos)
+        send_hwp_command('GOTO %i' % hwp_pos)
         hwpinfo = hwp_wait_for_arrival(hwp_pos)
     is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
 
@@ -148,7 +148,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
                 if hwp_pos>7 or hwp_pos<1:
                     hwp_increment -= hwp_increment
                     hwp_pos += 2*hwp_increment
-                send_hwp_command('POS %i' % hwp_pos)
+                send_hwp_command('GOTO %i' % hwp_pos)
                 hwpinfo = hwp_wait_for_arrival(hwp_pos,maxwait=15)
                 if not hwpinfo['ok']:
                     print('ERROR with HWP: %s' % hwpinfo['error_message'])
