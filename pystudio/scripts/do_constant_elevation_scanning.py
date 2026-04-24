@@ -99,7 +99,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
 
     # check if it's ok to use the HWP
     use_hwp = True
-    if not is_arrived:
+    if not hwpinfo['ok']:
         print('ERROR! Problem with HWP: %s' % hwpinfo['error_message'])
         use_hwp = False
         
@@ -149,7 +149,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
                     hwp_increment -= hwp_increment
                     hwp_pos += 2*hwp_increment
                 send_hwp_command('GOTO %i' % hwp_pos)
-                hwpinfo = hwp_wait_for_arrival(hwp_pos,maxwait=15)
+                hwpinfo = hwp_wait_for_arrival(hwp_pos)
                 if not hwpinfo['ok']:
                     print('ERROR with HWP: %s' % hwpinfo['error_message'])
                     use_hwp = False
