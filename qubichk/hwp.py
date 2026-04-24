@@ -101,6 +101,7 @@ def get_hwp_data():
         retval['brief message'] = retval['message']
         return retval
     
+    s.close()
     msg = msg_rcv.decode()
     retval['data message'] = msg
     return retval
