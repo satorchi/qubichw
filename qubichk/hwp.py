@@ -205,8 +205,9 @@ def hwp_wait_for_arrival(pos,maxwait=180):
         delta = utcnow() - start_time
 
     if not is_arrived:
-        printmsg('ERROR! did not reach final position: %s' % hwpinfo['error_message'],'HWP')
-
+        printmsg('ERROR! did not reach position %i: %s' % (pos,hwpinfo['error_message']),'HWP')
+    
+    printmsg('current position: %s' % hwpinfo['pos'],'HWP')
     return hwpinfo
 
 
