@@ -35,6 +35,7 @@ from satorchipy.datefunctions import utcnow
 from pystudio import pystudio
 from qubichk.obsmount import obsmount
 from qubichk.hwp import get_hwp_info, send_hwp_command, hwp_wait_for_arrival
+from qubichk.utilities import printmsg
 
 parameterList = ['el',
                  'azmin',
@@ -100,7 +101,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
     # check if it's ok to use the HWP
     use_hwp = True
     if not hwpinfo['ok']:
-        print('ERROR! Problem with HWP: %s' % hwpinfo['error_message'])
+        printmsg('ERROR! Problem with HWP: %s' % hwpinfo['error_message'],'HWP')
         use_hwp = False
         
     now = utcnow()
@@ -142,24 +143,21 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
                         azel['error'] = errmsg
                         return mount.return_with_error(azel)
 
-            # go to next HWP position
-            if use_hwp:
-                hwp_pos += hwp_increment
-                if hwp_pos>7 or hwp_pos<1:
-                    hwp_increment -= hwp_increment
-                    hwp_pos += 2*hwp_increment
-                send_hwp_command('GOTO %i' % hwp_pos)
-                hwpinfo = hwp_wait_for_arrival(hwp_pos)
-                if not hwpinfo['ok']:
-                    print('ERROR with HWP: %s' % hwpinfo['error_message'])
-                    use_hwp = False
-                          
-                
-                
+        # go to next HWP position
+        if use_hwp:
+            hwp_pos += hwp_increment
+            if hwp_pos>7 or hwp_pos<1:
+                hwp_increment -= hwp_increment
+                hwp_pos += 2*hwp_increment
+            printmsg('going to position %i' % hwp_pos, 'HWP')
+            send_hwp_command('GOTO %i' % hwp_pos)
+            hwpinfo = hwp_wait_for_arrival(hwp_pos)
+            if not hwpinfo['ok']:
+                printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP')
+                use_hwp = False
 
-            now = utcnow()
-
-            
+        # check the time
+        now = utcnow()            
     return True
 
 
