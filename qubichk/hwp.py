@@ -14,7 +14,7 @@ HWP control software by Carlos Reyes
 '''
 import socket,re
 from time import sleep
-from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts
+from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts, printmsg
 from satorchipy.datefunctions import utcnow
 
 known_hosts = get_known_hosts()
@@ -113,14 +113,14 @@ def get_hwp_info():
     for idx in range(n_attempts):
         retval = get_hwp_data()
         if not retval['ok']:
-            print('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']))
+            printmsg('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']), 'HWP')
             if idx<n_attempts-1: sleep(1.2)            
 
     retval['pos'] = None
     retval['dir'] = None
     retval['motor'] = None
     if not retval['ok']:
-        print('ERROR! Could not get HWP info after %i attempts.' % n_attempts)
+        printmsg('ERROR! Could not get HWP info after %i attempts.' % n_attempts, 'HWP')
         return retval
         
     
@@ -187,13 +187,13 @@ def hwp_wait_for_arrival(pos,maxwait=180):
     
     hwpinfo = get_hwp_info()
     if not hwpinfo['ok']:
-        print(hwpinfo['error_message'])
+        printmsg(hwpinfo['error_message'],'HWP')
         return hwpinfo
     
     is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(pos)
 
     if is_arrived:
-        print('HWP in position %s' % hwpinfo['pos'])
+        printmsg('HWP in position %s' % hwpinfo['pos'],'HWP')
         return hwpinfo
 
     start_time = utcnow()
@@ -205,7 +205,7 @@ def hwp_wait_for_arrival(pos,maxwait=180):
         delta = utcnow() - start_time
 
     if not is_arrived:
-        print('ERROR! HWP did not reach final position: %s' % hwpinfo['error_message'])
+        printmsg('ERROR! did not reach final position: %s' % hwpinfo['error_message'],'HWP')
 
     return hwpinfo
 
