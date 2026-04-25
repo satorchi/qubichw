@@ -624,7 +624,7 @@ def start_acquisition(self,title=None,comment=None):
     # start dumping the azel data
     mount = obsmount()
     day_str = acq_start.strftime('%Y-%m-%d')
-    dump_dir = os.sep.join([os.environ['HOME'],'data',day_str,dataset_name,'Hks'])
+    dump_dir = os.sep.join(['/home/qubic/data',day_str,dataset_name,'Hks'])
     cmd = 'DUMP=%s' % dump_dir
     ack = mount.send_request_to_rebroadcaster(cmd)
     mount.disconnect()
