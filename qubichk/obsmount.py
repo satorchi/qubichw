@@ -57,7 +57,7 @@ class obsmount:
     testmode = False
 
     elmin = 30 # minimum permitted elevation
-    elmax = 70 # maximum permitted elevation
+    elmax = 69.8 # maximum permitted elevation (2026-04-27 15:11:19 less than 70 while waiting for Luciano to correct the maximum range)
     azmin = -38 + position_offset['AZ'] # minimum permitted azimuth
     azmax = 398 + position_offset['AZ'] # maximum permitted azimuth (2026-02-12 15:49:34)
     azstep = 5 # default step size for azimuth movement for skydips
