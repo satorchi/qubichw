@@ -50,7 +50,8 @@ parameterList = ['el',
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
-
+hwp_pos_min = 2
+hwp_pos_max = 6
 def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None):
     '''
     do azimuth back and forth scanning at a given elevation
@@ -89,7 +90,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         end_time = tend.replace(tzinfo=UTC)
 
     # move HWP to start position
-    hwp_pos = 1
+    hwp_pos = hwp_pos_min
     hwp_increment = 1
     hwpinfo = get_hwp_info()
     is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
@@ -146,7 +147,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         # go to next HWP position
         if use_hwp:
             hwp_pos += hwp_increment
-            if hwp_pos>7 or hwp_pos<1:
+            if hwp_pos>hwp_pos_max or hwp_pos<hwp_pos_min:
                 hwp_increment *= -1
                 hwp_pos += 2*hwp_increment
             printmsg('going to position %i' % hwp_pos, 'HWP')
