@@ -52,7 +52,7 @@ datefmt = '%Y-%m-%d %H:%M:%S'
 
 hwp_pos_min = 2
 hwp_pos_max = 6
-def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None):
+def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=True):
     '''
     do azimuth back and forth scanning at a given elevation
 
@@ -89,21 +89,21 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
     else:
         end_time = tend.replace(tzinfo=UTC)
 
-    # move HWP to start position
-    hwp_pos = hwp_pos_min
-    hwp_increment = 1
-    hwpinfo = get_hwp_info()
-    is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
-    if not is_arrived:
-        send_hwp_command('GOTO %i' % hwp_pos)
-        hwpinfo = hwp_wait_for_arrival(hwp_pos)
-    is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
+    if use_hwp:
+        # move HWP to start position
+        hwp_pos = hwp_pos_min
+        hwp_increment = 1
+        hwpinfo = get_hwp_info()
+        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
+        if not is_arrived:
+            send_hwp_command('GOTO %i' % hwp_pos)
+            hwpinfo = hwp_wait_for_arrival(hwp_pos)
+        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
 
-    # check if it's ok to use the HWP
-    use_hwp = True
-    if not hwpinfo['ok']:
-        printmsg('ERROR! Problem with HWP: %s' % hwpinfo['error_message'],'HWP')
-        use_hwp = False
+        # check if it's ok to use the HWP
+        if not hwpinfo['ok']:
+            printmsg('ERROR! Problem with HWP: %s' % hwpinfo['error_message'],'HWP')
+            use_hwp = False
         
     now = utcnow()
     while now<end_time:
