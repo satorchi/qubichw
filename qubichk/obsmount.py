@@ -627,7 +627,9 @@ class obsmount:
         
         errmsg = []
         errlevel = 0
-        retval['TIMESTAMP'] = packet['TIMESTAMP']
+        for key in packet.keys():
+            if key.find('TIMESTAMP')==0:
+                retval[key] = packet[key]
         retval['data'] = plc_data
 
         for axis in self.axis_keys:
