@@ -27,7 +27,7 @@ from threading import Thread
 import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory, log_datefmt
-from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
+from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname, plc_timestamp_keys
 command_delimiter = ' '
 known_hosts = get_known_hosts()
 class obsmount:
@@ -627,9 +627,14 @@ class obsmount:
         
         errmsg = []
         errlevel = 0
+        tstamp_keys = []
         for key in packet.keys():
             if key.find('TIMESTAMP')==0:
                 retval[key] = packet[key]
+                tstamp_keys.append(key)
+        if 'TIMESTAMP' not in packet.keys():
+            retval['TIMESTAMP'] = tstamp_keys[0]
+            
         retval['data'] = plc_data
 
         for axis in self.axis_keys:
