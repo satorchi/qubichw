@@ -295,30 +295,6 @@ class obsmount:
         retval['CHUNK'] = dat
         return retval
 
-    def flush_data(self):
-        '''
-        flush the data stream from the PLC
-        NOTE:  This is not used anymore since the implementation of acquisition() running in a thread
-        to be deleted
-        '''
-        maxloop = 1000
-        counter = 0
-        now_tstamp = utcnow().timestamp()
-        tstamp_delta = 1000.0
-        tstamp_precision = 10*0.001*self.sampleperiod
-        errmsg = 'NONE'
-        
-        while (tstamp_delta>tstamp_precision) and (errmsg.find('timeout')<0) and (counter<maxloop):
-            azel = self.get_azel_from_plc()
-            errmsg = azel['error']
-            if not azel['ok']:
-                break
-            
-            tstamp = azel['TIMESTAMP']
-            tstamp_delta = now_tstamp-tstamp
-        
-        return azel
-        
 
     def send_command(self,cmd_str):
         '''
