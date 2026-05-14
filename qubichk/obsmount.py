@@ -609,7 +609,7 @@ class obsmount:
                 retval[key] = packet[key]
                 tstamp_keys.append(key)
         if 'TIMESTAMP' not in packet.keys():
-            retval['TIMESTAMP'] = tstamp_keys[0]
+            retval['TIMESTAMP'] = packet[tstamp_keys[0]]
             
         retval['data'] = plc_data
 
