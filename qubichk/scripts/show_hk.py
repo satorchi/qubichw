@@ -324,7 +324,7 @@ def list_hk():
     if hwpinfo['pos'] is None:
         hwppos_str = 'UNKNOWN'
     else:
-        hwppos_str = hwpinfo['pos']
+        hwppos_str = str(hwpinfo['pos'])
         line = '%s %s %s' % (date_str, hwppos_str.rjust(20), label.center(20))
         lines.append(line)
         tstamps.append(tstamp)

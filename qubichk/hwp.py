@@ -135,7 +135,12 @@ def get_hwp_info():
         dir_str = msg.split('direction:')[1].split(',')[0].strip()
         motor_str = msg.split(',')[-1].strip()
 
-    retval['pos'] = pos_str
+    try:
+        pos = eval(pos_str)
+    except:
+        pos = pos_str
+
+    retval['pos'] = pos
     retval['dir'] = dir_str
     retval['motor'] = motor_str       
 
