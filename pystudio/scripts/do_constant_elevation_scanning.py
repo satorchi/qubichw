@@ -46,13 +46,14 @@ parameterList = ['el',
                  'Voffset',
                  'Tbath',
                  'title',
-                 'comment']
+                 'comment',
+                 'use_hwp']
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
 hwp_pos_min = 2
-hwp_pos_max = 6
-def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=True):
+hwp_pos_max = 7
+def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None):
     '''
     do azimuth back and forth scanning at a given elevation
 
@@ -65,6 +66,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         tend     : datetime object for end time (default is defined by duration)
         duration : duration in seconds.
              By default, this is a near endless loop and must be stopped manually with ctrl-c and do_end_observation.py
+        use_hwp  : cycle the HWP position after every there-and-back scan (default: True)
 
     NOTE: 2026-04-23 18:10:39 this was moved from the obsmount() class in order to integrate the HWP movement
     '''
@@ -72,6 +74,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
     if el is None: el = 50
     if azmin is None: azmin = 155
     if azmax is None: azmax = 205
+    if use_hwp is None: use_hwp = True
 
     if tstart is None:
         start_time = utcnow()
@@ -90,15 +93,22 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         end_time = tend.replace(tzinfo=UTC)
 
     if use_hwp:
-        # move HWP to start position
-        hwp_pos = hwp_pos_min
-        hwp_increment = 1
+        hwp_increment = 1 # start by going in the positive direction
+
+        # get or move to HWP start position
         hwpinfo = get_hwp_info()
-        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
+        hwp_pos = hwpinfo['pos']
+        if hwp_pos==0:
+            printmsg('moving to start position %i' % hwp_pos_min, 'HWP')
+            send_hwp_command('GOTO %i' % hwp_pos_min)
+            hwpinfo = hwp_wait_for_arrival(hwp_pos_min)
+            hwp_pos = hwp_pos_min
+
+        # check again
+        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==hwp_pos
         if not is_arrived:
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
-        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(hwp_pos)
 
         # check if it's ok to use the HWP
         if not hwpinfo['ok']:
@@ -147,9 +157,12 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         # go to next HWP position
         if use_hwp:
             hwp_pos += hwp_increment
-            if hwp_pos>hwp_pos_max or hwp_pos<hwp_pos_min:
+            if hwp_pos>hwp_pos_max:
                 hwp_increment *= -1
-                hwp_pos += 2*hwp_increment
+                hwp_pos = hwp_pos_max - 1
+            if  hwp_pos<hwp_pos_min:
+                hwp_increment *= -1
+                hwp_pos = hwp_pos_min + 1
             printmsg('going to position %i' % hwp_pos, 'HWP')
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
@@ -235,7 +248,8 @@ def cli():
 
     # run the scanning sequence from obsmount
     do_constant_elevation_scanning(mount,el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
-                                  tstart=options['tstart'],tend=options['tend'],duration=options['duration'])
+                                   tstart=options['tstart'],tend=options['tend'],duration=options['duration'],
+                                   use_hwp=options['use_hwp'])
 
     # stop the acquisition
     ack = dispatcher.end_observation()
