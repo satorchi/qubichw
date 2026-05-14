@@ -113,9 +113,9 @@ def get_hwp_info():
     n_attempts = 4
     for idx in range(n_attempts):
         retval = get_hwp_data()
-        if not retval['ok']:
-            printmsg('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']), 'HWP')
-            if idx<n_attempts-1: sleep(1.2)            
+        if retval['ok']: break
+        printmsg('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']), 'HWP')
+        sleep(0.4) 
 
     retval['pos'] = None
     retval['dir'] = None
