@@ -185,7 +185,7 @@ def send_hwp_command(cmd):
     s.close()
     return
 
-def hwp_wait_for_arrival(pos,maxwait=180):
+def hwp_wait_for_arrival(pos,maxwait=60):
     '''
     wait for HWP to get to a particular position
     '''
@@ -196,7 +196,7 @@ def hwp_wait_for_arrival(pos,maxwait=180):
         printmsg(hwpinfo['error_message'],'HWP')
         return hwpinfo
     
-    is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(pos)
+    is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==pos
 
     if is_arrived:
         printmsg('HWP in position %s' % hwpinfo['pos'],'HWP')
@@ -205,9 +205,9 @@ def hwp_wait_for_arrival(pos,maxwait=180):
     start_time = utcnow()
     delta = utcnow() - start_time
     while not is_arrived and delta.total_seconds()<maxwait:
-        sleep(2)
+        sleep(1.85)
         hwpinfo = get_hwp_info()
-        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==str(pos)
+        is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==pos
         delta = utcnow() - start_time
 
     if not is_arrived:
