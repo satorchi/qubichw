@@ -861,7 +861,7 @@ class obsmount:
         
         
         while np.abs(val-val_final)>self.pos_margin:
-            sleep(2)
+            sleep(1.6)
             now = utcnow().timestamp()
             if (now-tstart)>maxwait:
                 errmsg = 'Exiting after maximum wait time: %.0f seconds' % maxwait
@@ -871,7 +871,7 @@ class obsmount:
         
             azel = self.get_azel()
             if not azel['ok']:
-                sleep(2)
+                sleep(1.6)
                 continue
 
             obsmount_tstamp = azel['TIMESTAMP']
