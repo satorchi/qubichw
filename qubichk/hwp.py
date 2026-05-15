@@ -12,9 +12,9 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 Half Wave Plate methods for housekeeping acquisition
 HWP control software by Carlos Reyes
 '''
-import socket,re
+import os,socket,re
 from time import sleep
-from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts, printmsg
+from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts, printmsg, verify_directory
 from satorchipy.datefunctions import utcnow
 
 known_hosts = get_known_hosts()
@@ -36,6 +36,15 @@ cmd_help = {
     'EN'           : 'enable motor',
     'DIR'          : 'sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)'
 }
+
+logfile = None
+log_dir = os.sep.join([os.environ['HOME'],'log'])
+log_dir = verify_directory(log_dir)
+if log_dir is None:
+    logfile = None
+else:
+    logfile = os.sep.join([log_dir,'pystudio_log.txt'])
+
 
 def check_hwp_status():
     '''
@@ -114,14 +123,14 @@ def get_hwp_info():
     for idx in range(n_attempts):
         retval = get_hwp_data()
         if retval['ok']: break
-        printmsg('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']), 'HWP')
+        printmsg('ERROR! Attempt No. %i: %s' % (idx+1,retval['error_message']), 'HWP',logfile=logfile)
         sleep(0.4) 
 
     retval['pos'] = None
     retval['dir'] = None
     retval['motor'] = None
     if not retval['ok']:
-        printmsg('ERROR! Could not get HWP info after %i attempts.' % n_attempts, 'HWP')
+        printmsg('ERROR! Could not get HWP info after %i attempts.' % n_attempts, 'HWP',logfile=logfile)
         return retval
         
     
@@ -193,13 +202,13 @@ def hwp_wait_for_arrival(pos,maxwait=60):
     
     hwpinfo = get_hwp_info()
     if not hwpinfo['ok']:
-        printmsg(hwpinfo['error_message'],'HWP')
+        printmsg(hwpinfo['error_message'],'HWP',logfile=logfile)
         return hwpinfo
     
     is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==pos
 
     if is_arrived:
-        printmsg('HWP in position %s' % hwpinfo['pos'],'HWP')
+        printmsg('HWP in position %s' % hwpinfo['pos'],'HWP',logfile=logfile)
         return hwpinfo
 
     start_time = utcnow()
@@ -211,9 +220,9 @@ def hwp_wait_for_arrival(pos,maxwait=60):
         delta = utcnow() - start_time
 
     if not is_arrived:
-        printmsg('ERROR! did not reach position %i: %s' % (pos,hwpinfo['error_message']),'HWP')
+        printmsg('ERROR! did not reach position %i: %s' % (pos,hwpinfo['error_message']),'HWP',logfile=logfile)
     
-    printmsg('current position: %s' % hwpinfo['pos'],'HWP')
+    printmsg('current position: %s' % hwpinfo['pos'],'HWP',logfile=logfile)
     return hwpinfo
 
 
