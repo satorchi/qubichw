@@ -56,7 +56,7 @@ def printmsg(msg,subsys_name,logfile=None):
     full_msg = '%s | %s: %s' % (date_str,subsys_name,msg)
 
     if logfile is not None:
-        h = open(self.logfile,'a')
+        h = open(logfile,'a')
         h.write(full_msg+'\n')
         h.close()
         
