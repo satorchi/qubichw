@@ -47,13 +47,14 @@ parameterList = ['el',
                  'Tbath',
                  'title',
                  'comment',
-                 'use_hwp']
+                 'use_hwp',
+                 'velocity']
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
 hwp_pos_min = 2
 hwp_pos_max = 7
-def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None):
+def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None,velocity=None):
     '''
     do azimuth back and forth scanning at a given elevation
 
@@ -67,6 +68,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         duration : duration in seconds.
              By default, this is a near endless loop and must be stopped manually with ctrl-c and do_end_observation.py
         use_hwp  : cycle the HWP position after every there-and-back scan (default: True)
+        velocity : scanning velocity (default is 1 degree per second)
 
     NOTE: 2026-04-23 18:10:39 this was moved from the obsmount() class in order to integrate the HWP movement
     '''
@@ -91,6 +93,10 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         end_time = start_time + duration_delta
     else:
         end_time = tend.replace(tzinfo=UTC)
+
+    if velocity is None:
+        velocity = 1
+    mount.set_az_speed(velocity)
 
     if use_hwp:
         hwp_increment = 1 # start by going in the positive direction
@@ -249,7 +255,7 @@ def cli():
     # run the scanning sequence from obsmount
     do_constant_elevation_scanning(mount,el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
                                    tstart=options['tstart'],tend=options['tend'],duration=options['duration'],
-                                   use_hwp=options['use_hwp'])
+                                   use_hwp=options['use_hwp'],velocity=options['velocity'])
 
     # stop the acquisition
     ack = dispatcher.end_observation()
