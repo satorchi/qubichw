@@ -14,8 +14,8 @@ user manuel: imacrt_1.4.pdf page 24-25
 this is especially the MGC3 temperature controller for the TES bath temperature
 see also in scripts directory:  mmr_mes1.py, fast_mmr.py (possibly to be updated)
 '''
-import socket
-from qubichk.utilities import get_known_hosts, log_datefmt
+import socket,os
+from qubichk.utilities import get_known_hosts, printmsg, verify_directory
 from satorchipy.datefunctions import utcnow
 known_hosts = get_known_hosts()
 
@@ -29,6 +29,15 @@ class iMACRT:
             self.imacrtIP = known_hosts['mgc3']
         self.imacrt_port = 12000 + eval(self.imacrtIP.split('.')[-1])
         self.verbosity = verbosity
+
+        self.logfile = None
+        log_dir = os.sep.join([os.environ['HOME'],'log'])
+        log_dir = verify_directory(log_dir)
+        if log_dir is None:
+            self.logfile = None
+        else:
+            self.logfile = os.sep.join([log_dir,'pystudio_log.txt'])
+        
         return
 
     def printmsg(self,msg,threshold=0):
@@ -36,11 +45,7 @@ class iMACRT:
         print a message to screen
         '''
         if self.verbosity<threshold: return
-        
-        date_str = utcnow().strftime(log_datefmt)
-        full_msg = '%s | iMACRT: %s' % (date_str,msg)        
-        print(full_msg)
-        return
+        return printmsg(msg,'iMACRT',logfile=self.logfile)
 
         
     def init_socket(self):
