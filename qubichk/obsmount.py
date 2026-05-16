@@ -934,7 +934,7 @@ class obsmount:
 
         for azlimit in [azmax, azmin]:
         
-            while (az<azmax) and (np.abs(az-azlimit)>self.pos_margin):
+            while (az<=azmax) and (np.abs(az-azlimit)>self.pos_margin):
                 ack = self.goto_el(elmax)
 
                 # if axis still moving, wait a bit and try again
