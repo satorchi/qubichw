@@ -29,7 +29,8 @@ parameterList = ['azstep',
                  'elmax',
                  'Voffset',
                  'Tbath',
-                 'comment']
+                 'comment',
+                 'velocity']
 options = parseargs(sys.argv,expected_args=parameterList)
 
 def cli():
@@ -42,7 +43,8 @@ def cli():
                                elmax=options['elmax'],
                                Voffset=options['Voffset'],
                                Tbath=options['Tbath'],
-                               comment=options['comment']
+                               comment=options['comment'],
+                               velocity=options['velocity']
                                )
 
     ack = dispatcher.unsubscribe()

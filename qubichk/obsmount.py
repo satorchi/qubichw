@@ -883,7 +883,7 @@ class obsmount:
         return azel
         
     
-    def do_skydip_sequence(self,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None):
+    def do_skydip_sequence(self,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,velocity=None):
         '''
         do the sky dip movements
         '''
@@ -892,6 +892,8 @@ class obsmount:
         if azmax is None:  azmax  = self.azmax
         if elmin is None:  elmin  = self.elmin
         if elmax is None:  elmax  = self.elmax
+        if velocity is not None:
+            self.set_el_speed(velocity)
         
     
         start_tstamp = utcnow().timestamp()
