@@ -65,6 +65,13 @@ def get_dome_status():
     values['RPM B'] = val_list[4]
     values['Current A'] = val_list[5]
     values['Current B'] = val_list[6]
+    values['all'] = val_list
+
+    if values['Puerta A']<24 and values['Puerta B']<24:
+        values['dome state'] = 'OPEN'
+    else:
+        values['dome state'] = 'CLOSED'
+    
     values['ok'] = True
     
     return values
