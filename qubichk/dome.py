@@ -14,6 +14,13 @@ from urllib.request import urlopen
 from qubichk.utilities import get_known_hosts, make_errmsg
 known_hosts = get_known_hosts()
 dome_server = known_hosts['dome']
+value_names = {0:'status',
+               1:'Puerta A',
+               2:'Puerta B',
+               3:'Current A',
+               5:'RPM A',
+               7:'Current B',
+               9:'RPM B'}
 
 def get_dome_status():
     '''
@@ -58,14 +65,11 @@ def get_dome_status():
         val_list.append(hex_val)
         idx = idx_end
 
-    values['status'] = val_list[0]
-    values['Puerta A'] = val_list[1]
-    values['Puerta B'] = val_list[2]
-    values['RPM A'] = val_list[3]
-    values['RPM B'] = val_list[4]
-    values['Current A'] = val_list[5]
-    values['Current B'] = val_list[6]
-    values['all'] = val_list
+        if lctr in value_names.keys():
+            valname = value_names[lctr]
+        else:
+            valname = 'unknown %i' % lctr
+        values[valname] = hex_val
 
     if values['Puerta A']<24 and values['Puerta B']<24:
         values['dome state'] = 'OPEN'
