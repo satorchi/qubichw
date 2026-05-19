@@ -52,7 +52,7 @@ parameterList = ['el',
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
-hwp_pos_min = 1
+hwp_pos_min = 2
 hwp_pos_max = 6
 def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None,velocity=None):
     '''
