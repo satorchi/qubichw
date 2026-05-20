@@ -36,6 +36,7 @@ from pystudio import pystudio
 from qubichk.obsmount import obsmount
 from qubichk.hwp import get_hwp_info, send_hwp_command, hwp_wait_for_arrival
 from qubichk.utilities import printmsg
+from qubichk.imacrt import iMACRT
 
 parameterList = ['el',
                  'azmin',
@@ -99,6 +100,11 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
     mount.set_az_speed(velocity)
 
     if use_hwp:
+
+        # we will switch off the bath temperature PID before each HWP movement: 2026-05-20 17:39:37
+        mgc = iMACRT(device='mgc')
+        pidstate = mgc.get_mgc_pid()
+        
         hwp_increment = 1 # start by going in the positive direction
 
         # get or move to HWP start position
@@ -170,12 +176,19 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
                 hwp_increment *= -1
                 hwp_pos = hwp_pos_min + 1
             printmsg('going to position %i' % hwp_pos, 'HWP')
+
+            # switch off the temperature regulation before HWP movement
+            if pidstate==1: mgc.set_mgc_pid(0)
+            
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
             if not hwpinfo['ok']:
                 printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP')
                 use_hwp = False
 
+            # switch back on the temperature regulation
+            if pidstate==1: mgc.set_mgc_pid(1)
+            
         # check the time
         now = utcnow()            
     return True
