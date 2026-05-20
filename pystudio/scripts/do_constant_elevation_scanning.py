@@ -110,7 +110,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         # get or move to HWP start position
         hwpinfo = get_hwp_info()
         hwp_pos = hwpinfo['pos']
-        if hwp_pos is None or hwp_pos==0:
+        if not hwpinfo['ok'] or hwp_pos==0:
             printmsg('moving to start position %i' % hwp_pos_min, 'HWP')
             send_hwp_command('GOTO %i' % hwp_pos_min)
             hwpinfo = hwp_wait_for_arrival(hwp_pos_min)
