@@ -755,6 +755,8 @@ class obsmount:
         send command to set the azimuth speed
         '''
         speed_str = '%.1f' % speed
+        cmd_str = self.make_command_string('TR','VEL',speed_str)
+        ack =  self.send_command(cmd_str)
         cmd_str = self.make_command_string('AZ','VEL',speed_str)
         return self.send_command(cmd_str)
     
