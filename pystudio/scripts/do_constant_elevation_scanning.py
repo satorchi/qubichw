@@ -178,7 +178,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
             printmsg('going to position %i' % hwp_pos, 'HWP')
 
             # switch off the temperature regulation before HWP movement
-            if pidstate==1: mgc.set_mgc_pid(0)
+            # if pidstate==1: mgc.set_mgc_pid(0)
             
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
@@ -187,7 +187,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
                 use_hwp = False
 
             # switch back on the temperature regulation
-            if pidstate==1: mgc.set_mgc_pid(1)
+            # if pidstate==1: mgc.set_mgc_pid(1) # not a good strategy. 2026-05-20_16.43.49__test_scan_temperature_control_off_during_hwp_movement
             
         # check the time
         now = utcnow()            
