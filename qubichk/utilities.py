@@ -420,7 +420,20 @@ def verify_directory(dirname):
         return None
 
     return dirname
+
+def assign_logfile(logfile=None):
+    '''
+    assign a logfile in a valid directory
+    '''
+    if logfile is None: return None
     
+    log_dir = os.sep.join([os.environ['HOME'],'log'])
+    log_dir = verify_directory(log_dir)
+    if log_dir is None:
+        return None
+    logfile_fullpath = os.sep.join([log_dir,logfile])
+    return logfile_fullpath
+
 
 def read_labels():
     '''

@@ -35,8 +35,9 @@ from satorchipy.datefunctions import utcnow
 from pystudio import pystudio
 from qubichk.obsmount import obsmount
 from qubichk.hwp import get_hwp_info, send_hwp_command, hwp_wait_for_arrival
-from qubichk.utilities import printmsg
+from qubichk.utilities import printmsg, assign_logfile
 from qubichk.imacrt import iMACRT
+logfile = assign_logfile('pystudio_log.txt')
 
 parameterList = ['el',
                  'azmin',
@@ -111,7 +112,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
         hwpinfo = get_hwp_info()
         hwp_pos = hwpinfo['pos']
         if not hwpinfo['ok'] or hwp_pos==0:
-            printmsg('moving to start position %i' % hwp_pos_min, 'HWP')
+            printmsg('moving to start position %i' % hwp_pos_min, 'HWP',logfile=logfile)
             send_hwp_command('GOTO %i' % hwp_pos_min)
             hwpinfo = hwp_wait_for_arrival(hwp_pos_min)
             hwp_pos = hwp_pos_min
@@ -124,7 +125,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
 
         # check if it's ok to use the HWP
         if not hwpinfo['ok']:
-            printmsg('ERROR! Problem with HWP: %s' % hwpinfo['error_message'],'HWP')
+            printmsg('ERROR! Problem with HWP: %s' % hwpinfo['error_message'],'HWP',logfile=logfile)
             use_hwp = False
         
     now = utcnow()
@@ -175,7 +176,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
             if  hwp_pos<hwp_pos_min:
                 hwp_increment *= -1
                 hwp_pos = hwp_pos_min + 1
-            printmsg('going to position %i' % hwp_pos, 'HWP')
+            printmsg('going to position %i' % hwp_pos, 'HWP',logfile=logfile)
 
             # switch off the temperature regulation before HWP movement
             # if pidstate==1: mgc.set_mgc_pid(0)
@@ -183,7 +184,7 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
             if not hwpinfo['ok']:
-                printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP')
+                printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP',logfile=logfile)
                 use_hwp = False
 
             # switch back on the temperature regulation

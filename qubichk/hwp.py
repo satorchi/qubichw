@@ -14,7 +14,7 @@ HWP control software by Carlos Reyes
 '''
 import os,socket,re
 from time import sleep
-from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts, printmsg, verify_directory
+from qubichk.utilities import ping,shellcommand,get_myip,get_known_hosts, printmsg, assign_logfile
 from satorchipy.datefunctions import utcnow
 
 known_hosts = get_known_hosts()
@@ -37,14 +37,7 @@ cmd_help = {
     'DIR'          : 'sets motor spin direction. Where <dir> is 0 (1-->7) and 1 (7-->1)'
 }
 
-logfile = None
-log_dir = os.sep.join([os.environ['HOME'],'log'])
-log_dir = verify_directory(log_dir)
-if log_dir is None:
-    logfile = None
-else:
-    logfile = os.sep.join([log_dir,'pystudio_log.txt'])
-
+logfile = assign_logfile('pystudio_log.txt')
 
 def check_hwp_status():
     '''
