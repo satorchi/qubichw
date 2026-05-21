@@ -15,7 +15,7 @@ this is especially the MGC3 temperature controller for the TES bath temperature
 see also in scripts directory:  mmr_mes1.py, fast_mmr.py (possibly to be updated)
 '''
 import socket,os
-from qubichk.utilities import get_known_hosts, printmsg, verify_directory
+from qubichk.utilities import get_known_hosts, printmsg, assign_logfile
 from satorchipy.datefunctions import utcnow
 known_hosts = get_known_hosts()
 
@@ -30,14 +30,7 @@ class iMACRT:
         self.imacrt_port = 12000 + eval(self.imacrtIP.split('.')[-1])
         self.verbosity = verbosity
 
-        self.logfile = None
-        log_dir = os.sep.join([os.environ['HOME'],'log'])
-        log_dir = verify_directory(log_dir)
-        if log_dir is None:
-            self.logfile = None
-        else:
-            self.logfile = os.sep.join([log_dir,'pystudio_log.txt'])
-        
+        self.logfile = assign_logfile('pystudio_log.txt')
         return
 
     def printmsg(self,msg,threshold=0):
