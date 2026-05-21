@@ -12,13 +12,16 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 do back-and-forth azimuth scanning at a constant elevation
 
 OPTIONS:
-         el       : elevation position during scanning
-         azmin    : azimuth start position
-         azmax    : azimuth end position
-         tstart   : start time (default is now)
-         tend     : end time (default is defined by duration)
-         duration : duration in seconds.
+         el         : elevation position during scanning
+         azmin      : azimuth start position
+         azmax      : azimuth end position
+         tstart     : start time (default is now)
+         tend       : end time (default is defined by duration)
+         duration   : duration in seconds.
              By default, this is a near endless loop and must be stopped manually with do_end_observation.py
+         use_hwp    : cycle the HWP position after every there-and-back scan (default: no)
+         velocity   : azimuth velocity (default: 1 degree/sec)
+         hwp_settle : settling time after HWP repositioning before continuing the scan (default: 0)
 
 EXAMPLE:
 
@@ -50,35 +53,38 @@ parameterList = ['el',
                  'title',
                  'comment',
                  'use_hwp',
+                 'hwp_settle',
                  'velocity']
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
 hwp_pos_min = 2
 hwp_pos_max = 6
-def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None,velocity=None):
+def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None,velocity=None,hwp_settle=None):
     '''
     do azimuth back and forth scanning at a given elevation
 
     ARGUMENTS:
-        mount    : an obsmount() object
-        el       : elevation position during scanning
-        azmin    : azimuth start position
-        azmax    : azimuth end position
-        tstart   : datetime object for start time (default is now)
-        tend     : datetime object for end time (default is defined by duration)
-        duration : duration in seconds.
+        mount      : an obsmount() object
+        el         : elevation position during scanning
+        azmin      : azimuth start position
+        azmax      : azimuth end position
+        tstart     : datetime object for start time (default is now)
+        tend       : datetime object for end time (default is defined by duration)
+        duration   : duration in seconds.
              By default, this is a near endless loop and must be stopped manually with ctrl-c and do_end_observation.py
-        use_hwp  : cycle the HWP position after every there-and-back scan (default: True)
-        velocity : scanning velocity (default is 1 degree per second)
-
-    NOTE: 2026-04-23 18:10:39 this was moved from the obsmount() class in order to integrate the HWP movement
+        use_hwp    : cycle the HWP position after every there-and-back scan (default: True)
+        velocity   : scanning velocity (default is 1 degree per second)
+        hwp_settle : settling time after HWP repositioning before continuing the scan (default: 0)
+    
+    NOTE: 2026-04-23 18:10:39 this module was moved from the obsmount() class in order to integrate the HWP movement
     '''
     if mount is None: mount = obsmount()
     if el is None: el = 50
     if azmin is None: azmin = 155
     if azmax is None: azmax = 205
     if use_hwp is None: use_hwp = True
+    if hwp_settle is None: hwp_settle = 0
 
     if tstart is None:
         start_time = utcnow()
@@ -186,7 +192,10 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
             if not hwpinfo['ok']:
                 printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP',logfile=logfile)
                 use_hwp = False
-
+            else:
+                printmsg('waiting for temperature to resettle after HWP movement: %.1f seconds' % hwp_settle,'SCAN',logfile=logfile)
+                sleep(hwp_settle)
+                
             # switch back on the temperature regulation
             # if pidstate==1: mgc.set_mgc_pid(1) # not a good strategy. 2026-05-20_16.43.49__test_scan_temperature_control_off_during_hwp_movement
             
@@ -269,7 +278,7 @@ def cli():
     # run the scanning sequence from obsmount
     do_constant_elevation_scanning(mount,el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
                                    tstart=options['tstart'],tend=options['tend'],duration=options['duration'],
-                                   use_hwp=options['use_hwp'],velocity=options['velocity'])
+                                   use_hwp=options['use_hwp'],velocity=options['velocity'],hwp_settle=options['hwp_settle'])
 
     # stop the acquisition
     ack = dispatcher.end_observation()
