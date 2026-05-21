@@ -219,7 +219,7 @@ def init_frontend(self,
     return
                   
 
-def set_bath_temperature(self,Tbath,timeout=120,precision=0.002):
+def set_bath_temperature(self,Tbath,timeout=120,precision=0.001):
     '''
     set the iMACRT PID for the desired temperature and wait until it reaches the temperature
     '''
