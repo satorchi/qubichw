@@ -60,12 +60,17 @@ datefmt = '%Y-%m-%d %H:%M:%S'
 
 hwp_pos_min = 2
 hwp_pos_max = 6
-def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tstart=None,tend=None,duration=None,use_hwp=None,velocity=None,hwp_settle=None):
+Tbath_precision = 0.0005
+def do_constant_elevation_scanning(mount=None, dispatcher=None,
+                                   el=None,azmin=None,azmax=None,
+                                   tstart=None,tend=None,duration=None,
+                                   use_hwp=None,velocity=None,hwp_settle=None):
     '''
     do azimuth back and forth scanning at a given elevation
 
     ARGUMENTS:
         mount      : an obsmount() object
+        dispatcher : a pystudio() object
         el         : elevation position during scanning
         azmin      : azimuth start position
         azmax      : azimuth end position
@@ -80,11 +85,11 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
     NOTE: 2026-04-23 18:10:39 this module was moved from the obsmount() class in order to integrate the HWP movement
     '''
     if mount is None: mount = obsmount()
+    if dispatcher is None: dispatcher = pystudio()        
     if el is None: el = 50
     if azmin is None: azmin = 155
     if azmax is None: azmax = 205
     if use_hwp is None: use_hwp = True
-    if hwp_settle is None: hwp_settle = 0
 
     if tstart is None:
         start_time = utcnow()
@@ -186,6 +191,9 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
 
             # switch off the temperature regulation before HWP movement
             # if pidstate==1: mgc.set_mgc_pid(0)
+
+            # get the current bath temperature
+            Tbath = mgc.get_mgc_measurement()
             
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
@@ -193,8 +201,12 @@ def do_constant_elevation_scanning(mount=None,el=None,azmin=None,azmax=None,tsta
                 printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP',logfile=logfile)
                 use_hwp = False
             else:
-                printmsg('waiting for temperature to resettle after HWP movement: %.1f seconds' % hwp_settle,'SCAN',logfile=logfile)
-                sleep(hwp_settle)
+                if Tbath is not None:
+                    printmsg('resetting bath temperature to %.1f mK to precision %.1f mK' % (Tbath*1000,Tbath_precision*1000))
+                    dispatcher.set_bath_temperature(Tbath,precision=Tbath_precision)
+                if hwp_settle is not None and hwp_settle>0:
+                    printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle,'SCAN',logfile=logfile)
+                    sleep(hwp_settle)
                 
             # switch back on the temperature regulation
             # if pidstate==1: mgc.set_mgc_pid(1) # not a good strategy. 2026-05-20_16.43.49__test_scan_temperature_control_off_during_hwp_movement
@@ -276,7 +288,8 @@ def cli():
     dispatcher.start_observation(Voffset=options['Voffset'],Tbath=options['Tbath'],title=dataset_name,comment=comment)
 
     # run the scanning sequence from obsmount
-    do_constant_elevation_scanning(mount,el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
+    do_constant_elevation_scanning(mount=mount,dispatcher=dispatcher,
+                                   el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
                                    tstart=options['tstart'],tend=options['tend'],duration=options['duration'],
                                    use_hwp=options['use_hwp'],velocity=options['velocity'],hwp_settle=options['hwp_settle'])
 
