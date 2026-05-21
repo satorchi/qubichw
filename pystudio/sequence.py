@@ -485,7 +485,7 @@ def do_SQUID_optimization(self,
     # get current temperature
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
-    if Tmeas=='':
+    if Tmeas is None:
         T_str = ''
     else:
         T_str = '%.0fmK' % (1000*Tmeas)
