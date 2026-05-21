@@ -161,6 +161,8 @@ class iMACRT:
         except:
             ans = ans_str
             self.printmsg('MGC measurement: %s' % ans)
+
+        if ans is None or ans=='': return None
             
         return ans
 
