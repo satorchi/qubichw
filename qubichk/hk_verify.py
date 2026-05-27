@@ -324,9 +324,9 @@ def check_temps(verbosity=1):
     # 18 temperature sensors
     # 1 pressure sensor
     # 1 usb thermometer
-    # 2 position (az,el)
+    # 4 position (az,el,tr,ro)
     # 2 inside and outside weather stations
-    nfiles = 51
+    nfiles = 53
     delta_max = 6 # seconds. if latest HK is earlier than this, we have a problem
     if verbosity>0: print('\n============ checking recent housekeeping values...',end='',flush=True)
     hk_dir = '/home/qubic/data/temperature/broadcast'
@@ -337,8 +337,11 @@ def check_temps(verbosity=1):
                 'HEATER*.txt',
                 'PRESSURE*.txt',
                 'CRYOSTAT.txt',
-                'AZIMUTH.txt',
-                'ELEVATION.txt']
+                'AZ.txt',
+                'EL.txt',
+                'TR.txt',
+                'RO.txt',
+                '*weather.txt']
 
     hk_files = []
     for pattern in patterns:
