@@ -218,7 +218,41 @@ def hwp_wait_for_arrival(pos,maxwait=60):
     printmsg('current position: %s' % hwpinfo['pos'],'HWP',logfile=logfile)
     return hwpinfo
 
+def hwp_step_to_next_position(stepsize=10,direction=None,maxsteps=3720):
+    '''
+    take small steps until the next non-zero position
 
+    direction: 0 is going from 1->7
+    direction: 1 is going from 7->1
+    
+    '''    
+    hwpinfo = get_hwp_info()
+    if direction is None and hwpinfo['data message'].find('direction:')<0:
+        print('HWP direction is not set.  Please specify a direction with option direction=0 or direction=1')
+        return hwpinfo
+    
+    if direction is not None:
+        send_hwp_command('DIR %i' % direction)
+        
+    stepcounter = 0
+    while stepcounter<maxsteps:
+        hwpinfo = get_hwp_info()
+        pos = hwpinfo['pos']
+        print('HWP position: %i, stepcounter: %i' % (pos,stepcounter))
+        if pos!=0: break
+        sleep(1)
+        print('stepping %i' % stepsize)
+        send_hwp_command('STEP %i' % stepsize)
+        stepcounter += stepsize
+
+    hwpinfo['stepcounter'] = stepcounter
+    return hwpinfo
+
+
+
+        
+
+    
         
     
     
