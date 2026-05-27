@@ -14,12 +14,14 @@ from urllib.request import urlopen
 from qubichk.utilities import get_known_hosts, make_errmsg
 known_hosts = get_known_hosts()
 dome_server = known_hosts['dome']
-value_names = {0:'status',
+value_names = {0:'Manual B',
                1:'Puerta A',
                2:'Puerta B',
                3:'Current A',
                5:'RPM A',
+               6:'Alarm',
                7:'Current B',
+               8:'Manual A',
                9:'RPM B'}
 
 def get_dome_status():
