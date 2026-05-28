@@ -71,7 +71,7 @@ class hk_broadcast :
         return tstamp
 
     def current_timestamp(self):
-        '''return the current date in milliseconds since 1970-01-01 in UT
+        '''return the current date in seconds since 1970-01-01 in UT
         '''
         now = utcnow()
         tstamp = now.timestamp()
