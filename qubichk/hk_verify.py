@@ -362,10 +362,10 @@ def check_temps(verbosity=1):
         h = open(F,'rb')
         h.seek(0,os.SEEK_END)
         fsize = h.tell()
-        if fsize<80:
+        if fsize<320:
             h.seek(0,os.SEEK_SET)
         else:
-            h.seek(-80,os.SEEK_END)
+            h.seek(-320,os.SEEK_END)
         x = h.read()
         h.close()
         lines = x.decode().split('\n')
