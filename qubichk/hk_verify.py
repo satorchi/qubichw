@@ -362,10 +362,10 @@ def check_temps(verbosity=1):
         h = open(F,'rb')
         h.seek(0,os.SEEK_END)
         fsize = h.tell()
-        if fsize<320:
+        if fsize<1024:
             h.seek(0,os.SEEK_SET)
         else:
-            h.seek(-320,os.SEEK_END)
+            h.seek(-1024,os.SEEK_END)
         x = h.read()
         h.close()
         lines = x.decode().split('\n')
@@ -379,7 +379,7 @@ def check_temps(verbosity=1):
             info['ok'] = False
             retval['ok'] = False
             info['error_message'] = 'unable to read timestamp'
-            msg = 'unable to read timestamp for %s' % info['name']
+            msg = '\nunable to read timestamp for %s' % info['name']
             if verbosity>0: print('\nERROR! %s' % msg,end='')
             retval['error_message'] += msg
             retval[F] = info
