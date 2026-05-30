@@ -138,6 +138,13 @@ def check_power(verbosity=1):
                 else:
                     msg += '\n--> %s should be OFF during normal operation.  Switch OFF with command "kellypi_off" (no quotes)' % subsys
                     retval['ok'] = False
+                    
+            elif subsys.find('horn')>=0:
+                if not state:
+                    msg += '...OK not necessary unless observing the calibration source'
+                else:
+                    msg += '\n--> %s is active.  Are we observing the calibration source?' % subsys
+                    
             elif subsys!='unused':
                 if state:
                     msg += '... OK'
