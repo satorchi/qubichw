@@ -369,7 +369,10 @@ def check_temps(verbosity=1):
         x = h.read()
         h.close()
         lines = x.decode().split('\n')
-        lastline = lines[-2]
+        if len(lines)<2:
+            lastline = lines[0]
+        else:
+            lastline = lines[-2]
         try:
             tstamp = float(lastline.split()[0])
         except:
