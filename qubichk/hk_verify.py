@@ -77,8 +77,8 @@ def check_network(verbosity=1):
                         msg += ' calsource state is UNKNOWN'
                         retval['ok'] = False
                         errmsg_list.append('calsource state is UNKNOWN')
-            elif machine.find('horns')>=0:
-                powerbar = energenie('horns')
+            elif machine.find('horn')>=0:
+                powerbar = energenie('horn')
                 if not powerbar.ok:
                     msg += ' %s' % powerbar.error_message
                     retval['ok'] = False
@@ -86,7 +86,7 @@ def check_network(verbosity=1):
                 else:
                     states = powerbar.get_socket_states()
                     if states['ok']:
-                        horn_state = states[powerbar.devicesocket['horns']]
+                        horn_state = states[powerbar.devicesocket['horn']]
                         if not horn_state:
                             msg += ' OK. horns are OFF'
                     else:
@@ -155,7 +155,7 @@ def check_power(verbosity=1):
                     msg += '\n--> %s should be OFF during normal operation.  Switch OFF with command "kellypi_off" (no quotes)' % subsys
                     retval['ok'] = False
                     
-            elif subsys.find('horns')>=0:
+            elif subsys.find('horn')>=0:
                 if not state:
                     msg += '...OK not necessary unless observing the calibration source'
                 else:
