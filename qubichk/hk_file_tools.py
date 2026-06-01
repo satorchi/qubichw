@@ -52,9 +52,30 @@ def read_hk_file(filename):
         return None,None
 
     h = open(filename,'r')
-    lines = h.read().split('\n')
+    txt = h.read()
     h.close()
+    txt_clean = txt.replace('\x00','').replace('inf','64218') # infinity = 0xfada
+    lines = txt_clean.split('\n')
     del(lines[-1])
+
+    # try to use numpy loadtxt which is fastest
+    try:
+        dat = np.loadtxt(lines)
+    except:
+        dat = None
+
+    if dat is not None:
+        ncols = dat.shape[-1]
+        npts = dat.shape[0]
+        t = dat[:,0]
+        v = dat[:,1]
+        if ncols==3:
+            onoff = dat[:,2]
+        else:
+            onoff = np.zeros(npts,dtype=bool)
+        return t,v,onoff
+        
+    
     npts = len(lines)
     t = np.zeros(npts)
     v = np.zeros(npts)
@@ -62,16 +83,12 @@ def read_hk_file(filename):
     idx=0
     badpattern = re.compile('[a-zA-Z]')
     for line_idx,line in enumerate(lines):
-        cols = line.strip().replace('\x00','').split()
+        cols = line.strip().split()
         if len(cols)<2: continue
         tstamp_str = cols[0]
         val_str = cols[1]
         if badpattern.match(tstamp_str): continue
-        if badpattern.match(val_str):
-            if val_str=='inf':
-                val_str = '64218' # infinity = 0xfada
-            else:
-                continue
+        if badpattern.match(val_str): continue
         try:
             tstamp = float(tstamp_str)
             reading = eval(val_str)
