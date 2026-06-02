@@ -23,7 +23,7 @@ from qubichk.pfeiffer import Pfeiffer
 from qubichk.utilities import shellcommand, get_known_hosts, get_myip
 from qubichk.obsmount import obsmount
 from qubichk.usbthermometer_hk import usbthermometer_hk
-
+from qubichk.dome import get_dome_status
 from qubicpack.utilities import fmt_translation
 
 
@@ -152,6 +152,7 @@ class hk_broadcast :
             dummy_val -= 1
         
         # cryostat outside temperature
+        # CRYOSTAT ends up in 'Pressure_5' in QubicStudio
         name = 'CRYOSTAT'
         names.append(name)
         fmts.append('f8')
@@ -167,14 +168,28 @@ class hk_broadcast :
             record_zero.append(dummy_val)
             dummy_val -= 1
 
-        # the temperature diodes
-        for idx in range(21): # THIS MUST CHANGE TO 21 AFTER WILFRIED CHANGES QUBICSTUDIO
+        # the temperature diodes.  There are 21 spaces for temperature diodes, but only 18 diodes
+        for idx in range(18):
             Tname='TEMPERATURE%02i' % (idx+1)
             names.append('%s' % Tname)
             fmts.append('f8')
             record_zero.append(dummy_val)
             dummy_val -= 1
 
+        # Dome status
+        # Dome Puerto-A ends up in TEMPERATURE19
+        # Dome Puerto-B ends up in TEMPERATURE20
+        for puerto in ['DOME_A','DOME_B']:
+            names.append(puerto)
+            fmts.append('f8')
+            record_zero.append(dummy_val)
+            dummy_val -= 1
+
+        # There's one more spot available
+        names.append('AVAILABLE')
+        fmts.append('f8')
+        record_zero.append(dummy_val)
+        
         ########### we don't send the labels themselves ###########
         # names=['LABELS']+names
         # names_line=','.join(names)
@@ -371,6 +386,22 @@ class hk_broadcast :
             self.log('ERROR! USBTHERMOMETER: %s' % ans['error'])
 
         return self.record
+
+    def get_dome_hk(self):
+        '''get the dome status
+        '''
+        domeinfo = get_dome_status()
+        if domeinfo['ok']:
+            tstamp = self.current_timestamp()
+            self.record['DOME_A'][0] = domeinfo['Puerta A']
+            self.log_hk('DOME_A',tstamp,domeinfo['Puerta A'])
+
+            self.record['DOME_B'][0] = domeinfo['Puerta B']
+            self.log_hk('DOME_B',tstamp,domeinfo['Puerta B'])
+        else:
+            self.log('ERROR! DOME STATUS: %s' % domeinfo['error'])
+
+        return self.record
         
     
     def get_all_hk(self):
@@ -382,6 +413,7 @@ class hk_broadcast :
         self.get_temperature_hk()
         self.get_pressure_hk()
         self.get_cryostat_temperature_hk()
+        self.get_dome_hk()
         self.get_azel_hk()
         return self.record
 
