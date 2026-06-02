@@ -55,7 +55,8 @@ def read_hk_file(filename):
     txt = h.read()
     h.close()
     txt_clean = txt.replace('\x00','').replace('inf','64218') # infinity = 0xfada
-    lines = txt_clean.split('\n')
+    txt_cleanclean = re.sub('\n.*\\.[0-9]*\\..*\n','\n',txt_clean)
+    lines = txt_cleanclean.split('\n')
     del(lines[-1])
 
     # try to use numpy loadtxt which is fastest
