@@ -376,13 +376,13 @@ class hk_broadcast :
     def get_all_hk(self):
         '''sample all the housekeeping from the various sensors
         '''
+        self.record[0].DATE = self.current_timestamp()
         self.get_entropy_hk()
         self.get_powersupply_hk()
         self.get_temperature_hk()
         self.get_pressure_hk()
-        self.get_azel_hk()
         self.get_cryostat_temperature_hk()
-        self.record[0].DATE = self.current_timestamp()
+        self.get_azel_hk()
         return self.record
 
     def unpack_data(self,data):
