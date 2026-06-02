@@ -304,8 +304,10 @@ def list_hk():
     label = 'Dome status'
     labelkey = 'DOME'
     dome = get_dome_status()
-    date_str = utcnow().strftime(date_fmt)
-    line = '%s %s %s %s' % (date_str, dome['message'].center(20), label.center(20), labelkey)
+    now = utcnow()
+    date_str = now.strftime(date_fmt)
+    tstamps.append(now.timestamp())
+    line = '%s %s %s %s' % (date_str, dome['message'].rjust(20), label.center(20), labelkey)
     lines.append(line)
 
     # read the UPS status
@@ -401,9 +403,9 @@ def list_hk():
                     R_label = labels[R_key]
                 else:
                     R_label = label
-                line = '%s %s %s %s' % (date_str, R_str.rjust(20), R_label.center(20), labelkey)
-                tstamps.append(tstamp)
-                lines.append(line)
+                    line = '%s %s %s %s' % (date_str, R_str.rjust(20), R_label.center(20), labelkey)
+                    tstamps.append(tstamp)
+                    lines.append(line)
 
 
 
@@ -424,7 +426,7 @@ def list_hk():
                 break
         if add_it:
             sorted_hk_files.append(F)
-    
+            
         
     # do the rest of the HK files
     az = None
