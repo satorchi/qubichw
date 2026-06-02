@@ -32,11 +32,13 @@ def get_dome_status():
     values = {}
     values['ok'] = False
     values['error'] = 'NONE'
+    values['message'] = 'NO INFO'
 
     try:
         website = urlopen(url,timeout=5)
     except:
         values['error'] = make_errmsg('could not get dome status:')
+        values['message'] = 'server unreachable'
         return values
 
     pg = website.read()
@@ -45,10 +47,12 @@ def get_dome_status():
         json = eval(pg)
     except:
         values['error'] = make_errmsg('could not interpret dome contents')
+        values['message'] = 'could not interpret'
         return values
 
     if 'val' not in json.keys():
         values['error'] = 'no values in JSON file'
+        values['message'] = 'no values in JSON'
         return values
 
     val_str = json['val']
@@ -77,6 +81,9 @@ def get_dome_status():
         values['dome state'] = 'OPEN'
     else:
         values['dome state'] = 'CLOSED'
+
+    msg = '%.1f, %.1f: %s' % (values['Puerta A'],values['Puerta B'],values['dome state'])
+    values['message'] = msg
     
     values['ok'] = True
     

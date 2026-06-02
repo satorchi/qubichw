@@ -20,6 +20,7 @@ from satorchipy.datefunctions import str2dt, utcnow, utcfromtimestamp
 #from qubichk.platform import get_position
 from qubichk.hwp import get_hwp_info
 from qubichk.utilities import get_fullpath, read_labels, get_sun_separation, get_moon_separation, get_altaz
+from qubichk.dome import get_dome_status
 
 year_str = utcnow().strftime('%Y')
 
@@ -299,6 +300,13 @@ def list_hk():
             lines.append(line)
 
 
+    # get the dome status
+    label = 'Dome status'
+    labelkey = 'DOME'
+    dome = get_dome_status()
+    date_str = utcnow().strftime(date_fmt)
+    line = '%s %s %s %s' % (date_str, dome['message'].center(20), label.center(20), labelkey)
+    lines.append(line)
 
     # read the UPS status
     retval = read_ups()
