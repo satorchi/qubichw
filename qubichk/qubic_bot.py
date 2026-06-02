@@ -1374,8 +1374,13 @@ class qubic_bot :
         '''
         return the HK listing as displayed by show_hk.py
         '''
-        answer = list_hk()
-        self._send_message(answer)
+        page = list_hk()
+        lines = page.split('\n')
+        nlines = len(lines)
+        p1 = '\n'.join(lines[:nlines//2])
+        p2 = '\n'.join(lines[nlines//2:])
+        self._send_message(p1)
+        self._send_message(p2)
         return
     
 
