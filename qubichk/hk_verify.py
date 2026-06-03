@@ -62,7 +62,7 @@ def check_network(verbosity=1):
         if not retval[machine]['ok']:
             msg = '%s %s' % (machine,retval[machine]['error_message'])
             if machine=='modulator':
-                powerbar = energenie('calsource')
+                powerbar = energenie('cf')
                 if not powerbar.ok:
                     msg += ' %s' % powerbar.error_message
                     retval['ok'] = False
@@ -78,7 +78,7 @@ def check_network(verbosity=1):
                         retval['ok'] = False
                         errmsg_list.append('calsource state is UNKNOWN')
             elif machine.find('horn')>=0:
-                powerbar = energenie('horn')
+                powerbar = energenie('electronics rack')
                 if not powerbar.ok:
                     msg += ' %s' % powerbar.error_message
                     retval['ok'] = False
