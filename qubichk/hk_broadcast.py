@@ -177,8 +177,8 @@ class hk_broadcast :
             dummy_val -= 1
 
         # Dome status
-        # Dome Puerto-A ends up in TEMPERATURE19
-        # Dome Puerto-B ends up in TEMPERATURE20
+        # Dome Puerto-A ends up in Temp_18 in QubicStudio
+        # Dome Puerto-B ends up in Temp_19 in QubicStudio
         for puerto in ['DOME_A','DOME_B']:
             names.append(puerto)
             fmts.append('f8')
