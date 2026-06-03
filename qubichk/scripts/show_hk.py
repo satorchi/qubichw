@@ -411,7 +411,7 @@ def list_hk():
 
     # sort the rest of the files as we want
     sorted_hk_files = []
-    pattern_list = ['AVS','TEMPERATURE','PRESSURE','MHS']
+    pattern_list = ['AVS','TEMPERATURE','PRESSURE','MHS','DOME']
     for pattern in pattern_list:
         for F in hk_files:
             basename = os.path.basename(F)
