@@ -72,11 +72,11 @@ def check_network(verbosity=1):
                     if states['ok']:
                         modulator_state = states[powerbar.devicesocket['modulator']]
                         if not modulator_state:
-                            msg += ' OK. calsource is OFF'
+                            msg += ' OK. carbon fibre is OFF'
                     else:
-                        msg += ' calsource state is UNKNOWN'
+                        msg += ' carbon fibre state is UNKNOWN'
                         retval['ok'] = False
-                        errmsg_list.append('calsource state is UNKNOWN')
+                        errmsg_list.append('carbon fibre state is UNKNOWN')
             elif machine.find('horn')>=0:
                 powerbar = energenie('electronics rack')
                 if not powerbar.ok:
