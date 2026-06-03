@@ -223,7 +223,7 @@ def ping(machine,verbosity=1):
         msg = 'UNREACHABLE!\n--> %s is unreachable.' % machine
         if machine=='modulator':
             msg += ' This is okay if carbon fibre is off.'
-        elif machine=='horn':
+        elif machine=='horns':
             msg += ' This is okay for normal observations (no calsource).'
         else:
             msg += ' Please make sure it is switched on and connected to the housekeeping network'
