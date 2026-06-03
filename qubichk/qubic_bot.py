@@ -1376,9 +1376,17 @@ class qubic_bot :
         '''
         page = list_hk()
         lines = page.split('\n')
-        nlines = len(lines)
-        p1 = '\n'.join(lines[:nlines//2])
-        p2 = '\n'.join(lines[nlines//2:])
+        
+        newlines = []
+        for line in lines:
+            col = line.split()
+            if len(col)<2: continue
+            newline = line.replace(col[-1],'').strip()
+            newlines.append(newline)
+
+        nlines = len(newlines)
+        p1 = '\n'.join(newlines[:nlines//2])
+        p2 = '\n'.join(newlines[nlines//2:])
         self._send_message(p1)
         self._send_message(p2)
         return
