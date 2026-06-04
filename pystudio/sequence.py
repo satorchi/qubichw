@@ -219,7 +219,7 @@ def init_frontend(self,
     return
                   
 
-def set_bath_temperature(self,Tbath,timeout=120,precision=0.001):
+def set_bath_temperature(self,Tbath,timeout=120,precision=0.0005):
     '''
     set the iMACRT PID for the desired temperature and wait until it reaches the temperature
     '''
@@ -239,19 +239,20 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.001):
 
     # wait for temperature
     Tdelta = np.abs(Tmeas-Tbath)
-    maxcount = int(timeout) + 1
-    count = 0
-    while (Tdelta>precision) and (count<maxcount):
-        sleep(1)
+    maxdate = utcnow() + timedelta(seconds=timeout)
+    while (Tdelta>precision) and (utcnow()<maxdate):
+        sleep(3)
         Tmeas = mgc.get_mgc_measurement()
         Tdelta = np.abs(Tmeas-Tbath)
-        count += 1
-    mgc.disconnect()
     
     if Tdelta>precision:
         self.printmsg('Did not reach desired bath temperature.  Current temperature: %.3f mK' % (1000*Tmeas))
         return False
 
+    # give some extra settling time
+    sleep(10)
+    Tmeas = mgc.get_mgc_measurement()
+    mgc.disconnect()
     self.printmsg('Current bath temperature: %.3f mK' % (1000*Tmeas))
     return True
 
