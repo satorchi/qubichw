@@ -167,7 +167,9 @@ def read_weather_csv(weather_file):
     '''
     read the CSV file from the weather station
     '''
-    utoffset = dt.timedelta(hours=3) # weather station data is in ART
+
+    # weather station is now in UTC:  2026-06-05 14:52:29
+    # utoffset = dt.timedelta(hours=3) # weather station data is in ART
     
     if not os.path.isfile(weather_file):
         print('weather file not found: %s' % weather_file)
@@ -187,7 +189,8 @@ def read_weather_csv(weather_file):
         col = line.split(',')
         for idx,key in enumerate(weather_csv_keys):
             if key=='date':
-                weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y') + utoffset)
+                # weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y') + utoffset)
+                weather_data[key].append(dt.datetime.strptime(col[0],'%H:%M:%S %d-%m-%Y'))
                 continue
             weather_data[key].append(eval(col[idx]))
 
