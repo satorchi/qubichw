@@ -626,19 +626,23 @@ class obsmount:
             
         return retval
 
-    def get_azel(self):
+    def get_azel(self,timeout=None):
         '''
         get azimuth and elevation by sending a query to the rebroadcast server
         '''
-        ans = self.send_request_to_rebroadcaster('GET AZEL')
+        ans = self.send_request_to_rebroadcaster('GET AZEL',timeout=timeout)
         return ans
         
 
-    def send_request_to_rebroadcaster(self,cmd):
+    def send_request_to_rebroadcaster(self,cmd,timeout=None):
         '''
         send a request to the rebroadcaster
         see above: self.lisen_for_command ()
         '''
+
+        # default long timeout, but this is a problem for the HK server
+        if timeout is None: timeout=12
+        
         retval = {}
         retval['ok'] = False
         retval['error'] = 'NONE'
@@ -647,7 +651,7 @@ class obsmount:
         my_ip = get_myip()
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.settimeout(12)
+        sock.settimeout(timeout)
         sock.sendto(cmd.encode(), (qc_ip, self.broadcast_request_port))
         
         ack = None
