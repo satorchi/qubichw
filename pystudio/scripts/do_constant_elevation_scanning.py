@@ -160,14 +160,14 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
             azel = mount.wait_for_arrival(az=azlimit)
             if not azel['ok']:
                 errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees\n%s' % (azlimit,azel['error'])
-                mount.printmsg(errmsg,threshold=0)
-                mount.printmsg('Azimuth scan trying to send command again',threshold=0)
+                printmsg(errmsg,'obsmount',logfile=logfile)
+                printmsg('Azimuth scan trying to send command again','obsmount',logfile=logfile)
                 ack = mount.goto_az(azlimit)
                 azel = mount.wait_for_arrival(az=azlimit)
 
                 if not azel['ok']:
                     errmsg += ' after two attempts to send command.  Trying a reset.'
-                    mount.printmsg(errmsg)
+                    printmsg(errmsg,'obsmount',logfile=logfile)
                     ack = mount.reset()
                     sleep(0.5)
                     ack = mount.goto_az(azlimit)
@@ -202,7 +202,7 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
                 use_hwp = False
             else:
                 if Tbath is not None:
-                    printmsg('resetting bath temperature to %.1f mK to precision %.1f mK' % (Tbath*1000,Tbath_precision*1000))
+                    printmsg('resetting bath temperature to %.1f mK to precision %.1f mK' % (Tbath*1000,Tbath_precision*1000),'iMACRT',logfile=logfile)
                     dispatcher.set_bath_temperature(Tbath,precision=Tbath_precision)
                 if hwp_settle is not None and hwp_settle>0:
                     printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle,'SCAN',logfile=logfile)
@@ -257,22 +257,22 @@ def cli():
     ####### start immediately by going to the starting position ##########
     ack = mount.goto_el(el)
     if not ack['ok']:
-        dispatcher.printmsg('Scan unable to send elevation command to observation mount')
+        printmsg('Scan unable to send elevation command to observation mount','SCAN',logfile=logfile)
         return
     
     azel = mount.wait_for_arrival(el=el)
     if not azel['ok']:
-        dispatcher.printmsg('Did not successfully get to elevation position: %.3f degrees' % el)
+        printmsg('Did not successfully get to elevation position: %.3f degrees' % el,'SCAN',logfile=logfile)
         return
         
     ack = mount.goto_az(azmin)
     if not ack['ok']:
-        dispatcher.printmsg('Scan unable to send azimuth command to observation mount')
+        printmsg('Scan unable to send azimuth command to observation mount','SCAN',logfile=logfile)
         return
         
     azel = mount.wait_for_arrival(az=azmin)
     if not azel['ok']:
-        dispatcher.printmsg('Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin)
+        printmsg('Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin,'SCAN',logfile=logfile)
         return
 
     #### wait for start time if necessary ####
@@ -280,7 +280,7 @@ def cli():
     if now<start_time:
         wait_delta = start_time - now
         wait_before_start = wait_delta.total_seconds()
-        dispatcher.printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start))
+        printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start),'SCAN',logfile=logfile)
         sleep(wait_before_start)
     
     #####################################
@@ -296,7 +296,7 @@ def cli():
     # stop the acquisition
     ack = dispatcher.end_observation()
     
-    dispatcher.printmsg('Scan completed for %s' % dataset_name)
+    printmsg('Scan completed for %s' % dataset_name,'SCAN',logfile=logfile)
     mount.disconnect()
     ack = dispatcher.unsubscribe()
     return
