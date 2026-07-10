@@ -118,7 +118,11 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
         # not a good idea: 2026-05-20 19:20:20
         # see data: 2026-05-20_16.43.49__test_scan_temperature_control_off_during_hwp_movement
         mgc = iMACRT(device='mgc')
-        pidstate = mgc.get_mgc_pid()
+
+        # hack to flush wrong response
+        for ctr in range(10):
+            pidstate = mgc.get_mgc_pid()
+        printmsg('PID state: %s' % pidstate,'iMACRT-MGC',logfile=logfile)
         
         hwp_increment = 1 # start by going in the positive direction
 
@@ -210,7 +214,7 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
                 if hwp_failure_counter > 9:
                     use_hwp = False
             else:
-                if Tbath is not None and pidstate==1:
+                if (Tbath is not None) and (pidstate==1):
                     printmsg('resetting bath temperature to %.1f mK to precision %.1f mK' % (Tbath*1000,Tbath_precision*1000),'iMACRT',logfile=logfile)
                     dispatcher.set_bath_temperature(Tbath,precision=Tbath_precision)
                 if hwp_settle is not None and hwp_settle>0:
