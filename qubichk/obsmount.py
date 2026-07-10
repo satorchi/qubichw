@@ -366,7 +366,7 @@ class obsmount:
 
         if cmd_echo.find('already moving')>=0:
             retval['error'] = cmd_echo
-            self.printmsg('ERROR! axis is already moving.  Please wait, or send "stop", and try again.')
+            self.printmsg('ERROR! axis is already moving.  Please wait, or send "stop", and try again.',threshold=0)
             return self.return_with_error(retval)
         
         return retval
@@ -859,25 +859,28 @@ class obsmount:
                 return self.return_with_error(azel)
         
         val = azel[key]
+        val_progress = [val]
 
         # maximum wait time to get to target
         maxwait = 1.1*np.abs(val_final-val) + 5 # margin added to 1 deg/sec rotation speed
         if maxwait<self.maxwait: maxwait=self.maxwait # always have patience for at least the default maxwait (3 minutes)
         self.printmsg('maximum wait time to reach target: %.1f secs' % maxwait,threshold=1)
         
-        
+        errmsg_list = []
         while np.abs(val-val_final)>self.pos_margin:
             sleep(1.6)
             now = utcnow().timestamp()
-            if (now-tstart)>maxwait:
+            wait_time = now-tstart
+            if wait_time>maxwait:
                 errmsg = 'Exiting after maximum wait time: %.0f seconds' % maxwait
                 errmsg += ' current value: %s = %.3f degrees' % (key,val)
-                azel['error'] = errmsg
+                errmsg_list.append(errmsg)
+                azel['error'] = '\n'.join(errmsg_list)
                 return self.return_with_error(azel)
         
             azel = self.get_azel()
             if not azel['ok']:
-                sleep(1.6)
+                errmsg_list.append(azel['error'])
                 continue
 
             obsmount_tstamp = azel['TIMESTAMP']
@@ -885,7 +888,13 @@ class obsmount:
             self.printmsg('[%s] AZ,EL = %.2f %.2f' % (obsmount_date_str,azel['AZ'],azel['EL']),threshold=0)
 
             val = azel[key]
+            val_progress.append(val)
+            val_delta = np.abs(val_progress[-2]-val_progress[-1])
+            if val_delta<self.pos_margin:
+                errmsg_list.append('[%s] %s is not moving.  wait time: %.1f seconds' % (obsmount_date_str,key,wait_time))
 
+        if len(errmsg_list)>0:
+            azel['error'] = '\n'.join(errmsg_list)
         return azel
         
     

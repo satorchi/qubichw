@@ -159,7 +159,7 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
             sleep(1) # wait before next command
             azel = mount.wait_for_arrival(az=azlimit)
             if not azel['ok']:
-                errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees' % azlimit
+                errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees\n%s' % (azlimit,azel['error'])
                 mount.printmsg(errmsg,threshold=0)
                 mount.printmsg('Azimuth scan trying to send command again',threshold=0)
                 ack = mount.goto_az(azlimit)
