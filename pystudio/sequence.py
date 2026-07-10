@@ -556,7 +556,9 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
     if Tbath is None:
         self.printmsg('WARNING!  TES bath temperature not specified. Using current temperature')
         Tbath = Tmeas
-    Tbath_ok = self.set_bath_temperature(Tbath)
+        Tbath_ok = True
+    else:
+        Tbath_ok = self.set_bath_temperature(Tbath)
 
     if not Tbath_ok:
         self.printmsg("Tbath temperature not reached.  aborting.")
