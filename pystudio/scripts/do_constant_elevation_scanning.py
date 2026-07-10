@@ -54,12 +54,22 @@ parameterList = ['el',
                  'comment',
                  'use_hwp',
                  'hwp_settle',
-                 'velocity']
+                 'velocity',
+                 'hwp_pos_min',
+                 'hwp_pos_max']
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
-hwp_pos_min = 2
-hwp_pos_max = 6
+if options['hwp_pos_min'] is None:
+    hwp_pos_min = 2
+else:
+    hwp_pos_min = options['hwp_pos_min']
+
+if options['hwp_pos_max'] is None:
+    hwp_pos_max = 6
+else:
+    hwp_pos_max = options['hwp_pos_max']
+    
 Tbath_precision = 0.0005
 def do_constant_elevation_scanning(mount=None, dispatcher=None,
                                    el=None,azmin=None,azmax=None,
