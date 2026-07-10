@@ -157,7 +157,6 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
             hwp_failure_counter += 1
             errmsg = 'ERROR! %s.  Failure count: %i' % (hwpinfo['error_message'],hwp_failure_counter)
             printmsg(errmsg,'HWP',logfile=logfile)
-            use_hwp = False
         
     now = utcnow()
     while now<end_time:
