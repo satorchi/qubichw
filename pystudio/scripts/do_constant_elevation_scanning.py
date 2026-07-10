@@ -112,8 +112,11 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
     mount.set_az_speed(velocity)
 
     if use_hwp:
+        hwp_failure_counter = 0
 
         # we will switch off the bath temperature PID before each HWP movement: 2026-05-20 17:39:37
+        # not a good idea: 2026-05-20 19:20:20
+        # see data: 2026-05-20_16.43.49__test_scan_temperature_control_off_during_hwp_movement
         mgc = iMACRT(device='mgc')
         pidstate = mgc.get_mgc_pid()
         
@@ -131,12 +134,15 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
         # check again
         is_arrived = hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==hwp_pos
         if not is_arrived:
+            hwp_failure_counter += 1
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
 
         # check if it's ok to use the HWP
         if not hwpinfo['ok']:
-            printmsg('ERROR! Problem with HWP: %s' % hwpinfo['error_message'],'HWP',logfile=logfile)
+            hwp_failure_counter += 1
+            errmsg = 'ERROR! %s.  Failure count: %i' % (hwpinfo['error_message'],hwp_failure_counter)
+            printmsg(errmsg,'HWP',logfile=logfile)
             use_hwp = False
         
     now = utcnow()
@@ -198,10 +204,13 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
             send_hwp_command('GOTO %i' % hwp_pos)
             hwpinfo = hwp_wait_for_arrival(hwp_pos)
             if not hwpinfo['ok']:
-                printmsg('ERROR! %s' % hwpinfo['error_message'], 'HWP',logfile=logfile)
-                use_hwp = False
+                hwp_failure_counter += 1
+                errmsg = 'ERROR! %s.  Failure count: %i' % (hwpinfo['error_message'],hwp_failure_counter)
+                printmsg(errmsg,'HWP',logfile=logfile)
+                if hwp_failure_counter > 9:
+                    use_hwp = False
             else:
-                if Tbath is not None:
+                if Tbath is not None and pidstate==1:
                     printmsg('resetting bath temperature to %.1f mK to precision %.1f mK' % (Tbath*1000,Tbath_precision*1000),'iMACRT',logfile=logfile)
                     dispatcher.set_bath_temperature(Tbath,precision=Tbath_precision)
                 if hwp_settle is not None and hwp_settle>0:
