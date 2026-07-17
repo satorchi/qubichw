@@ -79,7 +79,7 @@ def run_hwp_test(ncycles,hwp_pos_min,hwp_pos_max,max_fails):
     npos = 1 + abs(hwp_pos_max - hwp_pos_min)
     npos_tot = npos*ncycles
     for loop_idx in range(npos_tot):
-        sleep(5)
+        sleep(10)
         
         hwp_pos += hwp_increment
         if hwp_pos>hwp_pos_max:
