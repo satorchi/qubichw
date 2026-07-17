@@ -28,7 +28,7 @@ options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
 if options['hwp_pos_min'] is None:
-    hwp_pos_min = 2
+    hwp_pos_min = 1
 else:
     hwp_pos_min = options['hwp_pos_min']
 
