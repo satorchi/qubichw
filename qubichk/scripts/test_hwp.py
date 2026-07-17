@@ -17,6 +17,7 @@ from qubichk.hwp import get_hwp_info, send_hwp_command, hwp_wait_for_arrival
 from qubichk.utilities import printmsg, assign_logfile
 from satorchipy.utilities import parseargs
 
+
 logfile = assign_logfile('hwp_test_log.txt')
 
 parameterList = ['hwp_pos_min',
@@ -75,7 +76,9 @@ def run_hwp_test(ncycles,hwp_pos_min,hwp_pos_max,max_fails):
         errmsg = 'ERROR! %s.  Failure count: %i' % (hwpinfo['error_message'],hwp_failure_counter)
         printmsg(errmsg,'HWP',logfile=logfile)
 
-    for loop_idx in range(ncycles):
+    npos = 1 + abs(hwp_pos_max - hwp_pos_min)
+    npos_tot = npos*ncycles
+    for loop_idx in range(npos_tot):
         
         hwp_pos += hwp_increment
         if hwp_pos>hwp_pos_max:
