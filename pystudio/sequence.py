@@ -548,8 +548,8 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()
     if Tmeas is None or Tmeas=='':
-        self.printmsg('ERROR! Could not get temperature from MGC3.  aborting')
-        return None
+        self.printmsg('ERROR! Could not get temperature from MGC3.')
+        Tmeas = 0.0
     
     self.printmsg('Tbath is currently: %.3f mK' % (Tmeas*1000))
     
@@ -561,8 +561,7 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
         Tbath_ok = self.set_bath_temperature(Tbath)
 
     if not Tbath_ok:
-        self.printmsg("Tbath temperature not reached.  aborting.")
-        return None
+        self.printmsg("WARNING!  Tbath temperature not reached.  Continuing anyway.")
     
     #####################################
     # configure the bolometers
