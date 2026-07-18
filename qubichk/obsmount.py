@@ -910,37 +910,45 @@ class obsmount:
         if velocity is not None:
             self.set_el_speed(velocity)
         
-    
+
+        fail_count = 0
+        max_fail = 100
         start_tstamp = utcnow().timestamp()
 
         ack = self.goto_az(azmin)
         # if axis still moving, wait a bit and try again
         if not ack['ok'] and ack['error'].find('already moving')>=0:
+            fail_count += 1
             sleep(5)
             ack = self.goto_az(azmin)
             
         if not ack['ok']:
-            return ack
+            fail_count += 1
+            self.printmsg('WARNING! Did not get to starting azimuth.  Fail count = %i' % fail_count)
         
         azel = self.wait_for_arrival(az=azmin)
         if not azel['ok']:
+            fail_count += 1
             azel['error'] = 'Did not successfully get to starting azimuth position: %s' % azel['error']
-            return self.return_with_error(azel)
+            self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
         self.goto_el(elmin)
         azel = self.wait_for_arrival(el=elmin)
         if not azel['ok']:
+            fail_count += 1
             azel['error'] = 'Did not successfully get to starting elevation position: %s' % azel['error']
-            return self.return_with_error(azel)
+            self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
         azel = self.get_azel()
+        start_tstamp = utcnow().timestamp() # re-assign start_tstamp because quite some time might have passed        
         while not azel['ok']:
+            fail_count += 1
             sleep(2)
             azel = self.get_azel()
             now = utcnow().timestamp()
-            if (now-start_tstamp)>10:
+            if (now-start_tstamp)>60:
                 azel['error'] = 'skydip unable to get current position: %s' % azel['error']
-                return self.return_with_error(azel)
+                self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
         
         
         az = azel['AZ']
@@ -950,6 +958,9 @@ class obsmount:
         for azlimit in [azmax, azmin]:
         
             while (az<=azmax) and (np.abs(az-azlimit)>self.pos_margin):
+                if fail_count > max_fail:
+                    return self.return_with_error(azel)
+
                 ack = self.goto_el(elmax)
 
                 # if axis still moving, wait a bit and try again
@@ -960,24 +971,26 @@ class obsmount:
                 sleep(1) # wait before next command
                 azel = self.wait_for_arrival(el=elmax)
                 if not azel['ok']:
+                    fail_count += 1
                     azel['error'] = 'Did not successfully get to maximum elevation: %s' % azel['error']
-                    return self.return_with_error(azel)
+                    self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
                 ack = self.goto_el(elmin)
                 sleep(1) # wait before next command
                 azel = self.wait_for_arrival(el=elmin)
                 if not azel['ok']:
+                    fail_count += 1
                     azel['error'] = 'Did not successfully get to minimum elevation: %s' % azel['error']
-                    return self.return_with_error(azel)
+                    self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
                 az += azstep
                 ack = self.goto_az(az)
                 sleep(1)
                 azel = self.wait_for_arrival(az=az)
                 if not azel['ok']:
+                    fail_count += 1
                     azel['error'] = 'Did not get to next azimuth position: %s' % azel['error']
-                    return self.return_with_error(azel)
-                    
+                    self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
             azstep = -azstep
 
