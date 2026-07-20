@@ -65,7 +65,8 @@ rsync -avztP $WEATHER_DIR $ARCHIVE_DIR/weather
 sudo chmod -R 0755 $ARCHIVE_HKDIR
 
 # use rsync to copy to CC
-rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
+### 2026-07-20 06:40:36 we pull from the other side from now on
+# rsync -avztP $ARCHIVE_DIR/ cc:$CC_DIR
 
 # use rsync to copy to apcjupyter
 ## Wed 15 Jul 2020 14:18:13 CEST apcjupyter has run out of space
