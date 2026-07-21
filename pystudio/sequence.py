@@ -18,6 +18,7 @@ from satorchipy.datefunctions import utcnow, str2dt
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
 from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
+from qubichk.entropy_hk import entropy_hk
 from qubicpack.utilities import interpret_rawmask
 
 #####################################
@@ -225,7 +226,7 @@ def set_bath_temperature(self,Tbath,timeout=120,precision=0.0005):
     '''
     # get current temperature
     mgc = iMACRT(device='mgc')
-    Tmeas = mgc.get_mgc_measurement()
+    Tmeas = mgc.get_mgc_measurement()    
     if Tmeas is None or Tmeas=='':
         self.printmsg('Could not get temperature from MGC3.')
         return None
@@ -546,10 +547,16 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
 
     # get current temperature
     mgc = iMACRT(device='mgc')
-    Tmeas = mgc.get_mgc_measurement()
+    Tmeas = mgc.get_mgc_measurement()    
     if Tmeas is None or Tmeas=='':
-        self.printmsg('ERROR! Could not get temperature from MGC3.')
-        Tmeas = 0.0
+        self.printmsg('ERROR! Could not get temperature from MGC3.  Using Major Tom.')
+        tom = entropy_hk()
+        Tbath_dat = tom.get_temperature(dev='AVS47_1',ch=2)
+        if Tbath_dat is None or len(Tbath_dat)!=2:
+            self.printmsg('ERROR! Could not get temperature from Major Tom.')
+            Tmeas = 0.0
+        else:
+            Tmeas = Tbath_dat[1]
     
     self.printmsg('Tbath is currently: %.3f mK' % (Tmeas*1000))
     
