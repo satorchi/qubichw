@@ -548,7 +548,7 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
     # get current temperature
     mgc = iMACRT(device='mgc')
     Tmeas = mgc.get_mgc_measurement()    
-    if Tmeas is None or Tmeas=='':
+    if Tmeas is None or Tmeas=='' or Tmeas<0.3:
         self.printmsg('ERROR! Could not get temperature from MGC3.  Using Major Tom.')
         tom = entropy_hk()
         Tbath_dat = tom.get_temperature(dev='AVS47_1',ch=2)
