@@ -13,7 +13,7 @@ control the RedPitaya oscilloscope/signal-generator
 import time,socket,os,sys
 import numpy as np
 import datetime as dt
-from qubichk.utilities import make_errmsg
+from satorchipy.utilities import make_errmsg
 from satorchipy.datefunctions import utcnow
 
 default_setting = {}

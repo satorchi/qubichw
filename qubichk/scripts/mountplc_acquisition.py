@@ -13,7 +13,8 @@ read mount position data from the PLC and dump it to binary data file
 '''
 import sys,os
 from qubichk.obsmount import obsmount
-from qubichk.utilities import make_errmsg, verify_directory
+from qubichk.utilities import verify_directory
+from satorchipy.utilities import make_errmsg
 from satorchipy.datefunctions import utcnow
 
 def cli():

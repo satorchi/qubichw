@@ -26,7 +26,8 @@ from time import sleep
 from threading import Thread
 import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
-from qubichk.utilities import make_errmsg, get_known_hosts, hk_dir, get_myip, verify_directory, log_datefmt
+from satorchipy.utilities import make_errmsg
+from qubichk.utilities import get_known_hosts, hk_dir, get_myip, verify_directory, log_datefmt
 from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()

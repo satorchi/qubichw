@@ -132,9 +132,9 @@ new offset: 60.713
 '''
 import os,sys,socket,time,re
 import numpy as np
-from qubichk.utilities import make_errmsg, get_known_hosts
+from qubichk.utilities import get_known_hosts
 from satorchipy.datefunctions import utcnow
-
+from satorchipy.utilities import make_errmsg
 known_hosts = get_known_hosts()
 hk_dir = os.environ['HOME']+'/data/temperature/broadcast'
 rec_fmt = '<Bdd'
