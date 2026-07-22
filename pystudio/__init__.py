@@ -192,6 +192,7 @@ class pystudio:
 
     from .sequence import\
         get_default_setting,\
+        get_bath_temperature,\
         set_bath_temperature,\
         do_DACoffset_measurement,\
         assign_saved_DACoffsetTables,\

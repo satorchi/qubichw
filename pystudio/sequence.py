@@ -119,6 +119,7 @@ def get_default_setting(self,parm=None,asic=None,measurement=None):
     return default_setting[asicKey][parm]
 
 
+
 def init_frontend(self,
                   asicNum=None,
                   nsamples=None,
@@ -219,6 +220,27 @@ def init_frontend(self,
     ack = self.park_frontend()
     return
                   
+
+def get_bath_temperature(self):
+    '''
+    get the current bath temperature
+    '''
+    mgc = iMACRT(device='mgc')
+    Tmeas = mgc.get_mgc_measurement()    
+    if not (Tmeas is None or Tmeas=='' or Tmeas<0.3):
+        return Tmeas
+
+
+    self.printmsg('ERROR! Could not get temperature from MGC3.  Using Major Tom.')
+    tom = entropy_hk()
+    Tbath_dat = tom.get_temperature(dev='AVS47_1',ch=2)
+    if Tbath_dat is None or len(Tbath_dat)!=2:
+        self.printmsg('ERROR! Could not get temperature from Major Tom.')
+        Tmeas = 0.0
+        return Tmeas
+
+    Tmeas = Tbath_dat[1]        
+    return Tmeas
 
 def set_bath_temperature(self,Tbath,timeout=120,precision=0.0005):
     '''
@@ -365,10 +387,8 @@ def do_IV_measurement(self,
 
     # start recording data
     # get current temperature
-    mgc = iMACRT(device='mgc')
-    Tmeas = mgc.get_mgc_measurement()
-    mgc.disconnect()
-    if Tmeas is None or Tmeas=='':
+    Tmeas = self.get_bath_temperature()
+    if Tmeas < 0.3:
         dataset_name = 'IV'
     else:
         dataset_name = 'IV_%.0fmK' % (1000*Tmeas)
@@ -546,17 +566,7 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
     #  maybe this is too much error checking, and too easily aborted
 
     # get current temperature
-    mgc = iMACRT(device='mgc')
-    Tmeas = mgc.get_mgc_measurement()    
-    if Tmeas is None or Tmeas=='' or Tmeas<0.3:
-        self.printmsg('ERROR! Could not get temperature from MGC3.  Using Major Tom.')
-        tom = entropy_hk()
-        Tbath_dat = tom.get_temperature(dev='AVS47_1',ch=2)
-        if Tbath_dat is None or len(Tbath_dat)!=2:
-            self.printmsg('ERROR! Could not get temperature from Major Tom.')
-            Tmeas = 0.0
-        else:
-            Tmeas = Tbath_dat[1]
+    Tmeas = self.get_bath_temperature()
     
     self.printmsg('Tbath is currently: %.3f mK' % (Tmeas*1000))
     
