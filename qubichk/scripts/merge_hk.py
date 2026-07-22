@@ -20,8 +20,8 @@ from glob import glob
 import numpy as np
 from astropy.io import fits as pyfits
 
-from qubichk.hk_file_tools import read_hk_file, read_entropy_label, read_entropy_logfile, read_temperature_dat
-
+from qubichk.hk_file_tools import read_entropy_label, read_entropy_logfile, read_temperature_dat
+from qubicpack.housekeeping.utilities import read_hk_file
 # a dictionary will have all the HK data
 # the keys of the dictionary are the labels of each housekeeping item
 # each dictionary entry will be a sub-dictionary with entries: value, time, unit
