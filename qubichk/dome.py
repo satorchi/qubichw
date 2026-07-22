@@ -11,7 +11,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 get the dome status
 '''
 from urllib.request import urlopen
-from qubichk.utilities import get_known_hosts, make_errmsg
+from qubichk.utilities import get_known_hosts
+from satorchipy.utilities import make_errmsg
 known_hosts = get_known_hosts()
 dome_server = known_hosts['dome']
 value_names = {0:'Manual B',
