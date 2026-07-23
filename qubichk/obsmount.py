@@ -811,7 +811,8 @@ class obsmount:
         sleep(0.5)
         ack = self.disable()
         sleep(0.5)
-        ack = self.do_command_init()
+        for axis_name in self.axis_keys:
+            ack = self.do_command_init(axis_name)
         return
         
     def disable(self):
