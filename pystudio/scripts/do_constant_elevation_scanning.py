@@ -95,7 +95,9 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
     NOTE: 2026-04-23 18:10:39 this module was moved from the obsmount() class in order to integrate the HWP movement
     '''
     if mount is None: mount = obsmount()
-    if dispatcher is None: dispatcher = pystudio()        
+    if dispatcher is None:
+        dispatcher = pystudio()
+        ack = dispatcher.subscribe_dispatcher()
     if el is None: el = 50
     if azmin is None: azmin = 155
     if azmax is None: azmax = 205
