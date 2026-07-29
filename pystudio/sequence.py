@@ -742,14 +742,14 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     self.printmsg('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return
 
-def get_spol(self):
+def get_frontend_parameter(self,parm_name):
     '''
-    get the current SQUID bias setting:  Spol
+    get the current value of a frontend parameter
+    parm_name : see tparameterstable.py
     '''
     retval = {}
     retval['ok'] = False
     retval['error'] = None
-    parm_name = 'ASIC_Spol_ID'
     vals = self.send_request(parameterList=[parm_name])
     retval['values'] = vals
     if 'bytes' not in vals.keys():
@@ -767,6 +767,34 @@ def get_spol(self):
         key = 'ASIC %2i' % (idx+1)
         retval[key] = val
 
+    return retval
+
+def get_spol(self):
+    '''
+    get the current SQUID bias setting:  Spol
+    '''
+    return self.get_frontend_parameter('ASIC_Spol_ID')
+
+def get_PID(self):
+    '''
+    get the current value for the readout PID I
+    '''
+    parms = {'state':'QUBIC_FLL_State_ID',
+             'P':'QUBIC_FLL_P_ID',
+             'I':'QUBIC_FLL_I_ID',
+             'D':'QUBIC_FLL_D_ID'}
+    
+    retval = {}
+    retval['ok'] = True
+    retval['error'] = None
+    errmsg_list = []
+    for PID_parm in parms.keys():
+        retval[PID_parm] = self.get_frontend_parameter(parms[PID_parm])
+        if not retval[PID_parm]['ok']:
+            retval['ok'] = False
+            errmsg_list.append(retval[PID_parm]['error'])
+    if len(errmsg_list)>0:
+        retval['error'] = '\n'.join(errmsg_list)
     return retval
 
 def get_frontend_settings(self,parameterList=None):

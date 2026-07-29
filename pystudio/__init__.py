@@ -207,7 +207,9 @@ class pystudio:
         park_frontend,\
         do_skydip,\
         init_frontend,\
+        get_frontend_parameter,\
         get_spol,\
+        get_PID,\
         get_frontend_settings
 
     from .tparameterstable import assign_parameterstable
