@@ -766,7 +766,7 @@ def get_frontend_parameter(self,parm_name):
     for idx,val in enumerate(parm_vals):
         key = 'ASIC %2i' % (idx+1)
         retval[key] = val
-
+    retval['ok'] = True
     return retval
 
 def get_spol(self):
