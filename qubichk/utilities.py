@@ -14,10 +14,12 @@ import sys,os,subprocess,re,struct
 import numpy as np
 from satorchipy.datefunctions import utcnow
 
+astropy_installed = True
 try:
     from astropy.coordinates import SkyCoord, EarthLocation, AltAz, get_body, angular_separation
     from astropy.time import Time as astrotime
 except:
+    astropy_installed = False
     print('astropy not installed')
 
 # format to use for log output
@@ -28,7 +30,7 @@ qubic_site = 'Alto Chorrillos'
 qubic_latitude = -(24 + 11.2002/60)
 qubic_longitude = -(66 + 28.7039/60)
 qubic_altitude = 4830.3
-qubicloc = EarthLocation(lon=qubic_longitude,lat=qubic_latitude,height=qubic_altitude)
+if astropy_installed: qubicloc = EarthLocation(lon=qubic_longitude,lat=qubic_latitude,height=qubic_altitude)
 
 # these are the default known hosts.  Updated addresses are read from /etc/hosts and from ~/.local/share/qubic/known_hosts
 known_hosts = {}
