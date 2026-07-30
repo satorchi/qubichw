@@ -148,7 +148,7 @@ class redpitaya:
             ans = self.sock.send(cmd_encode)
         except:
             msg = make_errmsg('ERROR!  Could not send to RedPitaya')
-            self.log(errmsg,verbosity=1)
+            self.log(msg,verbosity=1)
             self.connection_status = False
             return None
         
