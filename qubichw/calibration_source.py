@@ -84,7 +84,7 @@ class calibration_source:
             print('Please enter the calibration source: HF or LF')
             return None
 
-        if source.upper()=='220':
+        if source.upper().find('HF')>=0 or source.find('220')>=0:
             dev='/dev/calsource-HF'
             which_freq='High'
             self.calsource = '220'
