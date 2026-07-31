@@ -94,6 +94,8 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
     
     NOTE: 2026-04-23 18:10:39 this module was moved from the obsmount() class in order to integrate the HWP movement
     '''
+    mount_failure_counter = 0
+    max_fail = 100
     if mount is None: mount = obsmount()
     if dispatcher is None:
         dispatcher = pystudio()
@@ -168,11 +170,13 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
 
             # if axis still moving, wait a bit and try again
             if not ack['ok'] and ack['error'].find('already moving')>=0:
+                mount_failure_counter += 1
                 sleep(5)
                 ack = mount.goto_az(azlimit)
 
             # if still not ok, try to reset
             if not ack['ok']:
+                mount_failure_counter += 1
                 ack = mount.reset()
                 sleep(1)
                 ack = mount.goto_az(azlimit)
@@ -180,6 +184,7 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
             sleep(1) # wait before next command
             azel = mount.wait_for_arrival(az=azlimit)
             if not azel['ok']:
+                mount_failure_counter += 1
                 errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees\n%s' % (azlimit,azel['error'])
                 printmsg(errmsg,'obsmount',logfile=logfile)
                 printmsg('Azimuth scan trying to send command again','obsmount',logfile=logfile)
@@ -187,6 +192,7 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
                 azel = mount.wait_for_arrival(az=azlimit)
 
                 if not azel['ok']:
+                    mount_failure_counter += 1
                     errmsg += ' after two attempts to send command.  Trying a reset.'
                     printmsg(errmsg,'obsmount',logfile=logfile)
                     ack = mount.reset()
@@ -195,9 +201,12 @@ def do_constant_elevation_scanning(mount=None, dispatcher=None,
                     azel = mount.wait_for_arrival(az=azlimit)
 
                     if not azel['ok']:
+                        mount_failure_counter += 1
                         errmsg += ' Reset unsuccessful.  Aborting.'
                         azel['error'] = errmsg
-                        return mount.return_with_error(azel)
+                        # check for maximum mount failures
+                        if mount_failure_counter>max_fail: return mount.return_with_error(azel)
+
 
         # go to next HWP position
         if use_hwp:
@@ -245,6 +254,8 @@ def cli():
     ack = dispatcher.subscribe_dispatcher()
 
     mount = obsmount()
+    fail_count = 0
+    max_fail = 100
     
     #####################################
     # defaults    
@@ -281,23 +292,27 @@ def cli():
     ####### start immediately by going to the starting position ##########
     ack = mount.goto_el(el)
     if not ack['ok']:
-        printmsg('Scan unable to send elevation command to observation mount','SCAN',logfile=logfile)
-        return
+        fail_count += 1
+        printmsg('Scan unable to send elevation command to observation mount. Trying again','SCAN',logfile=logfile)
+        sleep(5)
+        ack = mount.goto_el(el)
     
     azel = mount.wait_for_arrival(el=el)
     if not azel['ok']:
-        printmsg('Did not successfully get to elevation position: %.3f degrees' % el,'SCAN',logfile=logfile)
-        return
+        fail_count += 1
+        printmsg('Did not successfully get to elevation position: %.3f degrees.' % el,'SCAN',logfile=logfile)
         
     ack = mount.goto_az(azmin)
     if not ack['ok']:
-        printmsg('Scan unable to send azimuth command to observation mount','SCAN',logfile=logfile)
-        return
+        fail_count += 1
+        printmsg('Scan unable to send azimuth command to observation mount. Trying again','SCAN',logfile=logfile)
+        sleep(5)
+        ack = mount.goto_az(azmin)
         
     azel = mount.wait_for_arrival(az=azmin)
     if not azel['ok']:
+        fail_count += 1
         printmsg('Scan did not successfully get to starting azimuth position: %.3f degrees' % azmin,'SCAN',logfile=logfile)
-        return
 
     #### wait for start time if necessary ####
     now = utcnow()
