@@ -24,6 +24,7 @@ from pystudio import pystudio
 
 parameterList = ['Voffset',
                  'Tbath',
+                 'PID',
                  'duration',
                  'comment',
                  'title']
@@ -34,6 +35,7 @@ def cli():
     ack = dispatcher.subscribe_dispatcher()
     ack = dispatcher.start_observation(Voffset=options['Voffset'],
                                        Tbath=options['Tbath'],
+                                       PID=options['PID'],
                                        comment=options['comment'],
                                        title=options['title']
                                        )

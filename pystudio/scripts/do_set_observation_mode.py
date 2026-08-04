@@ -19,13 +19,14 @@ from pystudio import pystudio
 
 parameterList = ['Voffset',
                  'Tbath',
-                 'FLL']
+                 'FLL',
+                 'PID']
 options = parseargs(sys.argv,expected_args=parameterList)
 
 def cli():
     dispatcher = pystudio()
     ack = dispatcher.subscribe_dispatcher()
-    ack = dispatcher.set_observation_mode(Voffset=options['Voffset'],Tbath=options['Tbath'],FLL=options['FLL'])
+    ack = dispatcher.set_observation_mode(Voffset=options['Voffset'],Tbath=options['Tbath'],FLL=options['FLL'],PID=options['PID'])
     ack = dispatcher.unsubscribe()
     return
 

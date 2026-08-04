@@ -551,15 +551,16 @@ def do_SQUID_optimization(self,
     return
 
 
-def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
+def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None,PID=None):
     '''
     setup the frontend for observing but do not start the acquisition
     '''
     #####################################
     # defaults
-    if Voffset is None: Voffset = 3.0
+    if Voffset is None: Voffset = self.get_default_setting('Voffset',measurement='observation')
     if FLL is None: FLL = True
-    asicNum = default_setting['asicNum']
+    if PID is None: PID = self.get_default_setting('PID')
+    asicNum = self.get_default_setting('asicNum')
 
     #####################################
     # check for desired bath temperature
@@ -594,6 +595,9 @@ def set_observation_mode(self,Voffset=None,Tbath=None,FLL=None):
 
     # configure continuous bias
     ack = self.send_TESDAC_CONTINUOUS(asicNum,Voffset)
+
+    # configure FLL
+    ack = self.send_configurePID(asicNum,PID[0],PID[1],PID[2])
 
     # start all regulations.  Optionally, do not start regulations
     if FLL: ack = self.send_startFLL(asicNum)
@@ -651,7 +655,7 @@ def start_acquisition(self,title=None,comment=None):
     self.printmsg('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return
 
-def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True):
+def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True,PID=None):
     '''
     setup the frontend for observing and start the acquisition
     '''
@@ -659,12 +663,11 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     # defaults
     if title is None: title = 'observation'
     if comment is None: comment = 'observation sent by pystudio'
-    if Voffset is None: Voffset = 3.0
 
     # make sure there is no running acquisition
     ack = self.end_observation()
 
-    ack = self.set_observation_mode(Voffset=Voffset,Tbath=Tbath,FLL=FLL)
+    ack = self.set_observation_mode(Voffset=Voffset,Tbath=Tbath,FLL=FLL,PID=PID)
 
     # pause a few seconds before starting acquisition
     self.printmsg('waiting 5 seconds to settle before starting acquisition')
