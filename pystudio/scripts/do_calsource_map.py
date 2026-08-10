@@ -60,7 +60,8 @@ datefmt = '%Y-%m-%d %H:%M:%S'
     
 Tbath_precision = 0.0005
 def do_calsource_map(mount=None, dispatcher=None,
-                     elmin=None,elmax=None,azmin=None,azmax=None,
+                     elmin=None,elmax=None,elstep=None,
+                     azmin=None,azmax=None,
                      tstart=None,
                      velocity=None,
                      hwp_position=None):
