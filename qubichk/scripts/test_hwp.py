@@ -23,7 +23,8 @@ logfile = assign_logfile('hwp_test_log.txt')
 parameterList = ['hwp_pos_min',
                  'hwp_pos_max',
                  'ncycles',
-                 'max_fails']
+                 'max_fails',
+                 'pause_time']
 options = parseargs(sys.argv,expected_args=parameterList)
 datefmt = '%Y-%m-%d %H:%M:%S'
 
@@ -46,6 +47,11 @@ if options['max_fails'] is None:
     max_fails = 9
 else:
     max_fails = options['max_fails']
+
+if options['pause_time'] is None:
+    pause_time = 10
+else:
+    pause_time = options['pause_time']
 
 def run_hwp_test(ncycles,hwp_pos_min,hwp_pos_max,max_fails):
     '''
@@ -79,7 +85,7 @@ def run_hwp_test(ncycles,hwp_pos_min,hwp_pos_max,max_fails):
     npos = 1 + abs(hwp_pos_max - hwp_pos_min)
     npos_tot = npos*ncycles
     for loop_idx in range(npos_tot):
-        sleep(10)
+        sleep(pause_time)
         
         hwp_pos += hwp_increment
         if hwp_pos>hwp_pos_max:
