@@ -126,4 +126,5 @@ script-files = ["qubichk/scripts/start_calsource_acq.sh",
                 "qubichk/scripts/archive-data.sh",
                 "qubichk/scripts/clean-hk.sh",
                 "qubichk/scripts/start_gpsd-ntpd.sh",
-		"qubichk/scripts/test_hwp.py"]
+		"qubichk/scripts/test_hwp.py",
+		"pystudio/scripts/do_calsource_map.py"]
