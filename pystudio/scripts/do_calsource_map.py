@@ -87,6 +87,7 @@ def do_calsource_map(mount=None, dispatcher=None,
         ack = dispatcher.subscribe_dispatcher()
     if elmin is None: elmin = 30
     if elmax is None: elmax = 70
+    if elstep is None: elstep = 2
     if azmin is None: azmin = -20
     if azmax is None: azmax = 40
 
