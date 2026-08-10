@@ -91,12 +91,6 @@ def do_calsource_map(mount=None, dispatcher=None,
     if azmin is None: azmin = -20
     if azmax is None: azmax = 40
 
-    if tstart is None:
-        start_time = utcnow()
-    else:
-        # correct for ambiguous timezone
-        start_time = tstart.replace(tzinfo=UTC)
-
     if velocity is None:
         velocity = 1
     mount.set_az_speed(velocity)
@@ -226,6 +220,11 @@ def cli():
     else:
         comment = options['comment']
 
+    if options['tstart'] is None:
+        start_time = utcnow()
+    else:
+        # correct for ambiguous timezone
+        start_time = tstart.replace(tzinfo=UTC)
         
     ## the rest of the defaults are defined in the relevant modules
 
