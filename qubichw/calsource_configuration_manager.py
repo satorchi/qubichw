@@ -11,8 +11,12 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 A class with methods to send/receive configuration command for the calibration source setup
 Commands are sent to switch on/off and configure three components: calsource, amplifier, modulator
 '''
-import socket,time,re,os,multiprocessing,sys
+import socket,re,os
+from time import sleep
 from copy import deepcopy
+import readline
+readline.parse_and_bind('tab: complete')
+readline.parse_and_bind('set editing-mode vi')
 
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from qubichk.utilities import shellcommand, get_myip, get_known_hosts, get_calsource_host
@@ -331,7 +335,7 @@ class calsource_configuration_manager():
 
         if delta < reset_delta:
             extra_wait = reset_delta - delta
-            time.sleep(extra_wait)
+            sleep(extra_wait)
 
         ack = ''
         if states is not None:
@@ -346,7 +350,7 @@ class calsource_configuration_manager():
             
                 
         # check for the on/off status
-        time.sleep(reset_delta) # wait a bit before sending another command
+        sleep(reset_delta) # wait a bit before sending another command
         states_read = self.device['relay'].state()
         if states_read=='QUIT':
             ack += 'QUIT_GET_STATES'
@@ -440,7 +444,7 @@ class calsource_configuration_manager():
 
 
         # wait a bit before trying to read the results
-        time.sleep(1)
+        sleep(1)
         status = self.device[dev].status()
         if status is None:
             msg = '%s:FAILED' % dev
@@ -499,7 +503,7 @@ class calsource_configuration_manager():
                 wait_time = self.wait_after_switch_on[dev] - already_waited
                 if wait_time > 0:
                     self.log('waiting %i seconds after switch on' % wait_time,verbosity=0)
-                    time.sleep(wait_time)
+                    sleep(wait_time)
                     already_waited += wait_time
 
                 if not self.device[dev].is_connected():
@@ -593,9 +597,6 @@ class calsource_configuration_manager():
             if 'calsource state' in retval.keys():
                 self.device['calsource_220'].state = retval['calsource_220 state']
             if 'amplifier state' in retval.keys():
-                # reassign amplifier state in the amplifier object
-                # this is a weirdness I don't quite understand because of using multiprocess
-                # does it make a temporary copy of the amplifier object?
                 self.device['amplifier'].state = retval['amplifier state']
 
             self.send_acknowledgement(ack,addr)
@@ -657,14 +658,10 @@ class calsource_configuration_manager():
         '''
         command line interface to send commands
         '''
-        pythonmajor = sys.version_info[0]
         keepgoing = True
         prompt = 'Enter command ("help" for list): '
         while keepgoing:
-            if pythonmajor==2:
-                ans = raw_input(prompt)
-            else:
-                ans = input(prompt)
+            ans = input(prompt)
             cmd_str = ans.strip().lower()
             cmd_list = cmd_str.split()
             if 'help' in cmd_list or 'h' in cmd_list:
