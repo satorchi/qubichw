@@ -53,7 +53,7 @@ if os.uname().machine.find('arm')>=0:
 
 class calsource_configuration_manager():
 
-    def __init__(self,role=None, verbosity=0):
+    def __init__(self,role=None, verbosity=1):
         '''
         initialize the object.  The role can be either "commander" or "manager"
         The "manager" runs on the Raspberry Pi, and interfaces directly with the hardware
@@ -298,7 +298,7 @@ class calsource_configuration_manager():
         
         if timeout is None: timeout = max(self.estimated_wait.values())
         if timeout < 25: timeout = 25
-        self.log('waiting up to %.0f seconds for acknowledgement from %s' % (timeout,self.receiver))
+        self.log('waiting up to %.0f seconds for acknowledgement from %s' % (timeout,self.receiver),verbosity=1)
         
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -314,7 +314,7 @@ class calsource_configuration_manager():
             return None
         received_date = utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
-        self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)))
+        self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)),verbosity=1)
         # clean up the acknowledgement
         ack_cleaned = []
         for line in ack.decode().strip().split():
