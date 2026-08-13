@@ -20,9 +20,11 @@ import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
 
+from satorchipy.datefunctions import utcnow
+
 # the Energenie powerbar
 #from PyMS import PMSDevice
-from qubichw.energenie import energenie
+from qubichw.energenie import energenie, socketinfo
 from qubichk.utilities import shellcommand
 
 # the low noise amplifier
@@ -32,11 +34,21 @@ from qubichw.amplifier import amplifier
 #from qubichw.modulator import modulator
 #from qubichw.modulator_tg5012a import tg5012 as modulator
 from qubichw.modulator_siglent import siglent as modulator
-
 from qubichk.utilities import get_known_hosts, get_myip
-from satorchipy.datefunctions import utcnow
-
 known_hosts = get_known_hosts()
+
+# the device list is the list of devices plugged into the Energenie powerbar
+modulator_channel['cf'] = socketinfo['cf']['modulator']
+valid_commands = {}
+valid_commands['cf'] = ['on','off',
+                        'output',
+                        'frequency',
+                        'amplitude',
+                        'offset',
+                        'duty',
+                        'shape',
+                        'default']
+device_list = list(valid_commands.keys())
 
 class cf_configuration_manager():
 
@@ -74,13 +86,13 @@ class cf_configuration_manager():
         '''
         print some help text to screen
         '''
-        device_list_str = ', '.join(self.device_list)
+        device_list_str = ', '.join(device_list)
         txt  = 'Carbon Fibre Commander:  Help\n'
         txt += 'commands should be given in the following format:\n'
         txt += '    <device>:<parameter>[=<value>]\n\n'
         txt += 'except for the following commands which are independent of device: help, status, on, off, save\n\n'
         txt += 'valid devices: %s\n' % device_list_str
-        for dev in self.device_list:
+        for dev in device_list:
             valid_commands = ', '.join(self.valid_commands[dev])
             txt += 'valid commands for %s: %s\n' % (dev,valid_commands)
         txt += '\nFor the modulator, frequency is given in Hz\n'
@@ -98,42 +110,6 @@ class cf_configuration_manager():
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
-        # the device list is the list of devices plugged into the Energenie powerbar
-        self.powersocket = {}
-        self.powersocket['modulator'] = 1
-        self.powersocket['calsource'] = 2
-        self.powersocket['lamp'] = 3
-        self.powersocket['amplifier'] = 4
-        self.powersocket['cf'] = 1
-        self.device_list = list(self.powersocket.keys())
-        
-
-        self.modulator_channel = {}
-        self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
-        self.modulator_channel['cf'] = 2
-        
-        self.valid_commands = {}
-        self.valid_commands['modulator'] = ['on','off',
-                                            'output',
-                                            'frequency',
-                                            'amplitude',
-                                            'offset',
-                                            'duty',
-                                            'shape',
-                                            'default']
-        self.valid_commands['cf'] = self.valid_commands['modulator']
-        
-        self.valid_commands['calsource'] = ['on','off','frequency','default']
-        self.valid_commands['amplifier'] = ['on','off',
-                                            'filter_mode',
-                                            'dynamic_range',
-                                            'gain',
-                                            'filter_low_frequency',
-                                            'filter_high_frequency',
-                                            'coupling',
-                                            'invert',
-                                            'default']
-        self.valid_commands['lamp' ]     = ['on','off']
 
         # time it takes for a device to register with the operating system
         # the Siglent signal generator requires 33 seconds !!!
@@ -151,7 +127,7 @@ class cf_configuration_manager():
         
         self.device = {} # the objects instantiated for each device
         self.device_on = {} # on/off state of each device
-        for dev in self.device_list:
+        for dev in device_list:
             self.device[dev] = None
             self.device_on[dev] = None
 
@@ -202,7 +178,7 @@ class cf_configuration_manager():
         # the returned command dictionary is a dictionary of dictionaries
         command = {}
         command['timestamp'] = {}
-        for dev in self.device_list:
+        for dev in device_list:
             command[dev] = {}
 
         command['all'] = {}
@@ -242,7 +218,7 @@ class cf_configuration_manager():
                 # if we forget to specify the device, use the most recent one
                 devcmd = cmd_lst[0]
 
-            if dev not in self.device_list:
+            if dev not in device_list:
                 continue
             
             if devcmd.find('=')>0:
@@ -393,7 +369,7 @@ class cf_configuration_manager():
 
         # get on/off status from Energenie powerbar
         ack = self.onoff()
-        for dev in self.device_list:
+        for dev in device_list:
             if self.device_on[dev] is not None:
                 if self.device_on[dev]:
                     msg += ' %s:ON' % dev
@@ -446,8 +422,9 @@ class cf_configuration_manager():
 
         # add None to modulator parameters that are to be set by default
         modulator_configure = False
-        for dev in ['modulator','cf']:
-            for parm in ['frequency','amplitude','shape','offset','duty','output','default']:
+        for dev in ['cf']:
+            for parm in valid_commands:
+                if parm=='on' or parm=='off': continue
                 if parm in command[dev].keys():
                     modulator_configure = True
                 else:
@@ -474,7 +451,7 @@ class cf_configuration_manager():
                 if command[dev][parm] == 'off':
                     state = False
                 if state is not None:
-                    states[self.powersocket[dev]] = state
+                    states[socketinfo[dev]] = state
                     msg += '%s:%s ' % (dev,command[dev][parm])
         if states:
             msg += 'energenie:%s ' % self.onoff(states)
@@ -485,7 +462,7 @@ class cf_configuration_manager():
             # initialize devices that need initializing
             already_waited = 0
             for dev in ['modulator','calsource','amplifier','cf']:
-                powersocket = self.powersocket[dev]
+                powersocket = socketinfo[dev]
                 if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
                     wait_time = self.wait_after_switch_on[dev] - already_waited
                     if wait_time > 0:
