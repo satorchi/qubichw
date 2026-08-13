@@ -13,9 +13,12 @@ Commands are sent to switch on/off and configure the signal generator
 
 This was originally the calsource_configuration_manager
 '''
-import socket,time,re,os,multiprocessing,sys
+import socket,time,re,os,sys
 import datetime as dt
 from copy import deepcopy
+import readline
+readline.parse_and_bind('tab: complete')
+readline.parse_and_bind('set editing-mode vi')
 
 # the Energenie powerbar
 #from PyMS import PMSDevice
@@ -37,7 +40,7 @@ known_hosts = get_known_hosts()
 
 class cf_configuration_manager():
 
-    def __init__(self,role=None, verbosity=0):
+    def __init__(self,role=None, verbosity=1):
         '''
         initialize the object.  The role can be either "commander" or "manager"
         The "manager" runs on the Raspberry Pi, and interfaces directly with the hardware
@@ -54,7 +57,7 @@ class cf_configuration_manager():
             
         return None
 
-    def log(self,msg,verbosity=0):
+    def log(self,msg,verbosity=1):
         '''
         log message to screen and to a file
         '''
@@ -281,7 +284,7 @@ class cf_configuration_manager():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.bind((self.receiver, self.broadcast_port))
 
-        self.log('listening on %s' % self.receiver)
+        self.log('listening on %s' % self.receiver,verbosity=1)
 
         now = utcnow()        
         try:
@@ -316,7 +319,7 @@ class cf_configuration_manager():
         s.bind((self.hostname, self.broadcast_port))
 
         now = utcnow()
-        self.log('waiting up to %.0f seconds for acknowledgement on %s' % (timeout,self.hostname))
+        self.log('waiting up to %.0f seconds for acknowledgement on %s' % (timeout,self.hostname),verbosity=1)
 
         try:
             ack, addr = s.recvfrom(self.nbytes)
@@ -325,12 +328,12 @@ class cf_configuration_manager():
             return None
         received_date = utcnow()
         received_tstamp = eval(received_date.strftime('%s.%f'))
-        self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)))
+        self.log('acknowledgement from %s at %s' % (addr,received_date.strftime(self.date_fmt)),verbosity=1)
         # clean up the acknowledgement
         ack_cleaned = []
         for line in ack.decode().strip().split():
             ack_cleaned.append(line.strip())
-        self.log('\n'.join(ack_cleaned))
+        self.log('\n'.join(ack_cleaned),verbosity=1)
         return received_tstamp, ack
     
 
@@ -637,7 +640,7 @@ class cf_configuration_manager():
         len_remain = self.nbytes - len_nowstr - 1
         fmt = '%%%is %%%is' % (len_nowstr,len_remain)
         msg = fmt % (now_str,cmd_str)
-        #self.log('sending socket data: %s' % msg)
+        self.log('sending socket data: %s' % msg,verbosity=2)
 
         s.sendto(msg.encode(), (self.receiver, self.broadcast_port))
         sockname = s.getsockname()
