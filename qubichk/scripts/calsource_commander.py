@@ -21,7 +21,6 @@ invoke with command line argument "manager" to run the "manager"
 import sys,re
 from qubichw.calsource_configuration_manager import calsource_configuration_manager, valid_commands
 
-valid_commands += ['status']
 verbosity = 1
 role = None
 cmd_list = []
@@ -39,12 +38,18 @@ for arg in sys.argv:
         continue
 
     # check if we just want to send commands and not enter the loop
+    if arg.lower()=='status':
+        role = 'bot'
+        cmd_list.append('status')
+        continue
+    
     for dev in valid_commands.keys():
         pattern = '.*%s...:' % dev
         match = re.search(pattern,arg)
         if match:
             role = 'bot'
             cmd_list.append(arg)
+            
 
 def cli():
     calsrc = calsource_configuration_manager(role=role, verbosity=verbosity)
