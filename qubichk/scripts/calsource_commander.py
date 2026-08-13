@@ -18,11 +18,12 @@ It has two components:
 by default, this script will run as the "commander"
 invoke with command line argument "manager" to run the "manager"
 '''
-import sys
-from qubichw.calsource_configuration_manager import calsource_configuration_manager
+import sys,re
+from qubichw.calsource_configuration_manager import calsource_configuration_manager, valid_commands
 
-verbosity = 0
+verbosity = 1
 role = None
+cmd_list = []
 for arg in sys.argv:
     if arg.lower() == 'manager':
         role = 'manager'
@@ -36,9 +37,20 @@ for arg in sys.argv:
         verbosity = eval(arg.split('=')[-1])
         continue
 
+    # check if we just want to send commands and not enter the loop
+    for dev in valid_commands.keys():
+        pattern = '.*%s...:' % dev
+        match = re.search(pattern,arg)
+        if match:
+            role = 'bot'
+            cmd_list.append(arg)
 
 def cli():
-    cli = calsource_configuration_manager(role=role, verbosity=verbosity)
+    calsrc = calsource_configuration_manager(role=role, verbosity=verbosity)
+    if len(cmd_list)==0: return
+    cmds = ' '.join(cmd_list)
+    calsrc.send_command(cmds)
+    ans = calsrc.listen_for_acknowledgement()
     return
 
 if __name__ == '__main__':
