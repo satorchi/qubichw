@@ -18,11 +18,12 @@ It has two components:
 by default, this script will run as the "commander"
 invoke with command line argument "manager" to run the "manager"
 '''
-import sys
-from qubichw.cf_configuration_manager import cf_configuration_manager
+import sys,re
+from qubichw.cf_configuration_manager import cf_configuration_manager, valid_commands
 
-verbosity = 0
+verbosity = 1
 role = None
+cmd_list = []
 for arg in sys.argv:
     if arg.lower() == 'manager':
         role = 'manager'
@@ -36,13 +37,27 @@ for arg in sys.argv:
         verbosity = eval(arg.split('=')[-1])
         continue
 
+    # check if we just want to send commands and not enter the loop
+    if arg.lower()=='status':
+        role = 'bot'
+        cmd_list.append('status')
+        continue
+    
+    for dev in valid_commands.keys():
+        pattern = '.*%s...:' % dev
+        match = re.search(pattern,arg)
+        if match:
+            role = 'bot'
+            cmd_list.append(arg)
+            
+
 def cli():
-    cli = cf_configuration_manager(role=role, verbosity=verbosity)
+    cf = cf_configuration_manager(role=role, verbosity=verbosity)
+    if len(cmd_list)==0: return
+    cmds = ' '.join(cmd_list)
+    cf.send_command(cmds)
+    ans = cf.listen_for_acknowledgement()
     return
 
 if __name__ == '__main__':
     cli()
-    
-
-
-    
