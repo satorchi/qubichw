@@ -21,6 +21,7 @@ invoke with command line argument "manager" to run the "manager"
 import sys,re
 from qubichw.calsource_configuration_manager import calsource_configuration_manager, valid_commands
 
+valid_commands += ['status']
 verbosity = 1
 role = None
 cmd_list = []
