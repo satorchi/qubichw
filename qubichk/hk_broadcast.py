@@ -473,12 +473,7 @@ class hk_broadcast :
             else:
                 eth = 'lo'
 
-            
-        cmd = '/sbin/ifconfig %s' % eth
-        out,err = shellcommand(cmd)
-        for line in out.split('\n'):
-            if line.find('inet ')>0: break
-        hostname = line.split()[1]
+        hostname = get_myip()
         self.log('server: hostname=%s' % hostname)
         self.log('server: receiver=%s' % self.RECEIVER)
         now = utcnow()
