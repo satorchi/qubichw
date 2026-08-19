@@ -456,23 +456,9 @@ class hk_broadcast :
         return local_counter
 
 
-    def hk_server(self,test=False,eth=None):
+    def hk_server(self,test=False):
         '''broadcast all housekeeping info
         '''
-
-        if eth is None:
-            cmd = '/sbin/ifconfig -a'
-            out,err = shellcommand(cmd)
-            devs = []
-            for line in out.split('\n'):
-                match = re.match('^(eth[0-9])',line)
-                if match:
-                   devs.append(match.groups()[0])
-            if devs:
-                eth = devs[-1]
-            else:
-                eth = 'lo'
-
         hostname = get_myip()
         self.log('server: hostname=%s' % hostname)
         self.log('server: receiver=%s' % self.RECEIVER)
