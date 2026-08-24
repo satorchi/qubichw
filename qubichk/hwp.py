@@ -249,7 +249,38 @@ def hwp_step_to_next_position(stepsize=10,direction=None,maxsteps=3720):
     return hwpinfo
 
 
+def hwp_goto_position(pos,fail_count=0):
+    '''
+    send the command to go to a position
+    send the command multiple times if necessary, and keep a count of the failures
+    '''
+    hwpinfo = get_hwp_info()
+    hwp_pos = hwpinfo['pos']
+    if not hwpinfo['ok']: fail_count += 1
+    if not hwpinfo['ok'] or hwp_pos==0:
+        printmsg('moving to position %i' % pos, 'HWP',logfile=logfile)
+        send_hwp_command('GOTO %i' % pos)
+        hwpinfo = hwp_wait_for_arrival(pos)
+        hwp_pos = hwpinfo['pos']
 
+    # check again
+    is_arrived = hwpinfo['ok'] and hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==pos
+    if not is_arrived:
+        fail_count += 1
+        send_hwp_command('GOTO %i' % hwp_pos)
+        hwpinfo = hwp_wait_for_arrival(hwp_pos)
+
+    # check if it's ok to use the HWP
+    if not hwpinfo['ok']:
+        fail_count += 1
+        errmsg = 'ERROR! %s.  Failure count: %i' % (hwpinfo['error_message'],fail_count)
+        printmsg(errmsg,'HWP',logfile=logfile)
+
+    hwpinfo['fail_count'] = fail_count
+    return hwpinfo
+
+
+    
         
 
     

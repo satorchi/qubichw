@@ -12,14 +12,21 @@ basic sequences for running observations
 '''
 import os
 from time import sleep
+import datetime as dt
+UTC = dt.timezone.utc
 from datetime import timedelta
 import numpy as np
 from satorchipy.datefunctions import utcnow, str2dt
+
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
 from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
 from qubichk.entropy_hk import entropy_hk
+
+from qubichk.hwp import hwp_goto_position
+
 from qubicpack.utilities import interpret_rawmask
+
 
 #####################################
 # defaults
@@ -653,7 +660,7 @@ def start_acquisition(self,title=None,comment=None):
     mount.disconnect()
    
     self.printmsg('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
-    return
+    return dataset_name
 
 def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True,PID=None):
     '''
@@ -672,9 +679,9 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     # pause a few seconds before starting acquisition
     self.printmsg('waiting 5 seconds to settle before starting acquisition')
     sleep(5)
-    ack = self.start_acquisition(title=title,comment=comment)
+    dataset_name = self.start_acquisition(title=title,comment=comment)
     
-    return
+    return dataset_name
 
 def end_observation(self):
     '''
@@ -735,7 +742,7 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     # setup and start the acquisition
     self.start_observation(Voffset,Tbath,dataset_name,comment)
 
-    # run the Sky Dip sequency from obsmount
+    # run the Sky Dip sequence from obsmount
     mount.do_skydip_sequence(azstep=azstep,azmin=azmin,azmax=azmax,elmin=elmin,elmax=elmax,velocity=velocity)
     mount.disconnect()
 
@@ -904,7 +911,127 @@ def get_frontend_settings(self,parameterList=None):
     return msg
 
 
+def do_scan(self,
+            title=None,Voffset=None,Tbath=None,new_observation=False,
+            el=None,
+            azmin=None,azmax=None,
+            tstart=None,tend=None,duration=None,
+            use_hwp=None,velocity=None,hwp_settle=None):
+    '''
+    do azimuth scanning
+
+    ARGUMENTS:
+        Voffset         : TES bias voltage
+        Tbath           : desired TES bath temperature
+        new_observation : reconfigure and restart FLL (default: False)
+        el              : elevation for the scan
+        azmin           : azimuth start position
+        azmax           : azimuth end position
+        tstart          : datetime object for start time (default is now)
+        tend            : datetime object for end time (default is defined by duration)
+        duration        : duration in seconds of the scan sequence
+        velocity        : scanning velocity (default is 1 degree per second)
+        use_hwp         : cycle the HWP position after every there-and-back scan (default: True)
+        hwp_settle      : settling time after HWP repositioning before continuing the scan (default: 0)
+        hwp_min_pos     : minimum position for HWP cycling (default: 1)
+        hwp_max_pos     : maximum position for HWP cycling (default: 6)
+    '''
     
-            
-              
+    #####################################
+    # initialization
+    mount_failure_counter = 0
+    max_fail = 100
+    mount = obsmount()
+
+    hwp_failure_counter = 0
+    
+    #####################################
+    # defaults    
+    if comment is None: comment = 'scan sequence sent by pystudio'
+    if title is None: title = 'scan'
+
+    ### pointing ###
+    if el is None: el = 50
+    if azmin is None: azmin = 155
+    if azmax is None: azmax = 205
+    if velocity is None:
+        velocity = 1
+    mount.set_az_speed(velocity)
+
+    ### HWP ###
+    if use_hwp is None: use_hwp = True
+    if hwp_min_pos is None: hwp_min_pos = 1
+    if hwp_max_pos is None: hwp_max_pos = 6
+    
+    ### scan start/end ###
+    if tstart is None:
+        start_time = utcnow()
+    else:
+        # correct for ambiguous timezone
+        start_time = tstart.replace(tzinfo=UTC)
+
+    if duration is None:
+        duration_delta = timedelta(days=30) # must end observation manually
+    else:
+        duration_delta = timedelta(seconds=duration)
+
+    if tend is None:
+        end_time = start_time + duration_delta
+    else:
+        end_time = tend.replace(tzinfo=UTC)
+
+
+    #####################################
+    # setup and start the acquisition
+    if new_observation:
+        # start a new observation, including reseting the FLL
+        dataset_name = self.start_observation(Voffset,Tbath,title,comment)
+    else:
+        # do not reset the FLL
+        # make sure there is no ongoing observation
+        ack = self.end_observation()
+        dataset_name = self.start_acquisition(title=title,comment=comment)
+    
+    if use_hwp:
+        hwp_increment = 1 # start by going in the positive direction
+
+        # get or move to HWP start position
+        hwpinfo = get_hwp_info()
+        hwp_pos = hwpinfo['pos']
+        if not hwpinfo['ok'] or hwp_pos==0:        
+            hwpinfo = hwp_goto_position(hwp_pos_min,fail_count=hwp_failure_count)
+            hwp_failure_count = hwpinfo['fail_count']
         
+    now = utcnow()
+    while now<end_time:
+
+        ack = mount.do_azimuth_scan(azmin,azmax)
+
+        # go to next HWP position
+        if use_hwp:
+            hwp_pos += hwp_increment
+            if hwp_pos>hwp_pos_max:
+                hwp_increment *= -1
+                hwp_pos = hwp_pos_max - 1
+            if  hwp_pos<hwp_pos_min:
+                hwp_increment *= -1
+                hwp_pos = hwp_pos_min + 1
+                
+            printmsg('going to position %i' % hwp_pos, 'HWP',logfile=logfile)
+            hwpinfo = hwp_goto_position(hwp_pos,fail_count=hwp_failure_counter)
+            hwp_failure_counter = hwpinfo['fail_count']
+            if hwp_failure_counter > 9: use_hwp = False
+
+            if hwp_settle is not None and hwp_settle>0:
+                printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle,'SCAN',logfile=logfile)
+                sleep(hwp_settle)
+            
+        # check the time
+        now = utcnow()
+        
+    # stop the acquisition
+    ack = self.end_observation()
+    self.printmsg('%s - Scan completed for %s' % utcnow().strftime('%Y-%m-%d %H:%M:%S'),dataset_name)
+
+    return True
+    
