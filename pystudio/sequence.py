@@ -932,7 +932,7 @@ def do_scan(self,
         Tbath           : desired TES bath temperature
         new_observation : reconfigure and restart FLL (default: False)
         new_acquisition : start a new acquisition (default: False)
-        end_observation : end observation after this scan (default: False)
+        end_acquisition : end acquisition after this scan (default: False)
         el              : elevation for the scan
         azmin           : azimuth start position
         azmax           : azimuth end position
