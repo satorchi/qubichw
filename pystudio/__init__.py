@@ -203,6 +203,7 @@ class pystudio:
         set_observation_mode,\
         start_acquisition,\
         start_observation,\
+        end_acquisition,\
         end_observation,\
         park_frontend,\
         do_skydip,\
@@ -210,7 +211,8 @@ class pystudio:
         get_frontend_parameter,\
         get_spol,\
         get_PID,\
-        get_frontend_settings
+        get_frontend_settings,\
+        do_scan
 
     from .tparameterstable import assign_parameterstable
 

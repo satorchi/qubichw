@@ -683,17 +683,24 @@ def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=T
     
     return dataset_name
 
+def end_acquisition(self):
+    '''
+    stop acquisition but don't change frontend settings
+    '''
+    ack = self.send_stopAcquisition()
+    # stop Az/El acquisition
+    mount = obsmount()
+    ans = mount.send_request_to_rebroadcaster('STOP DUMP')
+    self.printmsg('%s - acquisition ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    return
+    
+
 def end_observation(self):
     '''
     stop acquisition and stop regulations
     '''
-    ack = self.send_stopAcquisition()
+    ack = self.end_acquisition()
     ack = self.send_stopFLL()
-    # stop Az/El acquisition
-    mount = obsmount()
-    ans = mount.send_request_to_rebroadcaster('STOP DUMP')
-    # mount.stop() # do not send stop.  This is maybe causing problems (to be confirmed: 2026-04-03 11:53:38)
-    mount.disconnect()
     self.printmsg('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
@@ -912,9 +919,9 @@ def get_frontend_settings(self,parameterList=None):
 
 
 def do_scan(self,
-            title=None,Voffset=None,Tbath=None,new_observation=False,
-            el=None,
-            azmin=None,azmax=None,
+            title=None,Voffset=None,Tbath=None,
+            new_observation=False,new_acquisition=False,end_acquisition=False,
+            el=None,azmin=None,azmax=None,
             tstart=None,tend=None,duration=None,
             use_hwp=None,velocity=None,hwp_settle=None):
     '''
@@ -924,6 +931,8 @@ def do_scan(self,
         Voffset         : TES bias voltage
         Tbath           : desired TES bath temperature
         new_observation : reconfigure and restart FLL (default: False)
+        new_acquisition : start a new acquisition (default: False)
+        end_observation : end observation after this scan (default: False)
         el              : elevation for the scan
         azmin           : azimuth start position
         azmax           : azimuth end position
@@ -986,10 +995,10 @@ def do_scan(self,
     if new_observation:
         # start a new observation, including reseting the FLL
         dataset_name = self.start_observation(Voffset,Tbath,title,comment)
-    else:
+    elif new_acquisition:
         # do not reset the FLL
         # make sure there is no ongoing observation
-        ack = self.end_observation()
+        ack = self.end_acquisition()
         dataset_name = self.start_acquisition(title=title,comment=comment)
     
     if use_hwp:
@@ -1017,7 +1026,6 @@ def do_scan(self,
                 hwp_increment *= -1
                 hwp_pos = hwp_pos_min + 1
                 
-            printmsg('going to position %i' % hwp_pos, 'HWP',logfile=logfile)
             hwpinfo = hwp_goto_position(hwp_pos,fail_count=hwp_failure_counter)
             hwp_failure_counter = hwpinfo['fail_count']
             if hwp_failure_counter > 9: use_hwp = False
@@ -1029,9 +1037,10 @@ def do_scan(self,
         # check the time
         now = utcnow()
         
+    self.printmsg('%s - Scan completed for elevation %.1f' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),el))
     # stop the acquisition
-    ack = self.end_observation()
-    self.printmsg('%s - Scan completed for %s' % utcnow().strftime('%Y-%m-%d %H:%M:%S'),dataset_name)
+    if end_acquisition:
+        ack = self.end_acquisition()
 
     return True
     

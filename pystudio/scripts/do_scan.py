@@ -31,6 +31,8 @@ from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
 parameterList = ['new_observation',
+                 'new_acquisition',
+                 'end_observation',
                  'el',
                  'azmin',
                  'azmax',
@@ -54,6 +56,8 @@ def cli():
 
     dispatcher.do_scan(title=options['title'],Voffset=options['Voffset'],Tbath=options['Tbath'],
                        new_observation=options['new_observation'],
+                       new_acquisition=options['new_acquisition'],
+                       end_observation=options['end_observation'],
                        el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
                        tstart=options['tstart'],tend=options['tend'],duration=options['duration'],
                        use_hwp=options['use_hwp'],hwp_pos_min=options['hwp_pos_min'],hwp_pos_max=options['hwp_pos_max'],
