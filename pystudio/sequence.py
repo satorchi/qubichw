@@ -921,9 +921,9 @@ def get_frontend_settings(self,parameterList=None):
 def do_scan(self,
             title=None,Voffset=None,Tbath=None,
             new_observation=False,new_acquisition=False,end_acquisition=False,
-            el=None,azmin=None,azmax=None,
+            el=None,azmin=None,azmax=None,velocity=None,
             tstart=None,tend=None,duration=None,
-            use_hwp=None,velocity=None,hwp_settle=None):
+            use_hwp=None,hwp_pos_min=None,hwp_pos_max=None,hwp_settle=None):
     '''
     do azimuth scanning
 
@@ -942,8 +942,8 @@ def do_scan(self,
         velocity        : scanning velocity (default is 1 degree per second)
         use_hwp         : cycle the HWP position after every there-and-back scan (default: True)
         hwp_settle      : settling time after HWP repositioning before continuing the scan (default: 0)
-        hwp_min_pos     : minimum position for HWP cycling (default: 1)
-        hwp_max_pos     : maximum position for HWP cycling (default: 6)
+        hwp_pos_min     : minimum position for HWP cycling (default: 1)
+        hwp_pos_max     : maximum position for HWP cycling (default: 6)
     '''
     
     #####################################
@@ -969,8 +969,8 @@ def do_scan(self,
 
     ### HWP ###
     if use_hwp is None: use_hwp = True
-    if hwp_min_pos is None: hwp_min_pos = 1
-    if hwp_max_pos is None: hwp_max_pos = 6
+    if hwp_pos_min is None: hwp_pos_min = 1
+    if hwp_pos_max is None: hwp_pos_max = 6
     
     ### scan start/end ###
     if tstart is None:
