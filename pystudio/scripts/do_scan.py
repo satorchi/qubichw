@@ -27,6 +27,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
         hwp_min_pos     : minimum position for HWP cycling (default: 1)
         hwp_max_pos     : maximum position for HWP cycling (default: 6)
 '''
+import sys
 from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
