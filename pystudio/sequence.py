@@ -23,7 +23,7 @@ from qubichk.obsmount import obsmount
 from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
 from qubichk.entropy_hk import entropy_hk
 
-from qubichk.hwp import hwp_goto_position
+from qubichk.hwp import hwp_goto_position, get_hwp_info
 
 from qubicpack.utilities import interpret_rawmask
 
