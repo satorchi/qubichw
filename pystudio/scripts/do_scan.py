@@ -33,7 +33,7 @@ from pystudio import pystudio
 
 parameterList = ['new_observation',
                  'new_acquisition',
-                 'end_acqusition',
+                 'end_acquisition',
                  'el',
                  'azmin',
                  'azmax',
