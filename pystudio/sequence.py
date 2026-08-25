@@ -919,7 +919,7 @@ def get_frontend_settings(self,parameterList=None):
 
 
 def do_scan(self,
-            title=None,Voffset=None,Tbath=None,
+            title=None,Voffset=None,Tbath=None,comment=None,
             new_observation=False,new_acquisition=False,end_acquisition=False,
             el=None,azmin=None,azmax=None,velocity=None,
             tstart=None,tend=None,duration=None,
