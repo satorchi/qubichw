@@ -267,8 +267,8 @@ def hwp_goto_position(pos,fail_count=0):
     is_arrived = hwpinfo['ok'] and hwpinfo['dir']=='STOPPED' and hwpinfo['pos']==pos
     if not is_arrived:
         fail_count += 1
-        send_hwp_command('GOTO %i' % hwp_pos)
-        hwpinfo = hwp_wait_for_arrival(hwp_pos)
+        send_hwp_command('GOTO %i' % pos)
+        hwpinfo = hwp_wait_for_arrival(pos)
 
     # check if it's ok to use the HWP
     if not hwpinfo['ok']:
