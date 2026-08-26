@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 get/save the calibration info from the calsource box and from the carbon fibre
 '''
 from qubichw.calsource_configuration_manager import calsource_configuration_manager
-from qubichw.cf_configuration_manager import cf_configuration_manager
+#from qubichw.cf_configuration_manager import cf_configuration_manager
 
 def save_calsource_info(dump_dir):
     '''
