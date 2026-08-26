@@ -1026,15 +1026,15 @@ class obsmount:
             if not azel['ok']:
                 fail_count += 1
                 errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees\n%s' % (azlimit,azel['error'])
-                printmsg(errmsg,'obsmount',logfile=logfile)
-                printmsg('Azimuth scan trying to send command again','obsmount',logfile=logfile)
+                self.printmsg(errmsg,threshold=0)
+                self.printmsg('Azimuth scan trying to send command again',threshold=0)
                 ack = self.goto_az(azlimit)
                 azel = self.wait_for_arrival(az=azlimit)
 
                 if not azel['ok']:
                     fail_count += 1
                     errmsg += ' after two attempts to send command.  Trying a reset.'
-                    printmsg(errmsg,'obsmount',logfile=logfile)
+                    self.printmsg(errmsg,threshold=0)
                     ack = self.reset()
                     sleep(0.5)
                     ack = self.goto_az(azlimit)
