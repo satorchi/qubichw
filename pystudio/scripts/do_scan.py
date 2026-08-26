@@ -14,7 +14,10 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
     ARGUMENTS:
         Voffset         : TES bias voltage
         Tbath           : desired TES bath temperature
-        new_observation : reconfigure and restart FLL (default: False)
+        new_observation : reconfigure and restart FLL, and start new acquisition (default: False)
+        reset_fll       : same as option new_observation
+        new_acquisition : start a new acquisition (default: False)
+        end_acquisition : end acquisition after this scan (default: False)
         el              : elevation for the scan
         azmin           : azimuth start position
         azmax           : azimuth end position
@@ -32,6 +35,7 @@ from satorchipy.utilities import parseargs
 from pystudio import pystudio
 
 parameterList = ['new_observation',
+                 'reset_fll',
                  'new_acquisition',
                  'end_acquisition',
                  'el',
@@ -57,6 +61,7 @@ def cli():
 
     dispatcher.do_scan(title=options['title'],Voffset=options['Voffset'],Tbath=options['Tbath'],
                        new_observation=options['new_observation'],
+                       reset_fll=options['reset_fll'],
                        new_acquisition=options['new_acquisition'],
                        end_acquisition=options['end_acquisition'],
                        el=options['el'],azmin=options['azmin'],azmax=options['azmax'],

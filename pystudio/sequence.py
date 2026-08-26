@@ -920,7 +920,7 @@ def get_frontend_settings(self,parameterList=None):
 
 def do_scan(self,
             title=None,Voffset=None,Tbath=None,comment=None,
-            new_observation=False,new_acquisition=False,end_acquisition=False,
+            new_observation=False,reset_fll=False,new_acquisition=False,end_acquisition=False,
             el=None,azmin=None,azmax=None,velocity=None,
             tstart=None,tend=None,duration=None,
             use_hwp=None,hwp_pos_min=None,hwp_pos_max=None,hwp_settle=None):
@@ -930,7 +930,8 @@ def do_scan(self,
     ARGUMENTS:
         Voffset         : TES bias voltage
         Tbath           : desired TES bath temperature
-        new_observation : reconfigure and restart FLL (default: False)
+        new_observation : reconfigure and restart FLL, and start new acquisition (default: False)
+        reset_fll       : same as option new_observation
         new_acquisition : start a new acquisition (default: False)
         end_acquisition : end acquisition after this scan (default: False)
         el              : elevation for the scan
@@ -955,7 +956,12 @@ def do_scan(self,
     hwp_failure_counter = 0
     
     #####################################
-    # defaults    
+    # defaults
+
+    ### fll_reset is an alias for new_observation
+    new_observation = new_observation or fll_reset
+
+    ### title and comment ###
     if comment is None: comment = 'scan sequence sent by pystudio'
     if title is None: title = 'scan'
 
