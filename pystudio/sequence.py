@@ -16,15 +16,16 @@ import datetime as dt
 UTC = dt.timezone.utc
 from datetime import timedelta
 import numpy as np
+from threading import Thread
+
 from satorchipy.datefunctions import utcnow, str2dt
 
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
 from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
 from qubichk.entropy_hk import entropy_hk
-
 from qubichk.hwp import hwp_goto_position, get_hwp_info
-
+from qubichw.calinfo import save_calsource_info
 from qubicpack.utilities import interpret_rawmask
 
 
@@ -959,7 +960,7 @@ def do_scan(self,
     # defaults
 
     ### fll_reset is an alias for new_observation
-    new_observation = new_observation or fll_reset
+    new_observation = new_observation or reset_fll
 
     ### title and comment ###
     if comment is None: comment = 'scan sequence sent by pystudio'
