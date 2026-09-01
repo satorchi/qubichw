@@ -27,18 +27,12 @@ from satorchipy.datefunctions import utcnow
 from qubichw.energenie import energenie, socketinfo
 from qubichk.utilities import shellcommand
 
-# the low noise amplifier
-from qubichw.amplifier import amplifier
-
-# the signal generator for modulating the calibration source
-#from qubichw.modulator import modulator
-#from qubichw.modulator_tg5012a import tg5012 as modulator
+# the signal generator for modulating the carbon fibre
 from qubichw.modulator_siglent import siglent as modulator
 from qubichk.utilities import get_known_hosts, get_myip
 known_hosts = get_known_hosts()
 
 # the device list is the list of devices plugged into the Energenie powerbar
-modulator_channel['cf'] = socketinfo['cf']['modulator']
 valid_commands = {}
 valid_commands['cf'] = ['on','off',
                         'output',
@@ -93,8 +87,8 @@ class cf_configuration_manager():
         txt += 'except for the following commands which are independent of device: help, status, on, off, save\n\n'
         txt += 'valid devices: %s\n' % device_list_str
         for dev in device_list:
-            valid_commands = ', '.join(self.valid_commands[dev])
-            txt += 'valid commands for %s: %s\n' % (dev,valid_commands)
+            dev_valid_commands = ', '.join(valid_commands[dev])
+            txt += 'valid commands for %s: %s\n' % (dev,dev_valid_commands)
         txt += '\nFor the modulator, frequency is given in Hz\n'
         txt += '\nExample:\n'
         txt += 'cf:on cf:frequency=0.333 cf:duty=33 cf:shape=squ\n'
@@ -110,6 +104,9 @@ class cf_configuration_manager():
 
         self.date_fmt = '%Y-%m-%d %H:%M:%S.%f'
 
+        self.modulator_channel = {}
+        self.modulator_channel['modulator'] = 1 # this is called "modulator" for backwards compatibility
+        self.modulator_channel['cf'] = 2
 
         # time it takes for a device to register with the operating system
         # the Siglent signal generator requires 33 seconds !!!
@@ -226,7 +223,7 @@ class cf_configuration_manager():
                 parm = devcmd_lst[0]
                 val = devcmd_lst[1]
 
-                if parm not in self.valid_commands[dev]:
+                if parm not in valid_commands[dev]:
                     continue
                 
                 try:
@@ -240,12 +237,12 @@ class cf_configuration_manager():
                 if devcmd=='on' or devcmd=='off':
                     parm = 'onoff'
                     val = devcmd
-                    if devcmd not in self.valid_commands[dev]:
+                    if devcmd not in valid_commands[dev]:
                         continue
                 else:
                     parm = devcmd
                     val = True
-                    if parm not in self.valid_commands[dev]:
+                    if parm not in valid_commands[dev]:
                         continue
                 command[dev][parm] = val
         return command
@@ -378,19 +375,7 @@ class cf_configuration_manager():
             else:
                 msg += ' %s:UNKNOWN' % dev
 
-        dev = 'amplifier'
-        if (self.device_on[dev] is None or self.device_on[dev]) and self.device[dev].is_connected():
-            msg += ' '+self.device[dev].status()
-            
-        dev = 'calsource'
-        if self.device_on[dev]:
-            if self.device[dev].state is not None:
-                msg += ' %s:frequency=%+06fGHz' % (dev,self.device[dev].state['frequency'])
-                msg += ' synthesiser:frequency=%+06fGHz' % self.device[dev].state['synthesiser_frequency']
-            else:
-                msg += ' %s:frequency=UNKNOWN' % dev
-                msg += ' synthesiser:frequency=UNKNOWN'
-            
+          
         dev = 'modulator'
         if self.device_on[dev] and not self.device[dev].is_connected():
             self.log('%s is ON, but not responding.  Trying to reinitialize.' % dev)
@@ -461,7 +446,7 @@ class cf_configuration_manager():
 
             # initialize devices that need initializing
             already_waited = 0
-            for dev in ['modulator','calsource','amplifier','cf']:
+            for dev in self.wait_after_switch_on.keys():
                 powersocket = socketinfo[dev]
                 if powersocket in states.keys() and states[powersocket] and device_was_off[dev]:
                     wait_time = self.wait_after_switch_on[dev] - already_waited
