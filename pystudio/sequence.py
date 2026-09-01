@@ -1000,9 +1000,18 @@ def do_scan(self,
     else:
         end_time = tend.replace(tzinfo=UTC)
 
+    #####################################
+    ## wait for start time if necessary #
+    now = utcnow()
+    if now<start_time:
+        wait_delta = start_time - now
+        wait_before_start = wait_delta.total_seconds()
+        printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start),'SCAN',logfile=logfile)
+        sleep(wait_before_start)
+        
 
     #####################################
-    # setup and start the acquisition
+    # setup and start the acquisition ###
     if new_observation:
         # start a new observation, including reseting the FLL
         dataset_name = self.start_observation(Voffset,Tbath,title,comment)
