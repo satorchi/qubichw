@@ -709,6 +709,10 @@ def park_frontend(self):
     '''
     set the frontend into "parking" mode
     '''
+
+    # stop a running acquisition
+    ack = self.end_acquisition()
+
     asicNum = default_setting['asicNum']
     # stop all regulations
     ack = self.send_stopFLL(asicNum)
