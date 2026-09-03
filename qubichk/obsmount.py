@@ -1002,7 +1002,7 @@ class obsmount:
 
     def do_azimuth_scan(self,azmin,azmax):
         '''
-        to one there-and-back scan in azimuth
+        do one there-and-back scan in azimuth
         '''
         fail_count = 0
         for azlimit in [azmax, azmin]:
