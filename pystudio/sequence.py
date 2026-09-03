@@ -1051,7 +1051,7 @@ def do_scan(self,
             if hwp_failure_counter > 9: use_hwp = False
 
             if hwp_settle is not None and hwp_settle>0:
-                printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle,'SCAN',logfile=logfile)
+                self.printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle,'SCAN',logfile=logfile)
                 sleep(hwp_settle)
             
         # check the time
