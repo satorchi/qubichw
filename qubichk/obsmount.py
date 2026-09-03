@@ -1000,11 +1000,10 @@ class obsmount:
         azel['fail_count'] = fail_count        
         return azel
 
-    def do_azimuth_scan(self,azmin,azmax):
+    def do_azimuth_scan(self,azmin,azmax,fail_count=0):
         '''
         do one there-and-back scan in azimuth
         '''
-        fail_count = 0
         for azlimit in [azmax, azmin]:
             ack = self.goto_az(azlimit)
 
@@ -1046,6 +1045,8 @@ class obsmount:
                         azel['error'] = errmsg
 
         azel['fail_count'] = fail_count
+        if not azel['ok']:
+            self.printmsg('ERROR! Fail count %i' % (fail_count))
         return azel
 
 
