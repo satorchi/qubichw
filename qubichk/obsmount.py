@@ -855,8 +855,9 @@ class obsmount:
             sleep(2)
             now = utcnow().timestamp()
             azel = self.get_azel()
-            if (now-tstart)>maxwait:
-                errmsg = 'Could not get AZ,EL position after having retried for %.0f seconds' % maxwait
+            time_passed = now - tstart
+            if time_passed>maxwait:
+                errmsg = 'Could not get AZ,EL position after having retried for %.1f seconds' % time_passed
                 azel['error'] = errmsg
                 return self.return_with_error(azel)
         
