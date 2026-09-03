@@ -20,6 +20,8 @@ from threading import Thread
 
 from satorchipy.datefunctions import utcnow, str2dt
 
+from .utilities import wait_for_start_time
+
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
 from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
@@ -1002,13 +1004,7 @@ def do_scan(self,
 
     #####################################
     ## wait for start time if necessary #
-    now = utcnow()
-    if now<start_time:
-        wait_delta = start_time - now
-        wait_before_start = wait_delta.total_seconds()
-        printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start),'SCAN',logfile=logfile)
-        sleep(wait_before_start)
-        
+    wait_for_start_time(start_time)
 
     #####################################
     # setup and start the acquisition ###
@@ -1030,11 +1026,14 @@ def do_scan(self,
         if not hwpinfo['ok'] or hwp_pos==0:        
             hwpinfo = hwp_goto_position(hwp_pos_min,fail_count=hwp_failure_count)
             hwp_failure_count = hwpinfo['fail_count']
-        
+
+    mount_failure_count = 0
     now = utcnow()
     while now<end_time:
 
-        ack = mount.do_azimuth_scan(azmin,azmax)
+        azel = mount.do_azimuth_scan(azmin,azmax,fail_count=mount_failure_count)
+        mount_failure_count = azel['fail_count']
+        
 
         # go to next HWP position
         if use_hwp:
