@@ -35,6 +35,7 @@ from datetime import timedelta
 from satorchipy.utilities import parseargs
 from satorchipy.datefunctions import utcnow
 from pystudio import pystudio
+from pystudio.utilities import wait_for_start_time
 from qubichk.obsmount import obsmount
 from qubichk.hwp import get_hwp_info, send_hwp_command, hwp_wait_for_arrival
 from qubichk.utilities import printmsg, assign_logfile
@@ -55,7 +56,6 @@ parameterList = ['elmin',
                  'hwp_position'
                  ]
 options = parseargs(sys.argv,expected_args=parameterList)
-datefmt = '%Y-%m-%d %H:%M:%S'
 
     
 Tbath_precision = 0.0005
@@ -231,12 +231,7 @@ def cli():
 
 
     #### wait for start time if necessary ####
-    now = utcnow()
-    if now<start_time:
-        wait_delta = start_time - now
-        wait_before_start = wait_delta.total_seconds()
-        printmsg('waiting until %s (%i seconds)' % (start_time.strftime(datefmt),wait_before_start),'SCAN',logfile=logfile)
-        sleep(wait_before_start)
+    wait_for_start_time(start_time)
     
     #####################################
     # setup and start the acquisition
