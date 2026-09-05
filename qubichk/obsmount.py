@@ -875,7 +875,7 @@ class obsmount:
             now = utcnow().timestamp()
             wait_time = now-tstart
             if wait_time>maxwait:
-                errmsg = 'Exiting after maximum wait time: %.0f seconds' % maxwait
+                errmsg = 'Exiting after %1f seconds which is greater than the maximum wait time of %.0f seconds' % (wait_time,maxwait)
                 errmsg += ' current value: %s = %.3f degrees' % (key,val)
                 errmsg_list.append(errmsg)
                 azel['error'] = '\n'.join(errmsg_list)
