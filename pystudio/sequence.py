@@ -1007,6 +1007,20 @@ def do_scan(self,
     wait_for_start_time(start_time)
 
     #####################################
+    ## go to desired elevation
+    ack = mount.goto_el(el)
+    if not ack['ok']:
+        mount_failure_counter += 1
+        self.printmsg('Scan unable to send elevation command to observation mount. Trying again')
+        sleep(5)
+        ack = mount.goto_el(el)
+    
+    azel = mount.wait_for_arrival(el=el)
+    if not azel['ok']:
+        mount_failure_counter += 1
+        self.printmsg('Did not successfully get to elevation position: %.3f degrees.' % el)
+
+    #####################################
     # setup and start the acquisition ###
     if new_observation:
         # start a new observation, including reseting the FLL
@@ -1024,15 +1038,14 @@ def do_scan(self,
         hwpinfo = get_hwp_info()
         hwp_pos = hwpinfo['pos']
         if not hwpinfo['ok'] or hwp_pos==0:        
-            hwpinfo = hwp_goto_position(hwp_pos_min,fail_count=hwp_failure_count)
-            hwp_failure_count = hwpinfo['fail_count']
+            hwpinfo = hwp_goto_position(hwp_pos_min,fail_count=hwp_failure_counter)
+            hwp_failure_counter = hwpinfo['fail_count']
 
-    mount_failure_count = 0
     now = utcnow()
     while now<end_time:
 
-        azel = mount.do_azimuth_scan(azmin,azmax,fail_count=mount_failure_count)
-        mount_failure_count = azel['fail_count']
+        azel = mount.do_azimuth_scan(azmin,azmax,fail_count=mount_failure_counter)
+        mount_failure_counter = azel['fail_count']
         
 
         # go to next HWP position
@@ -1050,7 +1063,7 @@ def do_scan(self,
             if hwp_failure_counter > 9: use_hwp = False
 
             if hwp_settle is not None and hwp_settle>0:
-                self.printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle,'SCAN',logfile=logfile)
+                self.printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle)
                 sleep(hwp_settle)
             
         # check the time
