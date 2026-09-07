@@ -442,22 +442,22 @@ class redpitaya:
         
     def set_output_load(self,load=None,ch=1):
         '''
-        set the output load: Hi-Z or L50 (high impedence or 50 Ohm)
+        set the output load: INF or L50 (high impedence or 50 Ohm)
         '''
         if load is None: load = self.default_setting['load']
-        if load.find('50'): load = 'L50'
-        if load.upper().find('H'): load = 'INF'
-        cmd = 'ACQ:SOUR%1i:LOAD %s' % (ch,load.upper())
+        if load.find('50')>=0: load = 'L50'
+        if load.upper().find('H')>=0 or load.upper().find('INF')>=0: load = 'INF'
+        cmd = 'SOUR%1i:LOAD %s' % (ch,load.upper())
         return self.send_command(cmd)
 
     def get_output_load(self,ch=1):
         '''
         get the output load: Hi-Z or L50 (high impedence or 50 Ohm)
         '''
-        cmd = 'ACQ:SOUR%1i:LOAD?' % ch
+        cmd = 'SOUR%1i:LOAD?' % ch
         load = self.get_info(cmd,is_string=True)
         self.current_setting[ch]['load'] = load
-        return gain
+        return load
         
     def set_default_settings(self,channel=None):
         '''
@@ -478,6 +478,7 @@ class redpitaya:
         self.set_acquisition_units(self.default_setting['acquisition_units'])
         self.set_decimation(self.default_setting['decimation'])
         self.set_input_coupling(self.default_setting['coupling'],channel)
+        self.set_output_load(self.default_settings['load'],channel)
 
         # do not switch on the output by default
         # self.set_output_on(ch)
@@ -499,7 +500,8 @@ class redpitaya:
                   acquisition_units=None,
                   decimation=None,
                   coupling=None,
-                  output=None):
+                  output=None,
+                  load=None):
         '''
         configure the settings for a given output channel
         '''
@@ -543,6 +545,9 @@ class redpitaya:
                 self.set_output_off(channel)
             else:
                 self.log('ERROR! Invalid command: %s' % str(output))
+
+        if load is not None:
+            self.set_output_load(load)
 
         if not self.connection_status:
             self.log('ERROR! configure: Problem setting parameters')
