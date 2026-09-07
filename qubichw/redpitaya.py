@@ -576,6 +576,7 @@ class redpitaya:
             ans = self.get_input_gain(ch)
             ans = self.get_output_state(ch)
             ans = self.get_input_coupling(ch)
+            ans = self.get_output_load(ch)
 
             if 'frequency' not in self.current_setting[ch].keys():
                 self.current_setting[ch]['frequency'] = self.get_frequency(ch)
