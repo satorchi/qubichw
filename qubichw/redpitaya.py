@@ -83,6 +83,7 @@ class redpitaya:
         self.log('creating new object',verbosity=2)
 
         self.connection_status = False
+        self.ip = None
         self.init(ip)
 
         return None
@@ -113,10 +114,11 @@ class redpitaya:
             return False
         return True        
 
-    def init(self,ip=None):
+    def init_socket(self,ip=None):
         '''
         connect to the RedPitaya
         '''
+        if ip is None: ip = self.ip
         if ip is None: ip = '192.168.2.21'
         self.ip = ip
         port    = 5000
@@ -133,16 +135,24 @@ class redpitaya:
             msg = make_errmsg('ERROR! Failed to connect to RedPitaya')
             self.log(msg,verbosity=1)
             self.connection_status = False
-            return False        
+            return False
+        return None
 
+    def init(self,ip=None):
+        self.init_socket(ip)
         self.set_decimation(self.default_setting['decimation'])
         self.get_buffer_size()
         return None
+
+    
 
     def send_command(self,cmd):
         '''
         send a command to the RedPitaya
         '''
+        if not self.is_connected(): ans = self.init_socket()
+        if not self.is_connected(): return None
+        
         self.log('sending command: %s' % cmd,verbosity=1)
         cmd_str = cmd + '\r\n'
         cmd_encode = cmd_str.encode()
@@ -160,6 +170,10 @@ class redpitaya:
         '''
         get the result of an inquiry command
         '''
+        if not self.is_connected(): ans = self.init_socket()
+        if not self.is_connected(): return None
+
+        
         if chunksize is None:
             chunksize = self.default_setting['chunksize']
         try:
