@@ -28,6 +28,7 @@ default_setting['decimation'] = 65536
 default_setting['coupling'] = 'DC'
 default_setting['channel'] = 1
 default_setting['output'] = 'OFF'
+default_setting['load'] = 'L50'
 # number of bytes to receive by default (but not for acquisition)
 default_setting['chunksize'] = 4096
 default_setting['acquisition_chunksize'] = 2**32
@@ -46,6 +47,7 @@ setting_fmt['decimation'] = '%i'
 setting_fmt['coupling'] = '%s'
 setting_fmt['channel'] = '%1i'
 setting_fmt['output'] = '%s'
+setting_fmt['load'] = '%s'
 setting_fmt['chunksize'] = '%i' 
 setting_fmt['response_delay'] = '%.2f'
 setting_fmt['buffer size'] = '%i'
@@ -438,6 +440,24 @@ class redpitaya:
         self.current_setting[ch]['coupling'] = coupling
         return coupling
         
+    def set_output_load(self,load=None,ch=1):
+        '''
+        set the output load: Hi-Z or L50 (high impedence or 50 Ohm)
+        '''
+        if load is None: load = self.default_setting['load']
+        if load.find('50'): load = 'L50'
+        if load.upper().find('H'): load = 'INF'
+        cmd = 'ACQ:SOUR%1i:LOAD %s' % (ch,load.upper())
+        return self.send_command(cmd)
+
+    def get_output_load(self,ch=1):
+        '''
+        get the output load: Hi-Z or L50 (high impedence or 50 Ohm)
+        '''
+        cmd = 'ACQ:SOUR%1i:LOAD?' % ch
+        load = self.get_info(cmd,is_string=True)
+        self.current_setting[ch]['load'] = load
+        return gain
         
     def set_default_settings(self,channel=None):
         '''
