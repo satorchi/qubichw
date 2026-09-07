@@ -155,8 +155,8 @@ class redpitaya:
         '''
         send a command to the RedPitaya
         '''
-        #if not self.is_connected(): ans = self.init_socket()
-        if not self.is_connected(): return None
+        if not self.connection_status: ans = self.init_socket()
+        if not self.connection_status: return None
         
         self.log('sending command: %s' % cmd,verbosity=1)
         cmd_str = cmd + '\r\n'
@@ -175,9 +175,8 @@ class redpitaya:
         '''
         get the result of an inquiry command
         '''
-        #if not self.is_connected(): ans = self.init_socket()
-        if not self.is_connected(): return None
-
+        if not self.connection_status: ans = self.init_socket()
+        if not self.connection_status: return None
         
         if chunksize is None:
             chunksize = self.default_setting['chunksize']
