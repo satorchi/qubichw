@@ -136,10 +136,15 @@ class redpitaya:
             self.log(msg,verbosity=1)
             self.connection_status = False
             return False
-        return None
+        return True
 
     def init(self,ip=None):
-        self.init_socket(ip)
+        '''
+        init the socket and set decimation
+        '''
+        is_sockinit = self.init_socket(ip)
+        if not is_sockinit: return None
+        
         self.set_decimation(self.default_setting['decimation'])
         self.get_buffer_size()
         return None
