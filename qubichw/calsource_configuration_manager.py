@@ -159,7 +159,7 @@ class calsource_configuration_manager():
                 role = 'commander'
         self.role = role
                 
-        self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role))
+        self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role),verbosity=1)
         
         if self.role=='manager':
             self.log('creating hardware modules',verbosity=2)

@@ -63,7 +63,7 @@ class cf_configuration_manager():
             
         return None
 
-    def log(self,msg,verbosity=1):
+    def log(self,msg,verbosity=0):
         '''
         log message to screen and to a file
         '''
@@ -158,7 +158,7 @@ class cf_configuration_manager():
         self.role = role
                 
         if role=='manager':
-            self.log('I am the carbon fibre configuration manager')
+            self.log('I am the carbon fibre configuration manager', verbosity=1)
             #self.energenie = PMSDevice('energenie', '1')
             self.device['modulator'] = modulator()
             self.device['amplifier'] = amplifier()
