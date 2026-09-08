@@ -415,6 +415,22 @@ def verify_directory(dirname):
 
     return dirname
 
+def assign_dump_dir(dump_dir):
+    '''
+    verify the directory and if not good, assign a default
+    '''
+    dump_dir = verify_directory(dump_dir)
+    if dump_dir is None and 'HOME' in os.environ.keys():
+        dump_dir = os.sep.join([os.environ['HOME'],'data'])
+        dump_dir = verify_directory(dump_dir)        
+    if dump_dir is None:
+        dump_dir = hk_dir
+        dump_dir = verify_directory(dump_dir)            
+    if dump_dir is None:
+        dump_dir = '/tmp'
+    return dump_dir
+
+
 def assign_logfile(logfile=None):
     '''
     assign a logfile in a valid directory
