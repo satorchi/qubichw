@@ -19,13 +19,12 @@ def get_calsource_info(src='calsource'):
     '''
     get the status message from the calsource server
     '''
-    cmds = ['status']
     if src.lower()=='cf' or src.lower().find('carb')>=0:
         server = cf_configuration_manager(role='bot', verbosity=0)
     else:
         server = calsource_configuration_manager(role='bot', verbosity=0)
         
-    server.send_command(cmds)
+    server.send_command('status')
     status_msg = server.listen_for_acknowledgement()
     return status_msg
 
