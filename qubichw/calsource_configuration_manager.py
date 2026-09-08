@@ -319,7 +319,7 @@ class calsource_configuration_manager():
         ack_cleaned = []
         for line in ack.decode().strip().split():
             ack_cleaned.append(line.strip())
-        self.log('\n'.join(ack_cleaned))
+        self.log('\n'.join(ack_cleaned),verbosity=1)
         return received_tstamp, ack
     
 
