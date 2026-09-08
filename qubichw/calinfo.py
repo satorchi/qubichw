@@ -98,7 +98,7 @@ def save_calsource_info(dump_dir):
     
     calinfo_list = []
     for src in ['calsource','cf']:
-        info = get_calsource_info[src]
+        info = get_calsource_info(src)
         info_txt = clean_status_message(info)
         calinfo_list.append(info_txt)
 
