@@ -27,7 +27,7 @@ from threading import Thread
 import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from satorchipy.utilities import make_errmsg
-from qubichk.utilities import get_known_hosts, hk_dir, get_myip, verify_directory, log_datefmt
+from qubichk.utilities import get_known_hosts, hk_dir, get_myip, verify_directory, assign_dump_dir, log_datefmt
 from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
 command_delimiter = ' '
 known_hosts = get_known_hosts()
@@ -376,15 +376,7 @@ class obsmount:
         '''
         open the POINTING.dat file for fast acquisition and assign the dumpfile_handle
         '''
-        dump_dir = verify_directory(dump_dir)
-        if dump_dir is None:
-            dump_dir = os.sep.join([os.environ['HOME'],'data'])
-            dump_dir = verify_directory(dump_dir)        
-        if dump_dir is None:
-            dump_dir = hk_dir
-            dump_dir = verify_directory(dump_dir)            
-        if dump_dir is None:
-            dump_dir = '/tmp'
+        dump_dir = assign_dump_dir(dump_dir)
             
         filename = os.sep.join([dump_dir,'POINTING.dat'])
         self.printmsg('pointing acquisition starting on file: %s' % filename,threshold=0)
