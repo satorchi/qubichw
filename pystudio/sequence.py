@@ -661,6 +661,10 @@ def start_acquisition(self,title=None,comment=None):
     cmd = 'DUMP=%s' % dump_dir
     ack = mount.send_request_to_rebroadcaster(cmd)
     mount.disconnect()
+
+    # save calibration information (calsource and carbon fibre)
+    calinfo_thread = Thread(target=save_calsource_info, args=(dump_dir))
+    calinfo_thread.start()
    
     self.printmsg('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
     return dataset_name
