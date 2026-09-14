@@ -475,6 +475,7 @@ class redpitaya:
         set the output load: INF or L50 (high impedence or 50 Ohm)
         '''
         if load is None: load = self.default_setting['load']
+        if not isinstance(load,str): load = str(load)
         if load.find('50')>=0: load = 'L50'
         if load.upper().find('H')>=0 or load.upper().find('INF')>=0: load = 'INF'
         cmd = 'SOUR%1i:LOAD %s' % (ch,load.upper())
@@ -577,7 +578,7 @@ class redpitaya:
                 self.log('ERROR! Invalid command: %s' % str(output))
 
         if load is not None:
-            self.set_output_load(load)
+            self.set_output_load(load,ch=channel)
 
         if not self.connection_status:
             self.log('ERROR! configure: Problem setting parameters')
