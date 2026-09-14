@@ -84,6 +84,7 @@ class redpitaya:
 
         self.connection_status = False
         self.ip = None
+        self.sock = None
         self.init(ip)
 
         return None
@@ -118,6 +119,9 @@ class redpitaya:
         '''
         connect to the RedPitaya
         '''
+        if isinstance(self.sock, socket.socket):
+            self.sock.close()
+            self.sock = None
         if ip is None: ip = self.ip
         if ip is None: ip = '192.168.2.21'
         self.ip = ip
@@ -135,6 +139,7 @@ class redpitaya:
             msg = make_errmsg('ERROR! Failed to connect to RedPitaya')
             self.log(msg,verbosity=1)
             self.connection_status = False
+            self.sock = None
             return False
         return True
 
@@ -303,7 +308,14 @@ class redpitaya:
 
         # we store the frequency commanded because the RedPitaya only returns a whole number for the frequency
         # even though the setting might have a fractional Hz
+        # 2026-09-14 15:10:30 after upgrade of the Redpitaya, the fractional frequency is returned correctly
         self.current_setting[ch]['frequency'] = freq
+
+        ack = self.send_command(cmd)
+
+        # 2026-09-14 15:11:48
+        # the frequency command does not take effect until after the TRIGGER command (?)
+        cmd = 'SOUR%1i:TR:INT:ONLY' % ch
         return self.send_command(cmd)
 
     def get_frequency(self,ch=1):
