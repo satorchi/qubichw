@@ -692,7 +692,7 @@ class redpitaya:
             return (start_tstamp,val)
         
         tstamps = start_tstamp + sample_period*np.arange(npts)/(npts-1)
-        return (tstamps,val)
+        return np.array((tstamps,val))
 
     def acq2array(self, acq_str):
         '''
