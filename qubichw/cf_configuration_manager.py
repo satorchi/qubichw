@@ -164,7 +164,7 @@ class cf_configuration_manager():
             self.device['amplifier'] = amplifier()
             self.device['cf'] = self.device['modulator']
 
-        self.log('Carbon Fibre Configuration: I am %s as the %s' % (self.hostname,self.role))
+        self.log('Carbon Fibre Configuration: I am %s as the %s' % (self.hostname,self.role), verbosity=1)
         return None
 
     def parse_command_string(self,cmdstr):
