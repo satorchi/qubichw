@@ -19,7 +19,9 @@ LOCAL_DATASET_DIR=/home/qubic/data
 #QS_DIR=pi@cam2:/qs2 
 #QS_DIR=/qs # 2021-11-30 11:52:06 back to samba mount on qubic-central
 # 2025-05-14 18:55:52:  new QubicStudio computer
-QS_DIR=pi@qsbridge:/qs3 
+#QS_DIR=pi@qsbridge:/qs3 
+# 2026-09-19:  the qsbridge RaspberryPi dropped out of the network
+QS_DIR=/qs
 
 #HWP_DIR=pi@hwp:/home/pi/HWP_QUBIC
 HWP_DIR=pi@hwp:/home/pi/hwpctl
