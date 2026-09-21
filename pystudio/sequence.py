@@ -20,11 +20,11 @@ from threading import Thread
 
 from satorchipy.datefunctions import utcnow, str2dt
 
-from .utilities import wait_for_start_time
+from .utilities import wait_for_start_time, save_comment
 
 from qubichk.imacrt import iMACRT
 from qubichk.obsmount import obsmount
-from qubichk.utilities import read_DACoffsetTables, shellcommand, verify_directory, get_dataset_list
+from qubichk.utilities import read_DACoffsetTables, get_dataset_list
 from qubichk.entropy_hk import entropy_hk
 from qubichk.hwp import hwp_goto_position, get_hwp_info
 from qubichw.calinfo import save_calsource_info
@@ -661,6 +661,9 @@ def start_acquisition(self,title=None,comment=None):
     cmd = 'DUMP=%s' % dump_dir
     ack = mount.send_request_to_rebroadcaster(cmd)
     mount.disconnect()
+
+    # save the comment
+    ack = save_comment(comment,dump_dir)
 
     # save calibration information (calsource and carbon fibre)
     calinfo_thread = Thread(target=save_calsource_info, args=(dump_dir,))

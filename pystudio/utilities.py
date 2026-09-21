@@ -12,7 +12,8 @@ utilities for observing scripts
 '''
 from time import sleep
 from satorchipy.datefunctions import utcnow
-from qubichk.utilities import printmsg, assign_logfile
+from qubichk.utilities import printmsg, assign_logfile, assign_dump_dir
+
 datefmt = '%Y-%m-%d %H:%M:%S'
 logfile = assign_logfile('pystudio_log.txt')
 
@@ -29,3 +30,17 @@ def wait_for_start_time(start_time):
     sleep(wait_before_start)
 
     return
+
+def save_comment(comment,dump_dir=None):
+    '''
+    open the COMMENT.txt file and save the dataset comment
+    '''
+    if comment is None: return None
+    dump_dir = assign_dump_dir(dump_dir)
+            
+    filename = os.sep.join([dump_dir,'COMMENT.txt'])
+    printmsg('COMMENT:  %s' % comment,'SCAN',logfile=logfile)
+    h = open(filename,'a')
+    h.write(comment+'\n')
+    h.close()
+    return dump_dir
