@@ -425,6 +425,7 @@ def assign_dump_dir(dump_dir_orig):
     if dump_dir is not None:
         chk = os.access(dump_dir, os.W_OK)
         if chk: return dump_dir
+        dump_dir = None
     
     if dump_dir is None and 'HOME' in os.environ.keys():
         dump_dir = os.sep.join([os.environ['HOME'],'data'])
