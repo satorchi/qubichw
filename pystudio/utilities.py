@@ -10,6 +10,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 utilities for observing scripts
 '''
+import os
 from time import sleep
 from satorchipy.datefunctions import utcnow
 from qubichk.utilities import printmsg, assign_logfile, assign_dump_dir
