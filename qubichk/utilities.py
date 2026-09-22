@@ -420,6 +420,12 @@ def assign_dump_dir(dump_dir_orig):
     verify the directory and if not good, assign a default
     '''
     dump_dir = verify_directory(dump_dir_orig)
+
+    # check if the directory is writable
+    if dump_dir is not None:
+        chk = os.access(dump_dir, os.W_OK)
+        if chk: return dump_dir
+    
     if dump_dir is None and 'HOME' in os.environ.keys():
         dump_dir = os.sep.join([os.environ['HOME'],'data'])
         dump_dir = verify_directory(dump_dir)        
