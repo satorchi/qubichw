@@ -652,12 +652,13 @@ def start_acquisition(self,title=None,comment=None):
             if delta_secs<10:
                 dataset_name = qs_dset
                 acq_start = qs_dset_date
-    
+
+    # get the directory to dump pointing data and other info
+    day_str = acq_start.strftime('%Y-%m-%d')
+    dump_dir = os.sep.join(['/home/qubic/data',day_str,dataset_name,'Hks'])
     
     # start dumping the azel data
     mount = obsmount()
-    day_str = acq_start.strftime('%Y-%m-%d')
-    dump_dir = os.sep.join(['/home/qubic/data',day_str,dataset_name,'Hks'])
     cmd = 'DUMP=%s' % dump_dir
     ack = mount.send_request_to_rebroadcaster(cmd)
     mount.disconnect()
