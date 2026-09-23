@@ -502,7 +502,10 @@ def get_dataset_list():
     '''
     get a list of datasets currently on QubicStudio
     '''
-    cmd = 'ssh qsbridge /bin/ls -1Ltd /QubicStudioData/20??-??-??/*'
+    #2026-09-23 21:36:47 we lost qsbridge on 2026-09-19
+    #cmd = 'ssh qsbridge /bin/ls -1Ltd /QubicStudioData/20??-??-??/*'
+    cmd = '/bin/ls -1Ltd /qs/Data/20??-??-??/*'
+
     out,err = shellcommand(cmd)
 
     dataset_list = []
