@@ -440,6 +440,7 @@ class calsource_configuration_manager():
                                        decimation=command[dev]['decimation'],
                                        coupling=command[dev]['coupling'],
                                        output=command[dev]['output'],
+                                       load=command[dev]['load'],
                                        channel=ch)
 
 
