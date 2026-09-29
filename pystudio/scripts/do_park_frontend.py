@@ -21,15 +21,14 @@ from qubichw.cf_configuration_manager import cf_configuration_manager
 
 def cli():
     dispatcher = pystudio()
-    dispatcher.verbosity = 1
     ack = dispatcher.subscribe_dispatcher()
     ack = dispatcher.park_frontend()
     ack = dispatcher.unsubscribe()
 
-    calsrc = calsource_configuration_manager(role='bot', verbosity=1)
+    calsrc = calsource_configuration_manager(role='bot', verbosity=0)
     ack = calsrc.send_command('calsource_150:off calsource_220:off modulator_ch1:output=off modulator_ch2:output=off')
     
-    cf = cf_configuration_manager(role='bot', verbosity=1)
+    cf = cf_configuration_manager(role='bot', verbosity=0)
     ack = cf.send_command('cf:off')
     
     return
