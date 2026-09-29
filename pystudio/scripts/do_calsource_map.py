@@ -40,6 +40,7 @@ from qubichk.obsmount import obsmount
 from qubichk.hwp import get_hwp_info, send_hwp_command, hwp_wait_for_arrival
 from qubichk.utilities import printmsg, assign_logfile
 from qubichk.imacrt import iMACRT
+from qubichw.calsource_configuration_manager import calsource_configuration_manager
 logfile = assign_logfile('pystudio_log.txt')
 
 parameterList = ['elmin',
@@ -49,16 +50,59 @@ parameterList = ['elmin',
                  'azmax',
                  'tstart',
                  'Voffset',
+                 'PID',
                  'Tbath',
                  'title',
                  'comment',
                  'velocity',
-                 'hwp_position'
+                 'hwp_position',
+                 'frequency',
+                 'modulation_frequency',
+                 'modulation_shape',
+                 'modulation_duty',
+                 'modulation_amplitude',
+                 'modulation_offset'
                  ]
 options = parseargs(sys.argv,expected_args=parameterList)
 
-    
-Tbath_precision = 0.0005
+
+def configure_calsource(frequency=None,
+                        modulation_frequency=None,
+                        modulation_shape=None,
+                        modulation_offset=None,
+                        modulation_amplitude=None,
+                        modulation_duty=None):
+    '''
+    configure the calibration source
+    '''
+    if frequency is None: frequency=150
+    if frequency>175:
+        src = 'calsource_220'
+        modulator = 'modulator_ch2'
+    else:
+        src = 'calsource_150'
+        modulator = 'modulator_ch1'
+
+    cmd_list = []
+    cmd_list.append('%s:on' % src)
+    cmd_list.append('%s:frequency=%.2f' % (src,frequency))
+
+    if modulation_frequency is not None:
+        cmd_list.append('%s:frequency=%.2f' % (modulator,modulation_frequency))
+    if modulation_shape is not None:
+        cmd_list.append('%s:shape=%s' % (modulator,modulation_shape))
+    if modulation_offset is not None:
+        cmd_list.append('%s:offset=%.2f' % (modulator,modulation_offset))
+    if modulation_amplitude is not None:
+        cmd_list.append('%s:amplitude=%.2f' % (modulator,modulation_amplitude))
+    if modulation_duty is not None:
+        cmd_list.append('%s:duty=%.2f' % (modulator,modulation_duty))
+
+    printmsg('sending command to calsource manager: %s' % cmd, 'CALSRC',logfile=logfile)
+    commander = calsource_configuration_manager(role='bot',verbosity=0)
+    ack = commander.send_command(cmd)
+    return
+
 def do_calsource_map(mount=None, dispatcher=None,
                      elmin=None,elmax=None,elstep=None,
                      azmin=None,azmax=None,
@@ -78,7 +122,7 @@ def do_calsource_map(mount=None, dispatcher=None,
         azmax        : azimuth end position
         tstart       : datetime object for start time (default is now)
         velocity     : scanning velocity (default is 1 degree per second)
-        hwp_position :
+        hwp_position : select position for HWP
     '''
     mount_failure_counter = 0
     max_fail = 100
@@ -115,7 +159,7 @@ def do_calsource_map(mount=None, dispatcher=None,
         hwp_failure_counter = 0
         
         # move HWP to desired position
-        printmsg('moving to start position %i' % hwp_pos_min, 'HWP',logfile=logfile)
+        printmsg('moving to position %i' % hwp_position, 'HWP',logfile=logfile)
         send_hwp_command('GOTO %i' % hwp_position)
         hwpinfo = hwp_wait_for_arrival(hwp_position)
 
@@ -155,48 +199,9 @@ def do_calsource_map(mount=None, dispatcher=None,
             errmsg = 'Mount did not successfully get to elevation position: %.3f degrees\n%s' % (el,azel['error'])
             printmsg(errmsg,'obsmount',logfile=logfile)
         
-        for azlimit in [azmax, azmin]:
-            ack = mount.goto_az(azlimit)
-
-            # if axis still moving, wait a bit and try again
-            if not ack['ok'] and ack['error'].find('already moving')>=0:
-                mount_failure_counter += 1
-                sleep(5)
-                ack = mount.goto_az(azlimit)
-
-            # if still not ok, try to reset
-            if not ack['ok']:
-                mount_failure_counter += 1
-                ack = mount.reset()
-                sleep(1)
-                ack = mount.goto_az(azlimit)
-                    
-            sleep(1) # wait before next command
-            azel = mount.wait_for_arrival(az=azlimit)
-            if not azel['ok']:
-                mount_failure_counter += 1
-                errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees\n%s' % (azlimit,azel['error'])
-                printmsg(errmsg,'obsmount',logfile=logfile)
-                printmsg('Azimuth scan trying to send command again','obsmount',logfile=logfile)
-                ack = mount.goto_az(azlimit)
-                azel = mount.wait_for_arrival(az=azlimit)
-
-                if not azel['ok']:
-                    mount_failure_counter += 1
-                    errmsg += ' after two attempts to send command.  Trying a reset.'
-                    printmsg(errmsg,'obsmount',logfile=logfile)
-                    ack = mount.reset()
-                    sleep(0.5)
-                    ack = mount.goto_az(azlimit)
-                    azel = mount.wait_for_arrival(az=azlimit)
-
-                    if not azel['ok']:
-                        mount_failure_counter += 1
-                        errmsg += ' Reset unsuccessful.  Aborting.'
-                        azel['error'] = errmsg
-                        # check for maximum mount failures
-                        if mount_failure_counter>max_fail: return mount.return_with_error(azel)
-                        
+        azel = mount.do_azimuth_scan(azmin,azmax,fail_count=mount_failure_counter)
+        mount_failure_counter = azel['fail_count']
+                                
         el += elstep
         now = utcnow()            
     return True
@@ -234,8 +239,21 @@ def cli():
     wait_for_start_time(start_time)
     
     #####################################
+    # configure the calibration source
+    configure_calsource(frequency=options['frequency'],
+                        modulation_frequency=options['modulation_frequency'],
+                        modulation_shape=options['modulation_shape'],
+                        modulation_offset=options['modulation_offset'],
+                        modulation_amplitude=options['modulation_amplitude'],
+                        modulation_duty=options['modulation_duty'])
+    
+    
     # setup and start the acquisition
-    dispatcher.start_observation(Voffset=options['Voffset'],Tbath=options['Tbath'],title=dataset_name,comment=comment)
+    dispatcher.start_observation(Voffset=options['Voffset'],
+                                 Tbath=options['Tbath'],
+                                 PID=options['PID'],
+                                 title=dataset_name,
+                                 comment=comment)
 
     # run the scanning sequence
     do_calsource_map(mount=mount,dispatcher=dispatcher,
