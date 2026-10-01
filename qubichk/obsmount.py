@@ -742,9 +742,36 @@ class obsmount:
         go to azimuth position in steps, and wait at each step before moving on
         '''
         azel = self.azel()
+        if not azel['ok']: self.return_with_error(azel)
+
+        az_current = azel['AZ']
+        delta = np.abs(az-az_current)
+        if delta<self.pos_margin:
+            return azel
         
-        
-        return
+        if delta<=stepsize:
+            self.goto_az(az)
+            azel = self.wait_for_arrival(az=az)
+            return azel
+
+        if az<az_current:
+            azstep = -stepsize
+        else:
+            azstep = stepsize
+
+        az_next = az_current + azstep
+        while delta>self.pos_margin:
+            self.goto_az(az_next)
+            azel = self.wait_for_arrival(az=az_next)
+            if not azel['ok']: self.return_with_error(azel)
+            az_current =azel['AZ']
+            delta = np.abs(az-az_current)                
+            if delta<stepsize:
+                az_next = az
+            else:
+                az_next += stepsize
+            sleep(pausetime)
+        return azel
 
     def goto_el(self,el):
         '''
