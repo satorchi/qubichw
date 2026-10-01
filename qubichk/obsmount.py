@@ -737,6 +737,15 @@ class obsmount:
         cmd_str = self.make_command_string('AZ','POS',az_str)
         return self.send_command(cmd_str)
 
+    def stepto_az(self,az,stepsize=2,pausetime=10):
+        '''
+        go to azimuth position in steps, and wait at each step before moving on
+        '''
+        azel = self.azel()
+        
+        
+        return
+
     def goto_el(self,el):
         '''
         send command to move to the given elevation
@@ -816,6 +825,24 @@ class obsmount:
             self.send_command(cmd_str)
         return
 
+    def azel(self):
+        '''
+        run get_azel() a few times to ensure the error is persistent
+        '''
+        tstart = utcnow().timestamp()
+        posinfo = self.get_azel()
+        
+        while not posinfo['ok']:
+            sleep(2)
+            now = utcnow().timestamp()
+            posinfo = self.get_azel()
+            time_passed = now - tstart
+            if time_passed>self.maxwait:
+                errmsg = 'Could not get AZ,EL position after having retried for %.1f seconds' % time_passed
+                posinfo['error'] = errmsg
+                return self.return_with_error(posinfo)
+        return posinfo
+
     def wait_for_arrival(self,az=None,el=None,maxwait=None):
         '''
         wait for telescope to get into requested position
@@ -841,17 +868,9 @@ class obsmount:
             val_final = el_final
 
         sleep(2)
-        azel = self.get_azel()
-        
-        while not azel['ok']:
-            sleep(2)
-            now = utcnow().timestamp()
-            azel = self.get_azel()
-            time_passed = now - tstart
-            if time_passed>maxwait:
-                errmsg = 'Could not get AZ,EL position after having retried for %.1f seconds' % time_passed
-                azel['error'] = errmsg
-                return self.return_with_error(azel)
+        azel = self.azel()
+        if not azel['ok']:
+            return self.return_with_error(azel)
         
         val = azel[key]
         val_progress = [val]
