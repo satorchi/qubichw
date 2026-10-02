@@ -1031,6 +1031,13 @@ def do_scan(self,
         self.printmsg('Did not successfully get to elevation position: %.3f degrees.' % el)
 
     #####################################
+    ## go to initial azimuth
+    azel = mount.moveto_az(azmin)
+    if not azel['ok']:
+        mount_failure_counter += 1
+        self.printmsg('Did not successfully get to starting azimuth position: %.3f degrees.' % azmin)
+
+    #####################################
     # setup and start the acquisition ###
     if new_observation:
         # start a new observation, including reseting the FLL
