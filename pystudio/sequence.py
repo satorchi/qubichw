@@ -1054,7 +1054,7 @@ def do_scan(self,
     now = utcnow()
     while now<end_time:
 
-        azel = mount.do_azimuth_scan(azmin,azmax,fail_count=mount_failure_counter)
+        azel = mount.do_azimuth_scan(azmin,azmax,azstep=azstep,pausetime=pausetime,fail_count=mount_failure_counter)
         mount_failure_counter = azel['fail_count']
         
 
