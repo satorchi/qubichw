@@ -769,7 +769,8 @@ class obsmount:
             if delta<stepsize:
                 az_next = az
             else:
-                az_next += stepsize
+                az_next += azstep
+            
             sleep(pausetime)
         return azel
 
