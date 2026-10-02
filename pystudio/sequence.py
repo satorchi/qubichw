@@ -936,7 +936,7 @@ def get_frontend_settings(self,parameterList=None):
 def do_scan(self,
             title=None,Voffset=None,Tbath=None,comment=None,
             new_observation=False,reset_fll=False,new_acquisition=False,end_acquisition=False,
-            el=None,azmin=None,azmax=None,velocity=None,
+            el=None,azmin=None,azmax=None,velocity=None,azstep=None,pausetime=None,
             tstart=None,tend=None,duration=None,
             use_hwp=None,hwp_pos_min=None,hwp_pos_max=None,hwp_settle=None):
     '''
@@ -952,6 +952,8 @@ def do_scan(self,
         el              : elevation for the scan
         azmin           : azimuth start position
         azmax           : azimuth end position
+        azstep          : if using the "stepto" function, this is the stepsize
+        pausetime       : if using the "stepto" function, this is the pause time at each step
         tstart          : datetime object for start time (default is now)
         tend            : datetime object for end time (default is defined by duration)
         duration        : duration in seconds of the scan sequence
@@ -987,7 +989,7 @@ def do_scan(self,
     if velocity is None:
         velocity = 1
     mount.set_az_speed(velocity)
-
+        
     ### HWP ###
     if use_hwp is None: use_hwp = True
     if hwp_pos_min is None: hwp_pos_min = 1

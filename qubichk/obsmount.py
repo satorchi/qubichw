@@ -773,6 +773,17 @@ class obsmount:
             sleep(pausetime)
         return azel
 
+    def moveto_az(self,az,azstepping=False):
+        '''
+        this is a wrapper to use in do_azimuth_scan
+        '''
+        if azstepping:
+            azel = self.stepto_az(az)
+        else:
+            ack = self.goto_az(az)
+            azel = self.wait_for_arrival(az=az)
+        return azel
+
     def goto_el(self,el):
         '''
         send command to move to the given elevation
@@ -1039,35 +1050,42 @@ class obsmount:
         azel['fail_count'] = fail_count        
         return azel
 
-    def do_azimuth_scan(self,azmin,azmax,fail_count=0):
+    def do_azimuth_scan(self,azmin,azmax,fail_count=0,azstep=None,pausetime=None):
         '''
         do one there-and-back scan in azimuth
-        '''
-        for azlimit in [azmax, azmin]:
-            ack = self.goto_az(azlimit)
 
+        azstepping is False by default.
+        If either azstep or pausetime is not None, then we do azstepping
+        '''
+
+        ### azimuth motion:  stepping or smooth
+        azstepping = False
+        if azstep is not None or pausetime is not None:
+            azstepping = True
+        
+        for azlimit in [azmax, azmin]:
+            azel = self.moveto_az(azlimit,azstepping)
+            
             # if axis still moving, wait a bit and try again
-            if not ack['ok'] and ack['error'].find('already moving')>=0:
+            if not azel['ok'] and azel['error'].find('already moving')>=0:
                 fail_count += 1
                 sleep(5)
-                ack = self.goto_az(azlimit)
+                azel = self.moveto_az(azlimit,azstepping)
 
             # if still not ok, try to reset
-            if not ack['ok']:
+            if not azel['ok']:
                 fail_count += 1
                 ack = self.reset()
                 sleep(1)
-                ack = self.goto_az(azlimit)
+                azel = self.moveto_az(azlimit,azstepping)
                     
             sleep(1) # wait before next command
-            azel = self.wait_for_arrival(az=azlimit)
             if not azel['ok']:
                 fail_count += 1
                 errmsg = 'Azimuth scan did not successfully get to azimuth position: %.3f degrees\n%s' % (azlimit,azel['error'])
                 self.printmsg(errmsg,threshold=0)
                 self.printmsg('Azimuth scan trying to send command again',threshold=0)
-                ack = self.goto_az(azlimit)
-                azel = self.wait_for_arrival(az=azlimit)
+                azel = self.moveto_az(azlimit,azstepping)
 
                 if not azel['ok']:
                     fail_count += 1
@@ -1075,8 +1093,7 @@ class obsmount:
                     self.printmsg(errmsg,threshold=0)
                     ack = self.reset()
                     sleep(0.5)
-                    ack = self.goto_az(azlimit)
-                    azel = self.wait_for_arrival(az=azlimit)
+                    azel = self.moveto_az(azlimit,azstepping)
 
                     if not azel['ok']:
                         fail_count += 1

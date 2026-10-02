@@ -21,6 +21,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
         el              : elevation for the scan
         azmin           : azimuth start position
         azmax           : azimuth end position
+        azstep          : if using the "stepto" function, this is the stepsize
+        pausetime       : if using the "stepto" function, this is the pause time at each step
         tstart          : datetime object for start time (default is now)
         tend            : datetime object for end time (default is defined by duration)
         duration        : duration in seconds of the scan sequence
@@ -29,6 +31,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
         hwp_settle      : settling time after HWP repositioning before continuing the scan (default: 0)
         hwp_min_pos     : minimum position for HWP cycling (default: 1)
         hwp_max_pos     : maximum position for HWP cycling (default: 6)
+
+    NOTE: for azstepping, if either azstep or pausetime is not None, then we use azstepping
 '''
 import sys
 from satorchipy.utilities import parseargs
@@ -41,6 +45,8 @@ parameterList = ['new_observation',
                  'el',
                  'azmin',
                  'azmax',
+                 'azstep',
+                 'pausetime',
                  'duration',
                  'tstart',
                  'tend',
@@ -64,7 +70,8 @@ def cli():
                        reset_fll=options['reset_fll'],
                        new_acquisition=options['new_acquisition'],
                        end_acquisition=options['end_acquisition'],
-                       el=options['el'],azmin=options['azmin'],azmax=options['azmax'],
+                       el=options['el'],
+                       azmin=options['azmin'],azmax=options['azmax'],azstep=options['azstep'],pausetime=options['pausetime'],
                        tstart=options['tstart'],tend=options['tend'],duration=options['duration'],
                        use_hwp=options['use_hwp'],hwp_pos_min=options['hwp_pos_min'],hwp_pos_max=options['hwp_pos_max'],
                        hwp_settle=options['hwp_settle'],
