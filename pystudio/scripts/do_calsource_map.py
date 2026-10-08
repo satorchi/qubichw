@@ -13,13 +13,23 @@ do scanning to make a map of the calibration source
 scan in azimuth, and then step in elevation
 
 OPTIONS:
-         elmin      : elevation start position
-         elmax      : elevation end position
-         azmin      : azimuth start position
-         azmax      : azimuth end position
-         tstart     : start time (default is now)
-         velocity   : azimuth velocity (default: 1 degree/sec)
-         title      : additional text to be added to title: calsource_map
+         elmin                : elevation start position
+         elmax                : elevation end position
+         azmin                : azimuth start position
+         azmax                : azimuth end position
+         tstart               : start time (default is now)
+         velocity             : azimuth velocity (default: 1 degree/sec)
+         title                : additional text to be added to title: calsource_map
+         comment              : free text for a comment
+         hwp_position         : HWP position during the scan (default 4)
+         use_calsource        : switch on and configure the calsource (default True)
+         frequency            : frequency of the calsource
+         modulation_frequency : modulation frequency of the calsource intensity
+         modulation_shape     : shape of the modulation (sine or square)
+         modulation_duty      : duty cycle in percent (if shape is square)
+         modulation_amplitude : amplitude of the modulation (default 1)
+         modulation_offset    : offset of the modulation (default 1)
+
 
 EXAMPLE:
 
@@ -56,6 +66,7 @@ parameterList = ['elmin',
                  'comment',
                  'velocity',
                  'hwp_position',
+                 'use_calsource',
                  'frequency',
                  'modulation_frequency',
                  'modulation_shape',
@@ -97,6 +108,8 @@ def configure_calsource(frequency=None,
         cmd_list.append('%s:amplitude=%.2f' % (modulator,modulation_amplitude))
     if modulation_duty is not None:
         cmd_list.append('%s:duty=%.2f' % (modulator,modulation_duty))
+    cmd_list.append('%s:output=on' % modulator)
+    cmd = ' '.join(cmd_list)
 
     printmsg('sending command to calsource manager: %s' % cmd, 'CALSRC',logfile=logfile)
     commander = calsource_configuration_manager(role='bot',verbosity=0)
@@ -240,12 +253,13 @@ def cli():
     
     #####################################
     # configure the calibration source
-    configure_calsource(frequency=options['frequency'],
-                        modulation_frequency=options['modulation_frequency'],
-                        modulation_shape=options['modulation_shape'],
-                        modulation_offset=options['modulation_offset'],
-                        modulation_amplitude=options['modulation_amplitude'],
-                        modulation_duty=options['modulation_duty'])
+    if options['use_calsource'] is None or options['use_calsource']:
+        configure_calsource(frequency=options['frequency'],
+                            modulation_frequency=options['modulation_frequency'],
+                            modulation_shape=options['modulation_shape'],
+                            modulation_offset=options['modulation_offset'],
+                            modulation_amplitude=options['modulation_amplitude'],
+                            modulation_duty=options['modulation_duty'])
     
     
     # setup and start the acquisition
