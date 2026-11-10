@@ -14,7 +14,7 @@ if ! ps -aux | grep "run_gps_broadcast.py" | grep -v -e grep -e SCREEN; then
 	echo "GPS broadcasting is not running";
 	screen -X -S GPS quit
 	echo "Starting a new screen and launching the broadcasting"
-	screen -S GPS -d -m python3 run_gps_broadcast.py --verbosity=1
+	screen -S GPS -d -m run_gps_broadcast.py --verbosity=1
 else
 	echo "GPS broadcasting is already running"
 fi
