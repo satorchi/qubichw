@@ -14,7 +14,7 @@ if ! ps -aux | grep "run_heater_manager.py" | grep -v -e grep -e SCREEN; then
 	echo "heater manager is not running";
 	screen -X -S heater quit
 	echo "Starting a new screen and launching the heater manager"
-	screen -S heater -d -m python3 /usr/local/bin/run_heater_manager.py --verbosity=1
+	screen -S heater -d -m python3 run_heater_manager.py --verbosity=1
 else
 	echo "heater manager is already running"
 fi

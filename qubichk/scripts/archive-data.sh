@@ -48,7 +48,7 @@ echo $ARCHIVE_HKDIR
 sudo chmod -R 1775 $ARCHIVE_HKDIR
 
 # make a tar file of the qubic-central configuration
-sudo /usr/local/bin/configfile_backup.sh
+sudo configfile_backup.sh
 
 # make a tar file of the fridge cycling scripts
 tar -cvf $ARCHIVE_DIR/fridgescripts.tar $FRIDGESCRIPTS_DIR/*.*

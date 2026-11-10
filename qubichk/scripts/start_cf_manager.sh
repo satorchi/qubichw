@@ -10,13 +10,13 @@
 # script to start carbon fibre setup manager
 # this is to be run on QUBIC PiGPS
 # the following line should appear in crontab
-# */5 * * * * /usr/local/bin/start_cf_manager.sh
+# */5 * * * * start_cf_manager.sh
 #
 if ! ps auxw | grep "f_commander.py" | grep -v -e grep -e SCREEN; then  
     echo "Carbon Fibre Manager not running";
     screen -X -S manager quit
     echo "Starting a new screen and launching the carbon fibre manager"
-    screen -S manager -d -m /usr/local/bin/cf_commander.py manager	
+    screen -S manager -d -m cf_commander.py manager	
 else
     echo "Carbon Fibre Manager already running"
 fi

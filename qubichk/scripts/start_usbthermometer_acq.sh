@@ -14,7 +14,7 @@ if ! ps -aux | grep "read_usbthermometer.py" | grep -v -e grep -e SCREEN; then
 	echo "Usbthermometer acquisition not running";
 	screen -X -S usbthermometer quit
 	echo "Starting a new screen and launching the acquisition"
-	screen -S usbthermometer -d -m /usr/local/bin/read_usbthermometer.py	
+	screen -S usbthermometer -d -m read_usbthermometer.py	
 else
 	echo "Acquisition already running"
 fi

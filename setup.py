@@ -64,7 +64,7 @@ setup(install_requires=['numpy'],
 )
 
 # install the executable scripts, if we have permission
-exec_dir_list = ['/usr/local/bin']
+exec_dir_list = []
 if 'HOME' in os.environ.keys():
     localbin = os.environ['HOME']+'/.local/bin'
     exec_dir_list.append(localbin)
