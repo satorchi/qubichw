@@ -1077,7 +1077,8 @@ def do_scan(self,
                 
             hwpinfo = hwp_goto_position(hwp_pos,fail_count=hwp_failure_counter)
             hwp_failure_counter = hwpinfo['fail_count']
-            if hwp_failure_counter > 9: use_hwp = False
+            if hwpinfo['ok']: hwp_failure_counter = 0
+            if hwp_failure_counter > 99: use_hwp = False
 
             if hwp_settle is not None and hwp_settle>0:
                 self.printmsg('waiting an extra %.1f seconds to resettle after HWP movement' % hwp_settle)
