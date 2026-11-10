@@ -509,7 +509,7 @@ class redpitaya:
         self.set_acquisition_units(self.default_setting['acquisition_units'])
         self.set_decimation(self.default_setting['decimation'])
         self.set_input_coupling(self.default_setting['coupling'],channel)
-        self.set_output_load(self.default_settings['load'],channel)
+        self.set_output_load(self.default_setting['load'],channel)
 
         # do not switch on the output by default
         # self.set_output_on(ch)
