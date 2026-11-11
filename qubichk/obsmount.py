@@ -28,7 +28,8 @@ import numpy as np
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
 from satorchipy.utilities import make_errmsg
 from qubichk.utilities import get_known_hosts, hk_dir, get_myip, verify_directory, assign_dump_dir, log_datefmt
-from qubicpack.pointing import position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
+from qubicpack.pointing import get_position_key, position_offset, STX, interpret_pointing_chunk, axis_fullname
+position_key = get_position_key()
 command_delimiter = ' '
 known_hosts = get_known_hosts()
 class obsmount:
