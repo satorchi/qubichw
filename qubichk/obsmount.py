@@ -1012,7 +1012,7 @@ class obsmount:
 
         for azlimit in [azmax, azmin]:
         
-            while (az<=azmax) and (np.abs(az-azlimit)>self.pos_margin):
+            while (np.abs(az-azmax)>self.pos_margin) and (np.abs(az-azlimit)>self.pos_margin):
                 if fail_count > max_fail:
                     azel['fail_count'] = fail_count
                     return self.return_with_error(azel)
