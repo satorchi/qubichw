@@ -748,7 +748,7 @@ def park_frontend(self):
     self.printmsg('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
     return
 
-def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None,velocity=None):
+def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None,velocity=None,ndips=None):
     '''
     do the skydip sequence
     '''
@@ -765,7 +765,7 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     self.start_observation(Voffset,Tbath,dataset_name,comment)
 
     # run the Sky Dip sequence from obsmount
-    mount.do_skydip_sequence(azstep=azstep,azmin=azmin,azmax=azmax,elmin=elmin,elmax=elmax,velocity=velocity)
+    mount.do_skydip_sequence(azstep=azstep,azmin=azmin,azmax=azmax,elmin=elmin,elmax=elmax,velocity=velocity,ndips=ndips)
     mount.disconnect()
 
     # stop the acquisition

@@ -952,7 +952,7 @@ class obsmount:
         return azel
         
     
-    def do_skydip_sequence(self,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,velocity=None):
+    def do_skydip_sequence(self,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,velocity=None,ndips=None):
         '''
         do the sky dip movements
         '''
@@ -961,6 +961,7 @@ class obsmount:
         if azmax is None:  azmax  = self.azmax
         if elmin is None:  elmin  = self.elmin
         if elmax is None:  elmax  = self.elmax
+        if ndips is None:  ndips  = 1
         if velocity is not None:
             self.set_el_speed(velocity)
         
@@ -1016,27 +1017,28 @@ class obsmount:
                     azel['fail_count'] = fail_count
                     return self.return_with_error(azel)
 
-                ack = self.goto_el(elmax)
-
-                # if axis still moving, wait a bit and try again
-                if not ack['ok'] and ack['error'].find('already moving')>=0:
-                    sleep(5)
+                for dipcounter in range(ndips):
                     ack = self.goto_el(elmax)
-                
-                sleep(1) # wait before next command
-                azel = self.wait_for_arrival(el=elmax)
-                if not azel['ok']:
-                    fail_count += 1
-                    azel['error'] = 'Did not successfully get to maximum elevation: %s' % azel['error']
-                    self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
-                ack = self.goto_el(elmin)
-                sleep(1) # wait before next command
-                azel = self.wait_for_arrival(el=elmin)
-                if not azel['ok']:
-                    fail_count += 1
-                    azel['error'] = 'Did not successfully get to minimum elevation: %s' % azel['error']
-                    self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
+                    # if axis still moving, wait a bit and try again
+                    if not ack['ok'] and ack['error'].find('already moving')>=0:
+                        sleep(5)
+                        ack = self.goto_el(elmax)
+
+                    sleep(1) # wait before next command
+                    azel = self.wait_for_arrival(el=elmax)
+                    if not azel['ok']:
+                        fail_count += 1
+                        azel['error'] = 'Did not successfully get to maximum elevation: %s' % azel['error']
+                        self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
+
+                    ack = self.goto_el(elmin)
+                    sleep(1) # wait before next command
+                    azel = self.wait_for_arrival(el=elmin)
+                    if not azel['ok']:
+                        fail_count += 1
+                        azel['error'] = 'Did not successfully get to minimum elevation: %s' % azel['error']
+                        self.printmsg('%s.  Fail count = %i' % (azel['error'],fail_count))
 
                 az += azstep
                 ack = self.goto_az(az)

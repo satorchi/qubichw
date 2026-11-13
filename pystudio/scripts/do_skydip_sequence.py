@@ -15,7 +15,9 @@ the script without arguments will use the default values
 you can change parameters on the command line:
 
 For example:
-do_skydip_sequence.py azstep=5 azmin=61 azmax=115
+do_skydip_sequence.py azstep=5 azmin=61 azmax=115 ndips=3
+
+ndips is the number of up/down at each azimuth
 
 '''
 import sys
@@ -27,6 +29,7 @@ parameterList = ['azstep',
                  'azmax',
                  'elmin',
                  'elmax',
+                 'ndips',
                  'Voffset',
                  'Tbath',
                  'comment',
@@ -44,7 +47,8 @@ def cli():
                                Voffset=options['Voffset'],
                                Tbath=options['Tbath'],
                                comment=options['comment'],
-                               velocity=options['velocity']
+                               velocity=options['velocity'],
+                               ndips=options['ndips']
                                )
 
     ack = dispatcher.unsubscribe()
