@@ -297,7 +297,7 @@ class compressor:
         retval['communication error'] = False
 
         if Pin<5.8:
-            retval['msg'] = 'WARNING! Low pressure!'
+            retval['msg'] = 'WARNING! Compressor %i: Low pressure!  %.2f bar' % (self.compressor_num,Pin)
             retval['status'] = False
             
         return retval
