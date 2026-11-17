@@ -14,10 +14,10 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
     ARGUMENTS:
         Voffset         : TES bias voltage
         Tbath           : desired TES bath temperature
-        new_observation : reconfigure and restart FLL, and start new acquisition (default: False)
+        new_observation : reconfigure and restart FLL, and start new acquisition (default: True)
         reset_fll       : same as option new_observation
-        new_acquisition : start a new acquisition (default: False)
-        end_acquisition : end acquisition after this scan (default: False)
+        new_acquisition : start a new acquisition (default: True)
+        end_acquisition : end acquisition after this scan (default: True)
         el              : elevation for the scan
         azmin           : azimuth start position
         azmax           : azimuth end position
