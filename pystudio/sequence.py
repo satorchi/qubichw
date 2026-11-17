@@ -413,7 +413,7 @@ def do_IV_measurement(self,
     # stop the FLL
     ack = self.send_stopFLL(asicNum)
 
-    self.printmsg('%s - IV measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('IV measurement completed')
     return
 
 def do_NEP_measurement(self,
@@ -442,7 +442,7 @@ def do_NEP_measurement(self,
     for Tbath in Tbath_list:
         self.do_IV_measurement(asicNum,Voffset,amplitude,undersampling,increment,Tbath,duration,comment)
 
-    self.printmsg('%s - NEP measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('NEP measurement completed')
     return
 
 
@@ -557,7 +557,7 @@ def do_SQUID_optimization(self,
         ack =self.send_Spol(asic,Spol)
         sleep(1)
     
-    self.printmsg('%s - SQUID optimization measurement completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('SQUID optimization measurement completed')
     return
 
 
@@ -670,7 +670,7 @@ def start_acquisition(self,title=None,comment=None):
     calinfo_thread = Thread(target=save_calsource_info, args=(dump_dir,))
     calinfo_thread.start()
    
-    self.printmsg('%s - %s started' % (utcnow().strftime('%Y-%m-%d %H:%M:%S'),title))
+    self.printmsg('%s started' % title)
     return dataset_name
 
 def start_observation(self,Voffset=None,Tbath=None,title=None,comment=None,FLL=True,PID=None):
@@ -702,7 +702,7 @@ def end_acquisition(self):
     # stop Az/El acquisition
     mount = obsmount()
     ans = mount.send_request_to_rebroadcaster('STOP DUMP')
-    self.printmsg('%s - acquisition ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    self.printmsg('acquisition ended')
     return
     
 
@@ -712,7 +712,7 @@ def end_observation(self):
     '''
     ack = self.end_acquisition()
     ack = self.send_stopFLL()
-    self.printmsg('%s - observation ended' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    self.printmsg('observation ended')
     return
 
 def park_frontend(self):
@@ -745,7 +745,7 @@ def park_frontend(self):
     ans = mgc.set_mgc_pid(0)
     mgc.disconnect()
     
-    self.printmsg('%s - frontend parked' % (utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+    self.printmsg('frontend parked')
     return
 
 def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elmin=None,elmax=None,comment=None,velocity=None,ndips=None):
@@ -771,7 +771,7 @@ def do_skydip(self,Voffset=None,Tbath=None,azstep=None,azmin=None,azmax=None,elm
     # stop the acquisition
     ack = self.end_observation()
     
-    self.printmsg('%s - Sky Dip completed' % utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    self.printmsg('Sky Dip completed')
     return
 
 def get_frontend_parameter(self,parm_name):
