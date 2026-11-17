@@ -935,7 +935,7 @@ def get_frontend_settings(self,parameterList=None):
 
 def do_scan(self,
             title=None,Voffset=None,Tbath=None,comment=None,
-            new_observation=None,reset_fll=None,new_acquisition=True,end_acquisition=True,
+            new_observation=None,reset_fll=None,new_acquisition=None,end_acquisition=None,
             el=None,azmin=None,azmax=None,velocity=None,azstep=None,pausetime=None,
             tstart=None,tend=None,duration=None,
             use_hwp=None,hwp_pos_min=None,hwp_pos_max=None,hwp_settle=None):
@@ -981,6 +981,9 @@ def do_scan(self,
         new_observation = True
     else:
         new_observation = new_observation or reset_fll
+
+    if new_acquisition is None: new_aqquisition = True
+    if end_acquisition is None: end_acquisition = True
 
     ### title and comment ###
     if comment is None: comment = 'scan sequence sent by pystudio'
