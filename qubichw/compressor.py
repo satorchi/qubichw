@@ -10,7 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 a class to read and command the pulse tube compressors
 '''
-import serial,sys,os,re,time
+import serial,sys,os,re
+from time import sleep
 from glob import glob
 import datetime as dt
 from qubichk.utilities import shellcommand
@@ -367,7 +368,7 @@ class compressor:
             return retval
 
         for cmdkey in ['id','temperature','pressure','status']:
-            time.sleep(0.2)
+            sleep(0.2)
             info = self.get_info(cmdkey)
             for key in info.keys():
                 retval[key] = info[key]
