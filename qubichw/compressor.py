@@ -297,7 +297,7 @@ class compressor:
         retval['communication error'] = False
 
         if Pin<5.8:
-            retval['msg'] = 'WARNING! Compressor %i: Low pressure!  %.2f bar' % (self.compressor_num,Pin)
+            retval['msg'] = 'WARNING! Compressor %i: Low pressure!  %.6f bar' % (self.compressor_num,Pin)
             retval['status'] = False
             
         return retval
@@ -410,14 +410,18 @@ class compressor:
         format the status info into a text for the log file
         '''
         now_str = utcnow().strftime('%Y-%m-%dT%H:%M:%S UT')
-        if not status['status']:
-            msg = '%s - compressor OFFLINE' % now_str
-            return msg
 
         # status() already checked that everything is okay
         msg_list = ['%s - ' % now_str]
         for key in shortlabel.keys():
-            msg_list.append('%s=%s' % (shortlabel[key],status[key]))
+            if key in status.keys():
+                msg_list.append('%s=%s' % (shortlabel[key],status[key]))
+            else:
+                msg_list.append('%s=???' % shortlabel[key])
+                
+        if not status['status']:
+            msg_list.append('OFFLINE')
+
         msg = ' '.join(msg_list)
         return msg
 
