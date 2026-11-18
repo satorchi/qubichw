@@ -10,7 +10,8 @@
 #
 # start the SimpleRTK data acquisition in a screen
 
-if ! ps -aux | grep "run_gps_acquisition.py" | grep -v -e grep -e SCREEN; then  
+if ! ps -aux | grep "run_gps_acquisition.py" | grep -v -e grep -e SCREEN; then
+        cd $HOME/data/calsource
 	echo "GPS acquisition not running";
 	screen -X -S GPS quit
 	echo "Starting a new screen and launching the acquisition"
