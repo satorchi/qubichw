@@ -305,6 +305,11 @@ class hk_broadcast :
             self.log('ERROR! Bad reply from Temperature diodes',verbosity=3)
             temperatures = -np.ones(self.hk_temperature.nT)
             data_ok = False
+
+            # reset the temperature diode object so that it tries to reconnect again the next time
+            del(self.hk_temperature)
+            self.hk_temperature = None
+
             
         for idx,val in enumerate(temperatures):
             recname = 'TEMPERATURE%02i' % (idx+1)
