@@ -11,7 +11,7 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 read the Pfeiffer pressure sensor
 '''
 import os,sys,serial
-from satorchipy.datefunctions import utcnow
+from qubichk.utilities import printmsg, assign_logfile
 
 class Pfeiffer :
 
@@ -21,6 +21,7 @@ class Pfeiffer :
         self.port=None
         self.info=None
         self.device_ok=False
+        self.logfile = assign_logfile('hk_pfeiffer.log')
 
         if port is None:
             print('NOTE: Please give a device (e.g. port="/dev/ttyUSB0")')
@@ -33,12 +34,7 @@ class Pfeiffer :
     def log(self,msg):
         '''messages to log file and to screen
         '''
-        now = utcnow()
-        logmsg = '%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h = open('hk_pfeiffer.log','a')
-        h.write(logmsg+'\n')
-        h.close()
-        print(logmsg)
+        printmsg(msg,'PFEIFFER',logfile=self.logfile)
         return
                 
     def init_Pfeiffer(self,port='/dev/pfeiffer'):
