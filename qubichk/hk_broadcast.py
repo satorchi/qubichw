@@ -20,7 +20,8 @@ from qubichk.powersupply import PowerSupply, PowerSupplies, known_supplies
 from qubichk.entropy_hk import entropy_hk
 from qubichk.temperature_hk import temperature_hk
 from qubichk.pfeiffer import Pfeiffer
-from qubichk.utilities import shellcommand, get_known_hosts, get_myip
+from qubichk.utilities import shellcommand, get_known_hosts, get_myip, printmsg, assign_logfile
+
 from qubichk.obsmount import obsmount
 from qubichk.usbthermometer_hk import usbthermometer_hk
 from qubichk.dome import get_dome_status
@@ -60,6 +61,7 @@ class hk_broadcast :
         self.hk_azel = None
         self.cryostat_temp = None
         self.verbosity_threshold = verbosity
+        self.logfile = asssign_logfile('hk_broadcast.log')
         return None
 
     def millisecond_timestamp(self):
@@ -549,13 +551,8 @@ class hk_broadcast :
         '''messages to log file and to screen
         '''
         if verbosity>self.verbosity_threshold: return
-        
-        now = utcnow()
-        logmsg = '%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h = open('hk_broadcast.log','a')
-        h.write(logmsg+'\n')
-        h.close()
-        print(logmsg)
+
+        printmsg(msg,'HK_BROADCAST',logfile=self.logfile)
         return
     
 ### end of hk_broadcast class definition
