@@ -61,7 +61,7 @@ class hk_broadcast :
         self.hk_azel = None
         self.cryostat_temp = None
         self.verbosity_threshold = verbosity
-        self.logfile = asssign_logfile('hk_broadcast.log')
+        self.logfile = assign_logfile('hk_broadcast.log')
         return None
 
     def millisecond_timestamp(self):
