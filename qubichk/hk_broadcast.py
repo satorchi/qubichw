@@ -287,6 +287,7 @@ class hk_broadcast :
         '''
         data_ok = True
 
+        roma_comm_error = False
         if self.hk_temperature is None:
             self.hk_temperature=temperature_hk(dumpraw=self.dump_diode_rawData)
 
@@ -295,9 +296,10 @@ class hk_broadcast :
             self.hk_temperature.connect()
             
         if not self.hk_temperature.connected:
-            self.log('ERROR! Temperature diodes not communicating',verbosity=3)
+            self.log('ERROR! Temperature diodes not communicating',verbosity=1)
             data_ok = False
-            temperatures = -np.ones(self.hk_temperature.nT)
+            temperatures = None
+            roma_comm_error = True
         else:
             temperatures = self.hk_temperature.get_temperatures()
 
@@ -306,10 +308,10 @@ class hk_broadcast :
             temperatures = -np.ones(self.hk_temperature.nT)
             data_ok = False
 
+        if roma_comm_error:
             # reset the temperature diode object so that it tries to reconnect again the next time
             del(self.hk_temperature)
             self.hk_temperature = None
-
             
         for idx,val in enumerate(temperatures):
             recname = 'TEMPERATURE%02i' % (idx+1)
