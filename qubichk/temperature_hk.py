@@ -23,6 +23,7 @@ from shutil import copyfile
 import numpy as np
 from scipy import interpolate
 from satorchipy.datefunctions import utcnow
+from qubichk.utilities import printmsg, assign_logfile
 
 class temperature_hk :
     ''' a class to gather temperatures from the temperature diodes
@@ -37,6 +38,7 @@ class temperature_hk :
         self.port=port
         self.dumpraw=dumpraw
         self.verbosity_threshold = verbosity
+        self.logfile = assign_logfile('hk_temperature.log')
         homedir='/home/pi'
         if 'HOME' in os.environ.keys():
             homedir=os.environ['HOME']
@@ -75,12 +77,7 @@ class temperature_hk :
         '''
         if verbosity>self.verbosity_threshold: return
         
-        now = utcnow()
-        logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h=open('hk_temperature.log','a')
-        h.write(logmsg+'\n')
-        h.close()
-        print(logmsg)
+        printmsg(msg,'ROMA DIODES',logfile=self.logfile)
         return
 
     def connect(self,port=None):
