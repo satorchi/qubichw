@@ -15,6 +15,7 @@ Mechanical heat switches
 import time,socket,re
 
 from satorchipy.datefunctions import str2dt, utcnow
+from qubichk.utilities import printmsg, assign_logfile
 
 class entropy_hk :
     def __init__(self,hostname=None):
@@ -26,6 +27,7 @@ class entropy_hk :
         self.MECH_OPEN = 0 # position of switch full open
         self.mech_idx = None
         self.verbosity = 0
+        self.logfile = assign_logfile('hk_entropy.log')
         
         if hostname is None:
             self.hostname = 'majortom'
@@ -53,12 +55,7 @@ class entropy_hk :
     def log(self,msg):
         '''messages to log file and to screen
         '''
-        now = utcnow()
-        logmsg = '%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        h = open('hk_entropy.log','a')
-        h.write(logmsg+'\n')
-        h.close()
-        print(logmsg)
+        printmsg(msg,'MAJOR TOM',logfile=self.logfile)
         return
 
     def assign_labels(self):
