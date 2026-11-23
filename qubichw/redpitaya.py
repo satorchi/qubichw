@@ -13,7 +13,7 @@ control the RedPitaya oscilloscope/signal-generator
 import time,socket,os,sys
 import numpy as np
 import datetime as dt
-from satorchipy.utilities import make_errmsg
+from satorchipy.utilities import make_errmsg, printmsg, assign_logfile
 from satorchipy.datefunctions import utcnow
 
 default_setting = {}
@@ -80,11 +80,13 @@ class redpitaya:
         initialize the RedPitaya SIGNALlab 250-12
         '''
         if verbosity is not None: self.verbosity = verbosity
+        self.logfile = assign_logfile('redpitaya_command.log')
         self.log('creating new object',verbosity=2)
 
         self.connection_status = False
         self.ip = None
         self.sock = None
+        
         self.init(ip)
 
         return None
@@ -94,15 +96,10 @@ class redpitaya:
         log message to screen and to a file
         '''
         if verbosity > self.verbosity: return
-        
-        filename = 'redpitaya_command.log'
-        fullmsg = '%s: RedPitaya - %s' % (utcnow().strftime(self.date_fmt),msg)
-        h = open(filename,'a')
-        h.write('%s\n' % fullmsg)
-        h.close()
-        print(fullmsg)
-        return
 
+        printmsg(msg,'RedPitaya',logfile=self.logfile)
+        return
+        
     def is_connected(self):
         '''
         check if RedPitaya is currently accessible
