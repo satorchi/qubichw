@@ -13,9 +13,9 @@ control the RedPitaya oscilloscope/signal-generator
 import time,socket,os,sys
 import numpy as np
 import datetime as dt
-from satorchipy.utilities import make_errmsg, printmsg, assign_logfile
+from qubichk.utilities import printmsg, assign_logfile
 from satorchipy.datefunctions import utcnow
-
+from satorchipy.utilities import make_errmsg
 default_setting = {}
 default_setting['frequency'] = 0.7
 default_setting['shape'] = 'SINE'
