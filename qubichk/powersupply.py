@@ -22,7 +22,7 @@ import numpy as np
 import readline
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
-from qubichk.utilities import shellcommand, get_fullpath, read_labels
+from qubichk.utilities import shellcommand, get_fullpath, read_labels, printmsg, assign_logfile
 from satorchipy.datefunctions import utcnow
 class PowerSupply :
 
@@ -34,7 +34,7 @@ class PowerSupply :
         self.info = None
         self.device_ok = False
         self.verbosity_threshold = verbosity
-
+        self.logfile = assign_logfile('hk_powersupply.log')
         if port is None:
             print('NOTE: Please give a device (e.g. port="/dev/ttyACM0")')
             return None
@@ -48,23 +48,7 @@ class PowerSupply :
         '''
         if verbosity>self.verbosity_threshold:
             return
-
-        if 'HOME' in os.environ.keys():
-            homedir = os.environ['HOME']
-        else:
-            homedir = '/tmp'
-        
-        logfile = homedir + os.sep + 'hk_powersupply.log'
-        
-        now = utcnow()
-        logmsg='%s | %s' % (now.strftime('%Y-%m-%d %H:%M:%S UT'),msg)
-        try:
-            h=open(logfile,'a')
-            h.write(logmsg+'\n')
-            h.close()
-        except:
-            pass
-        print(logmsg)
+        printmsg(msg,'POWERSUPPLY',logfile=self.logfile)
         return
                 
     def identify_PowerSupply(self):
