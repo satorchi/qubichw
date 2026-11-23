@@ -28,9 +28,8 @@ from qubichw.calsource_configuration_manager import calsource_configuration_mana
 from qubichk.hk_verify import check_compressors,check_diskspace
 
 from qubichk.send_telegram import get_botId,get_TelegramAddresses, get_alarm_recipients
-from qubichk.utilities import get_fullpath
+from qubichk.utilities import get_fullpath, shellcommand, printmsg, assign_logfile
 from qubichk.ups import get_ups_info
-from qubichk.utilities import shellcommand
 from qubichk.scripts.show_hk import list_hk
 
 class dummy_bot:
@@ -67,6 +66,7 @@ class qubic_bot :
     '''
 
     def __init__(self,test=False,idfile=None):
+        self.logfile = assign_logfile('bot.log')
         self.TESTMODE=test
         self.botId=None
         self.bot=None
@@ -1475,11 +1475,8 @@ class qubic_bot :
         known_users = get_TelegramAddresses()
         if self.chat_id in known_users.keys():user=known_users[self.chat_id]
         msg="%s %i %16s %s" % (now.strftime(self.time_fmt),self.chat_id, user, cmd)
-    
-        print(msg)
-        h=open('bot.log','a')
-        h.write(msg+'\n')
-        h.close()
+
+        printmsg(msg,'BOT',logfile=self.logfile)
 
         if len(cmd_list)>0:
             run_cmd = cmd_list[0].lower()
