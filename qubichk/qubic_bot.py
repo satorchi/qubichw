@@ -1474,7 +1474,7 @@ class qubic_bot :
         user='unknown'
         known_users = get_TelegramAddresses()
         if self.chat_id in known_users.keys():user=known_users[self.chat_id]
-        msg="%s %i %16s %s" % (now.strftime(self.time_fmt),self.chat_id, user, cmd)
+        msg="%i %16s %s" % (self.chat_id, user, cmd)
 
         printmsg(msg,'BOT',logfile=self.logfile)
 
