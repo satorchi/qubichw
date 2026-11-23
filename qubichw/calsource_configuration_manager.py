@@ -19,7 +19,7 @@ readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
 
 from satorchipy.datefunctions import utcnow, utcfromtimestamp
-from qubichk.utilities import shellcommand, get_myip, get_known_hosts, get_calsource_host
+from qubichk.utilities import shellcommand, get_myip, get_known_hosts, get_calsource_host, printmsg, assign_logfile
 
 known_hosts = get_known_hosts()
 
@@ -61,6 +61,8 @@ class calsource_configuration_manager():
         '''
         self.verbosity = verbosity
         self.assign_variables(role)
+        self.logfile = assign_logfile('calsource_configuration_%s.log' % self.role)
+
         if self.role == 'manager':
             self.listen_loop()
         elif self.role == 'bot':
@@ -75,12 +77,7 @@ class calsource_configuration_manager():
         log message to screen and to a file
         '''
         if verbosity > self.verbosity: return
-        
-        filename = 'calsource_configuration_%s.log' % self.role
-        h = open(filename,'a')
-        h.write('%s: %s\n' % (utcnow().strftime(self.date_fmt),msg))
-        h.close()
-        print(msg)
+        printmsg(msg,'CALSOURCE',logfile=self.logfile)
         return
 
     def command_help(self):

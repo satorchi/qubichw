@@ -29,7 +29,7 @@ from qubichk.utilities import shellcommand
 
 # the signal generator for modulating the carbon fibre
 from qubichw.modulator_siglent import siglent as modulator
-from qubichk.utilities import get_known_hosts, get_myip
+from qubichk.utilities import get_known_hosts, get_myip, printmsg, assign_logfile
 known_hosts = get_known_hosts()
 
 # the device list is the list of devices plugged into the Energenie powerbar
@@ -54,6 +54,8 @@ class cf_configuration_manager():
         '''
         self.verbosity = verbosity
         self.assign_variables(role)
+        self.logfile = assign_logfile('cf_configuration_%s.log' % self.role)
+        
         if self.role == 'manager':
             self.listen_loop()
         elif self.role == 'bot':
@@ -68,12 +70,7 @@ class cf_configuration_manager():
         log message to screen and to a file
         '''
         if verbosity > self.verbosity: return
-        
-        filename = 'cf_configuration_%s.log' % self.role
-        h = open(filename,'a')
-        h.write('%s: %s\n' % (utcnow().strftime(self.date_fmt),msg))
-        h.close()
-        print(msg)
+        printmsg(msg,'CARBFIBRE',logfile=self.logfile)
         return
 
     def command_help(self):
