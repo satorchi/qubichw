@@ -308,7 +308,7 @@ class hk_broadcast :
             temperatures = self.hk_temperature.get_temperatures()
 
         if temperatures is None:
-            self.log('ERROR! Bad reply from Temperature diodes',verbosity=1)
+            self.log('ERROR! Bad reply from Temperature diodes',verbosity=3)
             temperatures = -np.ones(self.hk_temperature.nT)
             data_ok = False
 
