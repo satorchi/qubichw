@@ -220,7 +220,7 @@ class temperature_hk :
         if a is None: return None
         data_length = len(a)
         if data_length == 0:
-            self.log('ERROR! Temperature diodes returned data length 0',verbosity=2)
+            self.log('ERROR! Temperature diodes returned data length 0',verbosity=3)
             return None
 
         datlist = a.split()
