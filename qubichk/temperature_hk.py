@@ -23,6 +23,7 @@ from shutil import copyfile
 import numpy as np
 from scipy import interpolate
 from satorchipy.datefunctions import utcnow
+from satorchipy.utilities import make_errmsg
 from qubichk.utilities import printmsg, assign_logfile
 
 class temperature_hk :
@@ -123,7 +124,9 @@ class temperature_hk :
         try:
             ans = self.ser.readline()
         except:
-            self.log("Error! Couldn't read Temperature Diode data")
+            errmsg = make_errmsg("Error! Couldn't read Temperature Diode data")
+            self.log(errmsg,verbosity=0)
+            self.disconnect()
             return None
 
         # clean the datlist from possible crap.  Sometimes the diodes return '\x00' in the middle of the number
