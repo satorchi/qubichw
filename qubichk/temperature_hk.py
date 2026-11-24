@@ -86,15 +86,15 @@ class temperature_hk :
         interface is defined in /etc/udev/rules.d/99-cryotemperature.rules
         '''
         if port is None: port=self.port
-        self.port=port
+        self.port = port
         
-        self.connected=False
+        self.connected = False
         if not os.path.exists(port):
             self.log('ERROR! Could not find the temperature device: %s' % port)
             return False
 
         try:
-            self.ser=serial.Serial(port=port, baudrate=19200, timeout=0.2)
+            self.ser = serial.Serial(port=port, baudrate=19200, timeout=0.2)
         except:
             errmsg = make_errmsg('ERROR! Could not connect to the temperature device.')
             self.log(errmsg,verbosity=0)
@@ -103,8 +103,8 @@ class temperature_hk :
         # wait for activation
         data_length = 0
         now = utcnow()
-        max_wait=dt.timedelta(seconds=30)
-        wait_endtime=now+max_wait
+        max_wait = dt.timedelta(seconds=30)
+        wait_endtime = now+max_wait
         while data_length == 0 and now < wait_endtime:
             string0 = self.device_readline()
             if string0 is None:
@@ -116,7 +116,7 @@ class temperature_hk :
                 self.log("ERROR! Timeout! Could not connect to cryo temperatures!")
                 return False
 
-        self.connected=True        
+        self.connected = True
         return True
 
     def device_readline(self):
