@@ -291,14 +291,16 @@ class hk_broadcast :
 
         roma_comm_error = False
         if self.hk_temperature is None:
-            self.hk_temperature=temperature_hk(dumpraw=self.dump_diode_rawData)
+            self.log('Creating new connection to Temperature diodes',verbosity=0)
+            self.hk_temperature = temperature_hk(dumpraw=self.dump_diode_rawData,verbosity=3)
 
         if not self.hk_temperature.connected:
             # try to reconnect
+            self.log('ERROR! Temperature diodes not connected.  Trying to re-connect...',verbosity=0)
             self.hk_temperature.connect()
             
         if not self.hk_temperature.connected:
-            self.log('ERROR! Temperature diodes not communicating',verbosity=1)
+            self.log('ERROR! Temperature diodes not communicating',verbosity=0)
             data_ok = False
             temperatures = None
             roma_comm_error = True
@@ -306,12 +308,13 @@ class hk_broadcast :
             temperatures = self.hk_temperature.get_temperatures()
 
         if temperatures is None:
-            self.log('ERROR! Bad reply from Temperature diodes',verbosity=3)
+            self.log('ERROR! Bad reply from Temperature diodes',verbosity=1)
             temperatures = -np.ones(self.hk_temperature.nT)
             data_ok = False
 
         if roma_comm_error:
             # reset the temperature diode object so that it tries to reconnect again the next time
+            self.log('ERROR! Temperature diodes not responding... re-establish at next request.',verbosity=0)
             del(self.hk_temperature)
             self.hk_temperature = None
             
