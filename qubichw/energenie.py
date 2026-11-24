@@ -12,7 +12,7 @@ control of the Energenie USB power bar.  Code originally was in hk_verify.py
 '''
 import time,re,os
 import datetime as dt
-from qubichk.utilities import shellcommand, ping
+from qubichk.utilities import shellcommand, ping, printmsg, assign_logfile
 from satorchipy.datefunctions import utcnow
 energenie_app = 'sispmctl'
 
@@ -63,6 +63,7 @@ class energenie:
         self.name = name
         self.manager = None
         self.error_message = None
+        self.logfile = assign_logfile('energenie.log')
 
         if name not in valid_names:
             msg = 'invalid Energenie identifier: %s' % name
@@ -106,12 +107,7 @@ class energenie:
         log message to screen and to a file
         '''
         if verbosity > self.verbosity: return
-        
-        filename = '%s/energenie.log' % os.environ['HOME']
-        h = open(filename,'a')
-        h.write('%s|ENERGENIE| %s\n' % (utcnow().strftime('%Y-%m-%dT%H:%M:%S'),msg))
-        h.close()
-        print(msg)
+        printmsg(msg,'ENERGENIE',logfile=self.logfile)
         return
 
 
