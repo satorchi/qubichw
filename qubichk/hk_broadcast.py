@@ -292,7 +292,7 @@ class hk_broadcast :
         roma_comm_error = False
         if self.hk_temperature is None:
             self.log('Creating new connection to Temperature diodes',verbosity=0)
-            self.hk_temperature = temperature_hk(dumpraw=self.dump_diode_rawData,verbosity=2)
+            self.hk_temperature = temperature_hk(dumpraw=self.dump_diode_rawData,verbosity=3)
 
         if not self.hk_temperature.connected:
             # try to reconnect

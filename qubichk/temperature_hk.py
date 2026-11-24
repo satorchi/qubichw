@@ -96,7 +96,8 @@ class temperature_hk :
         try:
             self.ser=serial.Serial(port=port, baudrate=19200, timeout=0.2)
         except:
-            self.log('ERROR! Could not connect to the temperature device.')
+            errmsg = make_errmsg('ERROR! Could not connect to the temperature device.')
+            self.log(errmsg,verbosity=0)
             return False
         
         # wait for activation
