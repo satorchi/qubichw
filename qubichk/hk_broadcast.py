@@ -10,7 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 class for broadcasting/receiving QUBIC Housekeeping data
 '''
-import sys,os,time,socket,struct
+import sys,os,socket,struct
+from time import sleep
 import numpy as np
 import datetime as dt
 import re
@@ -44,7 +45,8 @@ class hk_broadcast :
         # self.LISTENER = '127.0.0.1' # client listens on localhost
         self.LISTENER = get_myip()  # client listens on the appropriate network
         # self.sampling_period = 0.0 # sampling period faster while we have az,el here (2023-04-18 11:25:28)
-        self.sampling_period = 0.4 # zero sampling period is too fast for obsmount
+        # self.sampling_period = 0.4 # zero sampling period is too fast for obsmount
+        self.sampling_period = 0.8 # sampling was too fast for Roma diodes (2026-11-27 05:44:26)
         self.nENTROPY_TEMPERATURE = 8
         self.nMECH = 2
         self.nHEATER = 8 # QubicStudio is expecting 8 heaters (there are only 6)
@@ -505,7 +507,7 @@ class hk_broadcast :
             # self.log_record()
             ###################################################################################
             
-            time.sleep(self.sampling_period)
+            sleep(self.sampling_period)
             now = utcnow()
             counter+=1
 
