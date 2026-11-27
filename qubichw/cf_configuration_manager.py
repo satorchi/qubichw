@@ -194,13 +194,13 @@ class cf_configuration_manager():
 
             if cmd=='on' or cmd=='off':
                 command['all']['onoff'] = cmd
-                for dev in ['calsource','amplifier','modulator']:
+                for dev in device_list:
                     command[dev]['onoff'] = cmd
                 continue
             
             if cmd=='default':
                 command['all']['default'] = True
-                for dev in ['calsource','amplifier','modulator','cf']:
+                for dev in device_list:
                     command[dev]['default'] = True
                 continue
                                 
@@ -315,7 +315,7 @@ class cf_configuration_manager():
         reset_delta = self.energenie_timeout # minimum time to wait
         now = utcnow()
         delta = (now - self.energenie_lastcommand_date).total_seconds()
-        powerbar = energenie('calsource')
+        powerbar = energenie('cf')
 
         if delta < reset_delta:
             extra_wait = reset_delta - delta
@@ -469,29 +469,10 @@ class cf_configuration_manager():
                 else:
                     self.log('not doing anything for %s' % dev)
 
-        # do configuration command for calsource
-        dev = 'calsource'
-        parm =  'frequency'
-        if dev in command.keys():
-            if 'default' in command[dev].keys() and command[dev]['default']:
-                of = self.device[dev].set_default_settings()
-                msg += '%s:frequency=%+06fGHz' % (dev,of)
-            elif parm in command[dev].keys():
-                of = self.device[dev].set_Frequency(command[dev][parm])
-                msg = '%s:%s=%+06fGHz ' % (dev,parm,command[dev][parm])
-                if of is None:
-                    msg += 'FAILED'
-                    retval['%s state' % dev] = None
-                else:
-                    msg += 'synthesiser:frequency=%+06fGHz' % of
-                    retval['%s state' % dev] = self.device[dev].state
-            self.log(msg)
-            ack += '%s ' % msg
-                
 
         # the modulator configuration also for the carbon fibre
         if modulator_configure:
-            for dev in ['modulator','cf']:
+            for dev in ['cf']:
                 if dev not in command.keys(): continue
             
                 if 'default' in command[dev].keys() and command[dev]['default']:
