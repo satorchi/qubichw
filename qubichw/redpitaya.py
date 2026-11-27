@@ -10,7 +10,8 @@ $license: GPLv3 or later, see https://www.gnu.org/licenses/gpl-3.0.txt
 
 control the RedPitaya oscilloscope/signal-generator
 '''
-import time,socket,os,sys
+import socket,os,sys
+from time import sleep
 import numpy as np
 import datetime as dt
 from qubichk.utilities import printmsg, assign_logfile
@@ -211,7 +212,7 @@ class redpitaya:
         '''
         ans = self.send_command(cmd)
         pausetime = self.default_setting['response_delay']
-        time.sleep(pausetime)
+        sleep(pausetime)
         return self.get_response(is_string=is_string)
 
     def get_id(self):
@@ -676,9 +677,14 @@ class redpitaya:
         cmd = 'ACQ:SOUR%1i:DATA?' % ch
         self.send_command(cmd)
         pausetime = self.default_setting['response_delay']
-        time.sleep(sample_period+pausetime)
+        sleep(sample_period+pausetime)
 
-        acq_str = self.get_response(chunksize=chunksize,is_string=True)
+        acq_list = []
+        acq_response = self.get_response(chunksize=chunksize,is_string=True)
+        while acq_response is not None:
+            acq_list.append(acq_response)
+            acq_response = self.get_response(chunksize=chunksize,is_string=True)
+        acq_str = ''.join(acq_list)
 
         val = self.acq2array(acq_str)
         if val is None:
