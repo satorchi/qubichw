@@ -46,7 +46,7 @@ def parse_status_message(status_txt):
     parse the message returned from the calsource server
 
     status_txt is a string which is the clean version of the status message
-      see cleaen_status_message() above
+      see clean_status_message() above
 
     the string is a space-separated list of items:
     1. timestamp when the response was received
