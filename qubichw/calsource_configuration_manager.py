@@ -60,7 +60,6 @@ class calsource_configuration_manager():
         The "commander" sends commands via socket to the "manager"
         '''
         self.verbosity = verbosity
-        self.logfile = assign_logfile('calsource_configuration_%s.log' % self.role)
         self.assign_variables(role)
 
         if self.role == 'manager':
@@ -155,6 +154,7 @@ class calsource_configuration_manager():
             else:
                 role = 'commander'
         self.role = role
+        self.logfile = assign_logfile('calsource_configuration_%s.log' % self.role)
                 
         self.log('Calibration Source Configuration: I am %s as the %s' % (self.hostname,self.role),verbosity=1)
         
