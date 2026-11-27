@@ -215,6 +215,7 @@ class temperature_hk :
 
         if self.ser is None:
             self.log('ERROR! Please setup the Temperature Diode device.  run connect()',verbosity=2)
+            self.connected = False
             return None
         
         voltageData = []
@@ -236,10 +237,10 @@ class temperature_hk :
 
         try:
             rawData = list(map(int,datlist))
-            #self.log('temperature diode rawData length = %i' % len(rawData))
         except:
             self.log('ERROR! Bad reply from Temperature diodes: npts=%i, datlist=%s' % (npts,datlist),verbosity=1)
             return None
+        self.log('temperature diode rawData length = %i' % len(rawData),verbosity=5)
         
         for idx in range(self.nT):
             voltageData.append(rawData[idx+1]*self.gain[idx]+self.offset[idx])
