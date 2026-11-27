@@ -53,8 +53,8 @@ class cf_configuration_manager():
         The "commander" sends commands via socket to the "manager"
         '''
         self.verbosity = verbosity
-        self.assign_variables(role)
         self.logfile = assign_logfile('cf_configuration_%s.log' % self.role)
+        self.assign_variables(role)
         
         if self.role == 'manager':
             self.listen_loop()
